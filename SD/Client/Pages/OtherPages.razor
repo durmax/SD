@@ -1,0 +1,35 @@
+﻿@inherits OtherPagesBase
+
+
+@if (!Collapsed && !string.IsNullOrEmpty(Word) && opRes == null)
+{
+    <b> Loading... </b>
+}
+else
+{
+    <div class="card">
+
+        <a class="btn btn-link text-left text-info" @onclick="GetP">
+            See @Word in other Dictionaries...  <span class="float-right  @(Collapsed? "oi oi-collapse-down" : "oi oi-collapse-up")"></span>
+        </a>
+        <div class=@(Collapsed? "collapse" : "")>
+            <div class="card-body">
+
+                @if (opRes != null)
+                {
+                    <ul>
+                        @foreach (var otherPage in opRes)
+                        {
+                            <li>
+                                <a href="@otherPage.Link" target="popup" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
+                                    @otherPage.Host (@Word)
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+
+}

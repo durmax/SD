@@ -1,7 +1,46 @@
 ﻿@page "/"
+@inherits IndexBase
 
-<h1>Hello, world!</h1>
+<h1>Hello,</h1>
+            Welcome to your SmartDict app.
+<br />
 
-Welcome to your new app.
+<div class="input-group mb-3">
+    <select class="custom-select" @bind="FLangCode">
+        <option selected>Choose...</option>
+        @foreach (var lang in langCodeService.Langs)
+        {
+            <option value="@lang.Key">@lang.Value</option>
+        }
+    </select>
+    <div class="input-group-prepend">
+        <button class="input-group-text" @onclick="Reverse"> <i class="fa fa-arrows-h" aria-hidden="true"></i></button>
+    </div>
+    <select class="custom-select" @bind="TLangCode">
+        <option selected>Choose...</option>
+        @foreach (var lang in langCodeService.Langs)
+        {
+            <option value="@lang.Key">@lang.Value</option>
+        }
+    </select>
+</div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<br />
+
+<div class="input-group mb-3">
+    <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Search for word</span>
+    </div>
+    <input type="text" class="form-control" placeholder="Search for word"
+           aria-label="Search for word" aria-describedby="basic-addon1"
+           @bind-value="Word" />
+</div>
+
+<br />
+<OtherPages FLangCode="@FLangCode" TLangCode="@TLangCode" Word="@Word" Collapsed="false"></OtherPages>
+<br />
+
+
+<SurveyPrompt Title="How is SmartDict working for you?" />
+
+

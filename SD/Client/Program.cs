@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using System.Text;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Blazored.LocalStorage;
+using SD.Client.Services;
+using SD.Client.Models;
 
 namespace SD.Client
 {
@@ -15,14 +18,21 @@ namespace SD.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
 
-            builder.Services.AddSingleton(new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddSingleton(new HttpClient { BaseAddress = new Uri("https://localhost:44322/") });
             builder.Services.AddMsalAuthentication(options =>
             {
                 var authentication = options.ProviderOptions.Authentication;
-                authentication.Authority = "https://login.microsoftonline.com/22222222-2222-2222-2222-222222222222";
-                authentication.ClientId = "33333333-3333-3333-33333333333333333";
+                authentication.Authority = "https://login.microsoftonline.com/common";
+                authentication.ClientId = "c7b4ae4a-ce9a-42aa-ad16-1c6f94c9a003";
             });
 
+            builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddSingleton<LangCodeService>();
+            builder.Services.AddTransient<UriService>();
+            builder.Services.AddTransient<LinkModel>();
+            builder.Services.AddTransient<LinkParam>();
+
+            builder.Services.AddTransient<OtherPageService>();
             await builder.Build().RunAsync();
         }
     }

@@ -52,7 +52,8 @@ namespace sd.Api
 
             app.UseCors(builder =>
             {
-                builder.WithOrigins("https://localhost:44331")
+                builder.WithOrigins("https://localhost:44331",
+                    "https://elastic-shockley-2de608.netlify.app")
                        .WithMethods("GET", "POST")
                        .AllowAnyHeader();
             });

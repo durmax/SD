@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,13 +17,13 @@ namespace sd.Api.Controllers
             _otherPageService = otherPageService;
         }
 
-        // GET: api/OtherPage/door/en/ar/de
+        // GET: api/OtherPage/ar/de
         [HttpGet("{fromLangCode}/{toLangCode}")]
-        public async Task<ActionResult<OtherPageResModel>> GetLinks(string fromLangCode, string toLangCode)  
+        public async Task<ActionResult<OtherPageResModel>> GetLinks(string fromLangCode, string toLangCode)
         {
             try
             {
-                return Ok(await _otherPageService.GetOPResModels(fromLangCode, toLangCode));  
+                return Ok(await _otherPageService.GetOPResModels(fromLangCode, toLangCode));
             }
             catch (Exception ex)
             {
@@ -33,13 +32,13 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("GetById")]
-        public async Task<ActionResult<OtherPageModel>> GetById(TransObj transObj)
+        [HttpGet]
+        [Route("GetById/{id}")]
+        public async Task<ActionResult<OtherPageModel>> GetById(string id)
         {
             try
             {
-                var result = await _otherPageService.GetOtherPageById(transObj);
+                var result = await _otherPageService.GetOtherPageById(id);
                 if (result == null) return NotFound();
                 return result;
             }
@@ -52,7 +51,7 @@ namespace sd.Api.Controllers
 
         [HttpPost]
         [Route("Create")]
-        public async Task<ActionResult<TransObj>> Create(OtherPageModel page)
+        public async Task<IActionResult> Create(OtherPageModel page)
         {
             try
             {
@@ -60,7 +59,16 @@ namespace sd.Api.Controllers
                     return BadRequest();
 
                 TransObj status = await _otherPageService.RegisterOtherPage(page);
-                return Ok(status);
+                if (status.BoolVar)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error creating new page record");
+                }
+
 
             }
             catch (Exception)
@@ -71,16 +79,22 @@ namespace sd.Api.Controllers
         }
 
 
-        [HttpPut("Update/{id}")]
-        public async Task<ActionResult<TransObj>> UpdateOtherPage(string id, OtherPageModel updatedPage)
+        [HttpPost]
+        [Route("Update")]
+        public async Task<IActionResult> UpdateOtherPage(OtherPageModel updatedPage)
         {
-            if (id != updatedPage.OtherPageId)
-            {
-                return NotFound(new TransObj { BoolVar = false, SetringVar = $"Sorry, update error." });
-            }
             try
             {
-                return Ok(await _otherPageService.UpdateOtherPage(id, updatedPage));
+                TransObj status = await _otherPageService.UpdateOtherPage(updatedPage.OtherPageId, updatedPage);
+                if (status.BoolVar)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                    status.SetringVar);
+                }
             }
             catch (Exception ex)
             {
@@ -94,8 +108,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                TransObj transObj = new TransObj() { SetringVar = id };
-                OtherPageModel pageToDelete = await _otherPageService.GetOtherPageById(transObj);
+                OtherPageModel pageToDelete = await _otherPageService.GetOtherPageById(id);
 
                 if (pageToDelete == null)
                 {

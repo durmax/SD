@@ -53,7 +53,8 @@ namespace sd.Api
             app.UseCors(builder =>
             {
                 builder.WithOrigins("https://localhost:44331",
-                    "https://elastic-shockley-2de608.netlify.app")
+                    "https://lingoclub.netlify.app",
+                    "https://lingoclub.net")
                        .WithMethods("GET", "POST")
                        .AllowAnyHeader();
             });

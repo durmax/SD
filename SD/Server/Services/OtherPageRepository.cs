@@ -46,9 +46,9 @@ namespace sd.Api.Services
             return res;
         }
 
-        public async Task<OtherPageModel> GetOtherPageById(TransObj status)
+        public async Task<OtherPageModel> GetOtherPageById(string id)
         {
-            return await _context.OtherPages.Find<OtherPageModel>(u => u.OtherPageId == status.SetringVar).FirstOrDefaultAsync();
+            return await _context.OtherPages.Find<OtherPageModel>(u => u.OtherPageId == id).FirstOrDefaultAsync();
         }
         async Task<IEnumerable<OtherPageModel>> FilterByLangs(string fromLang, string toLang)
         {

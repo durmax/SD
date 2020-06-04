@@ -1,10 +1,6 @@
 ﻿@page "/"
 @inherits IndexBase
 
-<h1>Hello,</h1>
-            Welcome to your SmartDict app.
-<br />
-
 <div class="input-group mb-3">
     <select class="custom-select" @bind="FLangCode">
         <option selected>Choose...</option>
@@ -38,9 +34,3 @@
 
 <br />
 <OtherPages FLangCode="@FLangCode" TLangCode="@TLangCode" Word="@Word" Collapsed="false"></OtherPages>
-<br />
-
-
-<SurveyPrompt Title="How is SmartDict working for you?" />
-
-

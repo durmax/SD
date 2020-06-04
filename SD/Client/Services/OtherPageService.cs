@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using SD.Client.Models;
 using SD.Shared;
 using System.Collections.Generic;
@@ -69,5 +70,24 @@ namespace SD.Client.Services
             return res;
         }
 
+        public async Task<OtherPageModel> GetOtherPageById(string id)
+        {
+            return await _httpClient.GetFromJsonAsync<OtherPageModel>($"api/OtherPage/GetById/{id}");
+        }
+
+        public async Task<HttpResponseMessage> RegisterOtherPage(OtherPageModel otherPage)
+        {
+            return await _httpClient.PostAsJsonAsync("api/OtherPage/Create", otherPage);
+        }
+
+        public async Task<HttpResponseMessage> RemoveOtherPage(string id)
+        {
+            return await _httpClient.DeleteAsync($"api/OtherPage/?id={id}");
+        }
+
+        public async Task<HttpResponseMessage> UpdateOtherPage(OtherPageModel newOtherPage)
+        {
+            return await _httpClient.PostAsJsonAsync("api/OtherPage/Update", newOtherPage);
+        }
     }
 }

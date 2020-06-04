@@ -21,7 +21,7 @@ else
                         @foreach (var otherPage in opRes)
                         {
                             <li>
-                                <a href="@otherPage.Link" target="popup" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
+                                <a href="@otherPage.Link" target="popup" class="btn btn-link" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
                                     @otherPage.Host (@Word)
                                 </a>
                             </li>

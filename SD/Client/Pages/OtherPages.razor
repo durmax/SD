@@ -3,33 +3,67 @@
 
 @if (!Collapsed && !string.IsNullOrEmpty(Word) && opRes == null)
 {
-    <b> Loading... </b>
+<b> Loading... </b>
 }
 else
 {
-    <div class="card">
+<div class="card">
 
-        <a class="btn btn-link text-left text-info" @onclick="GetP">
-            See @Word in other Dictionaries...  <span class="float-right  @(Collapsed? "oi oi-collapse-down" : "oi oi-collapse-up")"></span>
-        </a>
-        <div class=@(Collapsed? "collapse" : "")>
-            <div class="card-body">
+    <a class="btn btn-link text-left text-info" @onclick="GetP">
+        See @Word in other Dictionaries...  <span class="float-right  @(Collapsed? "oi oi-collapse-down" : "oi oi-collapse-up")"></span>
+    </a>
+    <div class=@(Collapsed? "collapse" : "")>
+        <div class="card-body">
 
-                @if (opRes != null)
-                {
-                    <ul>
-                        @foreach (var otherPage in opRes)
+            @if (opRes != null)
+            {
+                <div class="list-group pb-2">
+                    @foreach (var otherPage in opRes)
+                    {
+                        @if (otherPage.Type == "Dict")
                         {
-                            <li>
-                                <a href="@otherPage.Link" target="popup" class="btn btn-link" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
-                                    @otherPage.Host (@Word)
-                                </a>
-                            </li>
+                            <a href="@otherPage.Link" target="popup" class="list-group-item list-group-item-action" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
+                                @otherPage.Host
+                            </a>
                         }
-                    </ul>
-                }
-            </div>
+                    }
+                </div>
+                <div class="list-group pb-2">
+                    @foreach (var otherPage in opRes)
+                    {
+                        @if (otherPage.Type == "Trans")
+                        {
+                            <a href="@otherPage.Link" target="popup" class="list-group-item list-group-item-action" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
+                                @otherPage.Host
+                            </a>
+                        }
+                    }
+                </div>
+                <div class="list-group pb-2">
+                    @foreach (var otherPage in opRes)
+                    {
+                        @if (otherPage.Type == "Vocab")
+                        {
+                            <a href="@otherPage.Link" target="popup" class="list-group-item list-group-item-action" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
+                                @otherPage.Host
+                            </a>
+                        }
+                    }
+                </div>
+                <div class="list-group pb-2">
+                    @foreach (var otherPage in opRes)
+                    {
+                        @if (otherPage.Type == "Search")
+                        {
+                            <a href="@otherPage.Link" target="popup" class="list-group-item list-group-item-action" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
+                                @otherPage.Host
+                            </a>
+                        }
+                    }
+                </div>
+            }
         </div>
     </div>
+</div>
 
 }

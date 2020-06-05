@@ -11,10 +11,6 @@ namespace SD.Client.Pages
         [Inject]
         protected OtherPageService OtherPageService { get; set; }
 
-        //[Inject]
-        //public HttpClient _httpClient { get; set; }
-
-
         protected IEnumerable<OtherPageResModel> otherPageModels;
         protected IEnumerable<OtherPageResModel> opRes;
 
@@ -60,8 +56,8 @@ namespace SD.Client.Pages
             Collapsed = (Collapsed) ? false : true;
             if (opRes == null)
             {
-            await GetOpRes(); 
-            } 
+                await GetOpRes();
+            }
         }
 
         protected async Task GetOpRes()
@@ -90,7 +86,7 @@ namespace SD.Client.Pages
         }
         protected override async Task OnParametersSetAsync()
         {
-            opRes =null;
+            opRes = null;
             await GetOpRes();
         }
 

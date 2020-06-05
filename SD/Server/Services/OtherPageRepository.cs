@@ -52,30 +52,12 @@ namespace sd.Api.Services
         }
         async Task<IEnumerable<OtherPageModel>> FilterByLangs(string fromLang, string toLang)
         {
-           // var DictBuilder = Builders<OtherPageModel>.Filter;
-           // var DictFilter =
-
-           //     (DictBuilder.ElemMatch<OtherPageModel>("PrimLangs", fromLang)) ||(DictBuilder.ElemMatch<OtherPageModel> ("PrimLangs", fromLang)) 
-                
-           //     ;
-
-           //     //(DictBuilder.Matches("PrimLangs", fromLang) & DictBuilder.Matches("SecLangs", toLang))
-           //     //| (DictBuilder.AnyEq(f => f.PrimLangs, toLang) & DictBuilder.AnyEq(f => f.SecLangs, fromLang))
-           //     //| DictBuilder.AnyEq(f => f.PrimLangs, "All");
-
-
-           // var filter = DictFilter;// | VokFilter;
-
-           //// return await _context.OtherPages.Find(filter).ToListAsync();
 
             return await _context.OtherPages.AsQueryable<OtherPageModel>()
                .Where(o =>
-                  o.PrimLangs == "All"
-               || o.SecLangs == "All"
-               || o.PrimLangs.Contains(fromLang)
-               || o.PrimLangs.Contains(toLang)
-               || o.SecLangs.Contains(fromLang)
-               || o.SecLangs.Contains(toLang)
+                  (o.PrimLangs == "All" && o.SecLangs == "All")
+               || (o.PrimLangs.Contains(fromLang) && (o.SecLangs.Contains(toLang) || o.SecLangs == "All"))
+               || (o.PrimLangs.Contains(toLang) && o.SecLangs.Contains(fromLang))
                    ).ToListAsync();
         }
 

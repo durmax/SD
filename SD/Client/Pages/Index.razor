@@ -1,36 +1,50 @@
 ﻿@page "/"
 @inherits IndexBase
+@using Blazored.Typeahead
 
-<div class="input-group mb-3">
-    <select class="custom-select" @bind="FLangCode">
-        <option selected>Choose...</option>
-        @foreach (var lang in langCodeService.Langs)
-        {
-            <option value="@lang.Key">@lang.Value</option>
-        }
-    </select>
-    <div class="input-group-prepend">
-        <button class="input-group-text" @onclick="Reverse"> <i class="fa fa-arrows-h" aria-hidden="true"></i></button>
+
+    <div class="container">
+        <div class="row no-gutters">
+            <div class="col-5">
+                <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedFL">
+                    <SelectedTemplate>
+                        @context.Value
+                    </SelectedTemplate>
+                    <ResultTemplate>
+                        @context.Value
+                    </ResultTemplate>
+                </BlazoredTypeahead>
+            </div>
+
+            <div class="col-auto">
+                <button class="btn btn-primary" @onclick="Reverse"> <i class="fa fa-arrows-h" aria-hidden="true"></i>=></button>
+            </div>
+            <div class="col-5">
+                <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedTL">
+                    <SelectedTemplate>
+                        @context.Value
+                    </SelectedTemplate>
+                    <ResultTemplate>
+                        @context.Value
+                    </ResultTemplate>
+                </BlazoredTypeahead>
+            </div>
+        </div>
     </div>
-    <select class="custom-select" @bind="TLangCode">
-        <option selected>Choose...</option>
-        @foreach (var lang in langCodeService.Langs)
-        {
-            <option value="@lang.Key">@lang.Value</option>
-        }
-    </select>
-</div>
 
-<br />
+    <br />
 
-<div class="input-group mb-3">
-    <div class="input-group-prepend">
-        <span class="input-group-text" id="basic-addon1">Search for word</span>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">Search for word</span>
+        </div>
+        <input type="text" class="form-control" placeholder="Search for word"
+               aria-label="Search for word" aria-describedby="basic-addon1"
+               @bind-value="Word" />
     </div>
-    <input type="text" class="form-control" placeholder="Search for word"
-           aria-label="Search for word" aria-describedby="basic-addon1"
-           @bind-value="Word" />
-</div>
 
-<br />
-<OtherPages FLangCode="@FLangCode" TLangCode="@TLangCode" Word="@Word" Collapsed="false"></OtherPages>
+    <br />
+    @if (SelectedFL != null && SelectedTL != null)
+{
+    <OtherPages FLangCode="@SelectedFL.Key" TLangCode="@SelectedTL.Key" Word="@Word" Collapsed="false"></OtherPages>
+}

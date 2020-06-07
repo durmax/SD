@@ -62,9 +62,9 @@ namespace SD.Client.Pages
 
         protected async Task GetOpRes()
         {
-            if (!Collapsed && !string.IsNullOrEmpty(Word))
+            if (!Collapsed)
             {
-                if ((langChanged || otherPageModels == null))
+                if (langChanged || otherPageModels == null)
                 {
                     otherPageModels = null;
                     opRes = null;

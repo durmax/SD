@@ -4,62 +4,94 @@ using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Linq;
+using SD.Client.Models;
 
 namespace SD.Client.Pages
 {
     public class IndexBase : ComponentBase
     {
-        //[Inject]
-        //public AuthenticationStateProvider AuthenticationStateProvider { set; get; }
+
         [Inject]
-        protected LangCodeService langCodeService { get; set; }
+        protected LangCodeService LangCodeService { get; set; }
 
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
 
 
-        private string fLang;
-        private string tLang;
-        protected string FLangCode
+        private LangCode SFL;
+        private LangCode STL;
+
+        protected LangCode SelectedFL
         {
-            get { return fLang; }
-            set {
-                fLang = value;
-                LocalStorageService.SetItemAsync("FLang", FLangCode);
-            }
-        }
-        protected string TLangCode
-        {
-            get { return tLang; }
+            get { return SFL; }
             set
             {
-                tLang = value;
-                LocalStorageService.SetItemAsync("TLang", TLangCode);
+                SFL = value;
+                LocalStorageService.SetItemAsync("FLang", SelectedFL.Key);
             }
         }
+
+        protected LangCode SelectedTL
+        {
+            get { return STL; }
+            set
+            {
+                STL = value;
+                LocalStorageService.SetItemAsync("TLang", SelectedTL.Key);
+            }
+        }
+
 
         protected string Word { get; set; }
         protected void Reverse()
         {
-            string l = FLangCode;
-            FLangCode = TLangCode;
-            TLangCode = l;
+            LangCode l = SelectedFL;
+            SelectedFL = SelectedTL;
+            SelectedTL = l;
+        }
+
+
+        [Parameter] public List<LangCode> LangCodes { get; set; }
+        protected async Task<IEnumerable<LangCode>> SearchLangs(string searchText)
+        {
+            return await Task.FromResult(LangCodes.Where(x => x.Value.ToLower().Contains(searchText.ToLower())).ToList());
         }
 
         protected override async Task OnInitializedAsync()
         {
-            FLangCode = await LocalStorageService.GetItemAsync<string>("FLang");
-            TLangCode = await LocalStorageService.GetItemAsync<string>("TLang");
 
-            if (string.IsNullOrWhiteSpace(FLangCode))
-                FLangCode = "de";
+            string fl = await LocalStorageService.GetItemAsync<string>("FLang");
+            fl = (string.IsNullOrWhiteSpace(fl) || fl == "null") ? "en" : fl;
+            string tl = await LocalStorageService.GetItemAsync<string>("TLang");
+            tl = (string.IsNullOrWhiteSpace(tl) || tl == "null") ? "de" : tl;
 
-            if (string.IsNullOrWhiteSpace(TLangCode))
-                TLangCode = "en";
+            SelectedFL = new LangCode
+            {
+                Key = fl,
+                Value = LangCodeService.Langs[fl]
+            };
 
-            //TLang= string.IsNullOrWhiteSpace(TLang) ? await LocalStorageService.GetItemAsync<string>("TLang") :"en";
+            SelectedTL = new LangCode
+            {
+                Key = tl,
+                Value = LangCodeService.Langs[tl]
+            };
+
+            LangCodes = new List<LangCode>();
+            foreach (var item in LangCodeService.Langs)
+            {
+                LangCode langCode = new LangCode
+                {
+                    Key = item.Key,
+                    Value = item.Value
+                };
+
+                LangCodes.Add(langCode);
+            }
         }
-
 
     }
 }

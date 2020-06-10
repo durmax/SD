@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Linq;
 using SD.Client.Models;
+using Microsoft.JSInterop;
 
 namespace SD.Client.Pages
 {
@@ -20,6 +21,8 @@ namespace SD.Client.Pages
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
 
+        [Inject]
+        IJSRuntime JSRuntime { get; set; }
 
         private LangCode SFL;
         private LangCode STL;
@@ -46,6 +49,8 @@ namespace SD.Client.Pages
 
 
         protected string Word { get; set; }
+        protected ElementReference wordRef;
+
         protected void Reverse()
         {
             LangCode l = SelectedFL;
@@ -93,5 +98,14 @@ namespace SD.Client.Pages
             }
         }
 
+        protected async override Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+               // await JSRuntime.InvokeVoidAsync("focusElement", wordRef);
+                await JSRuntime.InvokeVoidAsync(
+    "exampleJsFunctions.focusElement", "wordId");
+            }
+        }
     }
 }

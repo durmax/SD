@@ -4,7 +4,7 @@
 
 
     <div class="container">
-        <div class="row no-gutters">
+        <div class="row">
             <div class="col-5">
                 <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedFL">
                     <SelectedTemplate>
@@ -16,7 +16,7 @@
                 </BlazoredTypeahead>
             </div>
 
-            <div class="col-auto">
+            <div class="col-2">
                 <button class="btn btn-link" @onclick="Reverse"> <i class="fas fa-exchange-alt"></i></button>
             </div>
             <div class="col-5">
@@ -30,23 +30,18 @@
                 </BlazoredTypeahead>
             </div>
         </div>
-    </div>
 
-    <br />
-
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">Search for word</span>
+        <div class="row">
+            <div class="col-12 pt-1">
+                <input type="text" class="form-control" placeholder="Search for word"
+                       aria-label="Search for word" aria-describedby="basic-addon1"
+                       id="wordId"
+                       @bind-value="Word" />
+            </div>
         </div>
-        <input type="text" class="form-control" placeholder="Search for word"
-               aria-label="Search for word" aria-describedby="basic-addon1"
-               id="wordId"
-               @ref=wordRef
-               @bind-value="Word" />
     </div>
-
-    <br />
-    @if (SelectedFL != null && SelectedTL != null)
-{
-    <OtherPages FLangCode="@SelectedFL.Key" TLangCode="@SelectedTL.Key" Word="@Word" Collapsed="false"></OtherPages>
-}
+        <br />
+        @if (SelectedFL != null && SelectedTL != null)
+        {
+            <OtherPages FLangCode="@SelectedFL.Key" TLangCode="@SelectedTL.Key" Word="@Word" Collapsed="false"></OtherPages>
+        }

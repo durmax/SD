@@ -19,8 +19,8 @@ namespace SD.Client
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddSingleton(new HttpClient {
-                BaseAddress = //new Uri("https://sdapi20200529140234.azurewebsites.net/") }); 
-                            new Uri("https://localhost:44394/") });
+                BaseAddress = new Uri("https://sdapi20200529140234.azurewebsites.net/") }); 
+                              //new Uri("https://localhost:44394/") });
            
             builder.Services.AddMsalAuthentication(options =>
             {

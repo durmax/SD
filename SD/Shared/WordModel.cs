@@ -22,6 +22,8 @@ namespace SD.Shared
         [StringLength(10)]
         public string WordLang { get; set; }
         [StringLength(10)]
+        public string ToLang { get; set; }
+        [StringLength(10)]
         public string Type { get; set; }
         public string Explain { get; set; }
         public string Meanings { get; set; }

@@ -1,0 +1,22 @@
+﻿ @using SD.Shared
+<div class="card">
+    <a class="card-header" @onclick="() => Collapsed = (Collapsed) ? false : true ">
+        <span>@word.WordLang:</span>
+        <b>@word.Title</b>
+        <span class="float-right  @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></span>
+    </a>
+    <div class=@(Collapsed ? "collapse" : "")>
+        the explaine...
+
+        <div class="card-body">
+            <OtherPages FLangCode="@word.WordLang" TLangCode="@word.ToLang" Word="@word.Title"></OtherPages>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool Collapsed = true;    // hide by default
+
+    [Parameter]
+    public WordModel word { get; set; }
+}

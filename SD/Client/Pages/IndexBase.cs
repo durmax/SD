@@ -98,6 +98,7 @@ namespace SD.Client.Pages
                     WordId = Guid.NewGuid().ToString(),
                     Title = Word,
                     WordLang = SelectedFL.Key,
+                    ToLang = SelectedTL.Key,
                     UserId = UserId,
                     CreatedAt = DateTime.Now
                 };

@@ -1,6 +1,16 @@
-﻿@inherits MyWordsBase
+﻿@page "/MyWords"
+@inherits MyWordsBase
 <h3>MyWords</h3>
 
-@code {
+@if (Words == null)
+{
+    <b>Loading...</b>
+}
+else
+{
 
+    @foreach (var word in Words)
+    {
+      <Word word="word"></Word>
+    }
 }

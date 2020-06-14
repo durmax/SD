@@ -30,6 +30,8 @@ namespace sd.Api
                                     sp.GetRequiredService<IOptions<MongodbSettings>>().Value);
 
             services.AddTransient<IOtherPageRepository, OtherPageRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IWordRepository, WordRepository>();
 
             services.AddDataProtection();
 

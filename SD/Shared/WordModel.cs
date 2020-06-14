@@ -1,15 +1,18 @@
-﻿
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace SD.Shared
 {
     public class WordModel
     {
-        [Key]
+        [BsonId]
+        [BsonRepresentation(BsonType.String)]
         public string WordId { get; set; }
-        public string UserId;
+
+        public string UserId { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         [Required]
@@ -17,10 +20,11 @@ namespace SD.Shared
         public String Title { get; set; }
 
         [StringLength(10)]
-        public string Language { get; set; }
+        public string WordLang { get; set; }
         [StringLength(10)]
         public string Type { get; set; }
         public string Explain { get; set; }
+        public string Meanings { get; set; }
 
         [StringLength(20)]
         public string Box { get; set; }

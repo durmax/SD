@@ -19,14 +19,15 @@ namespace SD.Client
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddSingleton(new HttpClient {
-                BaseAddress = new Uri("https://sdapi20200529140234.azurewebsites.net/") }); 
-                           // new Uri("https://localhost:44394/") });
+                BaseAddress = //new Uri("https://sdapi20200529140234.azurewebsites.net/") }); 
+                            new Uri("https://localhost:44394/") });
            
             builder.Services.AddMsalAuthentication(options =>
             {
                 var authentication = options.ProviderOptions.Authentication;
                 authentication.Authority = "https://login.microsoftonline.com/common";
                 authentication.ClientId = "cbae27bd-5b20-43c3-931a-c125881b56a4";
+                authentication.ValidateAuthority = true;
                 //https://docs.microsoft.com/en-us/aspnet/core/security/blazor/webassembly/standalone-with-microsoft-accounts?view=aspnetcore-3.1
             });
 
@@ -36,6 +37,8 @@ namespace SD.Client
             builder.Services.AddTransient<LinkModel>();
             builder.Services.AddTransient<LinkParam>();
             builder.Services.AddTransient<OtherPageService>();
+            builder.Services.AddTransient<UserService>();
+            builder.Services.AddTransient<WordService>();
             await builder.Build().RunAsync();
         }
     }

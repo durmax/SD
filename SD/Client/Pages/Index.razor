@@ -2,46 +2,60 @@
 @inherits IndexBase
 @using Blazored.Typeahead
 
-
-    <div class="container">
-        <div class="row">
-            <div class="col-5">
-                <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedFL">
-                    <SelectedTemplate>
-                        @context.Value
-                    </SelectedTemplate>
-                    <ResultTemplate>
-                        @context.Value
-                    </ResultTemplate>
-                </BlazoredTypeahead>
-            </div>
-
-            <div class="col-2">
-                <button class="btn btn-link" @onclick="Reverse"> <i class="fas fa-exchange-alt"></i></button>
-            </div>
-            <div class="col-5">
-                <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedTL">
-                    <SelectedTemplate>
-                        @context.Value
-                    </SelectedTemplate>
-                    <ResultTemplate>
-                        @context.Value
-                    </ResultTemplate>
-                </BlazoredTypeahead>
-            </div>
+<div class="container">
+    <div class="row">
+        <div class="col-5">
+            <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedFL">
+                <SelectedTemplate>
+                    @context.Value
+                </SelectedTemplate>
+                <ResultTemplate>
+                    @context.Value
+                </ResultTemplate>
+            </BlazoredTypeahead>
         </div>
 
-        <div class="row">
-            <div class="col-12 pt-1">
+        <div class="col-2">
+            <button class="btn btn-link" @onclick="Reverse"> <i class="fas fa-exchange-alt"></i></button>
+        </div>
+        <div class="col-5">
+            <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedTL">
+                <SelectedTemplate>
+                    @context.Value
+                </SelectedTemplate>
+                <ResultTemplate>
+                    @context.Value
+                </ResultTemplate>
+            </BlazoredTypeahead>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 pt-1">
+            <div class="input-group mb-3">
+
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <input type="checkbox">
+                    </div>
+                </div>
+
                 <input type="text" class="form-control" placeholder="Search for word"
                        aria-label="Search for word" aria-describedby="basic-addon1"
                        id="wordId"
                        @bind-value="Word" />
+
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"  @onclick="AddWord">Add</button>
+                </div>
+
             </div>
         </div>
     </div>
-        <br />
-        @if (SelectedFL != null && SelectedTL != null)
-        {
-            <OtherPages FLangCode="@SelectedFL.Key" TLangCode="@SelectedTL.Key" Word="@Word" Collapsed="false"></OtherPages>
-        }
+</div>
+
+<br />
+@if (SelectedFL != null && SelectedTL != null)
+{
+    <OtherPages FLangCode="@SelectedFL.Key" TLangCode="@SelectedTL.Key" Word="@Word" Collapsed="false"></OtherPages>
+}

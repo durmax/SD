@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Linq;
 using SD.Client.Models;
 using Microsoft.JSInterop;
+using SD.Shared;
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SD.Client.Pages
 {
@@ -23,6 +24,17 @@ namespace SD.Client.Pages
 
         [Inject]
         IJSRuntime JSRuntime { get; set; }
+
+        [Inject]
+        WordService WordService { get; set; }
+
+        [CascadingParameter]
+        private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+        [Inject]
+        NavigationManager NavigationManager { get; set; }
+
+        protected string UserId { get; set; }
 
         private LangCode SFL;
         private LangCode STL;
@@ -49,7 +61,6 @@ namespace SD.Client.Pages
 
 
         protected string Word { get; set; }
-        protected ElementReference wordRef;
 
         protected void Reverse()
         {
@@ -65,8 +76,54 @@ namespace SD.Client.Pages
             return await Task.FromResult(LangCodes.Where(x => x.Value.ToLower().Contains(searchText.ToLower())).ToList());
         }
 
+        protected async Task AddWord()
+        {
+            if (string.IsNullOrWhiteSpace(UserId))
+            {
+                var user = (await authenticationStateTask).User;
+
+                if (user.Identity.IsAuthenticated)
+                {
+                    UserId = user.FindFirst(c => c.Type == "tid")?.Value;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("authentication/login");
+                }
+            }
+            else
+            {
+                WordModel w = new WordModel
+                {
+                    WordId = Guid.NewGuid().ToString(),
+                    Title = Word,
+                    WordLang = SelectedFL.Key,
+                    UserId = UserId,
+                    CreatedAt = DateTime.Now
+                };
+                if (!string.IsNullOrWhiteSpace(w.Title))
+                {
+                    await WordService.AddWord(w);
+                }
+            }
+        }
+
+
         protected override async Task OnInitializedAsync()
         {
+            try
+            {
+                var user = (await authenticationStateTask).User;
+
+                if (user.Identity.IsAuthenticated)
+                {
+                    UserId = user.FindFirst(c => c.Type == "tid")?.Value;
+                }
+            }
+            catch
+            {
+                //NavigationManager.NavigateTo("/");
+            }
 
             string fl = await LocalStorageService.GetItemAsync<string>("FLang");
             fl = (string.IsNullOrWhiteSpace(fl) || fl == "null") ? "en" : fl;
@@ -96,13 +153,14 @@ namespace SD.Client.Pages
 
                 LangCodes.Add(langCode);
             }
+
+
         }
 
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-               // await JSRuntime.InvokeVoidAsync("focusElement", wordRef);
                 await JSRuntime.InvokeVoidAsync(
     "exampleJsFunctions.focusElement", "wordId");
             }

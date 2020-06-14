@@ -24,10 +24,11 @@ namespace SD.Client
            
             builder.Services.AddMsalAuthentication(options =>
             {
-                var authentication = options.ProviderOptions.Authentication;
-                authentication.Authority = "https://login.microsoftonline.com/common";
-                authentication.ClientId = "cbae27bd-5b20-43c3-931a-c125881b56a4";
-                authentication.ValidateAuthority = true;
+                var config = options.ProviderOptions;
+                config.Authentication.Authority = "https://login.microsoftonline.com/common";
+                config.Authentication.ClientId = "cbae27bd-5b20-43c3-931a-c125881b56a4";
+                config.Authentication.ValidateAuthority = true;
+                config.Cache.CacheLocation = "localStorage";
                 //https://docs.microsoft.com/en-us/aspnet/core/security/blazor/webassembly/standalone-with-microsoft-accounts?view=aspnetcore-3.1
             });
 

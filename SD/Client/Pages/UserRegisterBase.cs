@@ -105,6 +105,8 @@ namespace SD.Client.Pages
                 Registered = false;
                 userModel.UserId = UserId;
                 userModel.Email = Email;
+                userModel.Name = Email;
+
                 await UserData();
             }
         }

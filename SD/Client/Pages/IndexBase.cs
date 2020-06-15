@@ -10,6 +10,7 @@ using Microsoft.JSInterop;
 using SD.Shared;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 
 namespace SD.Client.Pages
 {
@@ -28,11 +29,16 @@ namespace SD.Client.Pages
         [Inject]
         WordService WordService { get; set; }
 
+        [Inject]
+        NavigationManager NavigationManager { get; set; }
+
+        [Inject]
+        public UserService UserService { set; get; }
+
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-        [Inject]
-        NavigationManager NavigationManager { get; set; }
+
 
         protected string UserId { get; set; }
 
@@ -119,6 +125,17 @@ namespace SD.Client.Pages
                 if (user.Identity.IsAuthenticated)
                 {
                     UserId = user.FindFirst(c => c.Type == "tid")?.Value;
+                    //UserModel userModel = await UserService.GetUserById(UserId);
+                    //if (userModel.UserId == null)
+                    //{
+                    UserModel userModel = new UserModel()
+                        {
+                            UserId = UserId,
+                            Email = user.FindFirst(c => c.Type == "email")?.Value,
+                            Name = user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
+                        };
+                        await UserService.AddUser(userModel);
+                   // }
                 }
             }
             catch

@@ -14,9 +14,7 @@ namespace SD.Client.Services
         private readonly HttpClient _httpClient;
         private readonly UriService _uriService;
         private LinkParam _reqLinkP;
-   
 
- 
         public OtherPageService(HttpClient http,
                                    UriService uriService,
                                    LinkParam reqLinkP)
@@ -42,7 +40,7 @@ namespace SD.Client.Services
             return OPResModels;
         }
 
-        public async Task<IEnumerable<OtherPageResModel>> MakeLinks(IEnumerable<OtherPageResModel> OtherPageModels, string word, string fromLang, string toLang)
+        public IEnumerable<OtherPageResModel> MakeLinks(IEnumerable<OtherPageResModel> OtherPageModels, string word, string fromLang, string toLang)
         {
             List<OtherPageResModel> res = new List<OtherPageResModel>();
             if (OtherPageModels != null)

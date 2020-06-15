@@ -12,6 +12,7 @@ namespace SD.Shared
         [BsonId]
         [BsonRepresentation(BsonType.String)]
         public string UserId { get; set; }
+        public string Name { get; set; }
         public DateTime CreatedAt { get; set; }
 
         [Required]

@@ -1,4 +1,6 @@
 ﻿ @using SD.Shared
+@inherits WordBase
+
 <div class="card">
     <a class="card-header" @onclick="() => Collapsed = (Collapsed) ? false : true ">
         <span>@word.WordLang:</span>
@@ -14,9 +16,3 @@
     </div>
 </div>
 
-@code {
-    private bool Collapsed = true;    // hide by default
-
-    [Parameter]
-    public WordModel word { get; set; }
-}

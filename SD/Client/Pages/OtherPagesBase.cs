@@ -71,7 +71,7 @@ namespace SD.Client.Pages
 
                     otherPageModels = await OtherPageService.GetOPResModels(FLangCode, TLangCode);
 
-                    opRes = await OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
+                    opRes =  OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
                     langChanged = false;
                 }
                 else
@@ -79,7 +79,7 @@ namespace SD.Client.Pages
                     if (!string.IsNullOrEmpty(Word) && otherPageModels != null)
                     {
                         opRes = null;
-                        opRes = await OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
+                        opRes =  OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
                     }
                 }
             }

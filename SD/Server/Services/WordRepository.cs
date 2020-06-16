@@ -43,7 +43,7 @@ namespace sd.Api.Services
         }
 
 
-        public async Task<bool> RemoveWord(string id, string userId)
+        public async Task<bool> RemoveWord(string id)
         {
             await _context.Words.DeleteOneAsync(u => u.WordId == id);
 

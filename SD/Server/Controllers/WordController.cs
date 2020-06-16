@@ -104,20 +104,13 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<IEnumerable<WordModel>>> DeleteWord(string id, string userId)
+        [HttpDelete("DeleteWord/{id}")]
+        public async Task<ActionResult<string>> DeleteWord(string id)
         {
             try
             {
-                var wordToDelete = await _wordService.GetWordById(id);
-
-                if (wordToDelete == null)
-                {
-                    return NotFound($"Word with Id = {id} not found");
-                }
-
-                await _wordService.RemoveWord(id, userId);
-                return Ok(await GetAllWords(userId));
+                await _wordService.RemoveWord(id);
+                return Ok(id);
             }
             catch (Exception)
             {

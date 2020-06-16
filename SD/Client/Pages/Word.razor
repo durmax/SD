@@ -1,15 +1,22 @@
-﻿ @using SD.Shared
+﻿
 @inherits WordBase
 
 <div class="card">
     <a class="card-header" @onclick="() => Collapsed = (Collapsed) ? false : true ">
         <span>@word.WordLang:</span>
-        <b>@word.Title</b>
+        <b style="@styleDeleted">@word.Title</b>
+        
         <span class="float-right  @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></span>
     </a>
     <div class=@(Collapsed ? "collapse" : "")>
-        the explaine...
-
+        <button type="button" class="btn btn-light @cssClassDelete " @onclick="DeleteWord">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+        
+        <div class="form-group">
+            <label for="exampleFormControlTextarea1">the explaine...</label>
+            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+        </div>
         <div class="card-body">
             <OtherPages FLangCode="@word.WordLang" TLangCode="@word.ToLang" Word="@word.Title"></OtherPages>
         </div>

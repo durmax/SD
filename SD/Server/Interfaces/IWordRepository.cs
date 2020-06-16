@@ -13,6 +13,6 @@ namespace sd.Api.Interfaces
         Task<WordModel> GetWordByText(string userId, string text);
         Task<WordModel> AddWord(WordModel word);
         Task<WordModel> UpdateWord(string id, WordModel newWord);
-        Task<bool> RemoveWord(string id, string userId);
+        Task<bool> RemoveWord(string id);
     }
 }

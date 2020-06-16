@@ -37,9 +37,9 @@ namespace SD.Client.Services
             throw new System.NotImplementedException();
         }
 
-        public async Task<bool> RemoveWord(string id)
+        public async Task<HttpResponseMessage> RemoveWord(string id)
         {
-            throw new System.NotImplementedException();
+           return await _httpClient.DeleteAsync($"api/Word/DeleteWord/{id}");
         }
 
         public async Task<WordModel> UpdateWord(string id, WordModel newWord)

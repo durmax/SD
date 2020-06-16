@@ -29,8 +29,14 @@
         <RedirectToLogin />
     </NotAuthorized>
     <Authorized>
-          authooooo
+        authooooo
         @_email
+
+        context.User.FindFirst: @context.User.FindFirst(c => c.Type == "email")?.Value
+        @if (@context.User.FindFirst(c => c.Type == "email")?.Value=="dured.maksoud@gmail.com")
+        {
+            <p>Dured Maksoud is signed in</p>
+        }
     </Authorized>
 </AuthorizeView>
 

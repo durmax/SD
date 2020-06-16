@@ -10,7 +10,7 @@ else
 <div class="card">
 
     <a class="btn btn-link text-left text-info" @onclick="GetP">
-        See @Word in other Dictionaries...  <span class="float-right  @(Collapsed? "oi oi-collapse-down" : "oi oi-collapse-up")"></span>
+        @Word @FLangCode <span class="fas fa-arrow-right"></span> @TLangCode  <span class="float-right  @(Collapsed? "oi oi-collapse-down" : "oi oi-collapse-up")"></span>
     </a>
     <div class=@(Collapsed? "collapse" : "")>
         <div class="card-body">

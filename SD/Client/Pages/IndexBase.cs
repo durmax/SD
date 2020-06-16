@@ -9,8 +9,6 @@ using SD.Client.Models;
 using Microsoft.JSInterop;
 using SD.Shared;
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Security.Claims;
 
 namespace SD.Client.Pages
 {
@@ -124,7 +122,7 @@ namespace SD.Client.Pages
 
                 if (user.Identity.IsAuthenticated)
                 {
-                    UserId = user.FindFirst(c => c.Type == "tid")?.Value;
+                    UserId = user.FindFirst(c => c.Type == "oid")?.Value;
                     //UserModel userModel = await UserService.GetUserById(UserId);
                     //if (userModel.UserId == null)
                     //{
@@ -132,7 +130,7 @@ namespace SD.Client.Pages
                         {
                             UserId = UserId,
                             Email = user.FindFirst(c => c.Type == "email")?.Value,
-                            Name = user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
+                            Name = user.Identity.Name//user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
                         };
                         await UserService.AddUser(userModel);
                    // }

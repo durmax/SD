@@ -38,7 +38,7 @@ namespace SD.Client.Pages
 
                 if (user.Identity.IsAuthenticated)
                 {
-                    UserId = user.FindFirst(c => c.Type == "tid")?.Value;
+                    UserId = user.FindFirst(c => c.Type == "oid")?.Value;
                 }
                 else
                 {

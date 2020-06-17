@@ -48,9 +48,19 @@
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="button" @onclick="AddWord">
                         <i class="fas fa-cloud-upload-alt"></i>
-                        </button>
+                    </button>
                 </div>
 
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                <label for="exampleFormControlTextarea1">the explaine...</label>
+                <textarea class="form-control" rows="3" @bind="Explain"></textarea>
             </div>
         </div>
     </div>
@@ -59,5 +69,5 @@
 <br />
 @if (SelectedFL != null && SelectedTL != null)
 {
-    <OtherPages FLangCode="@SelectedFL.Key" TLangCode="@SelectedTL.Key" Word="@Word" Collapsed="false"></OtherPages>
+<OtherPages FLangCode="@SelectedFL.Key" TLangCode="@SelectedTL.Key" Word="@Word" Collapsed="false"></OtherPages>
 }

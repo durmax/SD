@@ -66,6 +66,8 @@ namespace SD.Client.Pages
 
         protected string Word { get; set; }
 
+        protected string Explain { get; set; }
+
         protected void Reverse()
         {
             LangCode l = SelectedFL;
@@ -104,7 +106,8 @@ namespace SD.Client.Pages
                     WordLang = SelectedFL.Key,
                     ToLang = SelectedTL.Key,
                     UserId = UserId,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.Now,
+                    Explain = Explain
                 };
                 if (!string.IsNullOrWhiteSpace(w.Title))
                 {

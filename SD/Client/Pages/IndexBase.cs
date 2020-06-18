@@ -14,15 +14,11 @@ namespace SD.Client.Pages
 {
     public class IndexBase : ComponentBase
     {
-
-        [Inject]
-        protected LangCodeService LangCodeService { get; set; }
-
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
 
-        [Inject]
-        IJSRuntime JSRuntime { get; set; }
+        //[Inject]
+        //IJSRuntime JSRuntime { get; set; }
 
         [Inject]
         WordService WordService { get; set; }
@@ -37,42 +33,46 @@ namespace SD.Client.Pages
         private Task<AuthenticationState> authenticationStateTask { get; set; }
 
 
+        private string fLang;
+        private string tLang;
+
+        protected string FLangCode //{ get; set; }
+        {
+            get { return fLang; }
+            set
+            {
+                if (fLang != value)
+                {
+                    fLang = value;
+                    LocalStorageService.SetItemAsync("FLang", fLang);
+                }
+            }
+        }
+
+        protected string TLangCode // { get; set; }
+        {
+            get { return tLang; }
+            set
+            {
+                if (tLang != value)
+                {
+                    tLang = value;
+                    LocalStorageService.SetItemAsync("TLang", tLang);
+                }
+            }
+        }
+
 
         protected string UserId { get; set; }
-
-        private LangCode SFL;
-        private LangCode STL;
-
-        protected LangCode SelectedFL
-        {
-            get { return SFL; }
-            set
-            {
-                SFL = value;
-                LocalStorageService.SetItemAsync("FLang", SelectedFL.Key);
-            }
-        }
-
-        protected LangCode SelectedTL
-        {
-            get { return STL; }
-            set
-            {
-                STL = value;
-                LocalStorageService.SetItemAsync("TLang", SelectedTL.Key);
-            }
-        }
-
-
         protected string Word { get; set; }
 
         protected string Explain { get; set; }
 
         protected void Reverse()
         {
-            LangCode l = SelectedFL;
-            SelectedFL = SelectedTL;
-            SelectedTL = l;
+            string l = FLangCode;
+            FLangCode = TLangCode;
+            TLangCode = l;
         }
 
 
@@ -103,8 +103,8 @@ namespace SD.Client.Pages
                 {
                     WordId = Guid.NewGuid().ToString(),
                     Title = Word,
-                    WordLang = SelectedFL.Key,
-                    ToLang = SelectedTL.Key,
+                    WordLang = FLangCode,
+                    ToLang = TLangCode,
                     UserId = UserId,
                     CreatedAt = DateTime.Now,
                     Explain = Explain
@@ -126,9 +126,6 @@ namespace SD.Client.Pages
                 if (user.Identity.IsAuthenticated)
                 {
                     UserId = user.FindFirst(c => c.Type == "oid")?.Value;
-                    //UserModel userModel = await UserService.GetUserById(UserId);
-                    //if (userModel.UserId == null)
-                    //{
                     UserModel userModel = new UserModel()
                         {
                             UserId = UserId,
@@ -136,7 +133,6 @@ namespace SD.Client.Pages
                             Name = user.Identity.Name//user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
                         };
                         await UserService.AddUser(userModel);
-                   // }
                 }
             }
             catch
@@ -144,45 +140,24 @@ namespace SD.Client.Pages
                 //NavigationManager.NavigateTo("/");
             }
 
-            string fl = await LocalStorageService.GetItemAsync<string>("FLang");
-            fl = (string.IsNullOrWhiteSpace(fl) || fl == "null") ? "en" : fl;
-            string tl = await LocalStorageService.GetItemAsync<string>("TLang");
-            tl = (string.IsNullOrWhiteSpace(tl) || tl == "null") ? "de" : tl;
+            FLangCode = await LocalStorageService.GetItemAsync<string>("FLang");
 
-            SelectedFL = new LangCode
+            TLangCode = await LocalStorageService.GetItemAsync<string>("TLang");
+
+
+            if (string.IsNullOrWhiteSpace(FLangCode) || FLangCode == "null" || string.IsNullOrWhiteSpace(TLangCode) || TLangCode == "null")
             {
-                Key = fl,
-                Value = LangCodeService.Langs[fl]
-            };
-
-            SelectedTL = new LangCode
-            {
-                Key = tl,
-                Value = LangCodeService.Langs[tl]
-            };
-
-            LangCodes = new List<LangCode>();
-            foreach (var item in LangCodeService.Langs)
-            {
-                LangCode langCode = new LangCode
-                {
-                    Key = item.Key,
-                    Value = item.Value
-                };
-
-                LangCodes.Add(langCode);
-            }
-
-
-        }
-
-        protected async override Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                await JSRuntime.InvokeVoidAsync(
-    "exampleJsFunctions.focusElement", "wordId");
+              NavigationManager.NavigateTo("Languages");
             }
         }
+
+    //    protected async override Task OnAfterRenderAsync(bool firstRender)
+    //    {
+    //        if (firstRender)
+    //        {
+    //            await JSRuntime.InvokeVoidAsync(
+    //"exampleJsFunctions.focusElement", "wordId");
+    //        }
+    //    }
     }
 }

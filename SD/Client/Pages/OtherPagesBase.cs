@@ -13,6 +13,7 @@ namespace SD.Client.Pages
 
         protected IEnumerable<OtherPageResModel> otherPageModels;
         protected IEnumerable<OtherPageResModel> opRes;
+        protected string opFilterVal = "Dict";
 
         [Parameter]
         public bool Collapsed { get; set; } = true;    // hide by default
@@ -85,7 +86,7 @@ namespace SD.Client.Pages
             }
         }
         protected override async Task OnParametersSetAsync()
-        {
+        { 
             opRes = null;
             await GetOpRes();
         }

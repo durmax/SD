@@ -13,11 +13,14 @@
             <i class="fas fa-trash-alt"></i>
         </button>
         
-        <div class="form-group">
-            <label for="exampleFormControlTextarea1">the explaine...</label>
-            <textarea class="form-control"> @word.Explain</textarea>
-        </div>
+
         <div class="card-body">
+
+            <div class="form-group">
+                <label for="exampleFormControlTextarea1">the explaine...</label>
+                <textarea class="form-control"> @word.Explain</textarea>
+            </div>
+
             <OtherPages FLangCode="@word.WordLang" TLangCode="@word.ToLang" Word="@word.Title"></OtherPages>
         </div>
     </div>

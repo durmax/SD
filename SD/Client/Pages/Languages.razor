@@ -1,0 +1,32 @@
+﻿@page "/Languages"
+@inherits LanguagesBase
+@using Blazored.Typeahead
+
+<div class="container">
+    <div class="row">
+        <div class="col-5">
+            <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedFL">
+                <SelectedTemplate>
+                    @context.Value
+                </SelectedTemplate>
+                <ResultTemplate>
+                    @context.Value
+                </ResultTemplate>
+            </BlazoredTypeahead>
+        </div>
+
+        <div class="col-2">
+            <button class="btn btn-link" @onclick="Reverse"> <i class="fas fa-exchange-alt"></i></button>
+        </div>
+        <div class="col-5">
+            <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedTL">
+                <SelectedTemplate>
+                    @context.Value
+                </SelectedTemplate>
+                <ResultTemplate>
+                    @context.Value
+                </ResultTemplate>
+            </BlazoredTypeahead>
+        </div>
+    </div>
+</div>

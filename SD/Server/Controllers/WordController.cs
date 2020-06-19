@@ -68,7 +68,7 @@ namespace sd.Api.Controllers
 
                 if (wordToInsert.Result != null)
                 {
-                    ModelState.AddModelError("word", "You have this Word is already");
+                    ModelState.AddModelError("word", "You have this Word already");
                     return BadRequest(ModelState);
                 }
 
@@ -85,9 +85,11 @@ namespace sd.Api.Controllers
         }
 
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<WordModel>> UpdateWord(string id, WordModel updatedWord)
+        [HttpPut]
+        [Route("UpdateWord")]
+        public async Task<ActionResult<WordModel>> UpdateWord(WordModel updatedWord)
         {
+            string id = updatedWord.WordId;
             try
             {
                 var wordToUpdate = await _wordService.GetWordById(id);

@@ -57,7 +57,7 @@ namespace sd.Api
                 builder.WithOrigins("https://localhost:44331",
                     "https://lingoclub.netlify.app",
                     "https://www.lingoclub.net")
-                       .WithMethods("GET", "POST", "UPDATE", "DELETE")
+                       .WithMethods("GET", "POST", "PUT", "DELETE")
                        .AllowAnyHeader();
             });
 

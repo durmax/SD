@@ -2,27 +2,46 @@
 @inherits WordBase
 
 <div class="card">
-    <a class="card-header" @onclick="() => Collapsed = (Collapsed) ? false : true ">
-        <span>@word.WordLang:</span>
-        <b style="@styleDeleted">@word.Title</b>
-        
-        <span class="float-right  @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></span>
-    </a>
-    <div class=@(Collapsed ? "collapse" : "")>
-        <button type="button" class="btn btn-light @cssClassDelete " @onclick="DeleteWord">
-            <i class="fas fa-trash-alt"></i>
-        </button>
-        
-
-        <div class="card-body">
-
-            <div class="form-group">
-                <label for="exampleFormControlTextarea1">the explaine...</label>
-                <textarea class="form-control"> @word.Explain</textarea>
-            </div>
-
-            <OtherPages FLangCode="@word.WordLang" TLangCode="@word.ToLang" Word="@word.Title"></OtherPages>
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <button type="button" class="btn btn-outline-secondary" @onclick="Reverse">
+                <span class="pr-1">@wordModel.WordLang</span>
+            </button>
         </div>
+
+        <input type="text" class="form-control font-weight-bold" style="@styleDeleted" placeholder="Search for word"
+               id="wordId"
+               @bind-value="@wordModel.Title" />
+
+        <div class="input-group-append">
+            <button type="button" class="btn btn-outline-secondary @cssClassDelete " @onclick="DeleteWord">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+
+        <div class="input-group-append">
+            <button type="button" class="btn btn-outline-secondary" @onclick="AddWord">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </button>
+        </div>
+
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" @onclick="() => Collapsed = (Collapsed) ? false : true ">
+                <i class="float-right  @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class=@(Collapsed ? "collapse" : "card-body")>
+
+        <div class="form-group">
+            <label for="exampleFormControlTextarea1">the explaine...</label>
+            <textarea class="form-control" @bind="@wordModel.Explain"> @wordModel.Explain</textarea>
+        </div>
+        @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
+        {
+            <OtherPages FLangCode="@wordModel.WordLang" TLangCode="@wordModel.ToLang" Word="@wordModel.Title"></OtherPages>
+        }
     </div>
 </div>
 

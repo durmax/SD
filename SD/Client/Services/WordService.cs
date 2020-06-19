@@ -42,9 +42,9 @@ namespace SD.Client.Services
            return await _httpClient.DeleteAsync($"api/Word/DeleteWord/{id}");
         }
 
-        public async Task<WordModel> UpdateWord(string id, WordModel newWord)
+        public async Task<HttpResponseMessage> UpdateWord(WordModel newWord)
         {
-            throw new System.NotImplementedException();
+            return await _httpClient.PutAsJsonAsync($"api/Word/UpdateWord", newWord);
         }
     }
 }

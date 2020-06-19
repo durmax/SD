@@ -22,6 +22,7 @@ namespace SD.Client.Pages
         protected bool Collapsed = true;    // hide by default
 
         protected string UserId { get; set; }
+
         protected List<WordModel> Words { get; set; }
 
         protected async Task<List<WordModel>> GetWords()

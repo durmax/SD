@@ -1,41 +1,4 @@
 ﻿@page "/"
 @inherits IndexBase
 
-<div class="container p-0">
-    <div class="row">
-        <div class="col-12">
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <button type="button" class="btn btn-outline-secondary" @onclick="Reverse">
-                    <span class="pr-1">@FLangCode</span> <i class="fas fa-exchange-alt"></i><span class="pl-1">@TLangCode</span>
-                    </button>
-                </div>
-
-                <input type="text" class="form-control" placeholder="Search for word"
-                       id="wordId"
-                       @bind-value="Word" />
-
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" @onclick="AddWord">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                    </button>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            <div class="form-group">
-                <label for="exampleFormControlTextarea1">the explaine...</label>
-                <textarea class="form-control" rows="3" @bind="Explain"></textarea>
-            </div>
-        </div>
-    </div>
-</div>
-
-@if (!(string.IsNullOrWhiteSpace(FLangCode) || string.IsNullOrWhiteSpace(TLangCode)))
-{
-<OtherPages FLangCode="@FLangCode" TLangCode="@TLangCode" Word="@Word" Collapsed="false"></OtherPages>
-}
+    <Word wordModel="wordModel" Collapsed="false"></Word>

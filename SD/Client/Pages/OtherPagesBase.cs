@@ -16,7 +16,7 @@ namespace SD.Client.Pages
         protected string opFilterVal = "Dict";
 
         [Parameter]
-        public bool Collapsed { get; set; } = true;    // hide by default
+        public bool Collapsed { get; set; } = false;    // hide by default
 
         [Parameter]
         public string Word { get; set; }

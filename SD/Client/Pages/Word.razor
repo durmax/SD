@@ -35,8 +35,10 @@
     <div class=@(Collapsed ? "collapse" : "card-body")>
 
         <div class="form-group">
-            <label for="exampleFormControlTextarea1">the explaine...</label>
-            <textarea class="form-control" @bind="@wordModel.Explain"> @wordModel.Explain</textarea>
+            <textarea class="form-control"
+                      rows="@Rows"
+                      @bind-value="@MyText"
+                      @bind-value:event="oninput">@MyText</textarea>
         </div>
         @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
         {

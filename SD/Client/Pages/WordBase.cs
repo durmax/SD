@@ -9,6 +9,9 @@ namespace SD.Client.Pages
 {
     public class WordBase : ComponentBase
     {
+        [CascadingParameter]
+        private Task<AuthenticationState> authenticationStateTask { get; set; }
+
         [Parameter]
         public bool Collapsed { set; get; } = true;    // hide by default
 
@@ -22,8 +25,25 @@ namespace SD.Client.Pages
         protected string styleDeleted;
         protected string cssClassDelete = "d-none";
 
-        [CascadingParameter]
-        private Task<AuthenticationState> authenticationStateTask { get; set; }
+        protected int Rows = 2;
+
+        string _myText;
+        protected string MyText
+        {
+            get => _myText;
+            set
+            {
+                _myText = value;
+                CalculateSize(value);
+            }
+        }
+
+        private void CalculateSize(string value)
+        {
+            Rows = Math.Max(value.Split('\n').Length, value.Split('\r').Length);
+            Rows = Math.Max(Rows, 2);
+            Rows = Math.Min(Rows, 20);
+        }
 
         protected async Task DeleteWord()
         {
@@ -52,6 +72,7 @@ namespace SD.Client.Pages
                     wordModel.WordId = Guid.NewGuid().ToString();
                     wordModel.UserId = UserId;
                     wordModel.CreatedAt = DateTime.Now;
+                    wordModel.Explain = MyText;
                 }
                 var respons = await WordService.AddWord(wordModel);
                 if (!respons.IsSuccessStatusCode)
@@ -62,6 +83,7 @@ namespace SD.Client.Pages
         }
         protected override async Task OnInitializedAsync()
         {
+            MyText = wordModel.Explain ?? "";
             var user = (await authenticationStateTask).User;
 
             if (user.Identity.IsAuthenticated)

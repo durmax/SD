@@ -10,13 +10,18 @@ else
     <div class="card">
 
         <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+            <div class="input-group-prepend">
+                <button type="button" class="btn btn-light" disabled><span class="float-left">@TLangCode</span></button>
+            </div>
             <button type="button" class="btn btn-light" @onclick="@(() => { opFilterVal = "Dict"; })"><i class="fas fa-book"></i></button>
             <button type="button" class="btn btn-light" @onclick="@(() => { opFilterVal = "Trans"; })"><i class="oi oi-document"></i></button>
             <button type="button" class="btn btn-light" @onclick="@(() => { opFilterVal = "Vocab"; })"><i class="fab fa-wikipedia-w"></i></button>
             <button type="button" class="btn btn-light" @onclick="@(() => { opFilterVal = "Search"; })"><i class="fas fa-globe"></i></button>
-            <button type="button" class="btn btn-light" @onclick="GetP">
-                <i class="float-right @(Collapsed? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
-            </button>
+            <div class="input-group-prepend">
+                <button type="button" class="btn btn-light" @onclick="GetP">
+                    <i class="float-right @(Collapsed? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
+                </button>
+            </div>
         </div>
 
         <div class=@(Collapsed? "collapse" : "")>

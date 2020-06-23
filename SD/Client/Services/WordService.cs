@@ -32,14 +32,21 @@ namespace SD.Client.Services
             return await _httpClient.GetFromJsonAsync<WordModel>($"api/Word/GetWord/{id}");
         }
 
-        public async Task<WordModel> GetWordByText(string userId, string text)
+        public async Task<WordModel> GetWordByText(string userId, string title)
         {
-            throw new System.NotImplementedException();
+            try
+            {
+              return await _httpClient.GetFromJsonAsync<WordModel>($"api/Word/GetWordByText/{userId}/{title}");
+            }
+            catch
+            {
+                return new WordModel();
+            }
         }
 
         public async Task<HttpResponseMessage> RemoveWord(string id)
         {
-           return await _httpClient.DeleteAsync($"api/Word/DeleteWord/{id}");
+            return await _httpClient.DeleteAsync($"api/Word/DeleteWord/{id}");
         }
 
         public async Task<HttpResponseMessage> UpdateWord(WordModel newWord)

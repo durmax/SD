@@ -38,6 +38,25 @@ namespace sd.Api.Controllers
             }
         }
 
+        // GET: api/Word/GetWord/5
+        [HttpGet("GetWordByText/{userId}/{title}")]
+        public async Task<ActionResult<WordModel>> GetWord(string userId, string title)
+        {
+            try
+            {
+                var result = await _wordService.GetWordByText(userId, title);
+
+               if (result == null) return NotFound();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
         // GET: api/Word/GetAllWords/5e915b3a1c9d4400003f1fba
         [HttpGet("GetAllWords/{userId}")]
         public async Task<ActionResult<IEnumerable<WordModel>>> GetAllWords(string userId)

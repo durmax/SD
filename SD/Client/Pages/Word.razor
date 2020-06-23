@@ -1,49 +1,64 @@
 ﻿
 @inherits WordBase
 
-<div class="card">
-    <div class="input-group">
-        <div class="input-group-prepend">
-            <button type="button" class="btn btn-outline-secondary" @onclick="Reverse">
-                <span class="pr-1">@wordModel.WordLang</span>
-            </button>
+    <div class="card">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <button type="button" class="btn btn-outline-secondary" @onclick="Reverse">
+                    <span>@wordModel.WordLang</span> <i class="fas fa-exchange-alt"></i>
+                </button>
+            </div>
+
+            <input type="text" class="form-control font-weight-bold" style="@styleDeleted" placeholder="Search for word"
+                   id="wordId"
+                   value="@wordModel.Title"
+                   @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"/>
+
+            <div class="input-group-append">
+                <button type="button" class="btn btn-outline-secondary @cssClassDelete " @onclick="DeleteWord">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+
+            <div class="input-group-append">
+                <button type="button" class="btn btn-outline-secondary" @onclick="AddWord">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </button>
+            </div>
+
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" @onclick="() => Collapsed = (Collapsed) ? false : true ">
+                    <i class="float-right  @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
+                </button>
+            </div>
         </div>
 
-        <input type="text" class="form-control font-weight-bold" style="@styleDeleted" placeholder="Search for word"
-               id="wordId"
-               @bind-value="@wordModel.Title" />
+        <i>@note</i>
+        <button type="button" class="btn btn-outline-secondary @cssClassUpdate" @onclick="UpdateWord">
+            This word is already exist, Update? <i class="fas fa-edit"></i>
+        </button>
 
-        <div class="input-group-append">
-            <button type="button" class="btn btn-outline-secondary @cssClassDelete " @onclick="DeleteWord">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-        </div>
-
-        <div class="input-group-append">
-            <button type="button" class="btn btn-outline-secondary" @onclick="AddWord">
-                <i class="fas fa-cloud-upload-alt"></i>
-            </button>
-        </div>
-
-        <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button" @onclick="() => Collapsed = (Collapsed) ? false : true ">
-                <i class="float-right  @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
-            </button>
-        </div>
-    </div>
-
-    <div class=@(Collapsed ? "collapse" : "card-body")>
-
-        <div class="form-group">
-            <textarea class="form-control"
-                      rows="@Rows"
-                      @bind-value="@MyText"
-                      @bind-value:event="oninput">@MyText</textarea>
-        </div>
-        @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
+        @if (loading)
         {
-            <OtherPages FLangCode="@wordModel.WordLang" TLangCode="@wordModel.ToLang" Word="@wordModel.Title"></OtherPages>
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
         }
+
+        <div class=@(Collapsed ? "collapse" : "card-body")>
+
+            <div class="form-group">
+                <textarea class="form-control"
+                          rows="@Rows"
+                          @bind-value="@MyText"
+                          @bind-value:event="oninput">@MyText</textarea>
+            </div>
+            @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
+            {
+                <OtherPages FLangCode="@wordModel.WordLang" TLangCode="@wordModel.ToLang" Word="@wordModel.Title" Collapsed="@opCollapsed"></OtherPages>
+            }
+        </div>
     </div>
-</div>
 

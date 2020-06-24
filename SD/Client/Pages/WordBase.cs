@@ -33,6 +33,8 @@ namespace SD.Client.Pages
         protected bool loading;
         protected string note;
 
+        protected string foundWordIdToUpdate;
+
         protected int Rows = 2;
 
         string _myText;
@@ -56,18 +58,6 @@ namespace SD.Client.Pages
             }
         }
 
-        protected async Task DeleteWord()
-        {
-            var response = await WordService.RemoveWord(wordModel.WordId);
-            if (response.IsSuccessStatusCode)
-            {
-                cssClassDelete = "d-none";
-                styleDeleted = "text-decoration: line-through;";
-                note = "Deleted";
-            }
-            //x = await response.Content.ReadAsStringAsync();
-
-        }
         protected void Reverse()
         {
             string l = wordModel.WordLang;
@@ -77,7 +67,7 @@ namespace SD.Client.Pages
 
         protected async Task AddWord()
         {
-            note = "...";
+            loading = true;
             if (string.IsNullOrWhiteSpace(wordModel.UserId) || UserId != wordModel.UserId)
             {
                 wordModel.WordId = Guid.NewGuid().ToString();
@@ -91,37 +81,60 @@ namespace SD.Client.Pages
             {
                 if ((int)respons.StatusCode == 302)
                 {
+                    ////
                     cssClassUpdate = "";
-                    wordModel.WordId = await respons.Content.ReadAsStringAsync();
+                    foundWordIdToUpdate = await respons.Content.ReadAsStringAsync();
                 }
                 //note = await respons.Content.ReadAsStringAsync();
             }
             else
             {
-                note = "Saved";
+                note = $"{wordModel.Title} is Saved";
                 if ((int)respons.StatusCode == 200)
                 {
                     NewWord();
+                    styleDeleted = "";
                     MyText = "";
                 }
             }
+            loading = false;
         }
         protected async Task UpdateWord()
         {
-            note = "...";
-            cssClassUpdate = "d-none";
-            HttpResponseMessage respons = await WordService.UpdateWord(wordModel);
-            if (!respons.IsSuccessStatusCode)
+            if (!string.IsNullOrWhiteSpace(foundWordIdToUpdate))
             {
-                //note = $"Sorry, {wordModel.Title} did not updated!";
-                note = await respons.Content.ReadAsStringAsync();
+                wordModel.WordId = foundWordIdToUpdate;
+                loading = true;
+
+                cssClassUpdate = "d-none";
+                HttpResponseMessage respons = await WordService.UpdateWord(wordModel);
+                if (!respons.IsSuccessStatusCode)
+                {
+                    //note = $"Sorry, {wordModel.Title} did not updated!";
+                    note = await respons.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    note = $"{wordModel.Title} is Updated";
+                    NewWord();
+                    MyText = "";
+                }
+                foundWordIdToUpdate = "";
+                loading = false;
             }
-            else
+        }
+        protected async Task DeleteWord()
+        {
+            loading = true;
+            var response = await WordService.RemoveWord(wordModel.WordId);
+            if (response.IsSuccessStatusCode)
             {
-                note = "Updated";
-                NewWord();
-                MyText = "";
+                cssClassDelete = "d-none";
+                styleDeleted = "text-decoration: line-through;";
+                note = $"{wordModel.Title} is Deleted";
             }
+            //x = await response.Content.ReadAsStringAsync();
+            loading = false;
         }
 
         private void NewWord()

@@ -10,8 +10,11 @@ namespace SD.Client.Pages
 {
     public class WordBase : ComponentBase
     {
-        //[CascadingParameter]
-        //private Task<AuthenticationState> authenticationStateTask { get; set; }
+        [CascadingParameter]
+        private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+        [Inject]
+        NavigationManager NavigationManager { get; set; }
 
         [Parameter]
         public bool Collapsed { set; get; } = true;    // hide by default
@@ -68,34 +71,41 @@ namespace SD.Client.Pages
         protected async Task AddWord()
         {
             loading = true;
-            if (string.IsNullOrWhiteSpace(wordModel.UserId) || UserId != wordModel.UserId)
+            if (!string.IsNullOrWhiteSpace(UserId))
             {
-                wordModel.WordId = Guid.NewGuid().ToString();
-                wordModel.UserId = UserId;
-                wordModel.CreatedAt = DateTime.Now;
-            }
-            wordModel.Explain = MyText;
-            HttpResponseMessage respons = await WordService.AddWord(wordModel);
+                if (string.IsNullOrWhiteSpace(wordModel.UserId) || UserId != wordModel.UserId)
+                {
+                    wordModel.WordId = Guid.NewGuid().ToString();
+                    wordModel.UserId = UserId;
+                    wordModel.CreatedAt = DateTime.Now;
+                }
+                wordModel.Explain = MyText;
+                HttpResponseMessage respons = await WordService.AddWord(wordModel);
 
-            if (!respons.IsSuccessStatusCode)
-            {
-                if ((int)respons.StatusCode == 302)
+                if (!respons.IsSuccessStatusCode)
                 {
-                    ////
-                    cssClassUpdate = "";
-                    foundWordIdToUpdate = await respons.Content.ReadAsStringAsync();
+                    if ((int)respons.StatusCode == 302)
+                    {
+                        ////
+                        cssClassUpdate = "";
+                        foundWordIdToUpdate = await respons.Content.ReadAsStringAsync();
+                    }
+                    //note = await respons.Content.ReadAsStringAsync();
                 }
-                //note = await respons.Content.ReadAsStringAsync();
+                else
+                {
+                    note = $"{wordModel.Title} is Saved";
+                    if ((int)respons.StatusCode == 200)
+                    {
+                        NewWord();
+                        styleDeleted = "";
+                        MyText = "";
+                    }
+                }
             }
-            else
+            else //note = "please Login to save word to your account";
             {
-                note = $"{wordModel.Title} is Saved";
-                if ((int)respons.StatusCode == 200)
-                {
-                    NewWord();
-                    styleDeleted = "";
-                    MyText = "";
-                }
+                UserId = await AuthAsync();
             }
             loading = false;
         }
@@ -157,6 +167,21 @@ namespace SD.Client.Pages
             note = "";
             wordModel.Title = title;
 
+        }
+
+        private async Task<string> AuthAsync()
+        {
+            var user = (await authenticationStateTask).User;
+
+                if (user.Identity.IsAuthenticated)
+                {
+                    UserId = user.FindFirst(c => c.Type == "oid")?.Value;
+                }
+            else
+            {
+                NavigationManager.NavigateTo("/authentication/login");
+            }
+            return UserId;
         }
         protected override void OnInitialized()
         {

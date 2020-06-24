@@ -74,7 +74,7 @@ namespace sd.Api.Controllers
 
         [HttpPost]
         [Route("AddWord")]
-        public async Task<ActionResult> Create(WordModel word)
+        public async Task<ActionResult<string>> Create(WordModel word)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace sd.Api.Controllers
                 if (wordToInsert != null)
                 {
                    return StatusCode(StatusCodes.Status302Found,
-                      $"{wordToInsert?.WordId}");
+                      $"{wordToInsert?.WordId}");    // returen word id that found
                 }
 
               int statusCode = await _wordService.AddWord(word) ?  200 : 500;

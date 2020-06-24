@@ -77,7 +77,7 @@ namespace SD.Client.Pages
 
         protected async Task AddWord()
         {
-            note = "";
+            note = "...";
             if (string.IsNullOrWhiteSpace(wordModel.UserId) || UserId != wordModel.UserId)
             {
                 wordModel.WordId = Guid.NewGuid().ToString();
@@ -108,7 +108,7 @@ namespace SD.Client.Pages
         }
         protected async Task UpdateWord()
         {
-            note = "";
+            note = "...";
             cssClassUpdate = "d-none";
             HttpResponseMessage respons = await WordService.UpdateWord(wordModel);
             if (!respons.IsSuccessStatusCode)

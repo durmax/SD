@@ -33,14 +33,5 @@ namespace sd.Api.Models
             _database.GetCollection<WordModel>(_settings.Value.WordCollectionName);
         public IMongoCollection<OtherPageModel> OtherPages =>
             _database.GetCollection<OtherPageModel>(_settings.Value.OtherPageCollectionName);
-
-        public ObjectId GetObjectId(string id)
-        {
-            ObjectId objId;
-            if (!ObjectId.TryParse(id, out objId))
-                objId = ObjectId.Empty;
-
-            return objId;
-        }
     }
 }

@@ -27,7 +27,6 @@ namespace SD.Client.Pages
 
         protected async Task<List<WordModel>> GetWords()
         {
-            await Auth();
             return await WordService.GetAllWords(UserId);
         }
 
@@ -52,11 +51,12 @@ namespace SD.Client.Pages
         {
             try
             {
+                await Auth();
                 Words = await GetWords();
             }
             catch
             {
-
+                NavigationManager.NavigateTo("/");
             }
 
         }

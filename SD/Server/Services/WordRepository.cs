@@ -30,24 +30,43 @@ namespace sd.Api.Services
             return await _context.Words.Find<WordModel>(u => u.Title == text && u.UserId == userId).FirstOrDefaultAsync();
         }
 
-        public async Task<WordModel> AddWord(WordModel word)
+        public async Task<bool> AddWord(WordModel word)
         {
-            await _context.Words.InsertOneAsync(word);
-            return word;
+            try
+            {
+            await _context.Words.InsertOneAsync(word); 
+            return true; 
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public async Task<WordModel> UpdateWord(string id, WordModel updatedWord)
+        public async Task<bool> UpdateWord(string id, WordModel updatedWord)
         {
-            await _context.Words.ReplaceOneAsync(word => word.WordId == id, updatedWord);
-            return updatedWord;
+            try
+            {
+                await _context.Words.ReplaceOneAsync(word => word.WordId == id, updatedWord);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
-
 
         public async Task<bool> RemoveWord(string id)
         {
-            await _context.Words.DeleteOneAsync(u => u.WordId == id);
-
-            return true;
+            try
+            {
+                await _context.Words.DeleteOneAsync(u => u.WordId == id);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

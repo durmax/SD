@@ -12,7 +12,8 @@
             <input type="text" class="form-control font-weight-bold" style="@styleDeleted" placeholder="Search for word"
                    id="wordId"
                    value="@wordModel.Title"
-                   @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"/>
+                   @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"
+                   @oninput="@(()=>{ note = ""; })"/>
 
             <div class="input-group-append">
                 <button type="button" class="btn btn-outline-secondary @cssClassDelete " @onclick="DeleteWord">
@@ -35,7 +36,7 @@
 
         <i>@note</i>
         <button type="button" class="btn btn-outline-secondary @cssClassUpdate" @onclick="UpdateWord">
-            This word is already exist, Update? <i class="fas fa-edit"></i>
+            @wordModel.Title is already exist, Update? <i class="fas fa-edit"></i>
         </button>
 
         @if (loading)

@@ -46,7 +46,7 @@ namespace sd.Api.Controllers
             {
                 var result = await _wordService.GetWordByText(userId, title);
 
-               if (result == null) return NotFound();
+                if (result == null) return NotFound();
 
                 return result;
             }
@@ -74,39 +74,46 @@ namespace sd.Api.Controllers
 
         [HttpPost]
         [Route("AddWord")]
-        public async Task<ActionResult<WordModel>> Create(WordModel word)
+        public async Task<ActionResult> Create(WordModel word)
         {
             try
             {
                 if (word == null)
                     return BadRequest();
 
-                // Add custom model validation error
-
-                var wordToInsert = _wordService.GetWordByText(word.UserId, word.Title);
-
-                if (wordToInsert.Result != null)
+               if( await _wordService.GetWordById(word.WordId)!=null)
                 {
-                    ModelState.AddModelError("word", "You have this Word already");
-                    return BadRequest(ModelState);
+                    await _wordService.UpdateWord(word.WordId, word);
+                    return StatusCode(StatusCodes.Status202Accepted,
+                       "Updated");
                 }
 
-                var createdWord = await _wordService.AddWord(word);
+               var wordToInsert = await _wordService.GetWordByText(word.UserId, word.Title);
+                
+                if (wordToInsert != null)
+                {
+                   return StatusCode(StatusCodes.Status302Found,
+                      $"{wordToInsert?.WordId}");
+                }
 
-                return CreatedAtAction(nameof(GetWord),
-                    new { id = createdWord }, createdWord);
+              int statusCode = await _wordService.AddWord(word) ?  200 : 500;
+
+                return StatusCode(statusCode);
+
+                //return CreatedAtAction(nameof(GetWord),
+                //    new { id = createdWord }, createdWord);
             }
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error creating new word record");
+                    $"Error to save new {word.Title}");
             }
         }
 
 
         [HttpPut]
         [Route("UpdateWord")]
-        public async Task<ActionResult<WordModel>> UpdateWord(WordModel updatedWord)
+        public async Task<ActionResult> UpdateWord(WordModel updatedWord)
         {
             string id = updatedWord.WordId;
             try
@@ -114,9 +121,13 @@ namespace sd.Api.Controllers
                 var wordToUpdate = await _wordService.GetWordById(id);
 
                 if (wordToUpdate == null)
-                    return NotFound($"Word with Id = {id} not found");
+                    return StatusCode(StatusCodes.Status404NotFound,
+                      $"{updatedWord.Title} is not found");
 
-                return await _wordService.UpdateWord(id, updatedWord);
+                int statusCode = await _wordService.UpdateWord(id, updatedWord) ? 200 : 500;
+
+                return StatusCode(statusCode);
+
             }
             catch (Exception)
             {
@@ -126,12 +137,12 @@ namespace sd.Api.Controllers
         }
 
         [HttpDelete("DeleteWord/{id}")]
-        public async Task<ActionResult<string>> DeleteWord(string id)
+        public async Task<ActionResult> DeleteWord(string id)
         {
             try
             {
                 await _wordService.RemoveWord(id);
-                return Ok(id);
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception)
             {

@@ -10,8 +10,8 @@ namespace SD.Client.Pages
 {
     public class WordBase : ComponentBase
     {
-        [CascadingParameter]
-        private Task<AuthenticationState> authenticationStateTask { get; set; }
+        //[CascadingParameter]
+        //private Task<AuthenticationState> authenticationStateTask { get; set; }
 
         [Parameter]
         public bool Collapsed { set; get; } = true;    // hide by default
@@ -23,7 +23,9 @@ namespace SD.Client.Pages
 
         [Parameter]
         public WordModel wordModel { get; set; }
-        protected string UserId { get; set; }
+
+        [Parameter]
+        public string UserId { get; set; }
 
         protected string styleDeleted;
         protected string cssClassDelete = "d-none";
@@ -61,6 +63,7 @@ namespace SD.Client.Pages
             {
                 cssClassDelete = "d-none";
                 styleDeleted = "text-decoration: line-through;";
+                note = "Deleted";
             }
             //x = await response.Content.ReadAsStringAsync();
 
@@ -74,70 +77,67 @@ namespace SD.Client.Pages
 
         protected async Task AddWord()
         {
-            if (!string.IsNullOrWhiteSpace(UserId) && !string.IsNullOrWhiteSpace(wordModel.Title))
+            note = "";
+            if (string.IsNullOrWhiteSpace(wordModel.UserId) || UserId != wordModel.UserId)
             {
-                WordModel foundWord = await SearchByTitle(wordModel.Title);
+                wordModel.WordId = Guid.NewGuid().ToString();
+                wordModel.UserId = UserId;
+                wordModel.CreatedAt = DateTime.Now;
+            }
+            wordModel.Explain = MyText;
+            HttpResponseMessage respons = await WordService.AddWord(wordModel);
 
-                if (foundWord.WordId != null)
+            if (!respons.IsSuccessStatusCode)
+            {
+                if ((int)respons.StatusCode == 302)
                 {
-                    wordModel = foundWord;
-                    // MyText += "\n " + (wordModel.Explain ?? MyText);
-                    wordModel.Explain = MyText;
-
-                    //note = "You have saved this word before, it is updated.";
                     cssClassUpdate = "";
+                    wordModel.WordId = await respons.Content.ReadAsStringAsync();
                 }
-
-                else
+                //note = await respons.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                note = "Saved";
+                if ((int)respons.StatusCode == 200)
                 {
-                    if (string.IsNullOrWhiteSpace(wordModel.UserId) || UserId != wordModel.UserId)
-                    {
-                        wordModel.WordId = Guid.NewGuid().ToString();
-                        wordModel.UserId = UserId;
-                        wordModel.CreatedAt = DateTime.Now;
-                    }
-                    wordModel.Explain = MyText;
-
-                    HttpResponseMessage respons = await WordService.AddWord(wordModel);
-
-                    if (!respons.IsSuccessStatusCode)
-                    {
-                        note = $"Sorry, {wordModel.Title} did not saved!";
-                    }
-                    else
-                    {
-                        wordModel.Title = "";
-                        MyText = "";
-                        wordModel.WordId = Guid.NewGuid().ToString();
-                    }
+                    NewWord();
+                    MyText = "";
                 }
             }
         }
         protected async Task UpdateWord()
         {
+            note = "";
             cssClassUpdate = "d-none";
             HttpResponseMessage respons = await WordService.UpdateWord(wordModel);
             if (!respons.IsSuccessStatusCode)
             {
-                note = $"Sorry, {wordModel.Title} did not updated!";
-            } 
+                //note = $"Sorry, {wordModel.Title} did not updated!";
+                note = await respons.Content.ReadAsStringAsync();
+            }
             else
             {
-                wordModel.Title = "";
+                note = "Updated";
+                NewWord();
                 MyText = "";
-                wordModel.WordId = Guid.NewGuid().ToString();
             }
         }
 
-        protected async Task<WordModel> SearchByTitle(string title)
+        private void NewWord()
         {
-            WordModel foundWord = new WordModel();
-            if (!string.IsNullOrWhiteSpace(title) && !string.IsNullOrWhiteSpace(UserId))
+            string wl = wordModel.WordLang;
+            string tl = wordModel.ToLang;
+            wordModel = new WordModel
             {
-                foundWord = await WordService.GetWordByText(UserId, title);
-            }
-            return foundWord;
+                WordId = Guid.NewGuid().ToString(),
+                WordLang = wl,
+                ToLang = tl,
+                UserId = UserId,
+                CreatedAt = DateTime.Now
+            };
         }
+
         protected void WordChanged(string title)
         {
             opCollapsed = false;
@@ -145,25 +145,19 @@ namespace SD.Client.Pages
             wordModel.Title = title;
 
         }
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
             MyText = wordModel.Explain ?? "";
-            var user = (await authenticationStateTask).User;
 
-            if (user.Identity.IsAuthenticated)
+            if (!string.IsNullOrWhiteSpace(wordModel.UserId) && wordModel.UserId != UserId)
             {
-                UserId = user.FindFirst(c => c.Type == "oid")?.Value;
-
-                if (!string.IsNullOrWhiteSpace(wordModel.UserId) && wordModel.UserId != UserId)
+                cssClassDelete = "d-none";
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(wordModel.WordId))
                 {
-                    cssClassDelete = "d-none";
-                }
-                else
-                {
-                    if (!string.IsNullOrWhiteSpace(wordModel.WordId))
-                    {
-                        cssClassDelete = "";
-                    }
+                    cssClassDelete = "";
                 }
             }
         }

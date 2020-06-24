@@ -11,8 +11,8 @@ namespace sd.Api.Interfaces
         Task<List<WordModel>> GetAllWords(string userId);
         Task<WordModel> GetWordById(string id);
         Task<WordModel> GetWordByText(string userId, string text);
-        Task<WordModel> AddWord(WordModel word);
-        Task<WordModel> UpdateWord(string id, WordModel newWord);
+        Task<bool> AddWord(WordModel word);
+        Task<bool> UpdateWord(string id, WordModel newWord);
         Task<bool> RemoveWord(string id);
     }
 }

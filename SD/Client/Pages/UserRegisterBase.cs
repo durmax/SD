@@ -12,6 +12,7 @@ namespace SD.Client.Pages
     public class UserRegisterBase : ComponentBase
     {
         public UserModel userModel = new UserModel();
+        public IEnumerable<UserModel> users;
 
         [Inject]
         public UserService UserService { set; get; }
@@ -28,8 +29,9 @@ namespace SD.Client.Pages
         public List<string> LearnLangs { get; set; }
 
         protected string Info { get; set; }
-        protected string InfoShowClass { get; set; } = "d-none";
+        protected string InfoDisplayClass { get; set; } = "d-none";
         protected bool Registered { get; set; } = true;
+        protected string SearchDisplayClass { get; set; } = "d-none";
 
         public async Task UserData()
         {
@@ -64,14 +66,29 @@ namespace SD.Client.Pages
                     // Error
                     Info += ex.Message;
                 }
-                InfoShowClass = "";
+                InfoDisplayClass = "";
+            }
+        }
+
+        public async Task SearchUser(string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                SearchDisplayClass = "";
+                users = await UserService.SearchUser(text);
+            }
+            else
+            {
+                users = null;
+                SearchDisplayClass = "d-none";
             }
         }
 
         public async Task RemoveUser()
         {
-            try { 
-            var res = await UserService.RemoveUser(UserId);
+            try
+            {
+                var res = await UserService.RemoveUser(UserId);
                 Info = $"{userModel.Email} deleted successfully";
             }
             catch (Exception ex)
@@ -80,18 +97,18 @@ namespace SD.Client.Pages
                 // Error
                 Info += ex.Message;
             }
-            InfoShowClass = "";
+            InfoDisplayClass = "";
         }
         protected async override Task OnInitializedAsync()
         {
             try
             {
                 var user = (await authenticationStateTask).User;
-                
+
                 if (user.Identity.IsAuthenticated)
                 {
-                   UserId= user.FindFirst(c => c.Type == "tid")?.Value;
-                   Email = user.FindFirst(c => c.Type == "email")?.Value;
+                    UserId = user.FindFirst(c => c.Type == "oid")?.Value;
+                    Email = user.FindFirst(c => c.Type == "email")?.Value;
                     userModel = await UserService.GetUserById(UserId);
                 }
             }

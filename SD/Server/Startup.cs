@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +7,6 @@ using Microsoft.Extensions.Options;
 using sd.Api.Interfaces;
 using sd.Api.Models;
 using sd.Api.Services;
-using SD.Shared;
 
 namespace sd.Api
 {

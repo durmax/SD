@@ -21,11 +21,8 @@ namespace SD.Shared
         public string EmailRegCode { get; set; }
         public bool IsEmailReg { get; set; }
         public int AccountLavel { get; set; }
-
         public string FirstLang { get; set; }
-        public List<string> KnownLangs { get; set; }
-        public List<string> LearnLangs { get; set; }
-
+        public string LearnLangs { get; set; }
         public List<string> FriendRequests { get; set; }
         public List<string> Friends { get; set; }
 

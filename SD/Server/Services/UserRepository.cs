@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using sd.Api.Interfaces;
@@ -13,7 +12,6 @@ namespace sd.Api.Services
     public class UserRepository : IUserRepository
     {
         private readonly MongodbContext _context = null;
-        private readonly IDataProtector _protector;
 
         public UserRepository(IOptions<MongodbSettings> settings)
         {
@@ -25,7 +23,13 @@ namespace sd.Api.Services
             return await _context.Users
                     .Find(user => true).ToListAsync();
         }
-        public async Task<UserModel> GetUser(string id)
+        public async Task<IEnumerable<UserModel>> SearchUser(string text)
+        {
+            var users = await _context.Users
+                .Find(u => u.Name.Contains(text) || u.Email.Contains(text)).ToListAsync();
+            return users;
+        }
+        public async Task<UserModel> GetUserById(string id)
         {
             bool userIsExist = await _context.Users.Find<UserModel>(u => u.UserId == id).AnyAsync();
             if (userIsExist)
@@ -83,7 +87,7 @@ namespace sd.Api.Services
 
         public async Task<TransObj> UpdateUser(string id, UserModel newVer)
         {
-            UserModel oldVer = await GetUser(id);
+            UserModel oldVer = await GetUserById(id);
             if (oldVer == null || newVer == null)
             {
                 return new TransObj { BoolVar = false, SetringVar = $"Sorry, update error." };

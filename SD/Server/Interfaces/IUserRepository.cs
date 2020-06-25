@@ -9,7 +9,8 @@ namespace sd.Api.Interfaces
     public interface IUserRepository
     {
         Task<IEnumerable<UserModel>> GetAllUsers();
-        Task<UserModel> GetUser(string id);
+        Task<UserModel> GetUserById(string id);
+        Task<IEnumerable<UserModel>> SearchUser(string text);
         Task<bool> CheckEmail(string email);
         Task<TransObj> RegisterUserAsync(UserModel user);
         Task<TransObj> UpdateUser(string id, UserModel newUser);

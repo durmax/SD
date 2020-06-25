@@ -22,9 +22,14 @@ namespace SD.Client.Services
         {
             return await _httpClient.GetFromJsonAsync<List<UserModel>>("api/User");
         }
+        public async Task<IEnumerable<UserModel>> SearchUser(string text)
+        {
+            var xxx= await _httpClient.GetFromJsonAsync<IEnumerable<UserModel>>($"api/User/GetUsersByText/{text}");
+            return xxx;
+        }
         public async Task<UserModel> GetUserById(string id)
         {
-            return await _httpClient.GetFromJsonAsync<UserModel>($"api/User/{id}");
+            return await _httpClient.GetFromJsonAsync<UserModel>($"api/User/GetUserById/{id}");
         }
         public async Task<HttpResponseMessage> AddUser(UserModel user)
         {

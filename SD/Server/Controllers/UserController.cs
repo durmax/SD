@@ -33,14 +33,30 @@ namespace sd.Api.Controllers
                     "Error retrieving data from the database");
             }
         }
-
-        // GET: api/User/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UserModel>> GetUser(string id)
+        // GET: api/User/GetUsersByText/Dured
+        [HttpGet("GetUsersByText/{text}")]
+        public async Task<ActionResult<IEnumerable<UserModel>>> GetUsersByText(string text)
         {
             try
             {
-                var result = await _userService.GetUser(id);
+                var result = await _userService.SearchUser(text);
+                if (result == null) return NotFound();
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database");
+            }
+        }
+
+        // GET: api/User/GetUserById/5
+        [HttpGet("GetUserById/{id}")]
+        public async Task<ActionResult<UserModel>> GetUserById(string id)
+        {
+            try
+            {
+                var result = await _userService.GetUserById(id);
                 if (result == null) return NotFound();
                 return result;
             }
@@ -95,7 +111,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                UserModel userToDelete = await _userService.GetUser(id);
+                UserModel userToDelete = await _userService.GetUserById(id);
 
                 if (userToDelete == null)
                 {

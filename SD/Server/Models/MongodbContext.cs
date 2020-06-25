@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using MongoDB.Bson;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using SD.Shared;
 using System;
 
@@ -9,16 +7,16 @@ namespace sd.Api.Models
     public class MongodbContext
     {
         private readonly IMongoDatabase _database = null;
-        private readonly IOptions<MongodbSettings> _settings;
+        private readonly IMongodbSettings _settings;
 
-        public MongodbContext(IOptions<MongodbSettings> settings)
+        public MongodbContext(IMongodbSettings settings)
         {
             _settings = settings;
             try
             {
-                var client = new MongoClient(_settings.Value.ConnectionString);
+                var client = new MongoClient(_settings.ConnectionString);
                 if (client != null)
-                    _database = client.GetDatabase(_settings.Value.DatabaseName);
+                    _database = client.GetDatabase(_settings.DatabaseName);
             }
             catch(Exception ex)
             {
@@ -28,10 +26,10 @@ namespace sd.Api.Models
         }
 
         public IMongoCollection<UserModel> Users =>
-            _database.GetCollection<UserModel>(_settings.Value.UserCollectionName);
+            _database.GetCollection<UserModel>(_settings.UserCollectionName);
         public IMongoCollection<WordModel> Words =>
-            _database.GetCollection<WordModel>(_settings.Value.WordCollectionName);
+            _database.GetCollection<WordModel>(_settings.WordCollectionName);
         public IMongoCollection<OtherPageModel> OtherPages =>
-            _database.GetCollection<OtherPageModel>(_settings.Value.OtherPageCollectionName);
+            _database.GetCollection<OtherPageModel>(_settings.OtherPageCollectionName);
     }
 }

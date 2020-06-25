@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using sd.Api.Interfaces;
 using sd.Api.Models;
 using SD.Shared;
@@ -13,7 +12,7 @@ namespace sd.Api.Services
     {
         private readonly MongodbContext _context = null;
 
-        public OtherPageRepository(IOptions<MongodbSettings> settings)
+        public OtherPageRepository(IMongodbSettings settings)
         {
             _context = new MongodbContext(settings);
         }

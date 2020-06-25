@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using sd.Api.Interfaces;
 using sd.Api.Models;
@@ -13,7 +12,7 @@ namespace sd.Api.Services
     {
         private readonly MongodbContext _context = null;
 
-        public UserRepository(IOptions<MongodbSettings> settings)
+        public UserRepository(IMongodbSettings settings)
         {
             _context = new MongodbContext(settings);
         }

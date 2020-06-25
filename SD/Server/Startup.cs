@@ -24,7 +24,7 @@ namespace sd.Api
         {
            services.Configure<MongodbSettings>(Configuration.GetSection(nameof(MongodbSettings)));
 
-            services.AddSingleton<MongodbSettings>(sp =>
+            services.AddSingleton<IMongodbSettings>(sp =>
                                     sp.GetRequiredService<IOptions<MongodbSettings>>().Value);
 
             services.AddTransient<IOtherPageRepository, OtherPageRepository>();

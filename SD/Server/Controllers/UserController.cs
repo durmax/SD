@@ -129,5 +129,66 @@ namespace sd.Api.Controllers
             }
         }
 
+
+
+
+
+        [HttpPost("AddFriendRequest/{UserId}/{friendId}")]
+        public async Task<ActionResult> AddFriendRequest(string UserId, string friendId)
+        {
+            try
+            {
+                await _userService.AddFriendRequest(UserId, friendId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+        [HttpPost("RemoveFriendRequest/{UserId}/{friendId}")]
+        public async Task<ActionResult> RemoveFriendRequest(string UserId, string friendId)
+        {
+            try
+            {
+                await _userService.RemoveFriendRequest(UserId, friendId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+        [HttpPost("AddFriend/{UserId}/{friendId}")]
+        public async Task<ActionResult> AddFriend(string UserId, string friendId)
+        {
+            try
+            {
+                await _userService.AddFriend(UserId, friendId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+        [HttpPost("RemoveFriend/{UserId}/{friendId}")]
+        public async Task<ActionResult> RemoveFriend(string UserId, string friendId)
+        {
+            try
+            {
+                await _userService.RemoveFriend(UserId, friendId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
     }
 }

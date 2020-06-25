@@ -9,8 +9,6 @@ namespace SD.Client.Pages
 {
     public class IndexBase : ComponentBase
     {
-        public WordModel wordModel = new WordModel();
-
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
 
@@ -19,6 +17,11 @@ namespace SD.Client.Pages
 
         [Inject]
         public UserService UserService { set; get; }
+
+        protected WordModel wordModel { get; set; } = new WordModel();
+
+        protected UserModel userModel { get; set; } = new UserModel();
+        protected int FriendRequestsCount= 0;
 
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -35,25 +38,23 @@ namespace SD.Client.Pages
                 NavigationManager.NavigateTo("Languages");
             }
 
-            try
-            {
-                var user = (await authenticationStateTask).User;
+            var user = (await authenticationStateTask).User;
 
-                if (user.Identity.IsAuthenticated)
+            if (user.Identity.IsAuthenticated)
+            {
+                UserId = user.FindFirst(c => c.Type == "oid")?.Value;
+                try
                 {
-                    UserId = user.FindFirst(c => c.Type == "oid")?.Value;
-                    UserModel userModel = new UserModel()
-                    {
-                        UserId = UserId,
-                        Email = user.FindFirst(c => c.Type == "email")?.Value,
-                        Name = user.Identity.Name//user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
-                    };
+                    userModel = await UserService.GetUserById(UserId);
+                    FriendRequestsCount = userModel.FriendRequests.Count;
+                }
+                catch
+                {
+                    userModel.UserId = UserId;
+                    userModel.Email = user.FindFirst(c => c.Type == "email")?.Value;
+                    userModel.Name = user.Identity.Name;//user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
                     await UserService.AddUser(userModel);
                 }
-            }
-            catch
-            {
-                //NavigationManager.NavigateTo("/");
             }
         }
 

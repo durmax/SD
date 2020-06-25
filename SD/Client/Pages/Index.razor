@@ -1,4 +1,12 @@
 ﻿@page "/"
 @inherits IndexBase
 
-    <Word wordModel="wordModel" UserId="@UserId" Collapsed="false"></Word>
+@if (userModel != null && @FriendRequestsCount > 0)
+{
+    <button type="button" class="btn btn-primary pb-2">
+        Friend Requests <span class="badge badge-light">@FriendRequestsCount</span>
+        <span class="sr-only">Friend Requests</span>
+    </button>
+}
+
+<Word wordModel="wordModel" UserId="@UserId" Collapsed="false"></Word>

@@ -23,10 +23,13 @@ namespace SD.Client.Pages
         protected string UserId { get; set; }
         protected string Email { get; set; }
 
-        [Parameter]
-        public List<string> KnownLangs { get; set; }
-        [Parameter]
-        public List<string> LearnLangs { get; set; }
+        protected List<string> FriendRequests { get; set; }
+        protected List<string> Friends { get; set; }
+
+        //[Parameter]
+        //public List<string> KnownLangs { get; set; }
+        //[Parameter]
+        //public List<string> LearnLangs { get; set; }
 
         protected string Info { get; set; }
         protected string InfoDisplayClass { get; set; } = "d-none";
@@ -41,7 +44,7 @@ namespace SD.Client.Pages
                 {
                     if (!Registered)
                     {
-                        userModel.UserId = UserId;
+                       // userModel.UserId = UserId;
                         var status = await UserService.AddUser(userModel);
                         if (status.IsSuccessStatusCode)
                         {
@@ -55,7 +58,7 @@ namespace SD.Client.Pages
                     }
                     else
                     {
-                        userModel.Email = Email;
+                       // userModel.Email = Email;
                         var status = await UserService.UpdateUser(userModel.UserId, userModel);
                         Info = status.ReasonPhrase;
                     }
@@ -81,6 +84,14 @@ namespace SD.Client.Pages
             {
                 users = null;
                 SearchDisplayClass = "d-none";
+            }
+        }
+
+        public async Task SendFriendRequest(string ToUserId)
+        {
+            if (!string.IsNullOrWhiteSpace(ToUserId))
+            {
+                 await UserService.AddFriendRequest(UserId , ToUserId);
             }
         }
 
@@ -120,9 +131,9 @@ namespace SD.Client.Pages
             if (userModel.UserId == null)
             {
                 Registered = false;
-                userModel.UserId = UserId;
-                userModel.Email = Email;
-                userModel.Name = Email;
+                //userModel.UserId = UserId;
+                //userModel.Email = Email;
+                //userModel.Name = Email;
 
                 await UserData();
             }

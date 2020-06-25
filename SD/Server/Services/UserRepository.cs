@@ -130,6 +130,31 @@ namespace sd.Api.Services
               Builders<UserModel>.Filter.Eq("UserId", id));
             return DeleteRecored.IsAcknowledged;
         }
+
+        public async Task AddFriendRequest(string UserId,  string friendId)
+        {
+            UserModel user = await GetUserById(friendId);
+            user.FriendRequests.Add(UserId);
+            await UpdateUser(friendId, user);
+        }  
+        public async Task RemoveFriendRequest(string UserId, string friendId)
+        {
+            UserModel user = await GetUserById(UserId);
+            user.FriendRequests.Remove(friendId);
+            await UpdateUser(UserId, user);
+        }
+        public async Task AddFriend(string UserId, string friendId)
+        {
+            UserModel user = await GetUserById(UserId);
+            user.Friends.Add(friendId);
+            await UpdateUser(UserId, user);
+        }
+        public async Task RemoveFriend(string UserId, string friendId)
+        {
+            UserModel user = await GetUserById(UserId);
+            user.Friends.Remove(friendId);
+            await UpdateUser(UserId, user);
+        }
     }
 }
 

@@ -80,8 +80,10 @@ namespace sd.Api.Controllers
             {
                 if (word == null)
                     return BadRequest();
+                if (string.IsNullOrWhiteSpace(word.UserId) || string.IsNullOrWhiteSpace(word.WordId) || string.IsNullOrWhiteSpace(word.Title))
+                    return BadRequest();
 
-               if( await _wordService.GetWordById(word.WordId)!=null)
+                if ( await _wordService.GetWordById(word.WordId)!=null)
                 {
                     await _wordService.UpdateWord(word.WordId, word);
                     return StatusCode(StatusCodes.Status202Accepted,

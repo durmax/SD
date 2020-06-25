@@ -74,9 +74,9 @@ namespace SD.Client.Pages
             if (!string.IsNullOrWhiteSpace(UserId))
             {
                 if (string.IsNullOrWhiteSpace(wordModel.UserId) || UserId != wordModel.UserId)
-                {
-                    wordModel.WordId = Guid.NewGuid().ToString();
+                {    
                     wordModel.UserId = UserId;
+                    wordModel.WordId = Guid.NewGuid().ToString();
                     wordModel.CreatedAt = DateTime.Now;
                 }
                 wordModel.Explain = MyText;

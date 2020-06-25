@@ -75,6 +75,8 @@ namespace sd.Api.Controllers
             {
                 if (user == null)
                     return BadRequest();
+                if (string.IsNullOrWhiteSpace(user.UserId) || string.IsNullOrWhiteSpace(user.Email))
+                    return BadRequest();
 
                 TransObj status = await _userService.RegisterUserAsync(user);
                 return Ok(status);

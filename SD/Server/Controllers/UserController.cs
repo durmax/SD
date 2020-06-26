@@ -133,12 +133,12 @@ namespace sd.Api.Controllers
 
 
 
-        [HttpPost("AddFriendRequest/{UserId}/{friendId}")]
-        public async Task<ActionResult> AddFriendRequest(string UserId, string friendId)
+        [HttpPost("AddFriendRequest/{userIdAndName}/{friendId}")]
+        public async Task<ActionResult> AddFriendRequest(string userIdAndName, string friendId)
         {
             try
             {
-                await _userService.AddFriendRequest(UserId, friendId);
+                await _userService.AddFriendRequest(userIdAndName, friendId);
                 return Ok();
             }
             catch (Exception ex)

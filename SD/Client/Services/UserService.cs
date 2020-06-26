@@ -46,9 +46,9 @@ namespace SD.Client.Services
             return await _httpClient.PutAsJsonAsync($"api/User/UpdateUser/{id}", newUser);
         }
 
-        public async Task<HttpResponseMessage> AddFriendRequest(string userId, string friendId)
+        public async Task<HttpResponseMessage> AddFriendRequest(string userIdAndName, string friendId)
         {
-            return await _httpClient.PostAsync($"api/User/AddFriendRequest/{userId}/{friendId}",null);
+            return await _httpClient.PostAsync($"api/User/AddFriendRequest/{userIdAndName}/{friendId}",null);
         }
         public async Task<HttpResponseMessage> RemoveFriendRequest(string userId, string friendId)
         {
@@ -62,18 +62,5 @@ namespace SD.Client.Services
         {
             return await _httpClient.PostAsync($"api/User/RemoveFriend/{userId}/{friendId}", null);
         }
-        //public async Task<HttpResponseMessage> GetUserByAccessTokenAsync(string token)
-        //{  try
-        //    {
-        //        TransObj status = new TransObj();
-        //        status.SetringVar = token;
-        //        return await _httpClient.PostAsJsonAsync("api/User/ValidateUserByAccessToken", status);
-        //    }
-        //    catch
-        //    {
-        //        return null;
-        //    }
-        //}
-
     }
 }

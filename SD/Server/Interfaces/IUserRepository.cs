@@ -16,7 +16,7 @@ namespace sd.Api.Interfaces
         Task<TransObj> UpdateUser(string id, UserModel newUser);
         Task<bool> RemoveUser(string id);
 
-        Task AddFriendRequest(string UserId, string friendId);
+        Task AddFriendRequest(string userIdAndName, string friendId);
         Task AddFriend(string UserId, string friendId);
         Task RemoveFriend(string UserId, string friendId);
         Task RemoveFriendRequest(string UserId, string friendId);

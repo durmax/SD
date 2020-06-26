@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
 using System.Threading.Tasks;
 using SD.Shared;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SD.Client.Pages
 {
@@ -21,7 +23,12 @@ namespace SD.Client.Pages
         protected WordModel wordModel { get; set; } = new WordModel();
 
         protected UserModel userModel { get; set; } = new UserModel();
-        protected int FriendRequestsCount= 0;
+        protected int? FriendRequestsCount { set; get; }
+        protected List<UserModel> FriendRequestsModels { set; get; }
+
+        // protected List<string> FriendRequestsNames;
+        protected Dictionary<string, string> FriendRequestsDictionary;
+   
 
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -46,7 +53,6 @@ namespace SD.Client.Pages
                 try
                 {
                     userModel = await UserService.GetUserById(UserId);
-                    FriendRequestsCount = userModel.FriendRequests.Count;
                 }
                 catch
                 {
@@ -55,6 +61,18 @@ namespace SD.Client.Pages
                     userModel.Name = user.Identity.Name;//user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
                     await UserService.AddUser(userModel);
                 }
+
+                FriendRequestsCount = userModel?.FriendRequests.Count ?? 0;
+                if (FriendRequestsCount > 0)
+                {
+                    FriendRequestsDictionary = new Dictionary<string, string>();
+                    foreach (var text in userModel.FriendRequests)
+                    {
+                       string[] words = text.Split(',');
+                            FriendRequestsDictionary.Add(words[0],words[1]);
+                    }
+                }
+
             }
         }
 

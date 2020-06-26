@@ -131,10 +131,10 @@ namespace sd.Api.Services
             return DeleteRecored.IsAcknowledged;
         }
 
-        public async Task AddFriendRequest(string UserId,  string friendId)
+        public async Task AddFriendRequest(string userIdAndName,  string friendId)
         {
             UserModel user = await GetUserById(friendId);
-            user.FriendRequests.Add(UserId);
+            user.FriendRequests.Add(userIdAndName);
             await UpdateUser(friendId, user);
         }  
         public async Task RemoveFriendRequest(string UserId, string friendId)

@@ -91,7 +91,7 @@ namespace SD.Client.Pages
         {
             if (!string.IsNullOrWhiteSpace(ToUserId))
             {
-                 await UserService.AddFriendRequest(UserId , ToUserId);
+                 await UserService.AddFriendRequest(UserId + "," + userModel.Name, ToUserId);
             }
         }
 

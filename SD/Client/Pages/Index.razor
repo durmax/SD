@@ -7,6 +7,23 @@
         Friend Requests <span class="badge badge-light">@FriendRequestsCount</span>
         <span class="sr-only">Friend Requests</span>
     </button>
+
+    @foreach (var item in FriendRequestsDictionary)
+    {
+        <div class="input-group">
+            <a href="User/@item.Key">@item.Value</a>
+            <div class="input-group-prepend">
+                <button type="button" class="btn btn-outline-secondary">
+                    <i class="fas fa-user-check"></i>
+                </button>
+            </div>
+            <div class="input-group-prepend">
+                <button type="button" class="btn btn-outline-secondary">
+                    <i class="fas fa-user-times"></i>
+                </button>
+            </div>
+        </div>
+    }
 }
 
 <Word wordModel="wordModel" UserId="@UserId" Collapsed="false"></Word>

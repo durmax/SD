@@ -26,9 +26,11 @@ namespace SD.Client.Pages
         protected int? FriendRequestsCount { set; get; }
         protected List<UserModel> FriendRequestsModels { set; get; }
 
+        protected bool Collapsed { get; set; } = true;    // hide by default
+
         // protected List<string> FriendRequestsNames;
         protected Dictionary<string, string> FriendRequestsDictionary;
-   
+
 
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -61,15 +63,17 @@ namespace SD.Client.Pages
                     userModel.Name = user.Identity.Name;//user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
                     await UserService.AddUser(userModel);
                 }
-
-                FriendRequestsCount = userModel?.FriendRequests.Count ?? 0;
-                if (FriendRequestsCount > 0)
+                if (userModel.FriendRequests != null)
                 {
-                    FriendRequestsDictionary = new Dictionary<string, string>();
-                    foreach (var text in userModel.FriendRequests)
+                    FriendRequestsCount = userModel?.FriendRequests.Count ?? 0;
+                    if (FriendRequestsCount > 0)
                     {
-                       string[] words = text.Split(',');
-                            FriendRequestsDictionary.Add(words[0],words[1]);
+                        FriendRequestsDictionary = new Dictionary<string, string>();
+                        foreach (var text in userModel.FriendRequests)
+                        {
+                            string[] words = text.Split(',');
+                            FriendRequestsDictionary.Add(words[0], words[1]);
+                        }
                     }
                 }
 

@@ -34,12 +34,12 @@ namespace sd.Api.Controllers
             }
         }
         // GET: api/User/GetUsersByText/Dured
-        [HttpGet("GetUsersByText/{text}")]
-        public async Task<ActionResult<IEnumerable<UserModel>>> GetUsersByText(string text)
+        [HttpGet("GetUsersByText/{searcherIdAndName}/{searchText}")]
+        public async Task<ActionResult<Dictionary<string, string>>> GetUsersByText(string searcherIdAndName, string searchText)
         {
             try
             {
-                var result = await _userService.SearchUser(text);
+                var result = await _userService.SearchUser(searcherIdAndName, searchText);
                 if (result == null) return NotFound();
                 return Ok(result);
             }

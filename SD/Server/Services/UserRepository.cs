@@ -22,11 +22,29 @@ namespace sd.Api.Services
             return await _context.Users
                     .Find(user => true).ToListAsync();
         }
-        public async Task<IEnumerable<UserModel>> SearchUser(string text)
+        public async Task<Dictionary<string, string>> SearchUser(string searcherIdAndName, string searchText)
         {
+            string relation="";
+            Dictionary<string, string> res= new  Dictionary<string, string>();
             var users = await _context.Users
-                .Find(u => u.Name.Contains(text) || u.Email.Contains(text)).ToListAsync();
-            return users;
+                .Find(u => u.Name.Contains(searchText) || u.Email.Contains(searchText)).ToListAsync();
+            foreach (var user in users)
+            {
+                if (user.Friends == null) user.Friends = new List<string>();
+                if (user.FriendRequests == null) user.FriendRequests = new List<string>();
+
+                if (user.FriendRequests.Contains(searcherIdAndName))
+                {
+                    relation = " (Friend Requested)";
+                }
+                if (user.Friends != null && user.Friends.Contains(searcherIdAndName))
+                {
+                    relation = " (Friends)";
+                }
+                res.Add(user.UserId, user.Name + relation);
+                relation = "";
+            }
+            return res;
         }
         public async Task<UserModel> GetUserById(string id)
         {
@@ -131,11 +149,21 @@ namespace sd.Api.Services
             return DeleteRecored.IsAcknowledged;
         }
 
-        public async Task AddFriendRequest(string userIdAndName,  string friendId)
+        public async Task AddFriendRequest(string userIdAndName, string friendId)
         {
             UserModel user = await GetUserById(friendId);
-            user.FriendRequests.Add(userIdAndName);
-            await UpdateUser(friendId, user);
+
+            if (user.Friends == null) user.Friends = new List<string>();
+            if (user.FriendRequests == null) user.FriendRequests = new List<string>();
+            
+            if (!user.Friends.Contains(userIdAndName))
+            {
+                if (!user.FriendRequests.Contains(userIdAndName))
+                {
+                    user.FriendRequests.Add(userIdAndName);
+                    await UpdateUser(friendId, user);
+                }
+            }
         }  
         public async Task RemoveFriendRequest(string UserId, string friendId)
         {

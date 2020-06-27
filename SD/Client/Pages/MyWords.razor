@@ -1,6 +1,8 @@
 ﻿@page "/MyWords"
+@page "/MyWords/{UserId}/{UserName}"
 @inherits MyWordsBase
-<h3>MyWords</h3>
+
+    <h3>@UserName</h3>
 
 @if (Words == null)
 {
@@ -11,6 +13,6 @@ else
 
     @foreach (var word in Words)
     {
-      <Word wordModel="word" UserId="@UserId" Collapsed="true"></Word>
+        <Word wordModel="word" UserId="@UserId" Collapsed="true"></Word>
     }
 }

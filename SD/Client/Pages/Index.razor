@@ -3,27 +3,35 @@
 
 @if (userModel != null && @FriendRequestsCount > 0)
 {
-    <button type="button" class="btn btn-primary pb-2">
+
+
+    <button type="button" class="btn btn-primary mb-2" @onclick="()=> Collapsed = Collapsed ? false : true">
         Friend Requests <span class="badge badge-light">@FriendRequestsCount</span>
         <span class="sr-only">Friend Requests</span>
     </button>
 
-    @foreach (var item in FriendRequestsDictionary)
-    {
-        <div class="input-group">
-            <a href="User/@item.Key">@item.Value</a>
-            <div class="input-group-prepend">
-                <button type="button" class="btn btn-outline-secondary">
-                    <i class="fas fa-user-check"></i>
-                </button>
-            </div>
-            <div class="input-group-prepend">
-                <button type="button" class="btn btn-outline-secondary">
-                    <i class="fas fa-user-times"></i>
-                </button>
+    <div class="card @(Collapsed? "collapse" : "")">
+        <div class="card-body">
+            <div class="container">
+                @foreach (var item in FriendRequestsDictionary)
+                {
+                    <div class="row">
+                        <div class="col-8">
+                            <a type="button" class="btn btn-link" href="MyWords/@item.Key/@item.Value">@item.Value</a>
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-link">
+                                <i class="fas fa-user-check"></i>
+                            </button>
+                            <button type="button" class="btn btn-link">
+                                <i class="fas fa-user-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
-    }
+    </div>
 }
 
 <Word wordModel="wordModel" UserId="@UserId" Collapsed="false"></Word>

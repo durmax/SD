@@ -1,4 +1,5 @@
-﻿@page "/User"
+﻿@page  "/User"
+@page "/User/{UserId}"
 
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
@@ -7,74 +8,86 @@
 @inherits UserRegisterBase
 
 
-<h3>RegisterAccount</h3>
+<h3>@userModel.Name</h3>
 
-<AuthorizeView>
-    <NotAuthorized>
-        <a href="SignIn">
-            <span class="oi oi-account-login" aria-hidden="true"></span> SignIn
-        </a>
-        <RedirectToLogin />
-    </NotAuthorized>
-    <Authorized Context="Auth">
+<EditForm Model="@userModel" OnValidSubmit="UserData">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-        <EditForm Model="@userModel" OnValidSubmit="UserData">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <InputText class="form-control" placeholder="Name"
+                       @bind-Value="userModel.Name" />
+        </div>
+    </div>
 
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <InputText class="form-control" placeholder="Email"
-                               @bind-Value="userModel.Email" />
-                </div>
+    <div class="@cssDisplayNotCurrentUser">
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <input type="search" class="form-control" placeholder="Find friend"
+                       @onchange="@(async(e)=> {await SearchUser((string)e.Value);})" />
             </div>
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <InputText class="form-control" placeholder="Name"
-                               @bind-Value="userModel.Name" />
-                </div>
-            </div>
-            <Languages></Languages>
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" placeholder="Find friend"
-                           @onchange="@(async(e)=> {await SearchUser((string)e.Value);})" />
-                </div>
-            </div>
-            <div class="@SearchDisplayClass">
-                @if (users == null)
-                {
-                    <b>Loading...</b>
-                }
-                else
-                {
-
-                    @foreach (var foudUser in users)
-                    {
-                        <a>@foudUser.Name</a> <button @onclick="@(async()=> { await SendFriendRequest(foudUser.UserId);})">Send Friend Request</button>
-                    }
-                }
-            </div>
-
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <div class="alert alert-primary @InfoDisplayClass" role="alert">
-                        @Info
+        </div>
+        <div class="@SearchDisplayClass">
+            @if (foundUsers == null)
+            {
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
                     </div>
                 </div>
-            </div>
-
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <button type="submit" class="btn btn-outline-primary"><i class="fa fa-save"></i> Save</button>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <div class="container">
+                            @foreach (var foudUser in foundUsers)
+                            {
+                                <div class="row">
+                                    <div class="col-10">
+                                        <a type="button" class="btn btn-link"
+                                           href="MyWords/@foudUser.Key/@foudUser.Value">@foudUser.Value</a>
+                                    </div>
+                                    <div class="col-2">
+                                        <button type="button" class="btn btn-link"
+                                                @onclick="@(async()=> { await SendFriendRequest(foudUser.Key, foudUser.Value);})">
+                                            <i class="fas fa-user-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                            @if (sendFriendReqWait)
+                            {
+                                <div class="d-flex justify-content-center">
+                                    <div class="spinner-border" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
+            }
+        </div>
 
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <div class="alert alert-primary @InfoDisplayClass" role="alert">
+                    @Info
+                </div>
             </div>
-        </EditForm>
+        </div>
 
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-outline-primary"><i class="fa fa-save"></i> Save</button>
+            </div>
+        </div>
         <div class="col-sm-10">
             <button class="btn btn-outline-danger" @onclick="RemoveUser"><i class="fa fa-trash-o fa-lg"></i> Remove</button>
         </div>
+    </div>
+</EditForm>
 
-    </Authorized>
-</AuthorizeView>
+

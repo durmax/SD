@@ -12,7 +12,7 @@ namespace SD.Client.Pages
     public class UserRegisterBase : ComponentBase
     {
         public UserModel userModel = new UserModel();
-        public IEnumerable<UserModel> users;
+        public Dictionary<string, string> foundUsers;
 
         [Inject]
         public UserService UserService { set; get; }
@@ -20,16 +20,16 @@ namespace SD.Client.Pages
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-        protected string UserId { get; set; }
+        [Parameter]
+        public string UserId { get; set; }
         protected string Email { get; set; }
+
+        protected string CurrentUserId { get; set; }
+        protected string cssDisplayNotCurrentUser = "d-none";
 
         protected List<string> FriendRequests { get; set; }
         protected List<string> Friends { get; set; }
-
-        //[Parameter]
-        //public List<string> KnownLangs { get; set; }
-        //[Parameter]
-        //public List<string> LearnLangs { get; set; }
+        protected bool sendFriendReqWait = false;
 
         protected string Info { get; set; }
         protected string InfoDisplayClass { get; set; } = "d-none";
@@ -44,7 +44,7 @@ namespace SD.Client.Pages
                 {
                     if (!Registered)
                     {
-                       // userModel.UserId = UserId;
+                        // userModel.UserId = UserId;
                         var status = await UserService.AddUser(userModel);
                         if (status.IsSuccessStatusCode)
                         {
@@ -58,7 +58,7 @@ namespace SD.Client.Pages
                     }
                     else
                     {
-                       // userModel.Email = Email;
+                        // userModel.Email = Email;
                         var status = await UserService.UpdateUser(userModel.UserId, userModel);
                         Info = status.ReasonPhrase;
                     }
@@ -73,26 +73,31 @@ namespace SD.Client.Pages
             }
         }
 
-        public async Task SearchUser(string text)
+        public async Task SearchUser(string SearchText)
         {
-            if (!string.IsNullOrWhiteSpace(text))
+            if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 SearchDisplayClass = "";
-                users = await UserService.SearchUser(text);
+                foundUsers = await UserService.SearchUser(CurrentUserId+","+userModel.Name ,SearchText);
             }
             else
             {
-                users = null;
+                foundUsers = null;
                 SearchDisplayClass = "d-none";
             }
         }
 
-        public async Task SendFriendRequest(string ToUserId)
+        public async Task SendFriendRequest(string ToUserId, string frindName)
         {
+            sendFriendReqWait = true;
             if (!string.IsNullOrWhiteSpace(ToUserId))
             {
-                 await UserService.AddFriendRequest(UserId + "," + userModel.Name, ToUserId);
+                await UserService.AddFriendRequest(UserId + "," + userModel.Name, ToUserId);
+                Info = $"The friend request sent to {frindName} successfully";
+                InfoDisplayClass = null;
             }
+            
+            sendFriendReqWait = false;
         }
 
         public async Task RemoveUser()
@@ -112,15 +117,15 @@ namespace SD.Client.Pages
         }
         protected async override Task OnInitializedAsync()
         {
+
             try
             {
                 var user = (await authenticationStateTask).User;
 
                 if (user.Identity.IsAuthenticated)
                 {
-                    UserId = user.FindFirst(c => c.Type == "oid")?.Value;
+                    CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
                     Email = user.FindFirst(c => c.Type == "email")?.Value;
-                    userModel = await UserService.GetUserById(UserId);
                 }
             }
             catch
@@ -128,13 +133,16 @@ namespace SD.Client.Pages
                 //NavigationManager.NavigateTo("/");
             }
 
+            if (string.IsNullOrWhiteSpace(UserId))
+            {
+                UserId = CurrentUserId;
+                cssDisplayNotCurrentUser = null;
+            }
+            userModel = await UserService.GetUserById(UserId);
+
             if (userModel.UserId == null)
             {
                 Registered = false;
-                //userModel.UserId = UserId;
-                //userModel.Email = Email;
-                //userModel.Name = Email;
-
                 await UserData();
             }
         }

@@ -9,11 +9,11 @@
             </button>
         </div>
 
-        <input type="text" class="form-control font-weight-bold" style="@styleDeleted" placeholder="Search for word"
+        <input type="search" class="form-control font-weight-bold" style="@styleDeleted" placeholder="Search for word"
                id="wordId"
                value="@wordModel.Title"
                @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"
-               @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})" />
+               @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})"  />
 
         <div class="input-group-append">
             <button type="button" class="btn btn-outline-secondary @cssClassDelete " @onclick="DeleteWord">
@@ -61,7 +61,7 @@
     <div class=@(Collapsed ? "collapse" : "card-body")>
 
         <div class="form-group">
-            <textarea class="form-control"
+            <textarea class="form-control text-wrap"
                       rows="@Rows"
                       @bind-value="@MyText"
                       @bind-value:event="oninput">@MyText</textarea>

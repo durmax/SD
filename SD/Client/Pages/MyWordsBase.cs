@@ -19,9 +19,12 @@ namespace SD.Client.Pages
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-        protected bool Collapsed = true;    // hide by default
+        [Parameter]
+        public string UserId { get; set; }
+        [Parameter]
+        public string UserName { get; set; }
 
-        protected string UserId { get; set; }
+        protected bool Collapsed = true;    // hide by default
 
         protected List<WordModel> Words { get; set; }
 

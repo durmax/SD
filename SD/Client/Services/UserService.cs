@@ -22,9 +22,9 @@ namespace SD.Client.Services
         {
             return await _httpClient.GetFromJsonAsync<List<UserModel>>("api/User");
         }
-        public async Task<IEnumerable<UserModel>> SearchUser(string text)
+        public async Task<Dictionary<string, string>> SearchUser(string searcherIdAndName, string SearchText)
         {
-            var xxx= await _httpClient.GetFromJsonAsync<IEnumerable<UserModel>>($"api/User/GetUsersByText/{text}");
+            var xxx= await _httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/User/GetUsersByText/{searcherIdAndName}/{SearchText}");
             return xxx;
         }
         public async Task<UserModel> GetUserById(string id)

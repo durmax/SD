@@ -168,20 +168,33 @@ namespace sd.Api.Services
         public async Task RemoveFriendRequest(string UserId, string friendId)
         {
             UserModel user = await GetUserById(UserId);
-            user.FriendRequests.Remove(friendId);
-            await UpdateUser(UserId, user);
+            if (user.FriendRequests != null)
+            {
+                user.FriendRequests.Remove(friendId);
+                await UpdateUser(UserId, user);
+            }
         }
-        public async Task AddFriend(string UserId, string friendId)
+        public async Task AddFriend(string UserId, string friendIdAndName)
         {
             UserModel user = await GetUserById(UserId);
-            user.Friends.Add(friendId);
-            await UpdateUser(UserId, user);
+            if (user.Friends == null) user.Friends = new List<string>();
+            if (!user.Friends.Contains(friendIdAndName))
+            {
+                user.Friends.Add(friendIdAndName);
+                await UpdateUser(UserId, user);
+            }
         }
-        public async Task RemoveFriend(string UserId, string friendId)
+        public async Task RemoveFriend(string UserId, string friendIdAndName)
         {
             UserModel user = await GetUserById(UserId);
-            user.Friends.Remove(friendId);
-            await UpdateUser(UserId, user);
+            if (user.Friends != null)
+            {
+                if (user.Friends.Contains(friendIdAndName))
+                {
+                    user.Friends.Remove(friendIdAndName);
+                    await UpdateUser(UserId, user);
+                }
+            }
         }
     }
 }

@@ -54,9 +54,9 @@ namespace SD.Client.Services
         {
             return await _httpClient.PostAsync($"api/User/RemoveFriendRequest/{userId}/{friendId}", null);
         }
-        public async Task<HttpResponseMessage> AddFriend(string userId, string friendId)
+        public async Task<HttpResponseMessage> AddFriend(string userId, string friendIdAndName)
         {
-            return await _httpClient.PostAsync($"api/User/AddFriend/{userId}/{friendId}", null);
+            return await _httpClient.PostAsync($"api/User/AddFriend/{userId}/{friendIdAndName}", null);
         }
         public async Task<HttpResponseMessage> RemoveFriend(string userId, string friendId)
         {

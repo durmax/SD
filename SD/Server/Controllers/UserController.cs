@@ -161,12 +161,12 @@ namespace sd.Api.Controllers
                     ex.Message);
             }
         }
-        [HttpPost("AddFriend/{UserId}/{friendId}")]
-        public async Task<ActionResult> AddFriend(string UserId, string friendId)
+        [HttpPost("AddFriend/{UserId}/{friendIdAndName}")]
+        public async Task<ActionResult> AddFriend(string UserId, string friendIdAndName)
         {
             try
             {
-                await _userService.AddFriend(UserId, friendId);
+                await _userService.AddFriend(UserId, friendIdAndName);
                 return Ok();
             }
             catch (Exception ex)

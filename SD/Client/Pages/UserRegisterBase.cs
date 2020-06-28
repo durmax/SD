@@ -96,7 +96,6 @@ namespace SD.Client.Pages
                 Info = $"The friend request sent to {frindName} successfully";
                 InfoDisplayClass = null;
             }
-            
             sendFriendReqWait = false;
         }
 

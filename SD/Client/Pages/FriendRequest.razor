@@ -1,0 +1,50 @@
+﻿@inherits FriendRequestBase
+
+<div class="row">
+    <div class="col-8">
+        <a type="button" class="btn btn-link" href="MyWords/@friendId/@friendName">@friendName</a>
+    </div>
+    <div class="col-4">
+
+        @if (string.IsNullOrEmpty(FriendReqState))
+        {
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button type="button" class="btn btn-link"
+                            @onclick="@(async () => { await AddFriend(); })">
+                        <i class="fas fa-user-check"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-link"
+                            @onclick="@(async () => { await RemoveFriendRequest(); })">
+                        <i class="fas fa-user-times"></i>
+                    </button>
+                </div>
+            </div>
+        }
+        else
+        {
+            @if (FriendReqState == "Added")
+            {
+                <div class="btn btn-link">
+                    <i class="fas fa-check-circle"></i> Accepted
+                </div>
+            }
+            else
+            {
+                <div class="btn btn-link">
+                    <i class="fas fa-window-close"></i>   Removed
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@if (FriendWait)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+}

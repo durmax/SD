@@ -15,33 +15,9 @@
             <div class="container">
                 @foreach (var item in FriendRequestsDictionary)
                 {
-                    <div class="row">
-                        <div class="col-8">
-                            <a type="button" class="btn btn-link" href="MyWords/@item.Key/@item.Value">@item.Value</a>
-                        </div>
-                        <div class="col-4">
-                            <button type="button" class="btn btn-link"
-                                    @onclick="@(async()=> { await AddFriend(item.Key+","+item.Value);})">
-                                <i class="fas fa-user-check"></i>
-                            </button>
-                            <button type="button" class="btn btn-link"
-                                    @onclick="@(async()=> { await RemoveFriendRequest(item.Key+","+item.Value);})">
-                                <i class="fas fa-user-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                }
-            </div>
-            @if (FriendWait)
-            {
-                <div class="d-flex justify-content-center">
-                    <div class="spinner-border" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                </div>
-            }
-            <div class="alert alert-primary @InfoDisplayClass" role="alert">
-                @Info
+                    <FriendRequest UserId="@UserId" friendId="@item.Key" friendName="@item.Value"></FriendRequest>
+                 }
+            
             </div>
         </div>
     </div>

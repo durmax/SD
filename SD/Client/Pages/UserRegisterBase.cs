@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Authorization;
 using SD.Shared;
 using SD.Client.Services;
-
+using System.Linq;
 
 namespace SD.Client.Pages
 {
@@ -78,7 +78,7 @@ namespace SD.Client.Pages
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 SearchDisplayClass = "";
-                foundUsers = await UserService.SearchUser(CurrentUserId+","+userModel.Name ,SearchText);
+                foundUsers = await UserService.SearchUser(CurrentUserId + "," + userModel.Name, SearchText);
             }
             else
             {
@@ -87,19 +87,39 @@ namespace SD.Client.Pages
             }
         }
 
-        public async Task SendFriendRequest(string ToUserId, string frindName)
+        public async Task SendFriendRequest(string ToUserId, string friendName)
         {
             sendFriendReqWait = true;
-            if (!string.IsNullOrWhiteSpace(ToUserId))
+
+            if (!string.IsNullOrWhiteSpace(UserId) && !string.IsNullOrWhiteSpace(ToUserId))
             {
-                await UserService.AddFriendRequest(UserId + "," + userModel.Name, ToUserId);
-                Info = $"The friend request sent to {frindName} successfully";
+                var res = await UserService.AddFriendRequest(UserId + "," + userModel.Name, ToUserId);
+
+                if (res.IsSuccessStatusCode)
+                {
+                    Info = $"The friend request sent to {friendName} successfully";
+                    InfoDisplayClass = null;
+                }
+            }
+            else
+            {
+                Info = $"Please, Login to add Friends";
                 InfoDisplayClass = null;
             }
             sendFriendReqWait = false;
         }
 
-        public async Task RemoveUser()
+        public async Task RemoveFriend(string friendId)
+        {
+            sendFriendReqWait = true;
+            if (!string.IsNullOrWhiteSpace(friendId))
+            {
+               await UserService.RemoveFriend(UserId, friendId);
+            }
+           sendFriendReqWait = false;
+        }
+
+            public async Task RemoveUser() // remove current user
         {
             try
             {
@@ -116,7 +136,6 @@ namespace SD.Client.Pages
         }
         protected async override Task OnInitializedAsync()
         {
-
             try
             {
                 var user = (await authenticationStateTask).User;
@@ -137,12 +156,18 @@ namespace SD.Client.Pages
                 UserId = CurrentUserId;
                 cssDisplayNotCurrentUser = null;
             }
-            userModel = await UserService.GetUserById(UserId);
 
-            if (userModel.UserId == null)
+            if (!string.IsNullOrEmpty(UserId))
             {
-                Registered = false;
-                await UserData();
+                try
+                {
+                    userModel = await UserService.GetUserById(UserId);
+                }
+                catch
+                {
+                    Registered = false;
+                    await UserData();
+                }
             }
         }
     }

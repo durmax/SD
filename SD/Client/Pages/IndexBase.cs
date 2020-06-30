@@ -24,49 +24,15 @@ namespace SD.Client.Pages
 
         protected UserModel userModel { get; set; } = new UserModel();
         protected int? FriendRequestsCount { set; get; }
-        protected List<UserModel> FriendRequestsModels { set; get; }
-        protected bool FriendWait = false;
-        protected string Info { get; set; }
-        protected string InfoDisplayClass { get; set; } = "d-none";
 
         protected bool Collapsed { get; set; } = true;    // hide by default
 
-        // protected List<string> FriendRequestsNames;
         protected Dictionary<string, string> FriendRequestsDictionary;
-
 
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
 
         protected string UserId { get; set; }
-
-        public async Task AddFriend(string friendIdAndName)
-        {
-            FriendWait = true;
-            if (!string.IsNullOrWhiteSpace(friendIdAndName))
-            {
-                await UserService.AddFriend(UserId, friendIdAndName);
-               await RemoveFriendRequest(friendIdAndName);
-                FriendRequestsDictionary.Remove(friendIdAndName);
-                string[] friendName = friendIdAndName.Split(",");
-                Info = $"You added {friendName[1]} to your friends successfully";
-                InfoDisplayClass = null;
-            }
-            FriendWait = false;
-        }
-        public async Task RemoveFriendRequest(string friendIdAndName)
-        {
-            FriendWait = true;
-            if (!string.IsNullOrWhiteSpace(friendIdAndName))
-            {
-                await UserService.RemoveFriendRequest(UserId, friendIdAndName);
-                FriendRequestsDictionary.Remove(friendIdAndName);
-                string[] friendName = friendIdAndName.Split(",");
-                Info = $"{friendName[1]} friend request removed successfully";
-                InfoDisplayClass = null;
-            }
-            FriendWait = false;
-        }
 
         protected override async Task OnInitializedAsync()
         {
@@ -107,9 +73,7 @@ namespace SD.Client.Pages
                         }
                     }
                 }
-
             }
         }
-
     }
 }

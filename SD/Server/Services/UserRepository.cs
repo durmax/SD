@@ -22,26 +22,26 @@ namespace sd.Api.Services
             return await _context.Users
                     .Find(user => true).ToListAsync();
         }
-        public async Task<Dictionary<string, string>> SearchUser(string searcherIdAndName, string searchText)
+        public async Task<Dictionary<string, string>> SearchUser(string CurrentUserId, string searchText)
         {
             string relation = "";
             Dictionary<string, string> res = new Dictionary<string, string>();
 
             var users = await _context.Users
                 .Find(u => u.Name.ToLower().Contains(searchText.ToLower())).ToListAsync();
-            
-            users.RemoveAll(u => searcherIdAndName.Contains(u.UserId)); //remove Sercher from list
-            
+
+            users.RemoveAll(u => u.UserId == CurrentUserId); //remove Sercher from list
+
             foreach (var user in users)
             {
                 if (user.Friends == null) user.Friends = new List<string>();
                 if (user.FriendRequests == null) user.FriendRequests = new List<string>();
 
-                if (user.FriendRequests.Contains(searcherIdAndName))
+                if (user.FriendRequests.Contains(CurrentUserId))
                 {
                     relation = " (Friend Requested)";
                 }
-                else if (user.Friends.Contains(searcherIdAndName))
+                else if (user.Friends.Contains(CurrentUserId))
                 {
                     relation = " (Friends)";
                 }
@@ -129,8 +129,6 @@ namespace sd.Api.Services
 
             try
             {
-                //newVer.AccessToken = _protector.Protect(newVer.Email + newVer.Password);
-                //newVer.Password = _protector.Protect(newVer.Password);
 
                 await _context.Users.FindOneAndReplaceAsync(
       Builders<UserModel>.Filter.Eq("UserId", id), newVer);
@@ -153,18 +151,18 @@ namespace sd.Api.Services
             return DeleteRecored.IsAcknowledged;
         }
 
-        public async Task AddFriendRequest(string userIdAndName, string friendId)
+        public async Task AddFriendRequest(string userId, string friendId)
         {
             UserModel user = await GetUserById(friendId);
 
             if (user.Friends == null) user.Friends = new List<string>();
             if (user.FriendRequests == null) user.FriendRequests = new List<string>();
 
-            if (!user.Friends.Contains(userIdAndName))
+            if (!user.Friends.Contains(userId))
             {
-                if (!user.FriendRequests.Contains(userIdAndName))
+                if (!user.FriendRequests.Contains(userId))
                 {
-                    user.FriendRequests.Add(userIdAndName);
+                    user.FriendRequests.Add(userId);
                     await UpdateUser(friendId, user);
                 }
             }
@@ -178,25 +176,23 @@ namespace sd.Api.Services
                 await UpdateUser(UserId, user);
             }
         }
-        public async Task AddFriend(string UserId, string friendIdAndName)
+        public async Task AddFriend(string UserId, string friendId)
         {
             UserModel userModel = await GetUserById(UserId);
             if (userModel.Friends == null) userModel.Friends = new List<string>();
 
-            if (!userModel.Friends.Contains(friendIdAndName))
+            if (!userModel.Friends.Contains(friendId))
             {
-                userModel.Friends.Add(friendIdAndName);
+                userModel.Friends.Add(friendId);
                 await UpdateUser(UserId, userModel);
             }
-
-            string friendId = friendIdAndName.Split(",")[0];
 
             UserModel friendModel = await GetUserById(friendId);
             if (friendModel.Friends == null) friendModel.Friends = new List<string>();
 
-            if (!friendModel.Friends.Contains(UserId + "," + userModel.Name))
+            if (!friendModel.Friends.Contains(UserId))
             {
-                friendModel.Friends.Add(UserId + "," + userModel.Name);
+                friendModel.Friends.Add(UserId);
                 await UpdateUser(friendId, friendModel);
             }
 

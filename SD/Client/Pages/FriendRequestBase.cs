@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using SD.Client.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -33,15 +30,14 @@ namespace SD.Client.Pages
         public async Task AddFriend()
         {   
             FriendWait = true;
-           string friendIdAndName = friendId + ","+ friendName;
-           
-            if (!string.IsNullOrWhiteSpace(friendIdAndName))
+          
+            if (!string.IsNullOrWhiteSpace(friendId))
             {
-                await UserService.AddFriend(UserId, friendIdAndName);
+                await UserService.AddFriend(UserId, friendId);
                 await RemoveFriendRequest();
-                //FriendRequestsDictionary.Remove(friendIdAndName);
-                string[] friendName = friendIdAndName.Split(",");
-                Info = $"You added {friendName[1]} to your friends successfully";
+
+               var user1= await UserService.GetUserById(friendId);
+                Info = $"You added {user1.Name} to your friends successfully";
                 InfoDisplayClass = null;
             }
             //FriendAdded = true;
@@ -51,14 +47,13 @@ namespace SD.Client.Pages
         public async Task RemoveFriendRequest()
         {
             FriendWait = true;
-            string friendIdAndName = friendId + "," + friendName;
 
-            if (!string.IsNullOrWhiteSpace(friendIdAndName))
+            if (!string.IsNullOrWhiteSpace(friendId))
             {
-                await UserService.RemoveFriendRequest(UserId, friendIdAndName);
-               // FriendRequestsDictionary.Remove(friendIdAndName);
-                string[] friendName = friendIdAndName.Split(",");
-                Info = $"{friendName[1]} friend request removed successfully";
+                await UserService.RemoveFriendRequest(UserId, friendId);
+
+                var user1 = await UserService.GetUserById(friendId);
+                Info = $"{user1.Name} friend request removed successfully";
                 InfoDisplayClass = null;
             }
             //FriendReqRemoved = true;

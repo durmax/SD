@@ -78,7 +78,7 @@ namespace SD.Client.Pages
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 SearchDisplayClass = "";
-                foundUsers = await UserService.SearchUser(CurrentUserId + "," + userModel.Name, SearchText);
+                foundUsers = await UserService.SearchUser(CurrentUserId, SearchText);
             }
             else
             {
@@ -93,7 +93,7 @@ namespace SD.Client.Pages
 
             if (!string.IsNullOrWhiteSpace(UserId) && !string.IsNullOrWhiteSpace(ToUserId))
             {
-                var res = await UserService.AddFriendRequest(UserId + "," + userModel.Name, ToUserId);
+                var res = await UserService.AddFriendRequest(UserId, ToUserId);
 
                 if (res.IsSuccessStatusCode)
                 {

@@ -22,9 +22,9 @@ namespace SD.Client.Services
         {
             return await _httpClient.GetFromJsonAsync<List<UserModel>>("api/User");
         }
-        public async Task<Dictionary<string, string>> SearchUser(string searcherIdAndName, string SearchText)
+        public async Task<Dictionary<string, string>> SearchUser(string CurrentUserId, string SearchText)
         {
-            var xxx= await _httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/User/GetUsersByText/{searcherIdAndName}/{SearchText}");
+            var xxx= await _httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/User/GetUsersByText/{CurrentUserId}/{SearchText}");
             return xxx;
         }
         public async Task<UserModel> GetUserById(string id)
@@ -46,17 +46,17 @@ namespace SD.Client.Services
             return await _httpClient.PutAsJsonAsync($"api/User/UpdateUser/{id}", newUser);
         }
 
-        public async Task<HttpResponseMessage> AddFriendRequest(string userIdAndName, string friendId)
+        public async Task<HttpResponseMessage> AddFriendRequest(string userId, string friendId)
         {
-            return await _httpClient.PostAsync($"api/User/AddFriendRequest/{userIdAndName}/{friendId}",null);
+            return await _httpClient.PostAsync($"api/User/AddFriendRequest/{userId}/{friendId}",null);
         }
         public async Task<HttpResponseMessage> RemoveFriendRequest(string userId, string friendId)
         {
             return await _httpClient.PostAsync($"api/User/RemoveFriendRequest/{userId}/{friendId}", null);
         }
-        public async Task<HttpResponseMessage> AddFriend(string userId, string friendIdAndName)
+        public async Task<HttpResponseMessage> AddFriend(string userId, string friendId)
         {
-            return await _httpClient.PostAsync($"api/User/AddFriend/{userId}/{friendIdAndName}", null);
+            return await _httpClient.PostAsync($"api/User/AddFriend/{userId}/{friendId}", null);
         }
         public async Task<HttpResponseMessage> RemoveFriend(string userId, string friendId)
         {

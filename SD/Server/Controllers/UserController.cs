@@ -34,12 +34,12 @@ namespace sd.Api.Controllers
             }
         }
         // GET: api/User/GetUsersByText/Dured
-        [HttpGet("GetUsersByText/{searcherIdAndName}/{searchText}")]
-        public async Task<ActionResult<Dictionary<string, string>>> GetUsersByText(string searcherIdAndName, string searchText)
+        [HttpGet("GetUsersByText/{CurrentUserId}/{searchText}")]
+        public async Task<ActionResult<Dictionary<string, string>>> GetUsersByText(string CurrentUserId, string searchText)
         {
             try
             {
-                var result = await _userService.SearchUser(searcherIdAndName, searchText);
+                var result = await _userService.SearchUser(CurrentUserId, searchText);
                 if (result == null) return NotFound();
                 return Ok(result);
             }
@@ -133,12 +133,12 @@ namespace sd.Api.Controllers
 
 
 
-        [HttpPost("AddFriendRequest/{userIdAndName}/{friendId}")]
-        public async Task<ActionResult> AddFriendRequest(string userIdAndName, string friendId)
+        [HttpPost("AddFriendRequest/{userId}/{friendId}")]
+        public async Task<ActionResult> AddFriendRequest(string userId, string friendId)
         {
             try
             {
-                await _userService.AddFriendRequest(userIdAndName, friendId);
+                await _userService.AddFriendRequest(userId, friendId);
                 return Ok();
             }
             catch (Exception ex)
@@ -161,12 +161,12 @@ namespace sd.Api.Controllers
                     ex.Message);
             }
         }
-        [HttpPost("AddFriend/{UserId}/{friendIdAndName}")]
-        public async Task<ActionResult> AddFriend(string UserId, string friendIdAndName)
+        [HttpPost("AddFriend/{UserId}/{friendId}")]
+        public async Task<ActionResult> AddFriend(string UserId, string friendId)
         {
             try
             {
-                await _userService.AddFriend(UserId, friendIdAndName);
+                await _userService.AddFriend(UserId, friendId);
                 return Ok();
             }
             catch (Exception ex)

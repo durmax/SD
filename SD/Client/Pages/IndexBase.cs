@@ -66,10 +66,10 @@ namespace SD.Client.Pages
                     if (FriendRequestsCount > 0)
                     {
                         FriendRequestsDictionary = new Dictionary<string, string>();
-                        foreach (var text in userModel.FriendRequests)
+                        foreach (var id in userModel.FriendRequests)
                         {
-                            string[] words = text.Split(',');
-                            FriendRequestsDictionary.Add(words[0], words[1]);
+                            UserModel user1 = await UserService.GetUserById(id);
+                            FriendRequestsDictionary.Add(user1.UserId, user1.Name);
                         }
                     }
                 }

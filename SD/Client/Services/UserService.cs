@@ -1,10 +1,8 @@
 ﻿
 using SD.Shared;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace SD.Client.Services

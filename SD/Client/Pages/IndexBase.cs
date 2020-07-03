@@ -5,7 +5,6 @@ using SD.Client.Services;
 using System.Threading.Tasks;
 using SD.Shared;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SD.Client.Pages
 {

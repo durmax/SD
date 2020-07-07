@@ -19,7 +19,7 @@ namespace SD.Client.Pages
         [Parameter]
         public bool Collapsed { set; get; } = true;    // hide by default
 
-        protected bool opCollapsed { set; get; } = true;    // hide by default
+        protected bool opCollapsed { set; get; } = false;    // show by default
 
         [Inject]
         public WordService WordService { set; get; }
@@ -29,10 +29,12 @@ namespace SD.Client.Pages
 
         [Parameter]
         public string UserId { get; set; }
+        protected string CurrentUserId { get; set; }
 
         protected string styleDeleted;
         protected string cssClassDelete = "d-none";
         protected string cssClassUpdate = "d-none";
+        protected bool cssClassComment { get; set; } = true;    // hide by default
         protected bool loading;
         protected string note;
 
@@ -71,11 +73,11 @@ namespace SD.Client.Pages
         protected async Task AddWord()
         {
             loading = true;
-            if (!string.IsNullOrWhiteSpace(UserId))
+            if (!string.IsNullOrWhiteSpace(CurrentUserId))
             {
-                if (string.IsNullOrWhiteSpace(wordModel.UserId) || UserId != wordModel.UserId)
-                {    
-                    wordModel.UserId = UserId;
+                if (string.IsNullOrWhiteSpace(wordModel.UserId) || CurrentUserId != wordModel.UserId)
+                {
+                    wordModel.UserId = CurrentUserId;
                     wordModel.WordId = Guid.NewGuid().ToString();
                     wordModel.CreatedAt = DateTime.Now;
                 }
@@ -86,7 +88,6 @@ namespace SD.Client.Pages
                 {
                     if ((int)respons.StatusCode == 302)
                     {
-                        ////
                         cssClassUpdate = "";
                         foundWordIdToUpdate = await respons.Content.ReadAsStringAsync();
                     }
@@ -105,32 +106,45 @@ namespace SD.Client.Pages
             }
             else //note = "please Login to save word to your account";
             {
-                UserId = await AuthAsync();
+                NavigationManager.NavigateTo("/authentication/login");
             }
             loading = false;
         }
         protected async Task UpdateWord()
         {
-            if (!string.IsNullOrWhiteSpace(foundWordIdToUpdate))
+            if (!string.IsNullOrWhiteSpace(CurrentUserId))
             {
-                wordModel.WordId = foundWordIdToUpdate;
-                loading = true;
-
-                cssClassUpdate = "d-none";
-                HttpResponseMessage respons = await WordService.UpdateWord(wordModel);
-                if (!respons.IsSuccessStatusCode)
+                if (string.IsNullOrWhiteSpace(wordModel.UserId) || CurrentUserId != wordModel.UserId)
                 {
-                    //note = $"Sorry, {wordModel.Title} did not updated!";
-                    note = await respons.Content.ReadAsStringAsync();
+                    await AddWord();
                 }
                 else
                 {
-                    note = $"{wordModel.Title} is Updated";
-                    NewWord();
-                    MyText = "";
+                    loading = true;
+                    if (!string.IsNullOrWhiteSpace(foundWordIdToUpdate))
+                    {
+                        wordModel.WordId = foundWordIdToUpdate;
+                        cssClassUpdate = "d-none";
+                        HttpResponseMessage respons = await WordService.UpdateWord(wordModel);
+                        if (!respons.IsSuccessStatusCode)
+                        {
+                            //note = $"Sorry, {wordModel.Title} did not updated!";
+                            note = await respons.Content.ReadAsStringAsync();
+                        }
+                        else
+                        {
+                            note = $"{wordModel.Title} is Updated";
+                            //NewWord();
+                            //MyText = "";
+                        }
+                        foundWordIdToUpdate = "";
+                    }
+                    loading = false;
                 }
-                foundWordIdToUpdate = "";
-                loading = false;
+            }
+            else //note = "please Login to save word to your account";
+            {
+                NavigationManager.NavigateTo("/authentication/login");
             }
         }
         protected async Task DeleteWord()
@@ -156,48 +170,43 @@ namespace SD.Client.Pages
                 WordId = Guid.NewGuid().ToString(),
                 WordLang = wl,
                 ToLang = tl,
-                UserId = UserId,
+                UserId = CurrentUserId,
                 CreatedAt = DateTime.Now
             };
         }
 
         protected void WordChanged(string title)
         {
-            opCollapsed = false;
+            //opCollapsed = false;
             note = "";
             wordModel.Title = title;
 
         }
 
-        private async Task<string> AuthAsync()
+        protected override async Task OnInitializedAsync()
         {
+            if (wordModel.Explain == null)
+            {
+                MyText = "";
+            }
+            else
+            {
+                MyText = wordModel.Explain;
+                cssClassComment = false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(wordModel.UserId))// is not a new word
+            {
+                if (wordModel.UserId != UserId) cssClassDelete = "d-none";
+                else cssClassDelete = "";
+            }
+
             var user = (await authenticationStateTask).User;
-
-                if (user.Identity.IsAuthenticated)
-                {
-                    UserId = user.FindFirst(c => c.Type == "oid")?.Value;
-                }
-            else
+            if (user.Identity.IsAuthenticated)
             {
-                NavigationManager.NavigateTo("/authentication/login");
+                CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
             }
-            return UserId;
-        }
-        protected override void OnInitialized()
-        {
-            MyText = wordModel.Explain ?? "";
-
-            if (!string.IsNullOrWhiteSpace(wordModel.UserId) && wordModel.UserId != UserId)
-            {
-                cssClassDelete = "d-none";
-            }
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(wordModel.WordId))
-                {
-                    cssClassDelete = "";
-                }
-            }
+            //opCollapsed = false;
         }
     }
 }

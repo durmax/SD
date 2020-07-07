@@ -77,7 +77,7 @@ namespace SD.Client.Pages
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(Word) && otherPageModels != null)
+                    if (otherPageModels != null)
                     {
                         opRes = null;
                         opRes =  OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);

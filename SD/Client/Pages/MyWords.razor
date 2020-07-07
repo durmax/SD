@@ -2,11 +2,13 @@
 @page "/MyWords/{UserId}/{UserName}"
 @inherits MyWordsBase
 
-    <h3>@UserName</h3>
+<h3>@UserName</h3>
 
 @if (Words == null)
 {
-    <b>Loading...</b>
+    <div style="position:absolute; top:30vh; text-align:center">
+        <p><i class="fas fa-spin fa-spinner"></i> The WORDS are loading...</p>
+    </div>
 }
 else
 {

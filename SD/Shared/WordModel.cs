@@ -23,15 +23,18 @@ namespace SD.Shared
         public string WordLang { get; set; }
         [StringLength(10)]
         public string ToLang { get; set; }
+        [BsonIgnoreIfNull]
         [StringLength(10)]
         public string Type { get; set; }
+        [BsonIgnoreIfNull]
         public string Explain { get; set; }
+        [BsonIgnoreIfNull]
         public string Meanings { get; set; }
-
         [StringLength(20)]
         public string Box { get; set; }
+        [BsonIgnoreIfNull]
         public string Level { get; set; }
-
+        [BsonIgnoreIfNull]
         [StringLength(20)]
         public string Category { get; set; }
     }

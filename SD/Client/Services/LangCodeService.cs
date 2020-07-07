@@ -8,13 +8,7 @@ namespace SD.Client.Services
         
         public LangCodeService()
         {
-            Langs.Add("aa", "afar");
-            Langs.Add("ab", "abkhazian");
-            Langs.Add("ae", "avestan");
             Langs.Add("af", "afrikaans");
-            Langs.Add("ak", "akan");
-            Langs.Add("am", "amharic");
-            Langs.Add("an", "aragonese");
             Langs.Add("ar", "arabic");
             Langs.Add("as", "assamese");
             Langs.Add("av", "avaric");

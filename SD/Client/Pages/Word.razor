@@ -5,7 +5,7 @@
     <div class="card-header p-0 border-bottom-0">
         <div class="input-group">
 
-            <input type="search" class="form-control font-weight-bold" style="@styleDeleted" placeholder="Search for word"
+            <input type="search" class="form-control font-weight-bold" style="@styleDeleted" placeholder="Search for new word"
                    id="wordId"
                    value="@wordModel.Title"
                    @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"
@@ -24,11 +24,12 @@
                 <button type="button" class="btn btn-light" @onclick="Reverse">
                     <span>@wordModel.WordLang</span> <i class="fas fa-exchange-alt"></i>
                 </button>
-
                 <button type="button" class="btn btn-light @cssClassDelete " @onclick="DeleteWord">
                     <i class="fas fa-trash-alt"></i>
                 </button>
-
+                <button type="button" class="btn btn-light" @onclick="()=> cssClassComment = cssClassComment ? false : true">
+                    <i class="fas fa-comment-dots"></i>
+                </button>
                 <button type="button" class="btn btn-light" @onclick="AddWord">
                     <i class="fas fa-cloud-upload-alt"></i>
                 </button>
@@ -40,7 +41,7 @@
     <div class=@(Collapsed ? "collapse" : "")>
         <div class="card-body">
 
-            <div class="card @cssClassUpdate">
+            <div class="card mb-1 @cssClassUpdate">
                 <div class="card-body">
                     <div class="text-muted">@wordModel.Title is already exist</div>
                 </div>
@@ -67,19 +68,18 @@
             <div class="text-muted pl-1">
                 <i>@note</i>
             </div>
-
-
-
-            <div class="form-group">
+            <div class="form-group @(cssClassComment? "collapse" : "")">
                 <textarea class="form-control text-wrap"
                           rows="@Rows"
                           @bind-value="@MyText"
                           @bind-value:event="oninput">@MyText</textarea>
             </div>
+
             @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
             {
                 <OtherPages FLangCode="@wordModel.WordLang" TLangCode="@wordModel.ToLang" Word="@wordModel.Title" Collapsed="@opCollapsed"></OtherPages>
             }
+
         </div>
     </div>
 </div>

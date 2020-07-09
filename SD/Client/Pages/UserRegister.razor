@@ -6,27 +6,51 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 @inherits UserRegisterBase
-@*
+
+<div class="alert alert-primary @InfoDisplayClass" role="alert">
+    @Info
+</div>
+
+<div class="card">
     <EditForm Model="@userModel" OnValidSubmit="UserData">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
         <div class="form-group row">
             <div class="col-sm-10">
-                <InputText class="form-control" placeholder="Name"
+                <InputText class="form-control" placeholder="Nick Name"
                            @bind-Value="userModel.Name" />
             </div>
-        </div>*@
+        </div>
+
+        @*<div class="form-group row">
+                <div class="col-sm-10">
+                    <div class="alert alert-primary @InfoDisplayClass" role="alert">
+                        @Info
+                    </div>
+                </div>
+            </div>*@
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-outline-primary"><i class="fa fa-save"></i> Save</button>
+            </div>
+        </div>
+        @*<div class="col-sm-10">
+                <button class="btn btn-outline-danger" @onclick="RemoveUser"><i class="fa fa-trash-o fa-lg"></i> Remove</button>
+            </div>*@
+    </EditForm>
+</div>
+
 
 <div class="@cssDisplayNotCurrentUser">
-    <div class="form-group row">
-        <div class="col-sm-10">
-            <input type="search" class="form-control" placeholder="Find friend"
-                   @onchange="@(async(e)=> {await SearchUser((string)e.Value);})" />
+    <div class="input-group mb-3 mt-3">
+        <input type="search" class="form-control" placeholder="Find friend"
+               @onchange="@(async(e)=> {await SearchUser((string)e.Value);})" />
 
-        </div>
-        <div class="col-sm-2 pt-2">
-            <i class="fas fa-search"></i>
+        <div class="input-group-append">
+            <button class="btn btn-light">
+                <i class="fas fa-search"></i>
+            </button>
         </div>
     </div>
     <div class="@SearchDisplayClass">
@@ -90,26 +114,30 @@
             </div>
         }
     </div>
-    <div class="alert alert-primary @InfoDisplayClass" role="alert">
-        @Info
-    </div>
 </div>
-@*<div class="form-group row">
-        <div class="col-sm-10">
-            <div class="alert alert-primary @InfoDisplayClass" role="alert">
-                @Info
+
+@if (FriendsDictionary != null)
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="container">
+                @foreach (var foudUser in FriendsDictionary)
+                {
+                    <div class="row">
+                        <div class="col-10">
+                            <a type="button" class="btn btn-link"
+                               href="MyWords/@foudUser.Key/@foudUser.Value">@foudUser.Value</a>
+                        </div>
+                        <div class="col-2">
+                            <button type="button" class="btn btn-link"
+                                    @onclick="@(async () => { await RemoveFriend(foudUser.Key); })">
+                                <i class="fas fa-user-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                }
+
             </div>
         </div>
     </div>
-    <div class="form-group row">
-        <div class="col-sm-10">
-            <button type="submit" class="btn btn-outline-primary"><i class="fa fa-save"></i> Save</button>
-        </div>
-    </div>
-    <div class="col-sm-10">
-        <button class="btn btn-outline-danger" @onclick="RemoveUser"><i class="fa fa-trash-o fa-lg"></i> Remove</button>
-    </div>*@
-
-
-
-
+}

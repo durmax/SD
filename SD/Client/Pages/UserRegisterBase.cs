@@ -14,6 +14,12 @@ namespace SD.Client.Pages
         public UserModel userModel = new UserModel();
         public Dictionary<string, string> foundUsers;
 
+        protected int? FriendsCount { set; get; }
+
+        protected bool Collapsed { get; set; } = true;    // hide by default
+
+        protected Dictionary<string, string> FriendsDictionary;
+
         [Inject]
         public UserService UserService { set; get; }
 
@@ -29,6 +35,7 @@ namespace SD.Client.Pages
 
         protected List<string> FriendRequests { get; set; }
         protected List<string> Friends { get; set; }
+
         protected bool sendFriendReqWait = false;
 
         protected string Info { get; set; }
@@ -167,6 +174,20 @@ namespace SD.Client.Pages
                 {
                     Registered = false;
                     await UserData();
+                }
+
+                if (userModel.Friends != null)
+                {
+                    FriendsCount = userModel?.Friends.Count ?? 0;
+                    if (FriendsCount > 0)
+                    {
+                        FriendsDictionary = new Dictionary<string, string>();
+                        foreach (var id in userModel.Friends)
+                        {
+                            UserModel user1 = await UserService.GetUserById(id);
+                            FriendsDictionary.Add(user1.UserId, user1.Name);
+                        }
+                    }
                 }
             }
         }

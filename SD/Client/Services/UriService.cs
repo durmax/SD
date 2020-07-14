@@ -23,12 +23,12 @@ namespace SD.Client.Services
 
             List<string> properties = new List<string> { "FLangCode", "TLangCode", "FLangName", "TLangName", "Word" };
 
-                _linkModel.FLangCode = linkParam.FLangCode;
-                _linkModel.TLangCode = linkParam.TLangCode;
+            _linkModel.FLangCode = linkParam.FLangCode;
+            _linkModel.TLangCode = linkParam.TLangCode;
 
-                _linkModel.FLangName = _langCodeService.Langs[linkParam.FLangCode]; // Get LangName from dictionery names
-                _linkModel.TLangName = _langCodeService.Langs[linkParam.TLangCode];     // GetLangName
-           
+            _linkModel.FLangName = _langCodeService.Langs[linkParam.FLangCode]; // Get LangName from dictionery names
+            _linkModel.TLangName = _langCodeService.Langs[linkParam.TLangCode];     // GetLangName
+
 
             _linkModel.Word = linkParam.Word;
 
@@ -50,19 +50,30 @@ namespace SD.Client.Services
 
         private void IrregularLink(string pattern)
         {
-            if (pattern.Contains("arabdict.com"))
+            if (_linkModel.FLangCode == "ar" || _linkModel.TLangCode == "ar")
             {
-                if (_linkModel.FLangCode == "ar")
+                if (pattern.Contains("arabdict.com"))
                 {
-                    _linkModel.FLangName = _langCodeService.Langs[_linkModel.TLangCode];
-                    _linkModel.TLangName = "arabic";
-                }
-                if (_linkModel.FLangCode == "de" || _linkModel.TLangCode == "de")
-                {
-                    _linkModel.FLangName = "deutsch";
-                    _linkModel.TLangName = "arabisch";
+                    if (_linkModel.FLangCode == "ar")
+                    {
+                        _linkModel.FLangName = _langCodeService.Langs[_linkModel.TLangCode];
+                        _linkModel.TLangName = "arabic";
+                    }
+                    if (_linkModel.FLangCode == "de" || _linkModel.TLangCode == "de")
+                    {
+                        _linkModel.FLangName = "deutsch";
+                        _linkModel.TLangName = "arabisch";
+                    }
                 }
 
+                if (pattern.Contains("almaany.com"))
+                {
+                    if (_linkModel.FLangCode != "ar")
+                    {
+                        _linkModel.TLangCode = _linkModel.FLangCode;
+                    }
+
+                }
             }
         }
     }

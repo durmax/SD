@@ -2,33 +2,67 @@
 @inherits LanguagesBase
 @using Blazored.Typeahead
 
-<div class="container">
-    <div class="row">
-        <div class="col-5">
-            <b>Learned Language</b>
-            <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedFL">
-                <SelectedTemplate>
-                    @context.Value
-                </SelectedTemplate>
-                <ResultTemplate>
-                    @context.Value
-                </ResultTemplate>
-            </BlazoredTypeahead>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <b>First Language</b>
+            </div>
+            <div class="col-6">
+                <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedTL">
+                    <SelectedTemplate>
+                        @context.Value
+                    </SelectedTemplate>
+                    <ResultTemplate>
+                        @context.Value
+                    </ResultTemplate>
+                </BlazoredTypeahead>
+            </div>
         </div>
 
-        <div class="col-2">
-            <button class="btn btn-link" @onclick="Reverse"> <i class="fas fa-exchange-alt"></i></button>
+        <div class="row">
+            <div class="col-6">
+                <b>Translate to</b>
+            </div>
+            <div class="col-6">
+                <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedFL">
+                    <SelectedTemplate>
+                        @context.Value
+                    </SelectedTemplate>
+                    <ResultTemplate>
+                        @context.Value
+                    </ResultTemplate>
+                </BlazoredTypeahead>
+            </div>
         </div>
-        <div class="col-5">
-            <b>First Language</b>
-            <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedTL">
-                <SelectedTemplate>
-                    @context.Value
-                </SelectedTemplate>
-                <ResultTemplate>
-                    @context.Value
-                </ResultTemplate>
-            </BlazoredTypeahead>
+
+        <div class="row">
+            <div class="col-12">
+                <b>Language List:</b>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                @if (KnownLangs != null)
+                {
+                    <div class="input-group mb-3" style="width:auto;">
+                        <ul class="form-check form-check-inline">
+                            @foreach (var item in KnownLangs)
+                            {
+                                <li @key="item"
+                                    class="btn btn-outline-secondary form-check-inline">
+                                    <label class="form-check-label">
+                                        @item
+                                    </label>
+                                    <button type="button" class="btn btn-link"
+                                            @onclick="(() => RemoveKnownLang(item))">
+                                        <i class="fas fa-backspace"></i>
+                                    </button>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
         </div>
     </div>
-</div>

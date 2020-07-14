@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
 using SD.Shared;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -24,7 +26,14 @@ namespace SD.Client.Pages
         [Inject]
         public WordService WordService { set; get; }
 
-        [Parameter]
+        [Inject]
+        public ILocalStorageService LocalStorageService { get; set; }
+
+        protected List<string> KnownLangs { get; set; }
+        protected string LangsStr { get; set; }
+
+
+    [Parameter]
         public WordModel wordModel { get; set; }
 
         [Parameter]
@@ -206,7 +215,27 @@ namespace SD.Client.Pages
             {
                 CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
             }
-            //opCollapsed = false;
+
+            KnownLangs = new List<string>();
+            KnownLangs.Add(await LocalStorageService.GetItemAsync<string>("FLang"));
+            KnownLangs.Add(await LocalStorageService.GetItemAsync<string>("TLang"));
+
+            LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
+            if (!string.IsNullOrWhiteSpace(LangsStr))
+            {
+                 string[] langArray = LangsStr.Split(",");
+
+                foreach (var lan in langArray)
+                {
+                    if (!string.IsNullOrWhiteSpace(lan))
+                    {
+                        if (!KnownLangs.Contains(lan))
+                        {
+                            KnownLangs.Add(lan);
+                        }
+                    }
+                }
+            }
         }
     }
 }

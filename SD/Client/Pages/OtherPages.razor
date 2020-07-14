@@ -11,17 +11,13 @@
 }
 else
 {
-    <div class="card">
-
+    <div class="card m-0">
         <div class="btn-group" role="group">
-            <div class="input-group-prepend">
-                <button type="button" class="btn btn-light" disabled><span class="float-left">@TLangCode</span></button>
-            </div>
             <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Dict";   Collapsed = false;   await GetOpRes(); })"><i class="fas fa-book"></i></button>
             <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Trans";  Collapsed = false; await GetOpRes();})"><i class="oi oi-document"></i></button>
             <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Vocab";  Collapsed = false; await GetOpRes();})"><i class="fab fa-wikipedia-w"></i></button>
             <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Search"; Collapsed = false; await GetOpRes();})"><i class="fas fa-globe"></i></button>
-            <div class="input-group-prepend">
+            <div class="input-group-append">
                 <button type="button" class="btn btn-light" @onclick="GetP">
                     <i class="float-right @(Collapsed? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
                 </button>

@@ -1,6 +1,5 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using SD.Client.Models;
 using SD.Client.Services;
 using System.Collections.Generic;
@@ -12,10 +11,16 @@ namespace SD.Client.Pages
     public class LanguagesBase : ComponentBase
     {
         [Inject]
+        public UserService UserService { set; get; }
+
+        [Inject]
         protected LangCodeService LangCodeService { get; set; }
 
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
+
+        protected List<string> KnownLangs { get; set; }
+        protected string LangsStr { get; set; }
 
         private LangCode SFL;
         private LangCode STL;
@@ -27,6 +32,7 @@ namespace SD.Client.Pages
             {
                 SFL = value;
                 LocalStorageService.SetItemAsync("FLang", SelectedFL.Key);
+                AddKnownLang(SFL.Key);
             }
         }
 
@@ -46,22 +52,74 @@ namespace SD.Client.Pages
             return await Task.FromResult(LangCodes.Where(x => x.Value.ToLower().Contains(searchText.ToLower())).ToList());
         }
 
-        protected void Reverse()
+        protected void AddKnownLang(string lang)
         {
-            LangCode l = SelectedFL;
-            SelectedFL = SelectedTL;
-            SelectedTL = l;
+            if (KnownLangs != null)
+            {
+                if (!KnownLangs.Contains(lang))
+                {
+                    KnownLangs.Add(lang);
+                    LangsStr += "," + lang;
+                }
+            }
+            else
+            {
+                KnownLangs = new List<string>();
+                KnownLangs.Add(lang);
+                LangsStr += "," + lang;
+            }
+            LocalStorageService.SetItemAsync("Langs", LangsStr);
+        }
+        protected void RemoveKnownLang(string lang)
+        {
+            KnownLangs.Remove(lang);
+            LangsStr = null;
+            foreach (var item in KnownLangs)
+            {
+                LangsStr += "," + item;
+            }
+            LocalStorageService.SetItemAsync("Langs", LangsStr);
+        }
+
+        protected async Task GetLangsFromLocalAsync()
+        {
+            KnownLangs = new List<string>();
+            try
+            {
+                LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
+            }
+            catch { }
+
+            if (!string.IsNullOrWhiteSpace(LangsStr))
+            {
+                string[] langArray = LangsStr.Split(",");
+
+                foreach (var lan in langArray)
+                {
+                    if (!string.IsNullOrWhiteSpace(lan))
+                    {
+                        if (!KnownLangs.Contains(lan))
+                        {
+                            KnownLangs.Add(lan);
+                        }
+                    }
+                }
+            }
         }
 
         protected override async Task OnInitializedAsync()
         {
+            await GetLangsFromLocalAsync();
+
             string fl = "en";
             string tl = "de";
-            try { 
-             fl = await LocalStorageService.GetItemAsync<string>("FLang");
-             tl = await LocalStorageService.GetItemAsync<string>("TLang");
+            try
+            {
+                fl = await LocalStorageService.GetItemAsync<string>("FLang");
+                tl = await LocalStorageService.GetItemAsync<string>("TLang");
             }
-            catch { 
+            catch
+            {
             }
             fl = (string.IsNullOrWhiteSpace(fl) || fl == "null") ? "en" : fl;
             tl = (string.IsNullOrWhiteSpace(tl) || tl == "null") ? "de" : tl;
@@ -89,7 +147,8 @@ namespace SD.Client.Pages
 
                 LangCodes.Add(langCode);
             }
-        }
 
+            
+        }
     }
 }

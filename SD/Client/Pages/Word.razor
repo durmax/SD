@@ -4,7 +4,6 @@
 <div class="card">
     <div class="card-header p-0 border-bottom-0">
         <div class="input-group">
-
             <input type="search" class="form-control font-weight-bold" style="@styleDeleted" placeholder="Search for new word"
                    id="wordId"
                    value="@wordModel.Title"
@@ -16,71 +15,121 @@
                     <i class="float-right @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
                 </button>
             </div>
-        </div>
 
+        </div>
 
         <div class=@(Collapsed ? "collapse" : "")>
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-light" @onclick="Reverse">
-                    <span>@wordModel.WordLang</span> <i class="fas fa-exchange-alt"></i>
-                </button>
-                <button type="button" class="btn btn-light @cssClassDelete " @onclick="DeleteWord">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-                <button type="button" class="btn btn-light" @onclick="()=> cssClassComment = cssClassComment ? false : true">
-                    <i class="fas fa-comment-dots"></i>
-                </button>
-                <button type="button" class="btn btn-light" @onclick="AddWord">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                </button>
+            <div class="input-group" role="group">
+
+                    @if (KnownLangs != null)
+                    {
+                        <div class="input-group-append">
+                            <select class="custom-select bg-transparent rounded-0 border-0" @bind="@wordModel.WordLang">
+                                @foreach (var item in KnownLangs)
+                                    {
+                                        if (item == wordModel.WordLang)
+                                        {
+                                        <option selected value="@item">@item</option>
+                                        }
+                                        else
+                                        {
+                                        <option value="@item">@item</option>
+                                        }
+                                    }
+                            </select>
+                        </div>
+
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+
+                        <div class="input-group-append">
+                            <select class="custom-select bg-transparent rounded-0 border-0" @bind="@wordModel.ToLang">
+                                @foreach (var item in KnownLangs)
+                                    {
+                                        if (item == wordModel.ToLang)
+                                        {
+                                        <option selected value="@item">@item</option>
+                                        }
+                                        else
+                                        {
+                                        <option value="@item">@item</option>
+                                        }
+                                    }
+                            </select>
+                        </div>
+
+                    }
+
+                  
+                        <button type="button" class="btn btn-light @cssClassDelete " @onclick="DeleteWord">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    
+                    
+                        <button type="button" class="btn btn-light" @onclick="()=> cssClassComment = cssClassComment ? false : true">
+                            <i class="fas fa-comment-dots"></i>
+                        </button>
+                    
+                    
+                        <button type="button" class="btn btn-light" @onclick="AddWord">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </button>
+                    
+                
             </div>
         </div>
-    </div>
 
-
-    <div class=@(Collapsed ? "collapse" : "")>
-        <div class="card-body">
-
-            <div class="card mb-1 @cssClassUpdate">
-                <div class="card-body">
-                    <div class="text-muted">@wordModel.Title is already exist</div>
-                </div>
-                <div class="card-footer">
-                    <button type="button" class="btn btn-outline-secondary" @onclick="UpdateWord">
-                        Update <i class="fas fa-question-circle"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary" @onclick="@(()=> {foundWordIdToUpdate=""; cssClassUpdate = "d-none";})">
-                        Cancel <i class="fas fa-window-close"></i>
-                    </button>
-                </div>
-            </div>
-
-            @if (loading)
-            {
-                <div class="d-flex justify-content-center">
-                    <div class="spinner-border spinner-border-sm" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                </div>
-            }
-
-
-            <div class="text-muted pl-1">
-                <i>@note</i>
-            </div>
-            <div class="form-group @(cssClassComment? "collapse" : "")">
-                <textarea class="form-control text-wrap"
-                          rows="@Rows"
-                          @bind-value="@MyText"
-                          @bind-value:event="oninput">@MyText</textarea>
-            </div>
-
-            @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
-            {
-                <OtherPages FLangCode="@wordModel.WordLang" TLangCode="@wordModel.ToLang" Word="@wordModel.Title" Collapsed="@opCollapsed"></OtherPages>
-            }
-
-        </div>
     </div>
 </div>
+
+
+<div class=@(Collapsed ? "collapse" : "")>
+    <div class="card-body">
+
+        <div class="card mb-1 @cssClassUpdate">
+            <div class="card-body">
+                <div class="text-muted">@wordModel.Title is already exist</div>
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-outline-secondary" @onclick="UpdateWord">
+                    Update <i class="fas fa-question-circle"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" @onclick="@(()=> {foundWordIdToUpdate=""; cssClassUpdate = "d-none";})">
+                    Cancel <i class="fas fa-window-close"></i>
+                </button>
+            </div>
+        </div>
+
+        @if (loading)
+        {
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        }
+
+
+        <div class="text-muted pl-1">
+            <i>@note</i>
+        </div>
+        <div class="form-group @(cssClassComment? "collapse" : "")">
+            <textarea class="form-control text-wrap"
+                      rows="@Rows"
+                      @bind-value="@MyText"
+                      @bind-value:event="oninput">@MyText</textarea>
+        </div>
+
+
+        @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
+        {
+            <OtherPages FLangCode="@wordModel.WordLang" TLangCode="@wordModel.ToLang" Word="@wordModel.Title" Collapsed="@opCollapsed"></OtherPages>
+        }
+
+    </div>
+</div>
+
 

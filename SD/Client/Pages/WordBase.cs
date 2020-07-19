@@ -33,8 +33,10 @@ namespace SD.Client.Pages
         protected string LangsStr { get; set; }
 
 
-    [Parameter]
+        [Parameter]
         public WordModel wordModel { get; set; }
+        [Parameter]
+        public string WordId { get; set; }
 
         [Parameter]
         public string UserId { get; set; }
@@ -64,7 +66,7 @@ namespace SD.Client.Pages
 
         private void CalculateSize(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (!string.IsNullOrWhiteSpace(value))
             {
                 Rows = Math.Max(value.Split('\n').Length, value.Split('\r').Length);
                 Rows = Math.Max(Rows, 2);
@@ -194,13 +196,31 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            if (wordModel.Explain == null)
+            if (wordModel==null)
+            {
+              wordModel = new WordModel();
+            }
+            
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(WordId))
+                {
+                    wordModel = await WordService.GetWordById(WordId);
+                    Collapsed = false;
+                }
+            }
+            catch { }
+
+            if (string.IsNullOrWhiteSpace(wordModel.Explain))
             {
                 MyText = "";
+                cssClassComment = true;
             }
             else
             {
                 MyText = wordModel.Explain;
+                CalculateSize(MyText);
+                Rows = Rows < 3 ? Rows : Rows++;
                 cssClassComment = false;
             }
 
@@ -223,7 +243,7 @@ namespace SD.Client.Pages
             LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
             if (!string.IsNullOrWhiteSpace(LangsStr))
             {
-                 string[] langArray = LangsStr.Split(",");
+                string[] langArray = LangsStr.Split(",");
 
                 foreach (var lan in langArray)
                 {
@@ -237,5 +257,6 @@ namespace SD.Client.Pages
                 }
             }
         }
+
     }
 }

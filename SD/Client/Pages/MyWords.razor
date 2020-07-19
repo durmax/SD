@@ -12,9 +12,15 @@
 }
 else
 {
-
-    @foreach (var word in Words)
-    {
-        <Word wordModel="word" UserId="@UserId" Collapsed="true"></Word>
-    }
+    <ol class="list-group ml-2">
+        @foreach (var word in Words)
+        {
+            <li >
+                <a class="list-group-item" href="Word/@word.WordId">
+                    @word.Title
+                </a>
+            </li>
+            @*<Word wordModel="word" UserId="@UserId" Collapsed="true"></Word>*@
+        }
+    </ol>
 }

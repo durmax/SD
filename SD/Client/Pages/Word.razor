@@ -1,4 +1,4 @@
-﻿
+﻿@page "/Word/{WordId}"
 @inherits WordBase
 
 <div class="card">
@@ -21,64 +21,64 @@
         <div class=@(Collapsed ? "collapse" : "")>
             <div class="input-group" role="group">
 
-                    @if (KnownLangs != null)
-                    {
-                        <div class="input-group-append">
-                            <select class="custom-select bg-transparent rounded-0 border-0" @bind="@wordModel.WordLang">
-                                @foreach (var item in KnownLangs)
-                                    {
-                                        if (item == wordModel.WordLang)
-                                        {
-                                        <option selected value="@item">@item</option>
-                                        }
-                                        else
-                                        {
-                                        <option value="@item">@item</option>
-                                        }
-                                    }
-                            </select>
-                        </div>
+                @if (KnownLangs != null)
+                {
+                    <div class="input-group-append">
+                        <select class="custom-select bg-transparent rounded-0 border-0" @bind="@wordModel.WordLang">
+                            @foreach (var item in KnownLangs)
+                            {
+                                if (item == wordModel.WordLang)
+                                {
+                                    <option selected value="@item">@item</option>
+                                }
+                                else
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            }
+                        </select>
+                    </div>
 
-                        <div class="input-group-append">
-                            <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
-                                <i class="fas fa-exchange-alt"></i>
-                            </button>
-                        </div>
-
-                        <div class="input-group-append">
-                            <select class="custom-select bg-transparent rounded-0 border-0" @bind="@wordModel.ToLang">
-                                @foreach (var item in KnownLangs)
-                                    {
-                                        if (item == wordModel.ToLang)
-                                        {
-                                        <option selected value="@item">@item</option>
-                                        }
-                                        else
-                                        {
-                                        <option value="@item">@item</option>
-                                        }
-                                    }
-                            </select>
-                        </div>
-
-                    }
-
-                  
-                        <button type="button" class="btn btn-light @cssClassDelete " @onclick="DeleteWord">
-                            <i class="fas fa-trash-alt"></i>
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
+                            <i class="fas fa-exchange-alt"></i>
                         </button>
-                    
-                    
-                        <button type="button" class="btn btn-light" @onclick="()=> cssClassComment = cssClassComment ? false : true">
-                            <i class="fas fa-comment-dots"></i>
-                        </button>
-                    
-                    
-                        <button type="button" class="btn btn-light" @onclick="AddWord">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                        </button>
-                    
-                
+                    </div>
+
+                    <div class="input-group-append">
+                        <select class="custom-select bg-transparent rounded-0 border-0" @bind="@wordModel.ToLang">
+                            @foreach (var item in KnownLangs)
+                            {
+                                if (item == wordModel.ToLang)
+                                {
+                                    <option selected value="@item">@item</option>
+                                }
+                                else
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                }
+
+
+                <button type="button" class="btn btn-light @cssClassDelete " @onclick="DeleteWord">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+
+
+                <button type="button" class="btn btn-light" @onclick="()=> cssClassComment = cssClassComment ? false : true">
+                    <i class="fas fa-comment-dots"></i>
+                </button>
+
+
+                <button type="button" class="btn btn-light" @onclick="AddWord">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </button>
+
+
             </div>
         </div>
 
@@ -87,7 +87,7 @@
 
 
 <div class=@(Collapsed ? "collapse" : "")>
-    <div class="card-body">
+    <div class="card-body pl-0 pr-0">
 
         <div class="card mb-1 @cssClassUpdate">
             <div class="card-body">

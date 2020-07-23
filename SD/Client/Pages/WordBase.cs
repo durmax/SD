@@ -32,7 +32,6 @@ namespace SD.Client.Pages
         protected List<string> KnownLangs { get; set; }
         protected string LangsStr { get; set; }
 
-
         [Parameter]
         public WordModel wordModel { get; set; }
         [Parameter]
@@ -40,10 +39,8 @@ namespace SD.Client.Pages
 
         [Parameter]
         public string UserId { get; set; }
-        protected string CurrentUserId { get; set; }
+        private string CurrentUserId { get; set; }
 
-        protected string styleDeleted;
-        protected string cssClassDelete = "d-none";
         protected string cssClassUpdate = "d-none";
         protected bool cssClassComment { get; set; } = true;    // hide by default
         protected bool loading;
@@ -81,6 +78,9 @@ namespace SD.Client.Pages
             wordModel.ToLang = l;
         }
 
+        [Parameter]
+        public EventCallback<WordModel> OnWordSave { get; set; }
+
         protected async Task AddWord()
         {
             loading = true;
@@ -91,6 +91,7 @@ namespace SD.Client.Pages
                     wordModel.UserId = CurrentUserId;
                     wordModel.WordId = Guid.NewGuid().ToString();
                     wordModel.CreatedAt = DateTime.Now;
+
                 }
                 wordModel.Explain = MyText;
                 HttpResponseMessage respons = await WordService.AddWord(wordModel);
@@ -109,9 +110,10 @@ namespace SD.Client.Pages
                     note = $"{wordModel.Title} is Saved";
                     if ((int)respons.StatusCode == 200)
                     {
-                        NewWord();
-                        styleDeleted = "";
-                        MyText = "";
+                        if (CurrentUserId == UserId)
+                        {
+                            await OnWordSave.InvokeAsync(wordModel);
+                        }
                     }
                 }
             }
@@ -121,6 +123,7 @@ namespace SD.Client.Pages
             }
             loading = false;
         }
+
         protected async Task UpdateWord()
         {
             if (!string.IsNullOrWhiteSpace(CurrentUserId))
@@ -158,21 +161,8 @@ namespace SD.Client.Pages
                 NavigationManager.NavigateTo("/authentication/login");
             }
         }
-        protected async Task DeleteWord()
-        {
-            loading = true;
-            var response = await WordService.RemoveWord(wordModel.WordId);
-            if (response.IsSuccessStatusCode)
-            {
-                cssClassDelete = "d-none";
-                styleDeleted = "text-decoration: line-through;";
-                note = $"{wordModel.Title} is Deleted";
-            }
-            //x = await response.Content.ReadAsStringAsync();
-            loading = false;
-        }
 
-        private void NewWord()
+        protected void NewWord()
         {
             string wl = wordModel.WordLang;
             string tl = wordModel.ToLang;
@@ -184,6 +174,7 @@ namespace SD.Client.Pages
                 UserId = CurrentUserId,
                 CreatedAt = DateTime.Now
             };
+            MyText = null;
         }
 
         protected void WordChanged(string title)
@@ -191,26 +182,10 @@ namespace SD.Client.Pages
             //opCollapsed = false;
             note = "";
             wordModel.Title = title;
-
         }
 
-        protected override async Task OnInitializedAsync()
+        private void SetMyText()
         {
-            if (wordModel==null)
-            {
-              wordModel = new WordModel();
-            }
-            
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(WordId))
-                {
-                    wordModel = await WordService.GetWordById(WordId);
-                    Collapsed = false;
-                }
-            }
-            catch { }
-
             if (string.IsNullOrWhiteSpace(wordModel.Explain))
             {
                 MyText = "";
@@ -223,12 +198,26 @@ namespace SD.Client.Pages
                 Rows = Rows < 3 ? Rows : Rows++;
                 cssClassComment = false;
             }
+        }
 
-            if (!string.IsNullOrWhiteSpace(wordModel.UserId))// is not a new word
+        protected override async Task OnInitializedAsync()
+        {
+            if (wordModel == null)
             {
-                if (wordModel.UserId != UserId) cssClassDelete = "d-none";
-                else cssClassDelete = "";
+                wordModel = new WordModel();
             }
+
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(WordId))
+                {
+                    wordModel = await WordService.GetWordById(WordId);
+                    Collapsed = false;
+                }
+            }
+            catch { }
+
+            SetMyText();
 
             var user = (await authenticationStateTask).User;
             if (user.Identity.IsAuthenticated)
@@ -257,6 +246,11 @@ namespace SD.Client.Pages
                 }
             }
         }
+        protected override void OnParametersSet()
+        {
+            note = null;
 
+            SetMyText();
+        }
     }
 }

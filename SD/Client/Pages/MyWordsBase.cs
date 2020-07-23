@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
 using SD.Shared;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -12,19 +11,28 @@ namespace SD.Client.Pages
     public class MyWordsBase : ComponentBase
     {
         [Inject]
+        public ILocalStorageService LocalStorageService { get; set; }
+
+        [Inject]
         public WordService WordService { set; get; }
         [Inject]
         NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
+        protected WordModel wordModel { get; set; } = new WordModel();
 
         [Parameter]
         public string UserId { get; set; }
+        private string CurrentUserId { get; set; }
         [Parameter]
         public string UserName { get; set; }
 
         protected bool Collapsed = true;    // hide by default
+        protected bool loading;
+
+        protected string styleDeleted;
+        protected string cssClassDelete;// = "d-none";
 
         protected List<WordModel> Words { get; set; }
 
@@ -33,20 +41,48 @@ namespace SD.Client.Pages
             return await WordService.GetAllWords(UserId);
         }
 
+        protected void NewWordHandler(WordModel newWord)
+        {
+            Words.Add(newWord);
+        }
+        protected async Task DeleteWord()
+        {
+            loading = true;
+
+            if (!string.IsNullOrWhiteSpace(wordModel.UserId))// is not a new word
+            {
+                await Auth();
+                if (wordModel.UserId == UserId)
+                {
+                    var response = await WordService.RemoveWord(wordModel.WordId);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Words.Remove(wordModel);
+                        //cssClassDelete = "d-none";
+                        //styleDeleted = "text-decoration: line-through;";
+                        //note = $"{wordModel.Title} is Deleted";
+                    }
+                    else
+                    {
+                        //note = $"You can NOT delete {wordModel.Title}";
+                    }
+                }
+            }
+            loading = false;
+        }
+
         protected async Task Auth()
         {
-            if (string.IsNullOrWhiteSpace(UserId))
-            {
-                var user = (await authenticationStateTask).User;
+            var user = (await authenticationStateTask).User;
 
-                if (user.Identity.IsAuthenticated)
-                {
-                    UserId = user.FindFirst(c => c.Type == "oid")?.Value;
-                }
-                else
-                {
-                    NavigationManager.NavigateTo("authentication/login");
-                }
+            if (user.Identity.IsAuthenticated)
+            {
+                CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
+                cssClassDelete = null;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("authentication/login");
             }
         }
 
@@ -54,7 +90,16 @@ namespace SD.Client.Pages
         {
             try
             {
-                await Auth();
+                if (string.IsNullOrWhiteSpace(UserId))
+                {
+                    await Auth();
+                    UserId = CurrentUserId;
+                }
+                else
+                {
+                    cssClassDelete = UserId == CurrentUserId? null : "d-none";
+                }
+
                 Words = await GetWords();
             }
             catch
@@ -62,6 +107,14 @@ namespace SD.Client.Pages
                 NavigationManager.NavigateTo("/");
             }
 
+            wordModel.WordLang = await LocalStorageService.GetItemAsync<string>("FLang");
+            wordModel.ToLang = await LocalStorageService.GetItemAsync<string>("TLang");
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            Words = null;
+            await OnInitializedAsync();
         }
     }
 }

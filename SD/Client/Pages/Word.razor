@@ -3,12 +3,23 @@
 
 <div class="card">
     <div class="card-header p-0 border-bottom-0">
+        <div class="text-muted pl-1">
+            <i class="bg-light">@note</i>
+        </div>
         <div class="input-group">
-            <input type="search" class="form-control font-weight-bold" style="@styleDeleted" placeholder="Search for new word"
+
+            <div class="input-group-append">
+                <button type="button" class="btn btn-outline-secondary bg-white text-dark" @onclick="NewWord">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+
+            <input type="search" class="form-control font-weight-bold" placeholder="Search for new word"
                    id="wordId"
                    value="@wordModel.Title"
                    @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"
                    @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})" />
+
 
             <div class="input-group-append">
                 <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="() => Collapsed = (Collapsed) ? false : true ">
@@ -19,7 +30,7 @@
         </div>
 
         <div class=@(Collapsed ? "collapse" : "")>
-            <div class="input-group" role="group">
+            <div class="btn-group" role="group">
 
                 @if (KnownLangs != null)
                 {
@@ -60,25 +71,23 @@
                             }
                         </select>
                     </div>
-
                 }
-
-
-                <button type="button" class="btn btn-light @cssClassDelete " @onclick="DeleteWord">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-
 
                 <button type="button" class="btn btn-light" @onclick="()=> cssClassComment = cssClassComment ? false : true">
                     <i class="fas fa-comment-dots"></i>
                 </button>
 
-
                 <button type="button" class="btn btn-light" @onclick="AddWord">
                     <i class="fas fa-cloud-upload-alt"></i>
                 </button>
-
-
+                @if (loading)
+                {
+                    <button type="button" class="btn btn-light">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </button>
+                }
             </div>
         </div>
 
@@ -87,7 +96,7 @@
 
 
 <div class=@(Collapsed ? "collapse" : "")>
-    <div class="card-body pl-0 pr-0">
+    <div class="card-body p-0">
 
         <div class="card mb-1 @cssClassUpdate">
             <div class="card-body">
@@ -103,20 +112,9 @@
             </div>
         </div>
 
-        @if (loading)
-        {
-            <div class="d-flex justify-content-center">
-                <div class="spinner-border spinner-border-sm" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-            </div>
-        }
 
 
-        <div class="text-muted pl-1">
-            <i>@note</i>
-        </div>
-        <div class="form-group @(cssClassComment? "collapse" : "")">
+        <div class="form-group m-0 @(cssClassComment? "collapse" : "")">
             <textarea class="form-control text-wrap"
                       rows="@Rows"
                       @bind-value="@MyText"

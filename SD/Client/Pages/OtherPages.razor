@@ -33,11 +33,11 @@ else
 
         <div class=@(Collapsed? "collapse" : "")>
 
-            <div class="card-body">
+            <div class="card-body p-0">
 
                 @if (opRes != null)
                 {
-                    <div class="list-group pb-2">
+                    <div class="list-group">
                         @foreach (var otherPage in opRes)
                         {
                             @if (otherPage.Type == opFilterVal)

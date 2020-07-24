@@ -37,20 +37,22 @@
 
 
 <div class="@cssDisplayNotCurrentUser">
-    <div class="input-group mb-3 mt-3">
-        <input type="search" class="form-control" placeholder="Find friend"
+
+    <div class="input-group pt-1">
+        <input type="search" class="form-control" placeholder="Find new friend"
                @onchange="@(async(e)=> {await SearchUser((string)e.Value);})" />
 
         <div class="input-group-append">
-            <button class="btn btn-light">
+            <button class="btn btn-outline-secondary bg-white text-dark">
                 <i class="fas fa-search"></i>
             </button>
         </div>
     </div>
+
     <div class="@SearchDisplayClass">
         @if (foundUsers == null)
         {
-            <div class="d-flex justify-content-center">
+            <div class="d-flex justify-content-center p-1">
                 <div class="spinner-border" role="status">
                     <span class="sr-only">Loading...</span>
                 </div>
@@ -97,7 +99,7 @@
                         }
                         @if (sendFriendReqWait)
                         {
-                            <div class="d-flex justify-content-center">
+                            <div class="d-flex justify-content-center p-1">
                                 <div class="spinner-border" role="status">
                                     <span class="sr-only">Loading...</span>
                                 </div>
@@ -110,28 +112,41 @@
     </div>
 </div>
 
-@if (FriendsDictionary != null)
+@if (FriendsCount == null)
 {
-    <div class="card">
-        <div class="card-body">
-            <div class="container">
-                @foreach (var foudUser in FriendsDictionary)
-                {
-                    <div class="row">
-                        <div class="col-10">
-                            <a type="button" class="btn btn-link"
-                               href="MyWords/@foudUser.Key/@foudUser.Value">@foudUser.Value</a>
-                        </div>
-                        <div class="col-2">
-                            <button type="button" class="btn btn-link"
-                                    @onclick="@(async () => { await RemoveFriend(foudUser.Key); })">
-                                <i class="fas fa-user-minus"></i>
-                            </button>
-                        </div>
-                    </div>
-                }
-
-            </div>
+    <div class="d-flex justify-content-center p-1">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
         </div>
+    </div>
+}
+else
+{
+    <div class="card pt-1">
+        <div class="card-header">You have <span class="badge badge-primary">@FriendsCount</span> Friends</div>
+        @if (FriendsDictionary != null)
+        {
+            <div class="card-body">
+                <div class="container">
+                    @foreach (var foudUser in FriendsDictionary)
+                    {
+                        <div class="row">
+                            <div class="col-10">
+                                <a type="button" class="btn btn-link"
+                                   href="MyWords/@foudUser.Key/@foudUser.Value">@foudUser.Value</a>
+                            </div>
+                            <div class="col-2">
+                                <button type="button" class="btn btn-link"
+                                        @onclick="@(async () => { await RemoveFriend(foudUser.Key); })">
+                                    <i class="fas fa-user-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        }
     </div>
 }

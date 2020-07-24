@@ -1,5 +1,4 @@
 ﻿using SD.Shared;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -51,6 +50,11 @@ namespace SD.Client.Services
         public async Task<HttpResponseMessage> UpdateWord(WordModel newWord)
         {
             return await _httpClient.PutAsJsonAsync($"api/Word/UpdateWord", newWord);
+        }
+
+        public async Task<HttpResponseMessage> Like(string userId, string wordId)
+        {
+            return await _httpClient.PostAsync($"api/Word/Like/{userId}/{wordId}", null);
         }
     }
 }

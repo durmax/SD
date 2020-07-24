@@ -83,22 +83,22 @@ namespace sd.Api.Controllers
                 if (string.IsNullOrWhiteSpace(word.UserId) || string.IsNullOrWhiteSpace(word.WordId) || string.IsNullOrWhiteSpace(word.Title))
                     return BadRequest();
 
-                if ( await _wordService.GetWordById(word.WordId)!=null)
+                if (await _wordService.GetWordById(word.WordId) != null)
                 {
                     await _wordService.UpdateWord(word.WordId, word);
                     return StatusCode(StatusCodes.Status202Accepted,
                        "Updated");
                 }
 
-               var wordToInsert = await _wordService.GetWordByText(word.UserId, word.Title);
-                
+                var wordToInsert = await _wordService.GetWordByText(word.UserId, word.Title);
+
                 if (wordToInsert != null)
                 {
-                   return StatusCode(StatusCodes.Status302Found,
-                      $"{wordToInsert?.WordId}");    // returen word id that found
+                    return StatusCode(StatusCodes.Status302Found,
+                       $"{wordToInsert?.WordId}");    // returen word id that found
                 }
 
-              int statusCode = await _wordService.AddWord(word) ?  200 : 500;
+                int statusCode = await _wordService.AddWord(word) ? 200 : 500;
 
                 return StatusCode(statusCode);
 
@@ -150,6 +150,21 @@ namespace sd.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "Error deleting data");
+            }
+        }
+
+        [HttpPost("Like/{userId}/{wordId}")]
+        public async Task<ActionResult> Like(string userId, string wordId)
+        {
+            try
+            {
+                await _wordService.Like(userId, wordId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace SD.Shared
@@ -40,6 +41,9 @@ namespace SD.Shared
 
         [BsonIgnoreIfNull]      
         public int ShareWith { get; set; }
+
+        [BsonIgnoreIfNull]
+        public List<string> Likes { get; set; }
     }
 
 }

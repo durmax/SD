@@ -16,7 +16,7 @@ namespace SD.Client.Services
 
         public string UriBuild(LinkParam linkParam)
         {
-            string link = "https://";
+            string link = "http://";
 
             string pattern = linkParam.Pattern;
             string[] patternParts = pattern.Split(':');

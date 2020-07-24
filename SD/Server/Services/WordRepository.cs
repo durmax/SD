@@ -3,7 +3,6 @@ using MongoDB.Driver.Linq;
 using sd.Api.Interfaces;
 using sd.Api.Models;
 using SD.Shared;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,8 +21,8 @@ namespace sd.Api.Services
         public async Task<List<WordModel>> GetAllWords(string CurrentUserId, string userId)
         {
             List<WordModel> words = new List<WordModel>();
-
             words = await _context.Words.Find(w => w.UserId == userId).ToListAsync();
+
             if (CurrentUserId == userId)
             {
                 return words;
@@ -45,7 +44,7 @@ namespace sd.Api.Services
         private async Task<bool> IsFriendAsync(string currentUserId, string userId)
         {
             var user = await _context.Users.Find<UserModel>(u => u.UserId == userId).FirstOrDefaultAsync();
-          return  user.Friends.Contains(currentUserId);
+            return  user.Friends.Contains(currentUserId);
         }
 
         public async Task<WordModel> GetWordById(string id)
@@ -94,6 +93,21 @@ namespace sd.Api.Services
             {
                 return false;
             }
+        }
+
+        public async Task Like(string userId, string wordId)
+        {
+            WordModel wordModel = await GetWordById(wordId);
+            if (wordModel.Likes == null) wordModel.Likes = new List<string>();
+            if (!wordModel.Likes.Contains(userId))
+            {
+                wordModel.Likes.Add(userId);
+            }
+            else
+            {
+                wordModel.Likes.Remove(userId);
+            }
+            await UpdateWord(wordModel.WordId, wordModel);
         }
     }
 }

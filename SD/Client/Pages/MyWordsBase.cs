@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
 using SD.Shared;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -38,7 +39,7 @@ namespace SD.Client.Pages
 
         protected async Task<List<WordModel>> GetWords()
         {
-            return await WordService.GetAllWords(CurrentUserId , UserId);
+            return await WordService.GetAllWords(CurrentUserId, UserId);
         }
 
         protected void NewWordHandler(WordModel newWord)
@@ -57,16 +58,24 @@ namespace SD.Client.Pages
                     var response = await WordService.RemoveWord(wordModel.WordId);
                     if (response.IsSuccessStatusCode)
                     {
-                        Words.Remove(wordModel);
-                        //cssClassDelete = "d-none";
-                        //styleDeleted = "text-decoration: line-through;";
-                        //note = $"{wordModel.Title} is Deleted";
+                      Words.Remove(wordModel);
                     }
                     else
                     {
                         //note = $"You can NOT delete {wordModel.Title}";
                     }
                 }
+            }
+            loading = false;
+        }
+        protected async Task Like()
+        {
+            loading = true;
+            
+            var response = await WordService.Like(CurrentUserId, wordModel.WordId);
+            if (response.IsSuccessStatusCode)
+            {
+
             }
             loading = false;
         }
@@ -93,11 +102,11 @@ namespace SD.Client.Pages
             {
                 if (string.IsNullOrWhiteSpace(UserId))
                 {
-                   UserId = CurrentUserId;
+                    UserId = CurrentUserId;
                 }
                 else
                 {
-                    cssClassDelete = UserId == CurrentUserId? null : "d-none";
+                    cssClassDelete = UserId == CurrentUserId ? null : "d-none";
                 }
 
                 Words = await GetWords();

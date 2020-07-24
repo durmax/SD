@@ -37,6 +37,9 @@ namespace SD.Shared
         [BsonIgnoreIfNull]
         [StringLength(20)]
         public string Category { get; set; }
+
+        [BsonIgnoreIfNull]      
+        public int ShareWith { get; set; }
     }
 
 }

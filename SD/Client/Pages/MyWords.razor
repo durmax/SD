@@ -13,7 +13,7 @@
 else
 {
 <div class="sticky-top pb-1">
-    <Word wordModel="@wordModel" UserId="@UserId" Collapsed="@Collapsed" OnWordSave="NewWordHandler"></Word>
+    <Word wordModel="@wordModel" UserId="@UserId"  OnWordSave="NewWordHandler"></Word>
     @if (loading)
     {
         <div class="d-flex justify-content-center">
@@ -31,7 +31,7 @@ else
                 <li>
                     <div class="list-group-item p-1 ">
                         <div class="input-group" role="group">
-                            <button type="button" class="btn btn-light" @onclick="() => { wordModel = word; Collapsed = true; }">
+                            <button type="button" class="btn btn-light" @onclick="() => { wordModel = word; }">
                                 <b style="@styleDeleted"> @word.Title </b>
                             </button>
 

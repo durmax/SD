@@ -8,7 +8,7 @@ namespace sd.Api.Interfaces
 {
     public interface IWordRepository
     {
-        Task<List<WordModel>> GetAllWords(string userId);
+        Task<List<WordModel>> GetAllWords(string CurrentUserId, string userId);
         Task<WordModel> GetWordById(string id);
         Task<WordModel> GetWordByText(string userId, string text);
         Task<bool> AddWord(WordModel word);

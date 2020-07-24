@@ -1,7 +1,7 @@
 ﻿
 @inherits OtherPagesBase
 
-@if (!Collapsed  && opRes == null)
+@if (!Collapsed && opRes == null)
 {
     <div class="d-flex justify-content-center">
         <div class="spinner-border" role="status">
@@ -24,6 +24,7 @@ else
             <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Search"; Collapsed = false; await GetOpRes();})">
                 <img src="/icons/image_search-24px.svg" asp-append-version="true" />
             </button>
+
             <div class="input-group-append">
                 <button type="button" class="btn btn-light" @onclick="GetP">
                     <i class="float-right @(Collapsed? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>

@@ -31,6 +31,9 @@ namespace SD.Client.Pages
 
         protected List<string> KnownLangs { get; set; }
         protected string LangsStr { get; set; }
+        protected string ShareWithClass { get; set; } = "fa-user-lock";
+
+        protected bool ShareWithCollapsed = true;
 
         [Parameter]
         public WordModel wordModel { get; set; }
@@ -245,12 +248,27 @@ namespace SD.Client.Pages
                     }
                 }
             }
+
+
         }
         protected override void OnParametersSet()
         {
             note = null;
 
             SetMyText();
+
+            switch (wordModel.ShareWith)
+            {
+                case 0:
+                    ShareWithClass = "/icons/user-lock-solid.svg";
+                    break;
+                case 1:
+                    ShareWithClass = "/icons/user-friends-solid.svg";
+                    break;
+                case 2:
+                    ShareWithClass = "/icons/globe-solid.svg";
+                    break;
+            }
         }
     }
 }

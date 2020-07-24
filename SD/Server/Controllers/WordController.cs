@@ -57,13 +57,13 @@ namespace sd.Api.Controllers
             }
         }
 
-        // GET: api/Word/GetAllWords/5e915b3a1c9d4400003f1fba
-        [HttpGet("GetAllWords/{userId}")]
-        public async Task<ActionResult<IEnumerable<WordModel>>> GetAllWords(string userId)
+        // GET: api/Word/GetAllWords/1111/5e915b3a1c9d4400003f1fba
+        [HttpGet("GetAllWords/{CurrentUserId}/{userId}")]
+        public async Task<ActionResult<IEnumerable<WordModel>>> GetAllWords(string CurrentUserId, string userId)
         {
             try
             {
-                return Ok(await _wordService.GetAllWords(userId));
+                return Ok(await _wordService.GetAllWords(CurrentUserId, userId));
             }
             catch (Exception ex)
             {

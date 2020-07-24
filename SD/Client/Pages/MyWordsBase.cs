@@ -28,7 +28,7 @@ namespace SD.Client.Pages
         [Parameter]
         public string UserName { get; set; }
 
-        protected bool Collapsed = true;    // hide by default
+        //protected bool Collapsed = true;    // hide by default
         protected bool loading;
 
         protected string styleDeleted;
@@ -38,7 +38,7 @@ namespace SD.Client.Pages
 
         protected async Task<List<WordModel>> GetWords()
         {
-            return await WordService.GetAllWords(UserId);
+            return await WordService.GetAllWords(CurrentUserId , UserId);
         }
 
         protected void NewWordHandler(WordModel newWord)
@@ -88,12 +88,12 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            await Auth();
             try
             {
                 if (string.IsNullOrWhiteSpace(UserId))
                 {
-                    await Auth();
-                    UserId = CurrentUserId;
+                   UserId = CurrentUserId;
                 }
                 else
                 {

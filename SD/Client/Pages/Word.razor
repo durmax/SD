@@ -1,133 +1,135 @@
 ﻿@page "/Word/{WordId}"
 @inherits WordBase
 
-<div class="card">
-    <div class="card-header p-0 border-bottom-0">
-        <div class="text-muted pl-1">
-            <i class="bg-light">@note</i>
-        </div>
-        <div class="input-group">
+<div class="card p-0 border-bottom-0">
 
-            <div class="input-group-append">
-                <button type="button" class="btn btn-outline-secondary bg-white text-dark" @onclick="NewWord">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
+    <div class="text-muted pl-1">
+        <i class="bg-light">@note</i>
+    </div>
+    <div class="input-group">
 
-            <input type="search" class="form-control font-weight-bold" placeholder="Search for new word"
-                   id="wordId"
-                   value="@wordModel.Title"
-                   @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"
-                   @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})" />
-
-
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="() => Collapsed = (Collapsed) ? false : true ">
-                    <i class="float-right @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
-                </button>
-            </div>
-
+        <div class="input-group-append">
+            <button type="button" class="btn btn-outline-secondary bg-white text-dark" @onclick="NewWord">
+                <i class="fas fa-plus"></i>
+            </button>
         </div>
 
-        <div class=@(Collapsed ? "collapse" : "")>
-            <div class="btn-group" role="group">
+        <input type="search" class="form-control font-weight-bold" placeholder="Search for new word"
+               id="wordId"
+               value="@wordModel.Title"
+               @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"
+               @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})" />
 
-                @if (KnownLangs != null)
-                {
-                    <div class="input-group-append">
-                        <select class="custom-select bg-transparent rounded-0 border-0" @bind="@wordModel.WordLang">
-                            @foreach (var item in KnownLangs)
-                            {
-                                if (item == wordModel.WordLang)
-                                {
-                                    <option selected value="@item">@item</option>
-                                }
-                                else
-                                {
-                                    <option value="@item">@item</option>
-                                }
-                            }
-                        </select>
-                    </div>
 
-                    <div class="input-group-append">
-                        <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
-                            <i class="fas fa-exchange-alt"></i>
-                        </button>
-                    </div>
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="() => Collapsed = (Collapsed) ? false : true ">
+                <i class="float-right @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
+            </button>
+        </div>
 
-                    <div class="input-group-append">
-                        <select class="custom-select bg-transparent rounded-0 border-0" @bind="@wordModel.ToLang">
-                            @foreach (var item in KnownLangs)
-                            {
-                                if (item == wordModel.ToLang)
-                                {
-                                    <option selected value="@item">@item</option>
-                                }
-                                else
-                                {
-                                    <option value="@item">@item</option>
-                                }
-                            }
-                        </select>
-                    </div>
-                }
+    </div>
 
-                <button type="button" class="btn btn-light" @onclick="()=> cssClassComment = cssClassComment ? false : true">
-                    <i class="fas fa-comment-dots"></i>
+    <div class=@(Collapsed ? "collapse" : "")>
+        <div class="btn-group" role="group">
+
+            @if (KnownLangs != null)
+            {
+                <select class="custom-select bg-transparent rounded-0 border-0" @bind="@wordModel.WordLang">
+                    @foreach (var item in KnownLangs)
+                    {
+                        if (item == wordModel.WordLang)
+                        {
+                            <option selected value="@item">@item</option>
+                        }
+                        else
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    }
+                </select>
+
+                <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
+                    <i class="fas fa-exchange-alt"></i>
                 </button>
 
-                <button type="button" class="btn btn-light" @onclick="AddWord">
-                    <i class="fas fa-cloud-upload-alt"></i>
+                <select class="custom-select bg-transparent rounded-0 border-0" @bind="@wordModel.ToLang">
+                    @foreach (var item in KnownLangs)
+                    {
+                        if (item == wordModel.ToLang)
+                        {
+                            <option selected value="@item">@item</option>
+                        }
+                        else
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    }
+                </select>
+            }
+
+            <button type="button" class="btn btn-light bg-transparent" @onclick="()=> cssClassComment = cssClassComment ? false : true">
+                <i class="fas fa-comment-dots"></i>
+            </button>
+
+            <button type="button" class="btn btn-light bg-transparent" @onclick="AddWord">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </button>
+
+            <button @onclick="@(()=>{ShareWithCollapsed=!ShareWithCollapsed;})" class="btn btn-light  bg-transparent dropdown-toggle" type="button">
+                <img src="@ShareWithClass" asp-append-version="true" />
+            </button>
+
+            @if (loading)
+            {
+                <button type="button" class="btn btn-light bg-transparent">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
                 </button>
-                @if (loading)
-                {
-                    <button type="button" class="btn btn-light">
-                        <div class="spinner-border spinner-border-sm" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
+            }
+        </div>
+
+        <div class="btn-group @(ShareWithCollapsed ? "collapse" : "")">
+            <button class="btn btn-light bg-transparent" @onclick="@(() => {ShareWithCollapsed = true; wordModel.ShareWith = 0; ShareWithClass = "/icons/user-lock-solid.svg"; })">Only Me <img width="20" height="20" src="/icons/user-lock-solid.svg" asp-append-version="true" /></button>
+            <button class="btn btn-light bg-transparent" @onclick="@(() => {ShareWithCollapsed = true; wordModel.ShareWith = 1; ShareWithClass = "/icons/user-friends-solid.svg";})">Friends <img width="20" height="20" src="/icons/user-friends-solid.svg" asp-append-version="true" /></button>
+            <button class="btn btn-light bg-transparent" @onclick="@(() => {ShareWithCollapsed = true; wordModel.ShareWith = 2; ShareWithClass = "/icons/globe-solid.svg";})">Public <img width="20" height="20" src="/icons/globe-solid.svg" asp-append-version="true" /></button>
+        </div>
+
+    </div>
+
+    <div class=@(Collapsed ? "collapse" : "")>
+        <div class="card-body p-0">
+
+            <div class="card mb-1 @cssClassUpdate">
+                <div class="card-body">
+                    <div class="text-muted">@wordModel.Title is already exist</div>
+                </div>
+                <div class="card-footer">
+                    <button type="button" class="btn btn-outline-secondary" @onclick="UpdateWord">
+                        Update <i class="fas fa-question-circle"></i>
                     </button>
-                }
+                    <button type="button" class="btn btn-outline-secondary" @onclick="@(()=> {foundWordIdToUpdate=""; cssClassUpdate = "d-none";})">
+                        Cancel <i class="fas fa-window-close"></i>
+                    </button>
+                </div>
             </div>
-        </div>
 
+
+
+            <div class="form-group m-0 @(cssClassComment? "collapse" : "")">
+                <textarea class="form-control text-wrap"
+                          rows="@Rows"
+                          @bind-value="@MyText"
+                          @bind-value:event="oninput">@MyText</textarea>
+            </div>
+
+
+            @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
+            {
+                <OtherPages FLangCode="@wordModel.WordLang" TLangCode="@wordModel.ToLang" Word="@wordModel.Title" Collapsed="@opCollapsed"></OtherPages>
+            }
+
+        </div>
     </div>
+
 </div>
-
-
-<div class=@(Collapsed ? "collapse" : "")>
-    <div class="card-body p-0">
-
-        <div class="card mb-1 @cssClassUpdate">
-            <div class="card-body">
-                <div class="text-muted">@wordModel.Title is already exist</div>
-            </div>
-            <div class="card-footer">
-                <button type="button" class="btn btn-outline-secondary" @onclick="UpdateWord">
-                    Update <i class="fas fa-question-circle"></i>
-                </button>
-                <button type="button" class="btn btn-outline-secondary" @onclick="@(()=> {foundWordIdToUpdate=""; cssClassUpdate = "d-none";})">
-                    Cancel <i class="fas fa-window-close"></i>
-                </button>
-            </div>
-        </div>
-
-
-
-        <div class="form-group m-0 @(cssClassComment? "collapse" : "")">
-            <textarea class="form-control text-wrap"
-                      rows="@Rows"
-                      @bind-value="@MyText"
-                      @bind-value:event="oninput">@MyText</textarea>
-        </div>
-
-
-        @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
-        {
-            <OtherPages FLangCode="@wordModel.WordLang" TLangCode="@wordModel.ToLang" Word="@wordModel.Title" Collapsed="@opCollapsed"></OtherPages>
-        }
-
-    </div>
-</div>
-
-

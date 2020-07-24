@@ -45,38 +45,41 @@ namespace SD.Client.Pages
 
         public async Task UserData()
         {
-            if (userModel.Email != null)
+            if (userModel != null)
             {
-                try
+                if (userModel.Email != null)
                 {
-                    if (!Registered)
+                    try
                     {
-                        // userModel.UserId = UserId;
-                        var status = await UserService.AddUser(userModel);
-                        if (status.IsSuccessStatusCode)
+                        if (!Registered)
                         {
-                            Info = $"Willcome {userModel.Email}!, your data saved successfully";
-                            Registered = true;
+                            // userModel.UserId = UserId;
+                            var status = await UserService.AddUser(userModel);
+                            if (status.IsSuccessStatusCode)
+                            {
+                                Info = $"Willcome {userModel.Email}!, your data saved successfully";
+                                Registered = true;
+                            }
+                            else
+                            {
+                                Info = status.ReasonPhrase;
+                            }
                         }
                         else
                         {
+                            // userModel.Email = Email;
+                            var status = await UserService.UpdateUser(userModel.UserId, userModel);
                             Info = status.ReasonPhrase;
                         }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        // userModel.Email = Email;
-                        var status = await UserService.UpdateUser(userModel.UserId, userModel);
-                        Info = status.ReasonPhrase;
+                        Info = "Check if your data saved successfully please! ";
+                        // Error
+                        Info += ex.Message;
                     }
+                    InfoDisplayClass = "";
                 }
-                catch (Exception ex)
-                {
-                    Info = "Check if your data saved successfully please! ";
-                    // Error
-                    Info += ex.Message;
-                }
-                InfoDisplayClass = "";
             }
         }
 

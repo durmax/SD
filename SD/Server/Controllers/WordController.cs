@@ -153,13 +153,12 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpPost("Like/{userId}/{wordId}")]
-        public async Task<ActionResult> Like(string userId, string wordId)
+        [HttpGet("Like/{userId}/{wordId}")]
+        public async Task<ActionResult<int>> Like(string userId, string wordId)
         {
             try
             {
-                await _wordService.Like(userId, wordId);
-                return Ok();
+                return Ok(await _wordService.Like(userId, wordId));
             }
             catch (Exception ex)
             {

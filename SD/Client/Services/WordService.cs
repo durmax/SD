@@ -52,9 +52,9 @@ namespace SD.Client.Services
             return await _httpClient.PutAsJsonAsync($"api/Word/UpdateWord", newWord);
         }
 
-        public async Task<HttpResponseMessage> Like(string userId, string wordId)
+        public async Task<int> Like(string userId, string wordId)
         {
-            return await _httpClient.PostAsync($"api/Word/Like/{userId}/{wordId}", null);
+            return await _httpClient.GetFromJsonAsync<int>($"api/Word/Like/{userId}/{wordId}", null);
         }
     }
 }

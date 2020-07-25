@@ -95,7 +95,7 @@ namespace sd.Api.Services
             }
         }
 
-        public async Task Like(string userId, string wordId)
+        public async Task<int> Like(string userId, string wordId)
         {
             WordModel wordModel = await GetWordById(wordId);
             if (wordModel.Likes == null) wordModel.Likes = new List<string>();
@@ -108,6 +108,7 @@ namespace sd.Api.Services
                 wordModel.Likes.Remove(userId);
             }
             await UpdateWord(wordModel.WordId, wordModel);
+            return wordModel.Likes.Count();
         }
     }
 }

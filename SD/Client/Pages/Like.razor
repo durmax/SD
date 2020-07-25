@@ -1,0 +1,5 @@
+﻿@inherits LikeBase
+
+<button type="button" class="btn btn-light @CULikeClass" @onclick="async () => {await Like(); }">
+    <i class="fas fa-thumbs-up"></i>  @LikesCount
+</button>

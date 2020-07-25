@@ -25,12 +25,14 @@ namespace SD.Client.Pages
 
         [Parameter]
         public string UserId { get; set; }
-        private string CurrentUserId { get; set; }
+        protected string CurrentUserId { get; set; }
         [Parameter]
         public string UserName { get; set; }
 
         //protected bool Collapsed = true;    // hide by default
         protected bool loading;
+
+        protected bool CULiked { get; set; }
 
         protected string styleDeleted;
         protected string cssClassDelete;// = "d-none";
@@ -65,17 +67,6 @@ namespace SD.Client.Pages
                         //note = $"You can NOT delete {wordModel.Title}";
                     }
                 }
-            }
-            loading = false;
-        }
-        protected async Task Like()
-        {
-            loading = true;
-            
-            var response = await WordService.Like(CurrentUserId, wordModel.WordId);
-            if (response.IsSuccessStatusCode)
-            {
-
             }
             loading = false;
         }

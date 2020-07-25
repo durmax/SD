@@ -38,10 +38,8 @@ else
                             <button type="button" class="btn btn-light @cssClassDelete " @onclick="async () => { wordModel = word; await DeleteWord(); }">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
-
-                            <button type="button" class="btn btn-light" @onclick="async () => { wordModel = word; await Like(); }">
-                                <i class="fas fa-thumbs-up"></i>  @word.Likes?.Count
-                            </button>
+                             @{  CULiked = (word.Likes != null) ? word.Likes.Contains(CurrentUserId) : false;}  
+                            <Like CurrentUserId="@CurrentUserId" WordId="@word.WordId" LikesCount="@word.Likes?.Count" CULiked="@CULiked"></Like>
                         </div>
                     </div>
                 </li>

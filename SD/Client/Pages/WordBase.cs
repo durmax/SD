@@ -37,8 +37,8 @@ namespace SD.Client.Pages
 
         [Parameter]
         public WordModel wordModel { get; set; }
-        [Parameter]
-        public string WordId { get; set; }
+        //[Parameter]
+        //public string WordId { get; set; }
 
         [Parameter]
         public string UserId { get; set; }
@@ -95,8 +95,10 @@ namespace SD.Client.Pages
                     wordModel.WordId = Guid.NewGuid().ToString();
                     wordModel.CreatedAt = DateTime.Now;
 
+                    wordModel.Likes = null;
                 }
                 wordModel.Explain = MyText;
+
                 HttpResponseMessage respons = await WordService.AddWord(wordModel);
 
                 if (!respons.IsSuccessStatusCode)
@@ -117,6 +119,8 @@ namespace SD.Client.Pages
                         {
                             await OnWordSave.InvokeAsync(wordModel);
                         }
+
+                        NewWord();
                     }
                 }
             }
@@ -205,28 +209,28 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            if (wordModel == null)
-            {
-                wordModel = new WordModel();
-            }
-
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(WordId))
-                {
-                    wordModel = await WordService.GetWordById(WordId);
-                    Collapsed = false;
-                }
-            }
-            catch { }
-
-            SetMyText();
-
             var user = (await authenticationStateTask).User;
             if (user.Identity.IsAuthenticated)
             {
                 CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
             }
+
+            if (wordModel == null)
+            {
+                wordModel = new WordModel();
+            }
+
+            //try
+            //{      //  WordId fom URL
+            //    if (!string.IsNullOrWhiteSpace(WordId))
+            //    {
+            //        wordModel = await WordService.GetWordById(WordId);
+            //        Collapsed = false;
+            //    }
+            //}
+            //catch { }
+
+            SetMyText();
 
             KnownLangs = new List<string>();
             KnownLangs.Add(await LocalStorageService.GetItemAsync<string>("FLang"));

@@ -5,6 +5,7 @@ using SD.Client.Services;
 using System.Threading.Tasks;
 using SD.Shared;
 using System.Collections.Generic;
+using System;
 
 namespace SD.Client.Pages
 {
@@ -50,6 +51,10 @@ namespace SD.Client.Pages
                 UserId = user.FindFirst(c => c.Type == "oid")?.Value;
                 try
                 {
+                    wordModel.UserId = UserId;
+                    wordModel.WordId = Guid.NewGuid().ToString();
+                    wordModel.CreatedAt = DateTime.Now;
+
                     userModel = await UserService.GetUserById(UserId);
                 }
                 catch

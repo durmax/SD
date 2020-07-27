@@ -29,6 +29,8 @@ namespace SD.Client.Pages
         [Parameter]
         public string UserName { get; set; }
 
+        protected bool Collapsed { set; get; } = true;    // hide by default
+
         //protected bool Collapsed = true;    // hide by default
         protected bool loading;
 

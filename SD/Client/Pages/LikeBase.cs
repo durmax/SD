@@ -8,6 +8,8 @@ namespace SD.Client.Pages
     {
         [Inject]
         public WordService WordService { set; get; }
+        [Inject]
+        NavigationManager NavigationManager { get; set; }
 
         [Parameter]
         public string CurrentUserId { get; set; }
@@ -25,9 +27,16 @@ namespace SD.Client.Pages
 
         protected async Task Like()
         {
-            LikesCount = await WordService.Like(CurrentUserId, WordId);
-            CULiked = !CULiked;
-            CULikeClass = CULiked ? "text-primary" : null;
+            if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")
+            {
+                LikesCount = await WordService.Like(CurrentUserId, WordId);
+                CULiked = !CULiked;
+                CULikeClass = CULiked ? "text-primary" : null;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("authentication/login");
+            }
         }
 
         protected override void OnInitialized()

@@ -155,6 +155,10 @@ namespace SD.Client.Pages
                     CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
                     Email = user.FindFirst(c => c.Type == "email")?.Value;
                 }
+                else
+                {
+                    CurrentUserId = "0";
+                }
             }
             catch
             {

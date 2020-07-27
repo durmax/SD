@@ -25,16 +25,14 @@
             </NavLink>
         </li>
 
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="MyWords">
-                <span class="oi oi-list" aria-hidden="true"></span> Word List
-            </NavLink>
-        </li>
-
-
-
         <AuthorizeView>
             <Authorized>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="MyWords">
+                        <span class="oi oi-list" aria-hidden="true"></span> Word List
+                    </NavLink>
+                </li>
+
                 @if (@context.User.FindFirst(c => c.Type == "email")?.Value == "dured.maksoud@gmail.com")
                 {
                     <li class="nav-item px-3">

@@ -82,7 +82,8 @@ namespace SD.Client.Pages
             }
             else
             {
-                NavigationManager.NavigateTo("authentication/login");
+                //NavigationManager.NavigateTo("authentication/login");
+                CurrentUserId ="0";
             }
         }
 
@@ -93,7 +94,14 @@ namespace SD.Client.Pages
             {
                 if (string.IsNullOrWhiteSpace(UserId))
                 {
-                    UserId = CurrentUserId;
+                    if (CurrentUserId == "0")
+                    {
+                        NavigationManager.NavigateTo("/");
+                    }
+                    else
+                    {
+                        UserId = CurrentUserId;
+                    }
                 }
                 else
                 {

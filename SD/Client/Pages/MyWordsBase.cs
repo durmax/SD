@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
 using SD.Shared;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages

@@ -22,13 +22,17 @@ namespace SD.Client.Services
         }
         public async Task<Dictionary<string, string>> SearchUser(string CurrentUserId, string SearchText)
         {
-            var xxx= await _httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/User/GetUsersByText/{CurrentUserId}/{SearchText}");
-            return xxx;
+            return await _httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/User/GetUsersByText/{CurrentUserId}/{SearchText}");
+        }
+        public async Task<Dictionary<string, string>> GetAllFriends(string id)
+        {
+            return await _httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/User/GetAllFriends/{id}");
         }
         public async Task<UserModel> GetUserById(string id)
         {
             return await _httpClient.GetFromJsonAsync<UserModel>($"api/User/GetUserById/{id}");
         }
+
         public async Task<HttpResponseMessage> AddUser(UserModel user)
         {
                 return await _httpClient.PostAsJsonAsync("api/User/Create", user);  

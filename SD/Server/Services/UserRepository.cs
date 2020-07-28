@@ -219,6 +219,19 @@ namespace sd.Api.Services
                 }
             }
         }
+
+        public async Task<Dictionary<string, string>> GetAllFriends(string userId)
+        {
+            Dictionary<string, string> res = new Dictionary<string, string>();
+            var users = await _context.Users
+                .Find(u => u.Friends.Contains(userId)).ToListAsync();
+            foreach (var user in users)
+            {
+                res.Add(user.UserId, user.Name);
+            }
+
+            return res;
+        }
     }
 }
 

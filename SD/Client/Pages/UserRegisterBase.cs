@@ -43,7 +43,7 @@ namespace SD.Client.Pages
         protected bool Registered { get; set; } = true;
         protected string SearchDisplayClass { get; set; } = "d-none";
 
-        public async Task UserData()
+        public async Task SaveUserData()
         {
             if (userModel != null)
             {
@@ -124,12 +124,12 @@ namespace SD.Client.Pages
             sendFriendReqWait = true;
             if (!string.IsNullOrWhiteSpace(friendId))
             {
-               await UserService.RemoveFriend(UserId, friendId);
+                await UserService.RemoveFriend(UserId, friendId);
             }
-           sendFriendReqWait = false;
+            sendFriendReqWait = false;
         }
 
-            public async Task RemoveUser() // remove current user
+        public async Task RemoveUser() // remove current user
         {
             try
             {
@@ -171,7 +171,7 @@ namespace SD.Client.Pages
                 cssDisplayNotCurrentUser = null;
             }
 
-            if (!string.IsNullOrEmpty(UserId))
+            if (!string.IsNullOrEmpty(UserId) && UserId != "0")
             {
                 try
                 {
@@ -180,21 +180,14 @@ namespace SD.Client.Pages
                 catch
                 {
                     Registered = false;
-                    await UserData();
+                    await SaveUserData();
                 }
 
-                if (userModel.Friends != null)
+                FriendsCount = userModel?.Friends.Count ?? 0;
+                if (FriendsCount > 0)
                 {
-                    FriendsCount = userModel?.Friends.Count ?? 0;
-                    if (FriendsCount > 0)
-                    {
-                        FriendsDictionary = new Dictionary<string, string>();
-                        foreach (var id in userModel.Friends)
-                        {
-                            UserModel user1 = await UserService.GetUserById(id);
-                            FriendsDictionary.Add(user1.UserId, user1.Name);
-                        }
-                    }
+                    FriendsDictionary = new Dictionary<string, string>();
+                    FriendsDictionary = await UserService.GetAllFriends(userModel.UserId);
                 }
             }
         }

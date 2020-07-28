@@ -11,7 +11,7 @@
 }
 else
 {
-    <div class="card m-0">
+    <div class="card m-0 border-left-0 border-right-0">
         <div class="btn-group" role="group">
             <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Dict";   Collapsed = false;   await GetOpRes(); })"><i class="fas fa-book"></i></button>
             <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Trans";  Collapsed = false; await GetOpRes();})">
@@ -43,7 +43,7 @@ else
                         {
                             @if (otherPage.Type == opFilterVal)
                             {
-                                <a href="@otherPage.Link" target="popup" class="list-group-item list-group-item-action" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
+                                <a href="@otherPage.Link" target="popup" class="list-group-item list-group-item-action border-left-0 border-right-0" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
                                     @otherPage.Host
                                 </a>
                             }

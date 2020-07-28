@@ -50,8 +50,24 @@ namespace sd.Api.Controllers
             }
         }
 
-        // GET: api/User/GetUserById/5
-        [HttpGet("GetUserById/{id}")]
+        [HttpGet("GetAllFriends/{userId}")]
+        public async Task<ActionResult<Dictionary<string, string>>> GetAllFriends(string userId)
+        {
+            try
+            {
+                var result = await _userService.GetAllFriends(userId);
+                if (result == null) return NotFound();
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database");
+            }
+        }
+
+            // GET: api/User/GetUserById/5
+            [HttpGet("GetUserById/{id}")]
         public async Task<ActionResult<UserModel>> GetUserById(string id)
         {
             try

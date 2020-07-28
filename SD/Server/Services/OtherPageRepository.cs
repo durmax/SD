@@ -5,6 +5,7 @@ using SD.Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver.Linq;
+using System.Linq;
 
 namespace sd.Api.Services
 {
@@ -41,8 +42,8 @@ namespace sd.Api.Services
                 }
                 // return res;
             }
-
-            return res;
+             
+            return res.OrderBy(o=> o.Eval);
         }
 
         public async Task<OtherPageModel> GetOtherPageById(string id)

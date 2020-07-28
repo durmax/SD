@@ -20,5 +20,7 @@ namespace sd.Api.Interfaces
         Task AddFriend(string UserId, string friendId);
         Task RemoveFriend(string UserId, string friendId);
         Task RemoveFriendRequest(string UserId, string friendId);
+
+        Task<Dictionary<string, string>> GetAllFriends(string userId);
     }
 }

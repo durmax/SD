@@ -22,31 +22,45 @@ namespace sd.Api.Services
             return await _context.Users
                     .Find(user => true).ToListAsync();
         }
-        public async Task<Dictionary<string, string>> SearchUser(string CurrentUserId, string searchText)
+        public async Task<Dictionary<string, Tuple<string, string>>> SearchUser(string CurrentUserId, string searchText)
         {
-            string relation = "";
-            Dictionary<string, string> res = new Dictionary<string, string>();
+            string relation = null;
+            Dictionary<string, Tuple<string, string>> res = new Dictionary<string, Tuple<string, string>>();
 
-            var users = await _context.Users
+            var foundUsers = await _context.Users
                 .Find(u => u.Name.ToLower().Contains(searchText.ToLower())).ToListAsync();
 
-            users.RemoveAll(u => u.UserId == CurrentUserId); //remove Sercher from list
+            var crrUser = await GetUserById(CurrentUserId);
 
-            foreach (var user in users)
+            foundUsers.RemoveAll(u => u.UserId == CurrentUserId); //remove Sercher from list
+
+            foreach (var user in foundUsers)
             {
                 if (user.Friends == null) user.Friends = new List<string>();
                 if (user.FriendRequests == null) user.FriendRequests = new List<string>();
 
-                if (user.FriendRequests.Contains(CurrentUserId))
+                if (user.Friends.Contains(CurrentUserId))
                 {
-                    relation = " (Friend Requested)";
+                    relation = "Friends";
                 }
-                else if (user.Friends.Contains(CurrentUserId))
+
+                else if (user.FriendRequests.Contains(CurrentUserId))
                 {
-                    relation = " (Friends)";
+                    relation = "CrrRequest";
                 }
-                res.Add(user.UserId, user.Name + relation);
-                relation = "";
+
+                else if (crrUser.FriendRequests.Contains(user.UserId))
+                {
+                    relation = "UserRequest";
+                }
+
+
+                var userT = Tuple.Create(user.Name, relation);
+                res.Add(user.UserId, userT);
+
+                relation = null;
+
+
             }
             return res;
         }

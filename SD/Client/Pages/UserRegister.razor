@@ -1,5 +1,4 @@
 ﻿@page  "/User"
-@page "/User/{UserId}"
 
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
@@ -34,127 +33,9 @@
                     <button type="submit" class="btn btn-outline-primary" @onclick="SaveUserData"><i class="fa fa-save"></i> Save</button>
                 </div>
             </div>
+
+            <div class="card-header"> <a href="Friends"> You have <span class="badge badge-primary">@FriendsCount</span> Friends</a></div>
             @*</EditForm>*@
         </div>
-    </Authorized>
-</AuthorizeView>
-
-<div class="@cssDisplayNotCurrentUser">
-
-    <div class="input-group pt-1">
-        <input type="search" class="form-control" placeholder="Find new friend"
-               @onchange="@(async(e)=> {await SearchUser((string)e.Value);})" />
-
-        <div class="input-group-append">
-            <button class="btn btn-outline-secondary bg-white text-dark">
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
-    </div>
-
-    <div class="@SearchDisplayClass">
-        @if (foundUsers == null)
-        {
-            <div class="d-flex justify-content-center p-1">
-                <div class="spinner-border" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="card">
-                <div class="card-body">
-                    <div class="container">
-                        @foreach (var foudUser in foundUsers)
-                        {
-                            <div class="row">
-                                <div class="col-10">
-                                    <a type="button" class="btn btn-link"
-                                       href="MyWords/@foudUser.Key/@foudUser.Value">@foudUser.Value</a>
-                                </div>
-                                <div class="col-2">
-                                    @if (foudUser.Value.Contains("Friend"))
-                                    {
-                                        if (foudUser.Value.Contains("Friend Requested"))
-                                        {
-                                            <div class="btn btn-link">
-                                                <i class="fas fa-paper-plane"></i>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <button type="button" class="btn btn-link"
-                                                    @onclick="@(async () => { await RemoveFriend(foudUser.Key); })">
-                                                <i class="fas fa-user-minus"></i>
-                                            </button>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <button type="button" class="btn btn-link"
-                                                @onclick="@(async () => { await SendFriendRequest(foudUser.Key, foudUser.Value); })">
-                                            <i class="fas fa-user-plus"></i>
-                                        </button>
-                                    }
-                                </div>
-                            </div>
-                        }
-                        @if (sendFriendReqWait)
-                        {
-                            <div class="d-flex justify-content-center p-1">
-                                <div class="spinner-border" role="status">
-                                    <span class="sr-only">Loading...</span>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-</div>
-
-
-<AuthorizeView>
-    <Authorized>
-        @if (FriendsCount == null)
-        {
-            <div class="d-flex justify-content-center p-1">
-                <div class="spinner-border" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="card pt-1">
-                <div class="card-header">You have <span class="badge badge-primary">@FriendsCount</span> Friends</div>
-                @if (FriendsDictionary != null)
-                {
-                    <div class="card-body">
-                        <div class="container">
-                            @foreach (var foudUser in FriendsDictionary)
-                            {
-                                <div class="row">
-                                    <div class="col-10">
-                                        <a type="button" class="btn btn-link"
-                                           href="MyWords/@foudUser.Key/@foudUser.Value">@foudUser.Value</a>
-                                    </div>
-                                    <div class="col-2">
-                                        <button type="button" class="btn btn-link"
-                                                @onclick="@(async () => { await RemoveFriend(foudUser.Key); })">
-                                            <i class="fas fa-user-minus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            }
-
-                        </div>
-                    </div>
-
-                }
-            </div>
-        }
     </Authorized>
 </AuthorizeView>

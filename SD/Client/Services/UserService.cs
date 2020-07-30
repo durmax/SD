@@ -1,5 +1,6 @@
 ﻿
 using SD.Shared;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -20,9 +21,9 @@ namespace SD.Client.Services
         {
             return await _httpClient.GetFromJsonAsync<List<UserModel>>("api/User");
         }
-        public async Task<Dictionary<string, string>> SearchUser(string CurrentUserId, string SearchText)
+        public async Task<Dictionary<string, Tuple<string, string>>> SearchUser(string CurrentUserId, string SearchText)
         {
-            return await _httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/User/GetUsersByText/{CurrentUserId}/{SearchText}");
+            return await _httpClient.GetFromJsonAsync<Dictionary<string, Tuple<string, string>>>($"api/User/GetUsersByText/{CurrentUserId}/{SearchText}");
         }
         public async Task<Dictionary<string, string>> GetAllFriends(string id)
         {

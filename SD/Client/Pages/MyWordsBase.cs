@@ -40,11 +40,6 @@ namespace SD.Client.Pages
 
         protected List<WordModel> Words { get; set; }
 
-        protected async Task<List<WordModel>> GetWords()
-        {
-            return await WordService.GetAllWords(CurrentUserId, UserId);
-        }
-
         protected void NewWordHandler(WordModel newWord)
         {
             Words.Add(newWord);
@@ -109,7 +104,7 @@ namespace SD.Client.Pages
                     cssClassDelete = UserId == CurrentUserId ? null : "d-none";
                 }
 
-                Words = await GetWords();
+                Words = await WordService.GetAllWords(CurrentUserId, UserId);
             }
             catch
             {

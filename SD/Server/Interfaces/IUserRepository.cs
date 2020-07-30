@@ -10,7 +10,7 @@ namespace sd.Api.Interfaces
     {
         Task<IEnumerable<UserModel>> GetAllUsers();
         Task<UserModel> GetUserById(string id);
-        Task<Dictionary<string,string>> SearchUser(string searcherIdAndName, string searchText);
+        Task<Dictionary<string, Tuple<string, string>>> SearchUser(string searcherIdAndName, string searchText);
         Task<bool> CheckEmail(string email);
         Task<TransObj> RegisterUserAsync(UserModel user);
         Task<TransObj> UpdateUser(string id, UserModel newUser);

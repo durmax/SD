@@ -35,7 +35,7 @@ namespace sd.Api.Controllers
         }
         // GET: api/User/GetUsersByText/Dured
         [HttpGet("GetUsersByText/{CurrentUserId}/{searchText}")]
-        public async Task<ActionResult<Dictionary<string, string>>> GetUsersByText(string CurrentUserId, string searchText)
+        public async Task<ActionResult<Dictionary<string, Tuple<string, string>>>> GetUsersByText(string CurrentUserId, string searchText)
         {
             try
             {

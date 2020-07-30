@@ -16,10 +16,6 @@ namespace SD.Client.Pages
 
         protected int? FriendsCount { set; get; }
 
-        protected bool Collapsed { get; set; } = true;    // hide by default
-
-        protected Dictionary<string, string> FriendsDictionary;
-
         [Inject]
         public UserService UserService { set; get; }
 
@@ -33,15 +29,9 @@ namespace SD.Client.Pages
         protected string CurrentUserId { get; set; }
         protected string cssDisplayNotCurrentUser = "d-none";
 
-        protected List<string> FriendRequests { get; set; }
-        protected List<string> Friends { get; set; }
-
-        protected bool sendFriendReqWait = false;
-
         protected string Info { get; set; }
         protected string InfoDisplayClass { get; set; } = "d-none";
         protected bool Registered { get; set; } = true;
-        protected string SearchDisplayClass { get; set; } = "d-none";
 
         public async Task SaveUserData()
         {
@@ -83,67 +73,6 @@ namespace SD.Client.Pages
             }
         }
 
-        public async Task SearchUser(string SearchText)
-        {
-            if (!string.IsNullOrWhiteSpace(SearchText))
-            {
-                SearchDisplayClass = "";
-                foundUsers = await UserService.SearchUser(CurrentUserId, SearchText);
-            }
-            else
-            {
-                foundUsers = null;
-                SearchDisplayClass = "d-none";
-            }
-        }
-
-        public async Task SendFriendRequest(string ToUserId, string friendName)
-        {
-            sendFriendReqWait = true;
-
-            if (!string.IsNullOrWhiteSpace(UserId) && !string.IsNullOrWhiteSpace(ToUserId))
-            {
-                var res = await UserService.AddFriendRequest(UserId, ToUserId);
-
-                if (res.IsSuccessStatusCode)
-                {
-                    Info = $"The friend request sent to {friendName} successfully";
-                    InfoDisplayClass = null;
-                }
-            }
-            else
-            {
-                Info = $"Please, Login to add Friends";
-                InfoDisplayClass = null;
-            }
-            sendFriendReqWait = false;
-        }
-
-        public async Task RemoveFriend(string friendId)
-        {
-            sendFriendReqWait = true;
-            if (!string.IsNullOrWhiteSpace(friendId))
-            {
-                await UserService.RemoveFriend(UserId, friendId);
-            }
-            sendFriendReqWait = false;
-        }
-
-        public async Task RemoveUser() // remove current user
-        {
-            try
-            {
-                var res = await UserService.RemoveUser(UserId);
-                Info = $"{userModel.Email} deleted successfully";
-            }
-            catch (Exception ex)
-            {
-                Info = "Check if your data deleted successfully please! ";
-                // Error
-                Info += ex.Message;
-            }
-            InfoDisplayClass = "";
-        }
         protected async override Task OnInitializedAsync()
         {
             try
@@ -184,11 +113,6 @@ namespace SD.Client.Pages
                 }
 
                 FriendsCount = userModel?.Friends.Count ?? 0;
-                if (FriendsCount > 0)
-                {
-                    FriendsDictionary = new Dictionary<string, string>();
-                    FriendsDictionary = await UserService.GetAllFriends(userModel.UserId);
-                }
             }
         }
     }

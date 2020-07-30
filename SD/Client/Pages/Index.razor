@@ -13,7 +13,7 @@
             <div class="container">
                 @foreach (var item in FriendRequestsDictionary)
                 {
-                    <FriendRequest UserId="@UserId" friendId="@item.Key" friendName="@item.Value"></FriendRequest>
+                    <Friendship UserId="@UserId" friendId="@item.Key" friendName="@item.Value" friendshipState="UserRequest"></Friendship>
                 }
 
             </div>

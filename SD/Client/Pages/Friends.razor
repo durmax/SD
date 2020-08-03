@@ -1,4 +1,5 @@
 ﻿@page  "/Friends"
+@inject ILanguageContainerService languageContainer
 @inherits FriendsBase
 
 <div class="text-muted pl-1 @InfoDisplayClass">
@@ -6,7 +7,7 @@
 </div>
 
 <div class="input-group pt-1">
-    <input type="search" class="form-control" placeholder="Find new friend"
+    <input type="search" class="form-control" placeholder=@languageContainer.Keys["FindUser"]
            @onchange="@(async(e)=> {await SearchUser((string)e.Value);})" />
 
     <div class="input-group-append">
@@ -60,22 +61,23 @@
         }
         else
         {
-            <div class="card pt-1">
-                <div class="card-header">You have <span class="badge badge-primary">@FriendsCount</span> Friends</div>
-                @if (FriendsDictionary != null)
-                {
-                    <div class="card-body">
-                        <div class="container">
-                            @foreach (var foudUser in FriendsDictionary)
-                            {
-                                <Friendship UserId="@CurrentUserId" friendId="@foudUser.Key" friendName="@foudUser.Value" friendshipState="Friends"></Friendship>
-                            }
+    <div class="card pt-1">
+        <div class="card-header"> <a href="Friends"> @languageContainer.Keys["YouHave"] <span class="badge badge-primary">@FriendsCount</span> @languageContainer.Keys["Friends"]</a></div>
 
-                        </div>
-                    </div>
+        @if (FriendsDictionary != null)
+        {
+            <div class="card-body">
+                <div class="container">
+                    @foreach (var foudUser in FriendsDictionary)
+                    {
+                        <Friendship UserId="@CurrentUserId" friendId="@foudUser.Key" friendName="@foudUser.Value" friendshipState="Friends"></Friendship>
+                    }
 
-                }
+                </div>
             </div>
+
+        }
+    </div>
         }
     </Authorized>
 </AuthorizeView>

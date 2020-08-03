@@ -3,6 +3,7 @@
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILanguageContainerService languageContainer
 
 @inherits UserRegisterBase
 
@@ -14,11 +15,11 @@
     <Authorized>
         <div class="card p-0">
             @*<EditForm Model="@userModel" OnValidSubmit="UserData">
-        <DataAnnotationsValidator />
-        <ValidationSummary />*@
+                <DataAnnotationsValidator />
+                <ValidationSummary />*@
 
             <div class="card-header">
-                <p>My Data</p>
+                <p>@languageContainer.Keys["MyProfile"]</p>
             </div>
             <div class="card-body">
 
@@ -30,11 +31,11 @@
             </div>
             <div class="card-footer">
                 <div class="col-sm-10">
-                    <button type="submit" class="btn btn-outline-primary" @onclick="SaveUserData"><i class="fa fa-save"></i> Save</button>
+                    <button type="submit" class="btn btn-outline-primary" @onclick="SaveUserData"><i class="fa fa-save"></i> @languageContainer.Keys["Save"]</button>
                 </div>
             </div>
 
-            <div class="card-header"> <a href="Friends"> You have <span class="badge badge-primary">@FriendsCount</span> Friends</a></div>
+            <div class="card-header"> <a href="Friends"> @languageContainer.Keys["YouHave"] <span class="badge badge-primary">@FriendsCount</span> @languageContainer.Keys["Friends"]</a></div>
             @*</EditForm>*@
         </div>
     </Authorized>

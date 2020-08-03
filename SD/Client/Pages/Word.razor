@@ -1,4 +1,4 @@
-﻿
+﻿@inject ILanguageContainerService languageContainer
 @inherits WordBase
 
 <div class="card">
@@ -14,7 +14,7 @@
             </button>
         </div>
 
-        <input type="search" class="form-control font-weight-bold" placeholder="Search for new word"
+        <input type="search" class="form-control font-weight-bold" placeholder=@languageContainer.Keys["NewWord"]
                id="wordId"
                value="@wordModel.Title"
                @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"
@@ -34,7 +34,7 @@
 
             @if (KnownLangs != null)
             {
-                <select class="custom-select bg-transparent rounded-0 border-0" @bind="@wordModel.WordLang">
+                <select class="bg-transparent rounded-0 border-0" @bind="@wordModel.WordLang">
                     @foreach (var item in KnownLangs)
                     {
                         if (item == wordModel.WordLang)
@@ -52,7 +52,7 @@
                     <i class="fas fa-exchange-alt"></i>
                 </button>
 
-                <select class="custom-select bg-transparent rounded-0 border-0" @bind="@wordModel.ToLang">
+                <select class="bg-transparent rounded-0 border-0" @bind="@wordModel.ToLang">
                     @foreach (var item in KnownLangs)
                     {
                         if (item == wordModel.ToLang)
@@ -68,17 +68,14 @@
             }
 
             <button type="button" class="btn btn-light bg-transparent" @onclick="()=> cssClassComment = cssClassComment ? false : true">
-                <i class="fas fa-comment-dots"></i>
+                <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
             </button>
-
-            <button type="button" class="btn btn-light bg-transparent" @onclick="AddWord">
-                <i class="fas fa-cloud-upload-alt"></i>
-            </button>
-
             <button @onclick="@(()=>{ShareWithCollapsed=!ShareWithCollapsed;})" class="btn btn-light  bg-transparent dropdown-toggle" type="button">
                 <img src="@ShareWithClass" asp-append-version="true" />
             </button>
-
+            <button type="button" class="btn btn-light bg-transparent d-flex" @onclick="AddWord">
+                <img width="20" height="20" src="/icons/cloud-upload-alt-solid.svg" asp-append-version="true" /> <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
+            </button> 
             @if (loading)
             {
                 <button type="button" class="btn btn-light bg-transparent">
@@ -90,9 +87,9 @@
         </div>
 
         <div class="btn-group @(ShareWithCollapsed ? "collapse" : "")">
-            <button class="btn btn-light bg-transparent" @onclick="@(() => {ShareWithCollapsed = true; wordModel.ShareWith = 0; ShareWithClass = "/icons/user-lock-solid.svg"; })">Only Me <img width="20" height="20" src="/icons/user-lock-solid.svg" asp-append-version="true" /></button>
-            <button class="btn btn-light bg-transparent" @onclick="@(() => {ShareWithCollapsed = true; wordModel.ShareWith = 1; ShareWithClass = "/icons/user-friends-solid.svg";})">Friends <img width="20" height="20" src="/icons/user-friends-solid.svg" asp-append-version="true" /></button>
-            <button class="btn btn-light bg-transparent" @onclick="@(() => {ShareWithCollapsed = true; wordModel.ShareWith = 2; ShareWithClass = "/icons/globe-solid.svg";})">Public <img width="20" height="20" src="/icons/globe-solid.svg" asp-append-version="true" /></button>
+            <button class="btn btn-light bg-transparent" @onclick="@(() => {ShareWithCollapsed = true; wordModel.ShareWith = 0; ShareWithClass = "/icons/user-lock-solid.svg"; })">@languageContainer.Keys["OnlyMe"] <img width="20" height="20" src="/icons/user-lock-solid.svg" asp-append-version="true" /></button>
+            <button class="btn btn-light bg-transparent" @onclick="@(() => {ShareWithCollapsed = true; wordModel.ShareWith = 1; ShareWithClass = "/icons/user-friends-solid.svg";})">@languageContainer.Keys["Friends"] <img width="20" height="20" src="/icons/user-friends-solid.svg" asp-append-version="true" /></button>
+            <button class="btn btn-light bg-transparent" @onclick="@(() => {ShareWithCollapsed = true; wordModel.ShareWith = 2; ShareWithClass = "/icons/globe-solid.svg";})">@languageContainer.Keys["Public"] <img width="20" height="20" src="/icons/globe-solid.svg" asp-append-version="true" /></button>
         </div>
 
     </div>

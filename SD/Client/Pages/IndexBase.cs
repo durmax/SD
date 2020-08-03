@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SD.Shared;
 using System.Collections.Generic;
 using System;
+using AKSoftware.Localization.MultiLanguages;
 
 namespace SD.Client.Pages
 {
@@ -19,6 +20,8 @@ namespace SD.Client.Pages
 
         [Inject]
         public UserService UserService { set; get; }
+        [Inject]
+        public ILanguageContainerService languageContainer { set; get; }
 
         protected WordModel wordModel { get; set; } = new WordModel();
 
@@ -36,6 +39,17 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
+            if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
+            {
+                try
+                {
+                    languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(uiLang));
+                }
+                catch { }
+            }
+
+
             wordModel.WordLang = await LocalStorageService.GetItemAsync<string>("FLang");
             wordModel.ToLang = await LocalStorageService.GetItemAsync<string>("TLang");
 

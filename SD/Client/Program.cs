@@ -1,13 +1,13 @@
 using System;
 using System.Net.Http;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Text;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Blazored.LocalStorage;
 using SD.Client.Services;
 using SD.Client.Models;
+using AKSoftware.Localization.MultiLanguages;
+using System.Reflection;
 
 namespace SD.Client
 {
@@ -19,8 +19,8 @@ namespace SD.Client
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddSingleton(new HttpClient {
-                BaseAddress = new Uri("https://sdapi20200529140234.azurewebsites.net/") }); 
-                              //new Uri("https://localhost:44394/") });
+                BaseAddress = //new Uri("https://sdapi20200529140234.azurewebsites.net/") }); 
+                              new Uri("https://localhost:44394/") });
            
             builder.Services.AddMsalAuthentication(options =>
             {
@@ -41,6 +41,9 @@ namespace SD.Client
             builder.Services.AddTransient<OtherPageService>();
             builder.Services.AddTransient<UserService>();
             builder.Services.AddTransient<WordService>();
+
+            builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
+
             await builder.Build().RunAsync();
         }
     }

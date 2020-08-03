@@ -1,7 +1,9 @@
-﻿using Blazored.LocalStorage;
+﻿using AKSoftware.Localization.MultiLanguages;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using SD.Client.Models;
 using SD.Client.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,12 +20,16 @@ namespace SD.Client.Pages
 
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
+        [Inject]
+        public ILanguageContainerService languageContainer { get; set; }
+
 
         protected List<string> KnownLangs { get; set; }
         protected string LangsStr { get; set; }
 
         private LangCode SFL;
         private LangCode STL;
+        private LangCode LToAdd;
 
         protected LangCode SelectedFL
         {
@@ -36,6 +42,71 @@ namespace SD.Client.Pages
             }
         }
 
+        protected LangCode LangToAdd
+        {
+            get { return LToAdd; }
+            set
+            {
+                LToAdd = value;
+                AddKnownLang(LToAdd.Key);
+            }
+        }
+
+        private void SetUILang(string langCode)
+        {
+            try
+            {
+                switch (langCode)
+                {
+                    case "ar":
+                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("ar-SY"));
+                        LocalStorageService.SetItemAsync("UILang", "ar-SY");
+                        break;
+                    case "de":
+                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("de-DE"));
+                        LocalStorageService.SetItemAsync("UILang", "de-DE");
+                        break;
+                    case "fr":
+                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("fr-FR"));
+                        LocalStorageService.SetItemAsync("UILang", "fr-FR");
+                        break;
+                    case "es":
+                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("es-ES"));
+                        LocalStorageService.SetItemAsync("UILang", "es-ES");
+                        break;
+                    case "fa":
+                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("fa-IR"));
+                        LocalStorageService.SetItemAsync("UILang", "fa-IR");
+                        break;
+                    case "it":
+                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("it-IT"));
+                        LocalStorageService.SetItemAsync("UILang", "it-IT");
+                        break;
+                    case "pt":
+                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("pt-PT"));
+                        LocalStorageService.SetItemAsync("UILang", "pt-PT");
+                        break;
+                    case "ru":
+                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("ru-RU"));
+                        LocalStorageService.SetItemAsync("UILang", "ru-RU");
+                        break;
+                    case "tr":
+                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("tr-TR"));
+                        LocalStorageService.SetItemAsync("UILang", "tr-TR");
+                        break;
+                    default:
+                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+                        LocalStorageService.SetItemAsync("UILang", "en-US");
+                        break;
+                }
+            }
+            catch
+            {
+                languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+                LocalStorageService.SetItemAsync("UILang", "en-US");
+            }
+        }
+
         protected LangCode SelectedTL
         {
             get { return STL; }
@@ -43,6 +114,7 @@ namespace SD.Client.Pages
             {
                 STL = value;
                 LocalStorageService.SetItemAsync("TLang", SelectedTL.Key);
+                SetUILang(SelectedTL.Key);
             }
         }
 
@@ -148,7 +220,7 @@ namespace SD.Client.Pages
                 LangCodes.Add(langCode);
             }
 
-            
+
         }
     }
 }

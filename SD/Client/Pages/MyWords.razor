@@ -1,28 +1,30 @@
 ﻿@page "/MyWords"
 @page "/MyWords/{UserId}/{UserName}"
+@inject ILanguageContainerService languageContainer
 @inherits MyWordsBase
 
 <h3>@UserName</h3>
 
 @if (Words == null)
 {
-    <div style="position:absolute; top:30vh; text-align:center">
-        <p><i class="fas fa-spin fa-spinner"></i> The WORDS are loading...</p>
+    <div style="position:absolute; top:30vh; text-align:center" class="w-100">
+        <p>@languageContainer.Keys["WORDSloading"]</p>
+        <p><i class="fas fa-spin fa-spinner"></i></p>
     </div>
 }
 else
 {
-<div class="sticky-top pb-1">
-    <Word wordModel="@wordModel" UserId="@UserId"  OnWordSave="NewWordHandler" Collapsed="Collapsed"></Word>
-    @if (loading)
-    {
-        <div class="d-flex justify-content-center p-1">
-            <div class="spinner-border spinner-border-sm" role="status">
-                <span class="sr-only">Loading...</span>
+    <div class="sticky-top pb-1">
+        <Word wordModel="@wordModel" UserId="@UserId" OnWordSave="NewWordHandler" Collapsed="Collapsed"></Word>
+        @if (loading)
+        {
+            <div class="d-flex justify-content-center p-1">
+                <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
 
     <div class="ml-5 mr-4">
         <ol class="list-group">
@@ -30,7 +32,7 @@ else
             {
                 <li>
                     <div class="list-group-item p-1 ">
-                        <div class="input-group" role="group">                                                       
+                        <div class="input-group" role="group">
                             <button type="button" class="btn btn-light" @onclick="() => { wordModel = word; Collapsed = false; }">
                                 <b style="@styleDeleted"> @word.Title </b>
                             </button>
@@ -38,7 +40,7 @@ else
                             <button type="button" class="btn btn-light @cssClassDelete " @onclick="async () => { wordModel = word; await DeleteWord(); }">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
-                             @{  CULiked = (word.Likes != null) ? word.Likes.Contains(CurrentUserId) : false;}  
+                            @{ CULiked = (word.Likes != null) ? word.Likes.Contains(CurrentUserId) : false;}
                             <Like CurrentUserId="@CurrentUserId" WordId="@word.WordId" LikesCount="@word.Likes?.Count" CULiked="@CULiked"></Like>
                         </div>
                     </div>

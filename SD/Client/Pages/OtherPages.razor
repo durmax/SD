@@ -1,5 +1,4 @@
-﻿
-@inherits OtherPagesBase
+﻿@inherits OtherPagesBase
 
 @if (!Collapsed && opRes == null)
 {
@@ -13,11 +12,12 @@ else
 {
     <div class="card m-0 border-left-0 border-right-0">
         <div class="btn-group" role="group">
-            <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Dict";   Collapsed = false;   await GetOpRes(); })"><i class="fas fa-book"></i></button>
+            <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Dict";   Collapsed = false;   await GetOpRes(); })">
+                <i class="fas fa-book"></i>
+            </button>
             <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Trans";  Collapsed = false; await GetOpRes();})">
                 <img src="/icons/translate-black-24dp.svg" asp-append-version="true" />
             </button>
-
             <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Vocab";  Collapsed = false; await GetOpRes();})">
                 <img src="/icons/abc.svg" asp-append-version="true" width="24" height="24" />
             </button>

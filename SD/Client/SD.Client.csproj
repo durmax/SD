@@ -7,6 +7,33 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\ar-SY.yml" />
+    <None Remove="Resources\de-DE.yml" />
+    <None Remove="Resources\en-US.yml" />
+    <None Remove="Resources\es-ES.yml" />
+    <None Remove="Resources\fa-IR.yml" />
+    <None Remove="Resources\fr-FR.yml" />
+    <None Remove="Resources\it-IT.yml" />
+    <None Remove="Resources\pt-PT.yml" />
+    <None Remove="Resources\ru-RU.yml" />
+    <None Remove="Resources\tr-TR.yml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ar-SY.yml" />
+    <EmbeddedResource Include="Resources\de-DE.yml" />
+    <EmbeddedResource Include="Resources\en-US.yml" />
+    <EmbeddedResource Include="Resources\es-ES.yml" />
+    <EmbeddedResource Include="Resources\fa-IR.yml" />
+    <EmbeddedResource Include="Resources\fr-FR.yml" />
+    <EmbeddedResource Include="Resources\it-IT.yml" />
+    <EmbeddedResource Include="Resources\pt-PT.yml" />
+    <EmbeddedResource Include="Resources\ru-RU.yml" />
+    <EmbeddedResource Include="Resources\tr-TR.yml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AKSoftware.Localization.MultiLanguages" Version="3.0.1" />
     <PackageReference Include="Blazored.LocalStorage" Version="2.1.6" />
     <PackageReference Include="Blazored.Typeahead" Version="4.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="3.2.0" />

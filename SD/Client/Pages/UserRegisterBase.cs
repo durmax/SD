@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Authorization;
 using SD.Shared;
 using SD.Client.Services;
-using System.Linq;
 
 namespace SD.Client.Pages
 {

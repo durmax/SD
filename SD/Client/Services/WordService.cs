@@ -1,4 +1,5 @@
 ﻿using SD.Shared;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -55,6 +56,10 @@ namespace SD.Client.Services
         public async Task<int> Like(string userId, string wordId)
         {
             return await _httpClient.GetFromJsonAsync<int>($"api/Word/Like/{userId}/{wordId}", null);
+        }
+        public async Task<Dictionary<string, Tuple<string, string>>> GetLikedUsers(string userId, string wordId)
+        {
+            return await _httpClient.GetFromJsonAsync<Dictionary<string, Tuple<string, string>>>($"api/Word/GetLikedUsers/{userId}/{wordId}");
         }
     }
 }

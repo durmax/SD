@@ -13,10 +13,12 @@ namespace sd.Api.Controllers
     public class WordController : ControllerBase
     {
         private readonly IWordRepository _wordService;
+        private readonly IUserRepository _userService;
 
-        public WordController(IWordRepository wordService)
+        public WordController(IWordRepository wordService, IUserRepository userService)
         {
             _wordService = wordService;
+            _userService = userService;
         }
 
         // GET: api/Word/GetWord/5
@@ -164,6 +166,23 @@ namespace sd.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ex.Message);
+            }
+        }
+
+        [HttpGet("GetLikedUsers/{CurrentUserId}/{wordId}")]
+        public async Task<ActionResult<Dictionary<string, Tuple<string, string>>>> GetLikes(string CurrentUserId, string wordId)
+        {
+            try
+            {
+                WordModel word = await _wordService.GetWordById(wordId);
+                var result = await _userService.GetUsersWithRelationship(CurrentUserId, word.Likes);
+                if (result == null) return NotFound();
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database");
             }
         }
     }

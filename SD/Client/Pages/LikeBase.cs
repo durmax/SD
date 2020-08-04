@@ -1,5 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
+using MongoDB.Bson;
 using SD.Client.Services;
+using System;
+using System.Collections.Generic;
+using System.Net.Http.Json;
+using System.Net.Security;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -8,6 +13,8 @@ namespace SD.Client.Pages
     {
         [Inject]
         public WordService WordService { set; get; }
+        [Inject]
+        public UserService UserService { set; get; }
         [Inject]
         NavigationManager NavigationManager { get; set; }
 
@@ -25,6 +32,10 @@ namespace SD.Client.Pages
         [Parameter]
         public int? LikesCount { get; set; }
 
+        protected bool Collapsed { get; set; } = true;    // hide by default
+
+        protected Dictionary<string, Tuple<string, string>> likedUsers;
+
         protected async Task Like()
         {
             if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")
@@ -36,6 +47,14 @@ namespace SD.Client.Pages
             else
             {
                 NavigationManager.NavigateTo("authentication/login");
+            }
+        }
+
+        protected async Task GetLikedUsers()
+        {
+            if (!Collapsed)
+            {
+                likedUsers = await WordService.GetLikedUsers(CurrentUserId, WordId);
             }
         }
 

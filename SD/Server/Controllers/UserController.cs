@@ -14,7 +14,7 @@ namespace sd.Api.Controllers
     {
         private readonly IUserRepository _userService;
 
-        public UserController(IUserRepository userService)
+        public UserController(IUserRepository userService, IWordRepository wordService)
         {
             _userService = userService;
         }
@@ -66,8 +66,8 @@ namespace sd.Api.Controllers
             }
         }
 
-            // GET: api/User/GetUserById/5
-            [HttpGet("GetUserById/{id}")]
+        // GET: api/User/GetUserById/5
+        [HttpGet("GetUserById/{id}")]
         public async Task<ActionResult<UserModel>> GetUserById(string id)
         {
             try

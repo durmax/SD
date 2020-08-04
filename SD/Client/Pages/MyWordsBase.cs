@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
 using SD.Shared;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -82,7 +83,6 @@ namespace SD.Client.Pages
                 CurrentUserId ="0";
             }
         }
-
         protected override async Task OnInitializedAsync()
         {
             await Auth();

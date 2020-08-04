@@ -30,21 +30,21 @@ else
         <ol class="list-group">
             @foreach (var word in Words)
             {
-                <li>
-                    <div class="list-group-item p-1 ">
-                        <div class="input-group" role="group">
-                            <button type="button" class="btn btn-light" @onclick="() => { wordModel = word; Collapsed = false; }">
-                                <b style="@styleDeleted"> @word.Title </b>
-                            </button>
+            <li>
+                <div class="list-group-item p-1 ">
+                    <div class="input-group" role="group">
+                        <button type="button" class="btn btn-light" @onclick="() => { wordModel = word; Collapsed = false; }">
+                            <b style="@styleDeleted"> @word.Title </b>
+                        </button>
 
-                            <button type="button" class="btn btn-light @cssClassDelete " @onclick="async () => { wordModel = word; await DeleteWord(); }">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                            @{ CULiked = (word.Likes != null) ? word.Likes.Contains(CurrentUserId) : false;}
-                            <Like CurrentUserId="@CurrentUserId" WordId="@word.WordId" LikesCount="@word.Likes?.Count" CULiked="@CULiked"></Like>
-                        </div>
+                        <button type="button" class="btn btn-light @cssClassDelete " @onclick="async () => { wordModel = word; await DeleteWord(); }">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        @{ CULiked = (word.Likes != null) ? word.Likes.Contains(CurrentUserId) : false;}
+                        <Like CurrentUserId="@CurrentUserId" WordId="@word.WordId" LikesCount="@word.Likes?.Count" CULiked="@CULiked"></Like>
                     </div>
-                </li>
+                </div>
+            </li>
             }
         </ol>
     </div>

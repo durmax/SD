@@ -1,5 +1,28 @@
 ﻿@inherits LikeBase
 
-<button type="button" class="btn btn-light @CULikeClass" @onclick="async () => {await Like(); }">
-    <i class="fas fa-thumbs-up"></i>  @LikesCount
-</button>
+
+<div class="btn-group" role="group">
+    <button type="button" class="btn btn-light @CULikeClass" @onclick="async () => {await Like(); }">
+        <i class="fas fa-thumbs-up"></i>  @LikesCount
+    </button>
+    <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="async() => { Collapsed = (Collapsed) ? false : true; await GetLikedUsers(); } ">
+        <i class="float-right @(Collapsed ? "oi oi-caret-bottom" : "oi oi-caret-top")"></i>
+    </button>
+
+    @if (likedUsers != null && !(likedUsers.Count < 1 || (likedUsers.ContainsKey(CurrentUserId) && likedUsers.Count < 2)))
+    {
+
+    }
+</div>
+
+<div class=@(Collapsed? "collapse" : "")>
+    @if (likedUsers != null)
+    {
+        @foreach (var foudUser in likedUsers)
+        {
+            <div class="row">
+                <Friendship UserId="@CurrentUserId" friendId="@foudUser.Key" friendName="@foudUser.Value.Item1" friendshipState="NotImportant"></Friendship>
+            </div>
+        }
+    }
+</div>

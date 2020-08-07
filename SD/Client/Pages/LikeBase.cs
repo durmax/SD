@@ -50,9 +50,9 @@ namespace SD.Client.Pages
             }
         }
 
-        protected async Task GetLikedUsers()
+        protected async Task GetLikedUsers(int? likesCount)
         {
-            if (!Collapsed)
+            if (!Collapsed && likesCount!=null)
             {
                 likedUsers = await WordService.GetLikedUsers(CurrentUserId, WordId);
             }
@@ -60,7 +60,8 @@ namespace SD.Client.Pages
 
         protected override void OnInitialized()
         {
-            CULikeClass = CULiked ? "text-primary" : null;
+            //CULikeClass = CULiked ? "border border-primary" : null;
+            LikesCount = LikesCount > 0 ? LikesCount : null;
         }
     }
 }

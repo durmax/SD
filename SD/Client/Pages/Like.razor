@@ -1,28 +1,31 @@
 ﻿@inherits LikeBase
 
 
-<div class="btn-group" role="group">
-    <button type="button" class="btn btn-light @CULikeClass" @onclick="async () => {await Like(); }">
-        <i class="fas fa-thumbs-up"></i>  @LikesCount
-    </button>
-    <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="async() => { Collapsed = (Collapsed) ? false : true; await GetLikedUsers(); } ">
-        <i class="float-right @(Collapsed ? "oi oi-caret-bottom" : "oi oi-caret-top")"></i>
-    </button>
-
-    @if (likedUsers != null && !(likedUsers.Count < 1 || (likedUsers.ContainsKey(CurrentUserId) && likedUsers.Count < 2)))
+@if (CULiked)
+{
+    <img width="20" height="20" src="/icons/thumbs-up-solid.svg" asp-append-version="true" @onclick="async () => { await Like(); }" />
+    @LikesCount
+}
+else
+{
+    <img width="20" height="20" src="/icons/thumbs-up-regular.svg" asp-append-version="true" @onclick="async () => { await Like(); }" />
+    @LikesCount
+}
+@if (LikesCount != null && LikesCount >0) { 
+<i class="@(Collapsed ? "oi oi-caret-bottom" : "oi oi-caret-top") pt-1 pl-1" @onclick="async() => { Collapsed = (Collapsed) ? false : true; await GetLikedUsers(LikesCount); } "></i>
+}
+@*@if (likedUsers != null && !(likedUsers.Count < 1 || (likedUsers.ContainsKey(CurrentUserId) && likedUsers.Count < 2)))
     {
 
-    }
-</div>
+    }*@
+
 
 <div class=@(Collapsed? "collapse" : "")>
     @if (likedUsers != null)
-    {
-        @foreach (var foudUser in likedUsers)
         {
-            <div class="row">
-                <Friendship UserId="@CurrentUserId" friendId="@foudUser.Key" friendName="@foudUser.Value.Item1" friendshipState="NotImportant"></Friendship>
-            </div>
-        }
-    }
+    @foreach (var foudUser in likedUsers)
+            {
+    <Friendship UserId="@CurrentUserId" friendId="@foudUser.Key" friendName="@foudUser.Value.Item1" friendshipState="NotImportant"></Friendship>
+            }
+}
 </div>

@@ -36,7 +36,6 @@ namespace SD.Client.Pages
 
         protected bool CULiked { get; set; }
 
-        protected string styleDeleted;
         protected string cssClassDelete;// = "d-none";
 
         protected List<WordModel> Words { get; set; }

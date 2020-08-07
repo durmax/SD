@@ -30,22 +30,41 @@ else
         <ol class="list-group">
             @foreach (var word in Words)
             {
-            <li>
-                <div class="list-group-item p-1 ">
-                    <div class="input-group" role="group">
-                        <button type="button" class="btn btn-light" @onclick="() => { wordModel = word; Collapsed = false; }">
-                            <b style="@styleDeleted"> @word.Title </b>
-                        </button>
-
-                        <button type="button" class="btn btn-light @cssClassDelete " @onclick="async () => { wordModel = word; await DeleteWord(); }">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                        @{ CULiked = (word.Likes != null) ? word.Likes.Contains(CurrentUserId) : false;}
-                        <Like CurrentUserId="@CurrentUserId" WordId="@word.WordId" LikesCount="@word.Likes?.Count" CULiked="@CULiked"></Like>
+                <li>
+                    <div class="card mb-2">
+                        <div class="card-body p-2" @onclick="() => { wordModel = word; Collapsed = false; }">
+                            @word.Title
+                        </div>
+                        <div class="card-footer p-1">
+                            <div class="row">
+                                <div class="col-10">
+                                    @{ CULiked = (word.Likes != null) ? word.Likes.Contains(CurrentUserId) : false;}
+                                    <Like CurrentUserId="@CurrentUserId" WordId="@word.WordId" LikesCount="@word.Likes?.Count" CULiked="@CULiked"></Like>
+                                </div>
+                                <div class="col-2">
+                                    <img style="float:right" width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" @onclick="async () => { wordModel = word; await DeleteWord(); }" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </li>
+                </li>
             }
         </ol>
     </div>
 }
+@*<i class="fas fa-trash-alt @cssClassDelete" @onclick="async () => { wordModel = word; await DeleteWord(); }"></i>
+    <Like CurrentUserId="@CurrentUserId" WordId="@word.WordId" LikesCount="@word.Likes?.Count" CULiked="@CULiked"></Like>*@
+@*<div class="list-group-item p-1 ">
+        <div class="input-group" role="group">
+            <button type="button" class="btn btn-light" @onclick="() => { wordModel = word; Collapsed = false; }">
+                <b style="@styleDeleted"> @word.Title </b>
+            </button>
+
+            <button type="button" class="btn btn-light @cssClassDelete" @onclick="async () => { wordModel = word; await DeleteWord(); }">
+                <i class="fas fa-trash-alt @cssClassDelete" @onclick="async () => { wordModel = word; await DeleteWord(); }"></i>
+            </button>
+            @{ CULiked = (word.Likes != null) ? word.Likes.Contains(CurrentUserId) : false;}
+            <Like CurrentUserId="@CurrentUserId" WordId="@word.WordId" LikesCount="@word.Likes?.Count" CULiked="@CULiked"></Like>
+        </div>
+    </div>*@
+

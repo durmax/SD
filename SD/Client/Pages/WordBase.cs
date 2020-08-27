@@ -119,7 +119,6 @@ namespace SD.Client.Pages
                         {
                             await OnWordSave.InvokeAsync(wordModel);
                         }
-
                         NewWord();
                     }
                 }
@@ -190,7 +189,7 @@ namespace SD.Client.Pages
         {
             //opCollapsed = false;
             note = null;
-            wordModel.Title = title;
+            wordModel.Title = title.Trim();
         }
 
         private void SetMyText()

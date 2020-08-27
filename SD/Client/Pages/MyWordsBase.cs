@@ -51,7 +51,7 @@ namespace SD.Client.Pages
             if (!string.IsNullOrWhiteSpace(wordModel.UserId))// is not a new word
             {
                 await Auth();
-                if (wordModel.UserId == UserId)
+                if (wordModel.UserId == CurrentUserId)
                 {
                     var response = await WordService.RemoveWord(wordModel.WordId);
                     if (response.IsSuccessStatusCode)

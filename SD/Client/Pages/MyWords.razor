@@ -41,7 +41,7 @@ else
                                     @{ CULiked = (word.Likes != null) ? word.Likes.Contains(CurrentUserId) : false;}
                                     <Like CurrentUserId="@CurrentUserId" WordId="@word.WordId" LikesCount="@word.Likes?.Count" CULiked="@CULiked"></Like>
                                 </div>
-                                <div class="col-2">
+                                <div class="col-2 @cssClassDelete">
                                     <img style="float:right" width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" @onclick="async () => { wordModel = word; await DeleteWord(); }" />
                                 </div>
                             </div>

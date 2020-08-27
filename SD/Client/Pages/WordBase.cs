@@ -31,7 +31,7 @@ namespace SD.Client.Pages
 
         protected List<string> KnownLangs { get; set; }
         protected string LangsStr { get; set; }
-        protected string ShareWithClass { get; set; } = "fa-user-lock";
+        protected string ShareWithClass { get; set; }
 
         protected bool ShareWithCollapsed = true;
 
@@ -105,7 +105,7 @@ namespace SD.Client.Pages
                 {
                     if ((int)respons.StatusCode == 302)
                     {
-                        cssClassUpdate = "";
+                        cssClassUpdate = null;
                         foundWordIdToUpdate = await respons.Content.ReadAsStringAsync();
                     }
                     //note = await respons.Content.ReadAsStringAsync();
@@ -158,7 +158,7 @@ namespace SD.Client.Pages
                             //NewWord();
                             //MyText = "";
                         }
-                        foundWordIdToUpdate = "";
+                        foundWordIdToUpdate = null;
                     }
                     loading = false;
                 }
@@ -181,13 +181,15 @@ namespace SD.Client.Pages
                 UserId = CurrentUserId,
                 CreatedAt = DateTime.Now
             };
-            MyText = null;
+            wordModel.Explain = null;
+            SetMyText();
+            ShareWithClass = "/icons/cloud-upload-alt-solid.svg";
         }
 
         protected void WordChanged(string title)
         {
             //opCollapsed = false;
-            note = "";
+            note = null;
             wordModel.Title = title;
         }
 
@@ -195,7 +197,7 @@ namespace SD.Client.Pages
         {
             if (string.IsNullOrWhiteSpace(wordModel.Explain))
             {
-                MyText = "";
+                MyText = null;
                 cssClassComment = true;
             }
             else
@@ -220,16 +222,6 @@ namespace SD.Client.Pages
                 wordModel = new WordModel();
             }
 
-            //try
-            //{      //  WordId fom URL
-            //    if (!string.IsNullOrWhiteSpace(WordId))
-            //    {
-            //        wordModel = await WordService.GetWordById(WordId);
-            //        Collapsed = false;
-            //    }
-            //}
-            //catch { }
-
             SetMyText();
 
             KnownLangs = new List<string>();
@@ -252,8 +244,7 @@ namespace SD.Client.Pages
                     }
                 }
             }
-
-
+            wordModel.ShareWith = 3; // nothing
         }
         protected override void OnParametersSet()
         {
@@ -271,6 +262,9 @@ namespace SD.Client.Pages
                     break;
                 case 2:
                     ShareWithClass = "/icons/globe-solid.svg";
+                    break;
+                default:
+                    ShareWithClass = "/icons/cloud-upload-alt-solid.svg";
                     break;
             }
         }

@@ -20,7 +20,6 @@
                @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"
                @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})" />
 
-
         <div class="input-group-append">
             <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="() => Collapsed = (Collapsed) ? false : true ">
                 <i class="float-right @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
@@ -71,11 +70,11 @@
                 <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
             </button>
             <button @onclick="@(()=>{ShareWithCollapsed=!ShareWithCollapsed;})" class="btn btn-light  bg-transparent dropdown-toggle" type="button">
-                <img src="@ShareWithClass" asp-append-version="true" />
+                <img width="20" height="20" src="@ShareWithClass" asp-append-version="true" />  <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
             </button>
-            <button type="button" class="btn btn-light bg-transparent d-flex" @onclick="AddWord">
+            @*<button type="button" class="btn btn-light bg-transparent d-flex" @onclick="AddWord">
                 <img width="20" height="20" src="/icons/cloud-upload-alt-solid.svg" asp-append-version="true" /> <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
-            </button> 
+            </button>*@ 
             @if (loading)
             {
                 <button type="button" class="btn btn-light bg-transparent">
@@ -87,9 +86,9 @@
         </div>
 
         <div class="btn-group @(ShareWithCollapsed ? "collapse" : "")">
-            <button class="btn btn-light bg-transparent" @onclick="@(() => {ShareWithCollapsed = true; wordModel.ShareWith = 0; ShareWithClass = "/icons/user-lock-solid.svg"; })">@languageContainer.Keys["OnlyMe"] <img width="20" height="20" src="/icons/user-lock-solid.svg" asp-append-version="true" /></button>
-            <button class="btn btn-light bg-transparent" @onclick="@(() => {ShareWithCollapsed = true; wordModel.ShareWith = 1; ShareWithClass = "/icons/user-friends-solid.svg";})">@languageContainer.Keys["Friends"] <img width="20" height="20" src="/icons/user-friends-solid.svg" asp-append-version="true" /></button>
-            <button class="btn btn-light bg-transparent" @onclick="@(() => {ShareWithCollapsed = true; wordModel.ShareWith = 2; ShareWithClass = "/icons/globe-solid.svg";})">@languageContainer.Keys["Public"] <img width="20" height="20" src="/icons/globe-solid.svg" asp-append-version="true" /></button>
+            <button class="btn btn-light bg-transparent" @onclick="@(async() => {ShareWithCollapsed = true; wordModel.ShareWith = 0; ShareWithClass = "/icons/user-lock-solid.svg"; await AddWord();})">@languageContainer.Keys["OnlyMe"] <img width="20" height="20" src="/icons/user-lock-solid.svg" asp-append-version="true" /></button>
+            <button class="btn btn-light bg-transparent" @onclick="@(async() => {ShareWithCollapsed = true; wordModel.ShareWith = 1; ShareWithClass = "/icons/user-friends-solid.svg";  await AddWord();})">@languageContainer.Keys["Friends"] <img width="20" height="20" src="/icons/user-friends-solid.svg" asp-append-version="true" /></button>
+            <button class="btn btn-light bg-transparent" @onclick="@(async() => {ShareWithCollapsed = true; wordModel.ShareWith = 2; ShareWithClass = "/icons/globe-solid.svg"; await AddWord();})">@languageContainer.Keys["Public"] <img width="20" height="20" src="/icons/globe-solid.svg" asp-append-version="true" /></button>
         </div>
 
     </div>
@@ -111,15 +110,12 @@
                 </div>
             </div>
 
-
-
             <div class="form-group m-0 @(cssClassComment? "collapse" : "")">
                 <textarea class="form-control text-wrap"
                           rows="@Rows"
                           @bind-value="@MyText"
                           @bind-value:event="oninput">@MyText</textarea>
             </div>
-
 
             @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
             {
@@ -128,5 +124,4 @@
 
         </div>
     </div>
-
 </div>

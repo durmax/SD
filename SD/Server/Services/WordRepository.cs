@@ -22,6 +22,7 @@ namespace sd.Api.Services
         {
             List<WordModel> words = new List<WordModel>();
             words = await _context.Words.Find(w => w.UserId == userId).ToListAsync();
+            words = words.OrderByDescending(w => w.CreatedAt).ToList();
 
             if (CurrentUserId == userId)
             {

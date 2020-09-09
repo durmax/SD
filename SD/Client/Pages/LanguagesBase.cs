@@ -17,6 +17,8 @@ namespace SD.Client.Pages
 
         [Inject]
         protected LangCodeService LangCodeService { get; set; }
+        [Inject]
+        KnownLangsService KnownLangsService { get; set; }
 
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
@@ -38,7 +40,19 @@ namespace SD.Client.Pages
             {
                 SFL = value;
                 LocalStorageService.SetItemAsync("FLang", SelectedFL.Key);
-                AddKnownLang(SFL.Key);
+                AddKnownLang(SelectedFL.Key);
+            }
+        }
+
+        protected LangCode SelectedTL
+        {
+            get { return STL; }
+            set
+            {
+                STL = value;
+                LocalStorageService.SetItemAsync("TLang", SelectedTL.Key);
+                SetUILang(SelectedTL.Key);
+                AddKnownLang(SelectedTL.Key);
             }
         }
 
@@ -48,7 +62,8 @@ namespace SD.Client.Pages
             set
             {
                 LToAdd = value;
-                AddKnownLang(LToAdd.Key);
+                LangsStr += "," + LToAdd.Key;
+                BuildKnownLangs();
             }
         }
 
@@ -107,16 +122,7 @@ namespace SD.Client.Pages
             }
         }
 
-        protected LangCode SelectedTL
-        {
-            get { return STL; }
-            set
-            {
-                STL = value;
-                LocalStorageService.SetItemAsync("TLang", SelectedTL.Key);
-                SetUILang(SelectedTL.Key);
-            }
-        }
+
 
         [Parameter] public List<LangCode> LangCodes { get; set; }
         protected async Task<IEnumerable<LangCode>> SearchLangs(string searchText)
@@ -140,11 +146,31 @@ namespace SD.Client.Pages
                 KnownLangs.Add(lang);
                 LangsStr += "," + lang;
             }
-            LocalStorageService.SetItemAsync("Langs", LangsStr);
         }
+
         protected void RemoveKnownLang(string lang)
         {
-            KnownLangs.Remove(lang);
+            if (lang != SelectedFL.Key && lang != SelectedTL.Key)
+            {
+                KnownLangs.Remove(lang);
+                SetLangsStr();
+            }
+        }
+
+        protected void BuildKnownLangs()
+        {
+            KnownLangsService.GetLangsFromLocalAsync(LangsStr,
+                SelectedFL.Key,
+               SelectedTL.Key);
+
+            KnownLangs = new List<string>();
+            KnownLangs = KnownLangsService.KnownLangs;
+
+            SetLangsStr();
+        }
+
+        private void SetLangsStr()
+        {
             LangsStr = null;
             foreach (var item in KnownLangs)
             {
@@ -153,38 +179,10 @@ namespace SD.Client.Pages
             LocalStorageService.SetItemAsync("Langs", LangsStr);
         }
 
-        protected async Task GetLangsFromLocalAsync()
-        {
-            KnownLangs = new List<string>();
-            try
-            {
-                LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
-            }
-            catch { }
-
-            if (!string.IsNullOrWhiteSpace(LangsStr))
-            {
-                string[] langArray = LangsStr.Split(",");
-
-                foreach (var lan in langArray)
-                {
-                    if (!string.IsNullOrWhiteSpace(lan))
-                    {
-                        if (!KnownLangs.Contains(lan))
-                        {
-                            KnownLangs.Add(lan);
-                        }
-                    }
-                }
-            }
-        }
-
         protected override async Task OnInitializedAsync()
         {
-            await GetLangsFromLocalAsync();
-
-            string fl = "en";
-            string tl = "de";
+            string tl = "en";
+            string fl = "de";
             try
             {
                 fl = await LocalStorageService.GetItemAsync<string>("FLang");
@@ -208,6 +206,9 @@ namespace SD.Client.Pages
                 Value = LangCodeService.Langs[tl]
             };
 
+            LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
+            BuildKnownLangs();
+
             LangCodes = new List<LangCode>();
             foreach (var item in LangCodeService.Langs)
             {
@@ -219,8 +220,6 @@ namespace SD.Client.Pages
 
                 LangCodes.Add(langCode);
             }
-
-
         }
     }
 }

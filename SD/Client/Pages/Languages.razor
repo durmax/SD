@@ -3,51 +3,51 @@
 @using Blazored.Typeahead
 
 
-    <div class="card">
-        <div class="card-header"><b>@languageContainer.Keys["LangConfig"]</b></div>
+<div class="card">
+    <div class="card-header"><b>@languageContainer.Keys["LangConfig"]</b></div>
 
-        <div class="card-body">
-            
-            <div class="row pb-1">
-                <div class="col-4"><lable>@languageContainer.Keys["Motherlanguage"]</lable></div>
-                <div class="col-8">
-                    <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedTL">
-                        <SelectedTemplate>
-                            @context.Value
-                        </SelectedTemplate>
-                        <ResultTemplate>
-                            @context.Value
-                        </ResultTemplate>
-                    </BlazoredTypeahead>
-                </div>
+    <div class="card-body">
+
+        <div class="row pb-1">
+            <div class="col-6"><lable>@languageContainer.Keys["Motherlanguage"]</lable></div>
+            <div class="col-6">
+                <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedTL">
+                    <SelectedTemplate>
+                        @context.Value
+                    </SelectedTemplate>
+                    <ResultTemplate>
+                        @context.Value
+                    </ResultTemplate>
+                </BlazoredTypeahead>
             </div>
+        </div>
 
-            <div class="row pb-1">
-                <div class="col-4"><lable>@languageContainer.Keys["Secondlanguage"]</lable></div>
-                <div class="col-8">
-                    <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedFL">
-                        <SelectedTemplate>
-                            @context.Value
-                        </SelectedTemplate>
-                        <ResultTemplate>
-                            @context.Value
-                        </ResultTemplate>
-                    </BlazoredTypeahead>
-                </div>
+        <div class="row pb-1">
+            <div class="col-6"><lable>@languageContainer.Keys["Secondlanguage"]</lable></div>
+            <div class="col-6">
+                <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedFL">
+                    <SelectedTemplate>
+                        @context.Value
+                    </SelectedTemplate>
+                    <ResultTemplate>
+                        @context.Value
+                    </ResultTemplate>
+                </BlazoredTypeahead>
             </div>
         </div>
     </div>
+</div>
 <div class=card>
     <div class="card-header"><b>@languageContainer.Keys["LList"]</b></div>
 
     <div class="card-body">
         <div class="row pb-1">
-            <div class="col-4">
+            <div class="col-6">
                 <label>
                     @languageContainer.Keys["AddLang"]
                 </label>
             </div>
-            <div class="col-8">
+            <div class="col-6">
                 <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="LangToAdd">
                     <SelectedTemplate>
                         @context.Value

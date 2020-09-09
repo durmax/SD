@@ -17,6 +17,8 @@ namespace SD.Client.Pages
 
         [Inject]
         NavigationManager NavigationManager { get; set; }
+        [Inject]
+        KnownLangsService KnownLangsService { get; set; }
 
         [Parameter]
         public bool Collapsed { set; get; } = true;    // hide by default
@@ -29,14 +31,19 @@ namespace SD.Client.Pages
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
 
-        protected List<string> KnownLangs { get; set; }
+        [Parameter]
+        public WordModel wordModel { get; set; }
+
         protected string LangsStr { get; set; }
+        //protected string WordLang { get; set; }
+        //protected string ToLang { get; set; }
+
+        protected List<string> KnownLangs { get; set; }
+
         protected string ShareWithClass { get; set; }
 
         protected bool ShareWithCollapsed = true;
 
-        [Parameter]
-        public WordModel wordModel { get; set; }
         //[Parameter]
         //public string WordId { get; set; }
 
@@ -119,7 +126,7 @@ namespace SD.Client.Pages
                         {
                             await OnWordSave.InvokeAsync(wordModel);
                         }
-                        NewWord();
+                        await NewWordAsync();
                     }
                 }
             }
@@ -168,10 +175,11 @@ namespace SD.Client.Pages
             }
         }
 
-        protected void NewWord()
+        protected async Task NewWordAsync()
         {
-            string wl = wordModel.WordLang;
-            string tl = wordModel.ToLang;
+            string wl = wordModel?.WordLang;
+            string tl = wordModel?.ToLang;
+
             wordModel = new WordModel
             {
                 WordId = Guid.NewGuid().ToString(),
@@ -183,6 +191,11 @@ namespace SD.Client.Pages
             wordModel.Explain = null;
             SetMyText();
             ShareWithClass = "/icons/cloud-upload-alt-solid.svg";
+
+            if (string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang))
+            {
+                await SetLangsAsync();
+            }
         }
 
         protected void WordChanged(string title)
@@ -208,6 +221,36 @@ namespace SD.Client.Pages
             }
         }
 
+        private async Task SetLangsAsync()
+        {
+            wordModel.WordLang = await LocalStorageService.GetItemAsync<string>("FLang");
+            wordModel.ToLang = await LocalStorageService.GetItemAsync<string>("TLang");
+
+            if (string.IsNullOrWhiteSpace(wordModel.WordLang) || wordModel.WordLang == "null" || string.IsNullOrWhiteSpace(wordModel.ToLang) || wordModel.ToLang == "null")
+            {
+                NavigationManager.NavigateTo("Languages");
+            }
+        }
+
+        private async Task BuildKnownLangsAsync()
+        {
+            if (KnownLangsService.KnownLangs.Count == 0)
+            {
+                // LangsStr += wordModel.WordLang + "," + wordModel.ToLang;
+
+                //WordLang = await LocalStorageService.GetItemAsync<string>("FLang");
+                //ToLang = await LocalStorageService.GetItemAsync<string>("TLang");
+
+
+                LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
+
+                KnownLangsService.GetLangsFromLocalAsync(LangsStr, wordModel.WordLang, wordModel.ToLang);
+            }
+
+            KnownLangs = new List<string>();
+            KnownLangs = KnownLangsService.KnownLangs;
+        }
+
         protected override async Task OnInitializedAsync()
         {
             var user = (await authenticationStateTask).User;
@@ -216,35 +259,21 @@ namespace SD.Client.Pages
                 CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
             }
 
+           
+
             if (wordModel == null)
             {
-                wordModel = new WordModel();
+                //wordModel = new WordModel();
+                await NewWordAsync();
             }
 
             SetMyText();
 
-            KnownLangs = new List<string>();
-            KnownLangs.Add(await LocalStorageService.GetItemAsync<string>("FLang"));
-            KnownLangs.Add(await LocalStorageService.GetItemAsync<string>("TLang"));
+            await BuildKnownLangsAsync();
 
-            LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
-            if (!string.IsNullOrWhiteSpace(LangsStr))
-            {
-                string[] langArray = LangsStr.Split(",");
-
-                foreach (var lan in langArray)
-                {
-                    if (!string.IsNullOrWhiteSpace(lan))
-                    {
-                        if (!KnownLangs.Contains(lan))
-                        {
-                            KnownLangs.Add(lan);
-                        }
-                    }
-                }
-            }
             wordModel.ShareWith = 3; // nothing
         }
+
         protected override void OnParametersSet()
         {
             note = null;

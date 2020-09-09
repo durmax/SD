@@ -23,7 +23,7 @@ namespace SD.Client.Pages
         [Inject]
         public ILanguageContainerService languageContainer { set; get; }
 
-        protected WordModel wordModel { get; set; } = new WordModel();
+        //protected WordModel wordModel { get; set; } //= new WordModel();
 
         protected UserModel userModel { get; set; } = new UserModel();
         protected int? FriendRequestsCount { set; get; }
@@ -49,15 +49,6 @@ namespace SD.Client.Pages
                 catch { }
             }
 
-
-            wordModel.WordLang = await LocalStorageService.GetItemAsync<string>("FLang");
-            wordModel.ToLang = await LocalStorageService.GetItemAsync<string>("TLang");
-
-            if (string.IsNullOrWhiteSpace(wordModel.WordLang) || wordModel.WordLang == "null" || string.IsNullOrWhiteSpace(wordModel.ToLang) || wordModel.ToLang == "null")
-            {
-                NavigationManager.NavigateTo("Languages");
-            }
-
             var user = (await authenticationStateTask).User;
 
             if (user.Identity.IsAuthenticated)
@@ -65,9 +56,9 @@ namespace SD.Client.Pages
                 UserId = user.FindFirst(c => c.Type == "oid")?.Value;
                 try
                 {
-                    wordModel.UserId = UserId;
-                    wordModel.WordId = Guid.NewGuid().ToString();
-                    wordModel.CreatedAt = DateTime.Now;
+                    //wordModel.UserId = UserId;
+                    //wordModel.WordId = Guid.NewGuid().ToString();
+                    //wordModel.CreatedAt = DateTime.Now;
 
                     userModel = await UserService.GetUserById(UserId);
                 }

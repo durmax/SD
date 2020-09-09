@@ -41,6 +41,7 @@ namespace SD.Client
             builder.Services.AddTransient<OtherPageService>();
             builder.Services.AddTransient<UserService>();
             builder.Services.AddTransient<WordService>();
+            builder.Services.AddSingleton<KnownLangsService>();
 
             builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
 

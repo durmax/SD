@@ -23,7 +23,8 @@ namespace SD.Client.Pages
         [Inject]
         public ILanguageContainerService languageContainer { set; get; }
 
-        //protected WordModel wordModel { get; set; } //= new WordModel();
+        [Inject]
+        DefaultLangsService DefaultLangsService { get; set; }
 
         protected UserModel userModel { get; set; } = new UserModel();
         protected int? FriendRequestsCount { set; get; }
@@ -40,6 +41,9 @@ namespace SD.Client.Pages
         protected override async Task OnInitializedAsync()
         {
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
+            //DefaultLangsService.DefaultWordLang = await LocalStorageService.GetItemAsync<string>("FLang");
+            //DefaultLangsService.DefaultToLang = await LocalStorageService.GetItemAsync<string>("TLang");
+
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
             {
                 try

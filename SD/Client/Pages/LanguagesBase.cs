@@ -3,7 +3,6 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using SD.Client.Models;
 using SD.Client.Services;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +16,10 @@ namespace SD.Client.Pages
 
         [Inject]
         protected LangCodeService LangCodeService { get; set; }
+
+        [Inject]
+        protected DefaultLangsService DefaultLangsService { get; set; }
+
         [Inject]
         KnownLangsService KnownLangsService { get; set; }
 
@@ -24,7 +27,6 @@ namespace SD.Client.Pages
         public ILocalStorageService LocalStorageService { get; set; }
         [Inject]
         public ILanguageContainerService languageContainer { get; set; }
-
 
         protected List<string> KnownLangs { get; set; }
         protected string LangsStr { get; set; }
@@ -41,6 +43,7 @@ namespace SD.Client.Pages
                 SFL = value;
                 LocalStorageService.SetItemAsync("FLang", SelectedFL.Key);
                 AddKnownLang(SelectedFL.Key);
+                DefaultLangsService.DefaultWordLang = SelectedFL.Key;
             }
         }
 
@@ -53,6 +56,7 @@ namespace SD.Client.Pages
                 LocalStorageService.SetItemAsync("TLang", SelectedTL.Key);
                 SetUILang(SelectedTL.Key);
                 AddKnownLang(SelectedTL.Key);
+                DefaultLangsService.DefaultToLang = SelectedTL.Key;
             }
         }
 

@@ -31,21 +31,19 @@ namespace SD.Client.Pages
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
 
+        [Inject]
+        public DefaultLangsService DefaultLangsService { get; set; }
+
         [Parameter]
         public WordModel wordModel { get; set; }
 
         protected string LangsStr { get; set; }
-        //protected string WordLang { get; set; }
-        //protected string ToLang { get; set; }
 
         protected List<string> KnownLangs { get; set; }
 
         protected string ShareWithClass { get; set; }
 
         protected bool ShareWithCollapsed = true;
-
-        //[Parameter]
-        //public string WordId { get; set; }
 
         [Parameter]
         public string UserId { get; set; }
@@ -161,8 +159,6 @@ namespace SD.Client.Pages
                         else
                         {
                             note = $"{wordModel.Title} is Updated";
-                            //NewWord();
-                            //MyText = "";
                         }
                         foundWordIdToUpdate = null;
                     }
@@ -177,14 +173,11 @@ namespace SD.Client.Pages
 
         protected async Task NewWordAsync()
         {
-            string wl = wordModel?.WordLang;
-            string tl = wordModel?.ToLang;
-
             wordModel = new WordModel
             {
                 WordId = Guid.NewGuid().ToString(),
-                WordLang = wl,
-                ToLang = tl,
+                WordLang = DefaultLangsService.DefaultWordLang,
+                ToLang = DefaultLangsService.DefaultToLang,
                 UserId = CurrentUserId,
                 CreatedAt = DateTime.Now
             };
@@ -223,8 +216,11 @@ namespace SD.Client.Pages
 
         private async Task SetLangsAsync()
         {
-            wordModel.WordLang = await LocalStorageService.GetItemAsync<string>("FLang");
-            wordModel.ToLang = await LocalStorageService.GetItemAsync<string>("TLang");
+            DefaultLangsService.DefaultWordLang = await LocalStorageService.GetItemAsync<string>("FLang");
+            DefaultLangsService.DefaultToLang = await LocalStorageService.GetItemAsync<string>("TLang");
+
+            wordModel.WordLang = DefaultLangsService.DefaultWordLang;
+            wordModel.ToLang = DefaultLangsService.DefaultToLang;
 
             if (string.IsNullOrWhiteSpace(wordModel.WordLang) || wordModel.WordLang == "null" || string.IsNullOrWhiteSpace(wordModel.ToLang) || wordModel.ToLang == "null")
             {
@@ -236,12 +232,6 @@ namespace SD.Client.Pages
         {
             if (KnownLangsService.KnownLangs.Count == 0)
             {
-                // LangsStr += wordModel.WordLang + "," + wordModel.ToLang;
-
-                //WordLang = await LocalStorageService.GetItemAsync<string>("FLang");
-                //ToLang = await LocalStorageService.GetItemAsync<string>("TLang");
-
-
                 LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
 
                 KnownLangsService.GetLangsFromLocalAsync(LangsStr, wordModel.WordLang, wordModel.ToLang);
@@ -259,11 +249,8 @@ namespace SD.Client.Pages
                 CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
             }
 
-           
-
             if (wordModel == null)
             {
-                //wordModel = new WordModel();
                 await NewWordAsync();
             }
 

@@ -35,13 +35,15 @@ namespace SD.Client
 
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddSingleton<LangCodeService>();
+            builder.Services.AddSingleton<KnownLangsService>();
+            builder.Services.AddSingleton<DefaultLangsService>();
+
             builder.Services.AddTransient<UriService>();
             builder.Services.AddTransient<LinkModel>();
             builder.Services.AddTransient<LinkParam>();
             builder.Services.AddTransient<OtherPageService>();
             builder.Services.AddTransient<UserService>();
             builder.Services.AddTransient<WordService>();
-            builder.Services.AddSingleton<KnownLangsService>();
 
             builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
 

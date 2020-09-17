@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
+using Newtonsoft.Json;
 using SD.Client.Services;
 using SD.Shared;
 using System.Collections.Generic;
@@ -10,6 +12,9 @@ namespace SD.Client.Pages
     {
         [Inject]
         protected OtherPageService OtherPageService { get; set; }
+
+        [Inject]
+        public ILocalStorageService LocalStorageService { get; set; }
 
         protected IEnumerable<OtherPageResModel> otherPageModels;
         protected IEnumerable<OtherPageResModel> opRes;
@@ -57,7 +62,7 @@ namespace SD.Client.Pages
             Collapsed = Collapsed ? false : true;
             //if (opRes == null)
             //{
-                await GetOpRes();
+            await GetOpRes();
             //}
         }
 
@@ -70,9 +75,21 @@ namespace SD.Client.Pages
                     otherPageModels = null;
                     opRes = null;
 
-                    otherPageModels = await OtherPageService.GetOPResModels(FLangCode, TLangCode);
+                    var OPStr = await LocalStorageService.GetItemAsync<string>(FLangCode + "-" + TLangCode);
+                    if (!string.IsNullOrEmpty(OPStr) && OPStr != "null")
+                    {
+                        otherPageModels = JsonConvert.DeserializeObject<IEnumerable<OtherPageResModel>>(OPStr);
+                    }
+                    else
+                    {
+                        otherPageModels = await OtherPageService.GetOPResModels(FLangCode, TLangCode);
+                        if (FLangCode != TLangCode)
+                        {
+                            await LocalStorageService.SetItemAsync(FLangCode + "-" + TLangCode, otherPageModels);
+                        }
+                    }
 
-                    opRes =  OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
+                    opRes = OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
                     langChanged = false;
                 }
                 else
@@ -80,13 +97,13 @@ namespace SD.Client.Pages
                     if (otherPageModels != null)
                     {
                         opRes = null;
-                        opRes =  OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
+                        opRes = OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
                     }
                 }
             }
         }
         protected override async Task OnParametersSetAsync()
-        { 
+        {
             opRes = null;
             await GetOpRes();
         }

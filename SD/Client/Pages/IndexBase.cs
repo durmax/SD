@@ -5,7 +5,6 @@ using SD.Client.Services;
 using System.Threading.Tasks;
 using SD.Shared;
 using System.Collections.Generic;
-using System;
 using AKSoftware.Localization.MultiLanguages;
 
 namespace SD.Client.Pages
@@ -16,15 +15,9 @@ namespace SD.Client.Pages
         public ILocalStorageService LocalStorageService { get; set; }
 
         [Inject]
-        NavigationManager NavigationManager { get; set; }
-
-        [Inject]
         public UserService UserService { set; get; }
         [Inject]
         public ILanguageContainerService languageContainer { set; get; }
-
-        [Inject]
-        DefaultLangsService DefaultLangsService { get; set; }
 
         protected UserModel userModel { get; set; } = new UserModel();
         protected int? FriendRequestsCount { set; get; }
@@ -41,8 +34,6 @@ namespace SD.Client.Pages
         protected override async Task OnInitializedAsync()
         {
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
-            //DefaultLangsService.DefaultWordLang = await LocalStorageService.GetItemAsync<string>("FLang");
-            //DefaultLangsService.DefaultToLang = await LocalStorageService.GetItemAsync<string>("TLang");
 
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
             {
@@ -60,10 +51,6 @@ namespace SD.Client.Pages
                 UserId = user.FindFirst(c => c.Type == "oid")?.Value;
                 try
                 {
-                    //wordModel.UserId = UserId;
-                    //wordModel.WordId = Guid.NewGuid().ToString();
-                    //wordModel.CreatedAt = DateTime.Now;
-
                     userModel = await UserService.GetUserById(UserId);
                 }
                 catch

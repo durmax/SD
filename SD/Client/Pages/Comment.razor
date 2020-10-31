@@ -1,0 +1,14 @@
+﻿@inherits CommentBase
+
+
+@if (commentModel != null)
+{
+    <p>  @commentModel.CreatedAt   </p>
+<textarea disabled="@IsDisabled" class="form-control text-wrap"
+          rows="@Rows"
+          @bind-value="@MyText"
+          @bind-value:event="oninput">@MyText</textarea>
+    <button class="@cssClassSave" @onclick="@SaveComment">Save Comment</button>
+    <button class="@cssClassSave" @onclick="@RemoveComment">Remove Comment</button>
+}
+

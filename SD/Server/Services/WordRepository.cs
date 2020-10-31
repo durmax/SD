@@ -11,7 +11,7 @@ namespace sd.Api.Services
 {
     public class WordRepository : IWordRepository
     {
-        private MongodbContext _context;
+        private readonly MongodbContext _context;
 
         public WordRepository(IMongodbSettings settings)
         {
@@ -70,11 +70,11 @@ namespace sd.Api.Services
             }
         }
 
-        public async Task<bool> UpdateWord(string id, WordModel updatedWord)
+        public async Task<bool> UpdateWord(string wordId, WordModel updatedWord)
         {
             try
             {
-                await _context.Words.ReplaceOneAsync(word => word.WordId == id, updatedWord);
+                await _context.Words.ReplaceOneAsync(word => word.WordId == wordId, updatedWord);
                 return true;
             }
             catch
@@ -94,22 +94,6 @@ namespace sd.Api.Services
             {
                 return false;
             }
-        }
-
-        public async Task<int> Like(string userId, string wordId)
-        {
-            WordModel wordModel = await GetWordById(wordId);
-            if (wordModel.Likes == null) wordModel.Likes = new List<string>();
-            if (!wordModel.Likes.Contains(userId))
-            {
-                wordModel.Likes.Add(userId);
-            }
-            else
-            {
-                wordModel.Likes.Remove(userId);
-            }
-            await UpdateWord(wordModel.WordId, wordModel);
-            return wordModel.Likes.Count();
         }
     }
 }

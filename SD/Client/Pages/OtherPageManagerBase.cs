@@ -137,10 +137,8 @@ namespace SD.Client.Pages
                 // add Authorization
                 otherPageModel =  await OtherPageService.GetOtherPageById(Id);
             }
-            catch (Exception ex)
-            {
-
-            }
+            catch
+            {}
 
             if (otherPageModel.OtherPageId == null)
             {

@@ -22,7 +22,7 @@ namespace SD.Client.Pages
         public string CurrentUserId { get; set; }
 
         [Parameter]
-        public bool CULiked { get; set; }
+        public bool CULiked { get; set; }  // Current User has like
 
         protected string CULikeClass;
 

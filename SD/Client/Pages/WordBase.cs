@@ -34,6 +34,9 @@ namespace SD.Client.Pages
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
 
+        [Inject]
+        public CommentService CommentService { get; set; }
+
         [Parameter]
         public WordModel wordModel { get; set; }
 
@@ -47,7 +50,7 @@ namespace SD.Client.Pages
 
         [Parameter]
         public string UserId { get; set; }
-        private string CurrentUserId { get; set; }
+        public string CurrentUserId { get; set; }
 
         protected string cssClassUpdate = "d-none";
         protected bool cssClassComment { get; set; } = true;    // hide by default
@@ -241,6 +244,32 @@ namespace SD.Client.Pages
             KnownLangs = KnownLangsService.KnownLangs;
         }
 
+        protected async Task CreateCommentAsync()
+        {
+            if (string.IsNullOrEmpty(CurrentUserId))
+            {
+                NavigationManager.NavigateTo("/authentication/login");
+            }
+            else
+            {
+                CommentModel commentModel = new CommentModel();
+                commentModel = new CommentModel();
+                commentModel.UserId = CurrentUserId;
+                commentModel.CommentId = Guid.NewGuid().ToString();
+                commentModel.CreatedAt = DateTime.Now;
+                commentModel.CommentText = "";
+
+                await CommentService.SaveComment(commentModel, wordModel.WordId);
+
+                if (wordModel.Comments==null)
+                {
+                    wordModel.Comments = new List<string>();
+                }
+                
+                wordModel.Comments.Add(commentModel.CommentId);
+            }
+
+        }
         protected override async Task OnInitializedAsync()
         {
             var user = (await authenticationStateTask).User;

@@ -30,6 +30,7 @@ namespace sd.Api
             services.AddTransient<IOtherPageRepository, OtherPageRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IWordRepository, WordRepository>();
+            services.AddTransient<ICommentRepository, CommentRepository>();
 
             services.AddDataProtection();
 

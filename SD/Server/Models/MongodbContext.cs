@@ -18,11 +18,8 @@ namespace sd.Api.Models
                 if (client != null)
                     _database = client.GetDatabase(_settings.DatabaseName);
             }
-            catch(Exception ex)
-            {
-
-            }
-
+            catch
+            {}
         }
 
         public IMongoCollection<UserModel> Users =>
@@ -31,5 +28,7 @@ namespace sd.Api.Models
             _database.GetCollection<WordModel>(_settings.WordCollectionName);
         public IMongoCollection<OtherPageModel> OtherPages =>
             _database.GetCollection<OtherPageModel>(_settings.OtherPageCollectionName);
+        public IMongoCollection<CommentModel> Comments =>
+            _database.GetCollection<CommentModel>(_settings.CommentCollectionName);
     }
 }

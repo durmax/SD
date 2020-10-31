@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,8 @@ namespace sd.Api.Controllers
         private readonly IWordRepository _wordService;
         private readonly IUserRepository _userService;
 
-        public WordController(IWordRepository wordService, IUserRepository userService)
+        public WordController(IWordRepository wordService, 
+            IUserRepository userService)
         {
             _wordService = wordService;
             _userService = userService;
@@ -160,7 +162,18 @@ namespace sd.Api.Controllers
         {
             try
             {
-                return Ok(await _wordService.Like(userId, wordId));
+                WordModel wordModel = await _wordService.GetWordById(wordId);
+                if (wordModel.Likes == null) wordModel.Likes = new List<string>();
+                if (!wordModel.Likes.Contains(userId))
+                {
+                    wordModel.Likes.Add(userId);
+                }
+                else
+                {
+                    wordModel.Likes.Remove(userId);
+                }
+                await _wordService.UpdateWord(wordModel.WordId, wordModel);
+                return wordModel.Likes.Count();
             }
             catch (Exception ex)
             {

@@ -1,7 +1,5 @@
 ﻿using SD.Shared;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace sd.Api.Interfaces
@@ -14,7 +12,5 @@ namespace sd.Api.Interfaces
         Task<bool> AddWord(WordModel word);
         Task<bool> UpdateWord(string id, WordModel newWord);
         Task<bool> RemoveWord(string id);
-
-        Task<int> Like(string userId, string wordId);
     }
 }

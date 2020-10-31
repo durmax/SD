@@ -44,6 +44,8 @@ namespace SD.Shared
 
         [BsonIgnoreIfNull]
         public List<string> Likes { get; set; }
-    }
 
+        [BsonIgnoreIfNull]
+        public List<string> Comments { get; set; }
+    }
 }

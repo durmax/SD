@@ -293,7 +293,7 @@ namespace SD.Client.Pages
            // CreateComment();
         }
 
-        protected override async Task OnParametersSetAsync()
+        protected override void OnParametersSet()
         {
             note = null;
 

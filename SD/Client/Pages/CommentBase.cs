@@ -86,18 +86,9 @@ namespace SD.Client.Pages
             }
         }
 
-        protected override void OnInitialized()
+        protected override void OnParametersSet()
         {
-            if (commentModel == null)
-            {
-                commentModel = new CommentModel();
-                commentModel.UserId = CurrentUserId;
-
-            }
-            else
-            {
-                MyText = commentModel.CommentText;
-            }
+            MyText = commentModel.CommentText;
         }
     }
 }

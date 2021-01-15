@@ -47,10 +47,17 @@ namespace sd.Api.Services
                 WordModel word = await _wordService.GetWordById(wordId);
                 if (word != null)
                 {
-                    CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == newComment.CommentId);
-                    if (comment != null)
+                    if (word.Comments != null)
                     {
-                        word.Comments.Remove(comment);
+                        CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == newComment.CommentId);
+                        if (comment != null)
+                        {
+                            word.Comments.Remove(comment);
+                        }
+                    }
+                    else
+                    {
+                        word.Comments = new List<CommentModel>();
                     }
 
                     word.Comments.Add(newComment);

@@ -21,83 +21,23 @@ namespace sd.Api.Controllers
             _wordService = wordService;
         }
 
-        [HttpGet("GetComment/{CommentId}")]
-        public async Task<ActionResult<CommentModel>> GetComment(string CommentId)
-        {
-            try
-            {
-                return Ok(await _commentService.GetComment(CommentId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
-        }
-
-        [HttpGet("GetAllComments/{WordId}")]
-        public async Task<ActionResult<IEnumerable<CommentModel>>> GetAllComments(string WordId)
-        {
-            try
-            {
-                return Ok(await _commentService.GetAllComments(WordId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
-        }
-
         [HttpPost]
-        [Route("AddComment/{WordId}")]
-        public async Task<ActionResult> AddComment(CommentModel comment, string WordId)
+        [Route("SaveComment/{WordId}")]
+        public async Task<ActionResult> SaveComment(string wordId, CommentModel comment)
         {
-            try
-            {
-                int statusCode = await _commentService.AddComment(comment) ? 200 : 500;
-                if (statusCode ==200)
-                {
-                 WordModel wordModel=   await _wordService.GetWordById(WordId);
+            if (await _commentService.SaveComment(wordId, comment))
+                return StatusCode(StatusCodes.Status200OK);
 
-                    if (wordModel.Comments == null)
-                    {
-                        wordModel.Comments = new List<string>();
-                    }
-                    wordModel.Comments.Add(comment.CommentId);
-                    await _wordService.UpdateWord(WordId, wordModel);
-                }
-                return StatusCode(statusCode);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error updating data");
-            }
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                $"Error to save comment");
         }
 
-        [HttpPut]
-        [Route("UpdateComment")]
-        public async Task<ActionResult> UpdateComment(CommentModel comment)
+        [HttpGet("LikeComment/{userId}/{WordId}/{commentId}")]
+        public async Task<ActionResult<int>> LikeComment(string userId, string wordId, string commentId)
         {
             try
             {
-                int statusCode = await _commentService.UpdateComment(comment) ? 200 : 500;
-                return StatusCode(statusCode);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error updating data");
-            }
-        }
-
-        [HttpGet("LikeComment/{userId}/{commentId}")]
-        public async Task<ActionResult<int>> LikeComment(string userId, string commentId)
-        {
-            try
-            {
-                return Ok(await _commentService.Like(userId, commentId));
+                return Ok(await _commentService.Like(userId, wordId, commentId));
             }
             catch (Exception ex)
             {
@@ -106,18 +46,18 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpDelete("DeleteComment/{id}")]
-        public async Task<ActionResult> DeleteComment(string id)
+        [HttpDelete("DeleteComment/{wordId}/{commentId}")]
+        public async Task<ActionResult> DeleteComment(string wordId, string commentId)
         {
             try
             {
-                await _commentService.RemoveComment(id);
+                await _commentService.RemoveComment(wordId, commentId);
                 return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error deleting data");
+                    "Error deleting comment");
             }
         }
 

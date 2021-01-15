@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using MongoDB.Driver.Builders;
 using sd.Api.Interfaces;
 using sd.Api.Models;
 using SD.Shared;
@@ -20,56 +21,54 @@ namespace sd.Api.Services
             _context = new MongodbContext(settings);
             _wordService = wordService;
         }
-        public async Task<CommentModel> GetComment(string commentId)
-        {
-          return await _context.Comments.Find(c => c.CommentId == commentId).FirstAsync();
-        }
-        public async Task<bool> AddComment(CommentModel comment)
+
+        public async Task<bool> RemoveComment(string wordId, string commentId)
         {
             try
             {
-                await _context.Comments.InsertOneAsync(comment);
+                WordModel word = await _wordService.GetWordById(wordId);
+                CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
+                if (comment != null)
+                    word.Comments.Remove(comment);
+                await _wordService.UpdateWord(wordId, word);
+
                 return true;
             }
-            catch (Exception Ex)
+            catch
             {
-                if (Ex.Message.Contains("duplicate key error"))
+                return false;
+            }
+        }
+
+        public async Task<bool> SaveComment(string wordId, CommentModel newComment)
+        {
+            try
+            {
+                WordModel word = await _wordService.GetWordById(wordId);
+                if (word != null)
                 {
-                    return await UpdateComment(comment);
+                    CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == newComment.CommentId);
+                    if (comment != null)
+                    {
+                        word.Comments.Remove(comment);
+                    }
+
+                    word.Comments.Add(newComment);
+                    await _wordService.UpdateWord(wordId, word);
+                    return true;
                 }
                 else return false;
             }
-        }
-
-        public async Task<bool> RemoveComment(string commentId)
-        {
-            try
-            {
-                await _context.Comments.DeleteOneAsync(c => c.CommentId == commentId);
-                return true;
-            }
             catch
             {
                 return false;
             }
         }
 
-        public async Task<bool> UpdateComment(CommentModel newComment)
+        public async Task<int> Like(string userId, string wordId, string commentId)
         {
-            try
-            {
-                await _context.Comments.ReplaceOneAsync(c => c.CommentId == newComment.CommentId, newComment);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public async Task<int> Like(string userId, string commentId)
-        {
-            CommentModel comment = await GetComment(commentId);
+            WordModel word = await _wordService.GetWordById(wordId);
+            CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
 
             if (comment == null) comment.Likes = new List<string>();
             if (!comment.Likes.Contains(userId))
@@ -80,33 +79,8 @@ namespace sd.Api.Services
             {
                 comment.Likes.Remove(userId);
             }
-            await UpdateComment(comment);
+            await SaveComment(wordId, comment);
             return comment.Likes.Count();
-        }
-
-        public async Task<IEnumerable<CommentModelWithOwnerName>> GetAllComments(string WordId)
-        {
-           var word= await _wordService.GetWordById(WordId);
-            List<CommentModel> comments = new List<CommentModel>();
-            List<CommentModelWithOwnerName> commentsWithName = new List<CommentModelWithOwnerName>();
-            foreach (var id in word.Comments)
-            {
-                comments.Add(await _context.Comments.Find(c => c.CommentId == id).FirstAsync());
-            }
-
-            if (comments!=null)
-            {
-                foreach (var comment in comments)
-                {
-                    CommentModelWithOwnerName modelWithNames = new CommentModelWithOwnerName();
-                    modelWithNames = (CommentModelWithOwnerName)comment;
-
-                   var user = await _context.Users.Find<UserModel>(u => u.UserId == comment.UserId).FirstOrDefaultAsync();
-                    modelWithNames.CommentOwnerName = user.Name;
-                    commentsWithName.Add(modelWithNames);
-                }
-            }
-            return commentsWithName;
         }
     }
 }

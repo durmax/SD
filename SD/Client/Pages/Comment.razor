@@ -1,14 +1,21 @@
 ﻿@inherits CommentBase
 
 
+
 @if (commentModel != null)
 {
-    <p>  @commentModel.CreatedAt   </p>
-<textarea disabled="@IsDisabled" class="form-control text-wrap"
-          rows="@Rows"
-          @bind-value="@MyText"
-          @bind-value:event="oninput">@MyText</textarea>
-    <button class="@cssClassSave" @onclick="@SaveComment">Save Comment</button>
-    <button class="@cssClassSave" @onclick="@RemoveComment">Remove Comment</button>
-}
+<div class="@cssClassDisplay">
+    <textarea disabled="@IsDisabled" class="form-control text-wrap"
+              rows="@Rows"
+              @bind-value="@MyText"
+              @bind-value:event="oninput">@MyText</textarea>
+    <button @onclick="@SaveComment">Save Comment</button>
+    <button @onclick="@RemoveComment">Remove Comment</button>
 
+    @if (commentModel.CommentId != null)
+    {
+        <i style="margin-left: 2px; margin-right: 2px;">  @commentModel.CreatedAt   </i>
+    }
+
+    </div>
+}

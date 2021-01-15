@@ -57,6 +57,9 @@ namespace SD.Client.Pages
         protected bool loading;
         protected string note;
 
+        [Parameter]
+        public List<CommentModel> Comments { get; set; } = new List<CommentModel>();
+
         protected string foundWordIdToUpdate;
 
         protected int Rows = 2;
@@ -244,7 +247,7 @@ namespace SD.Client.Pages
             KnownLangs = KnownLangsService.KnownLangs;
         }
 
-        protected async Task CreateCommentAsync()
+        protected void CreateComment()
         {
             if (string.IsNullOrEmpty(CurrentUserId))
             {
@@ -259,14 +262,11 @@ namespace SD.Client.Pages
                 commentModel.CreatedAt = DateTime.Now;
                 commentModel.CommentText = "";
 
-                await CommentService.SaveComment(commentModel, wordModel.WordId);
-
-                if (wordModel.Comments==null)
+                if (wordModel.Comments == null)
                 {
-                    wordModel.Comments = new List<string>();
+                    wordModel.Comments = new List<CommentModel>();
                 }
-                
-                wordModel.Comments.Add(commentModel.CommentId);
+                wordModel.Comments.Add(commentModel);
             }
 
         }
@@ -288,9 +288,12 @@ namespace SD.Client.Pages
             await BuildKnownLangsAsync();
 
             wordModel.ShareWith = 3; // nothing
+
+
+           // CreateComment();
         }
 
-        protected override void OnParametersSet()
+        protected override async Task OnParametersSetAsync()
         {
             note = null;
 

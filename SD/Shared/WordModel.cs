@@ -39,13 +39,13 @@ namespace SD.Shared
         [StringLength(20)]
         public string Category { get; set; }
 
-        [BsonIgnoreIfNull]      
+        [BsonIgnoreIfNull]
         public int ShareWith { get; set; }
 
         [BsonIgnoreIfNull]
         public List<string> Likes { get; set; }
 
         [BsonIgnoreIfNull]
-        public List<string> Comments { get; set; }
+        public List<CommentModel> Comments { get; set; }
     }
 }

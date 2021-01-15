@@ -1,21 +1,31 @@
-﻿@inherits CommentBase
+﻿@inject ILanguageContainerService languageContainer
+@inherits CommentBase
 
 
 
 @if (commentModel != null)
 {
-<div class="@cssClassDisplay">
-    <textarea disabled="@IsDisabled" class="form-control text-wrap"
-              rows="@Rows"
-              @bind-value="@MyText"
-              @bind-value:event="oninput">@MyText</textarea>
-    <button @onclick="@SaveComment">Save Comment</button>
-    <button @onclick="@RemoveComment">Remove Comment</button>
+    <div class="card mb-2">
+        <div class="card-body p-2">
+            <textarea disabled="@IsDisabled" class="form-control text-wrap"
+                      rows="@Rows"
+                      @bind-value="@MyText"
+                      @bind-value:event="oninput">@MyText</textarea>
 
-    @if (commentModel.CommentId != null)
-    {
-        <i style="margin-left: 2px; margin-right: 2px;">  @commentModel.CreatedAt   </i>
-    }
+        </div>
+        <div class="card-footer p-0">
+            <button type="button" class="btn btn-light bg-transparent @cssClassDisplay" @onclick="@SaveComment">
+                <img width="20" height="20" src="/icons/check-outlined.svg" asp-append-version="true" /> <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
+            </button>
 
+            @if (commentModel.CommentId != null)
+            {
+                <i style="margin-left: 2px; margin-right: 2px;">  @commentModel.CreatedAt   </i>
+            }
+
+            <button type="button" class="btn btn-light bg-transparent @cssClassDisplay" @onclick="@RemoveComment">
+                <img width="20" height="20" src="/icons/bxs-message-x.svg" asp-append-version="true" />
+            </button>
+        </div>
     </div>
 }

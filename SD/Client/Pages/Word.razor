@@ -68,12 +68,6 @@
 
             <button type="button" class="btn btn-light bg-transparent" @onclick="()=> cssClassComment = cssClassComment ? false : true">
                 <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
-                @if (wordModel != null)
-                {
-                    @if (wordModel.Comments != null)
-                    {@wordModel.Comments.Count
-                }
-                }
             </button>
             <button @onclick="@(()=>{ShareWithCollapsed=!ShareWithCollapsed;})" class="btn btn-light  bg-transparent dropdown-toggle" type="button">
                 <img width="20" height="20" src="@ShareWithClass" asp-append-version="true" />  <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
@@ -124,18 +118,23 @@
             </div>
             @if (wordModel != null)
             {
-                <CascadingValue Value="@CurrentUserId">
+        <CascadingValue Value="@CurrentUserId">
 
-                    @if (wordModel.Comments != null)
-                    {
-                        @foreach (var comment in wordModel.Comments)
-                        {
-                            <Comment commentModel="@comment" WordId="@wordModel.WordId"></Comment>
-                        }
-                    }
+            @if (wordModel.Comments != null)
+            {
+                @foreach (var comment in wordModel.Comments)
+                {
+                    <Comment commentModel="@comment" WordId="@wordModel.WordId"></Comment>
+                }
+            }
 
-                    <img width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" @onclick="@CreateComment" />
-                </CascadingValue>
+            @if (wordModel != null)
+            {
+                @if (wordModel.Comments != null)
+                {<span>@wordModel.Comments.Count comments </span>}
+            }
+            <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" @onclick="@CreateComment" />
+        </CascadingValue>
             }
             @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
             {

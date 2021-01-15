@@ -25,7 +25,7 @@ namespace SD.Client.Pages
         [Parameter]
         public CommentModel commentModel { get; set; }
 
-        protected int Rows = 2;
+        protected int Rows = 1;
 
         string _myText;
 
@@ -44,7 +44,7 @@ namespace SD.Client.Pages
             if (!string.IsNullOrWhiteSpace(value))
             {
                 Rows = Math.Max(value.Split('\n').Length, value.Split('\r').Length);
-                Rows = Math.Max(Rows, 2);
+                Rows = Math.Max(Rows, 1);
                 Rows = Math.Min(Rows, 20);
             }
         }
@@ -59,36 +59,36 @@ namespace SD.Client.Pages
             {
                 if (commentModel.CommentId == null)
                 {
-                    commentModel.UserId = CurrentUserId;
+                    //commentModel.UserId = CurrentUserId;
                     commentModel.CommentId = Guid.NewGuid().ToString();
                     commentModel.CreatedAt = DateTime.Now;
                 }
 
                 if (commentModel.UserId == CurrentUserId)
                 {
-                    commentModel.CreatedAt = DateTime.Now;
                     commentModel.CommentText = MyText;
-
                     HttpResponseMessage respons = await CommentService.SaveComment(commentModel, WordId);
                 }
-
-                //if (!respons.IsSuccessStatusCode)
             }
         }
 
         protected async Task RemoveComment()
         {
             HttpResponseMessage respons = await CommentService.RemoveComment(WordId, commentModel.CommentId);
-            if (respons.IsSuccessStatusCode)
-            {
-                cssClassDisplay = "d-none";
-                IsDisabled = false;
-            }
         }
 
         protected override void OnParametersSet()
         {
             MyText = commentModel.CommentText;
+        }
+
+        protected override void OnInitialized()
+        {
+            if (commentModel.UserId != CurrentUserId)
+            {
+                IsDisabled = true;
+                cssClassDisplay = "d-none";
+            }
         }
     }
 }

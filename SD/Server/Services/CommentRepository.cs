@@ -52,14 +52,15 @@ namespace sd.Api.Services
                         CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == newComment.CommentId);
                         if (comment != null)
                         {
-                            word.Comments.Remove(comment);
+                            word.Comments.Remove(comment);  
+                            newComment.UpdatedAt= DateTime.Now;
                         }
                     }
                     else
                     {
                         word.Comments = new List<CommentModel>();
                     }
-
+                   
                     word.Comments.Add(newComment);
                     await _wordService.UpdateWord(wordId, word);
                     return true;

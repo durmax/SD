@@ -34,9 +34,6 @@ namespace SD.Client.Pages
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
 
-        [Inject]
-        public CommentService CommentService { get; set; }
-
         [Parameter]
         public WordModel wordModel { get; set; }
 
@@ -105,11 +102,10 @@ namespace SD.Client.Pages
                     wordModel.UserId = CurrentUserId;
                     wordModel.WordId = Guid.NewGuid().ToString();
                     wordModel.CreatedAt = DateTime.Now;
-
                     wordModel.Likes = null;
                 }
                 wordModel.Explain = MyText;
-
+                wordModel.Comments.RemoveAll(x => x.UserId != CurrentUserId);
                 HttpResponseMessage respons = await WordService.AddWord(wordModel);
 
                 if (!respons.IsSuccessStatusCode)
@@ -258,9 +254,9 @@ namespace SD.Client.Pages
                 CommentModel commentModel = new CommentModel();
                 commentModel = new CommentModel();
                 commentModel.UserId = CurrentUserId;
-                commentModel.CommentId = Guid.NewGuid().ToString();
-                commentModel.CreatedAt = DateTime.Now;
-                commentModel.CommentText = "";
+                //commentModel.CommentId = Guid.NewGuid().ToString();
+                //commentModel.CreatedAt = DateTime.Now;
+                //commentModel.CommentText = "";
 
                 if (wordModel.Comments == null)
                 {
@@ -289,8 +285,6 @@ namespace SD.Client.Pages
 
             wordModel.ShareWith = 3; // nothing
 
-
-           // CreateComment();
         }
 
         protected override void OnParametersSet()

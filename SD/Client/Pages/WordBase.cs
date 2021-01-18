@@ -53,12 +53,9 @@ namespace SD.Client.Pages
         public string CurrentUserName { get; set; }
 
         protected string cssClassUpdate = "d-none";
-        protected bool cssClassComment { get; set; } = true;    // hide by default
+        protected bool cssClassComment { get; set; }    // hide by default
         protected bool loading;
         protected string note;
-
-        //[Parameter]
-        //public List<CommentModel> Comments { get; set; } = new List<CommentModel>();
 
         protected string foundWordIdToUpdate;
 

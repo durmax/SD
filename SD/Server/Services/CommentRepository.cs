@@ -13,12 +13,12 @@ namespace sd.Api.Services
     public class CommentRepository : ICommentRepository
     {
 
-        private readonly MongodbContext _context;
+        //private readonly MongodbContext _context;
         private readonly IWordRepository _wordService;
 
-        public CommentRepository(IMongodbSettings settings, IWordRepository wordService)
+        public CommentRepository(IWordRepository wordService)
         {
-            _context = new MongodbContext(settings);
+            //_context = new MongodbContext(settings);
             _wordService = wordService;
         }
 
@@ -27,6 +27,7 @@ namespace sd.Api.Services
             try
             {
                 WordModel word = await _wordService.GetWordById(wordId);
+                if (word == null) return false;
                 CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
                 if (comment != null)
                     word.Comments.Remove(comment);
@@ -52,15 +53,15 @@ namespace sd.Api.Services
                         CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == newComment.CommentId);
                         if (comment != null)
                         {
-                            word.Comments.Remove(comment);  
-                            newComment.UpdatedAt= DateTime.Now;
+                            word.Comments.Remove(comment);
+                            newComment.UpdatedAt = DateTime.Now;
                         }
                     }
                     else
                     {
                         word.Comments = new List<CommentModel>();
                     }
-                   
+
                     word.Comments.Add(newComment);
                     await _wordService.UpdateWord(wordId, word);
                     return true;

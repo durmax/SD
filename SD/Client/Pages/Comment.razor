@@ -5,27 +5,38 @@
 
 @if (commentModel != null)
 {
-    <div class="card mb-2">
-        <div class="card-body p-2">
-            <textarea disabled="@IsDisabled" class="form-control text-wrap"
-                      rows="@Rows"
-                      @bind-value="@MyText"
-                      @bind-value:event="oninput">@MyText</textarea>
+    <div class="ml-2 mr-2">
+        <div class="card mb-2">
+            <div class="card-body p-2">
+                <textarea disabled="@IsDisabled" @oninput="@(()=> {IsChanged=true;})" class="form-control text-wrap"
+                          rows="@Rows"
+                          @bind-value="@MyText"
+                          @bind-value:event="onchange">@MyText </textarea>
+            </div>
+            <div class="card-footer p-1">
+                @if (IsChanged)
+                {
+                    <button type="button" class="btn btn-link bg-transparent @cssClassDisplay" @onclick="@SaveComment">
+                        <img width="20" height="20" src="/icons/content-save-edit-outline.svg" asp-append-version="true" /> <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
+                    </button>
+                }
+                @if (commentModel.CommentId != null)
+                {
+                    <lable>  @commentModel.CreatedAt </lable>
+                }
 
-        </div>
-        <div class="card-footer p-0">
-            <button type="button" class="btn btn-light bg-transparent @cssClassDisplay" @onclick="@SaveComment">
-                <img width="20" height="20" src="/icons/check-outlined.svg" asp-append-version="true" /> <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
-            </button>
-
-            @if (commentModel.CommentId != null)
-            {
-                <i style="margin-left: 2px; margin-right: 2px;">  @commentModel.CreatedAt   </i>
-            }
-
-            <button type="button" class="btn btn-light bg-transparent @cssClassDisplay" @onclick="@RemoveComment">
-                <img width="20" height="20" src="/icons/bxs-message-x.svg" asp-append-version="true" />
-            </button>
+                <button type="button" style="float:right" class="btn btn-link bg-transparent @cssClassDisplay" @onclick="@(async () => await RemoveComment())">
+                    <img width="20" height="20" src="/icons/bxs-message-x.svg" asp-append-version="true" />
+                </button>
+                @if (loading)
+                {
+                    <button type="button" class="btn btn-light">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </button>
+                }
+            </div>
         </div>
     </div>
 }

@@ -22,6 +22,10 @@ namespace SD.Client.Services
 
         public async Task<HttpResponseMessage> RemoveComment(string wordId, string commentId)
         {
+            if (string.IsNullOrEmpty(wordId) || string.IsNullOrEmpty(commentId))
+            {
+                return null;
+            }
             return await _httpClient.DeleteAsync($"api/Comment/DeleteComment/{wordId}/{commentId}");
         }
     }

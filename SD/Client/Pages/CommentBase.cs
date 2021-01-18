@@ -20,10 +20,16 @@ namespace SD.Client.Pages
         protected bool cssClassComment { get; set; } = true;    // hide by default
         [Parameter]
         public string cssClassDisplay { get; set; }           //= "d-none";
+        protected bool IsChanged { get; set; } =false;
         protected bool IsDisabled { get; set; }
 
         [Parameter]
         public CommentModel commentModel { get; set; }
+
+        [Parameter]
+        public EventCallback<CommentModel> OnCommentDelete { get; set; }
+
+        protected bool loading;
 
         protected int Rows = 1;
 
@@ -33,13 +39,13 @@ namespace SD.Client.Pages
         {
             get => _myText;
             set
-            {
+            {   
                 _myText = value;
+                commentModel.CommentText = value;
                 CalculateSize(value);
             }
         }
-
-        private void CalculateSize(string value)
+    private void CalculateSize(string value)
         {
             if (!string.IsNullOrWhiteSpace(value))
             {
@@ -51,6 +57,7 @@ namespace SD.Client.Pages
 
         protected async Task SaveComment()
         {
+            loading = true;
             if (string.IsNullOrEmpty(CurrentUserId))
             {
                 NavigationManager.NavigateTo("/authentication/login");
@@ -59,7 +66,6 @@ namespace SD.Client.Pages
             {
                 if (commentModel.CommentId == null)
                 {
-                    //commentModel.UserId = CurrentUserId;
                     commentModel.CommentId = Guid.NewGuid().ToString();
                     commentModel.CreatedAt = DateTime.Now;
                 }
@@ -70,12 +76,36 @@ namespace SD.Client.Pages
                     HttpResponseMessage respons = await CommentService.SaveComment(commentModel, WordId);
                 }
             }
+            IsChanged = false;
+            loading = false;
         }
 
         protected async Task RemoveComment()
         {
-            HttpResponseMessage respons = await CommentService.RemoveComment(WordId, commentModel.CommentId);
+            loading = true;
+            if (string.IsNullOrWhiteSpace(commentModel.CommentId))
+            {
+               // await OnCommentDelete.InvokeAsync(commentModel);
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(CurrentUserId))
+                {
+                    if (!string.IsNullOrWhiteSpace(commentModel.UserId) && CurrentUserId == commentModel.UserId)
+                    {
+                        HttpResponseMessage respons = await CommentService.RemoveComment(WordId, commentModel.CommentId);
+                        if (respons.IsSuccessStatusCode)
+                        {
+                          await OnCommentDelete.InvokeAsync(commentModel);  
+                        }
+                    }
+                }
+            }
+            loading = false;
         }
+
+        
+
 
         protected override void OnParametersSet()
         {

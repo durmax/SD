@@ -22,6 +22,7 @@ namespace SD.Client.Pages
 
         [Parameter]
         public bool Collapsed { set; get; } = true;    // hide by default
+        //public bool Collapsed { set; get; } = true;    // hide by default
 
         protected bool opCollapsed { set; get; } = false;    // show by default
 
@@ -33,6 +34,8 @@ namespace SD.Client.Pages
 
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
+        [Inject]
+        public CommentService CommentService { get; set; }
 
         [Parameter]
         public WordModel wordModel { get; set; }
@@ -54,8 +57,8 @@ namespace SD.Client.Pages
         protected bool loading;
         protected string note;
 
-        [Parameter]
-        public List<CommentModel> Comments { get; set; } = new List<CommentModel>();
+        //[Parameter]
+        //public List<CommentModel> Comments { get; set; } = new List<CommentModel>();
 
         protected string foundWordIdToUpdate;
 
@@ -105,6 +108,7 @@ namespace SD.Client.Pages
                     wordModel.Likes = null;
                 }
                 wordModel.Explain = MyText;
+                wordModel.Comments.RemoveAll(x => x.CommentId == null);
                 wordModel.Comments.RemoveAll(x => x.UserId != CurrentUserId);
                 HttpResponseMessage respons = await WordService.AddWord(wordModel);
 
@@ -265,6 +269,12 @@ namespace SD.Client.Pages
                 wordModel.Comments.Add(commentModel);
             }
 
+        }
+        
+
+        protected void RemoveCommentHandler(CommentModel comment)
+        {
+            wordModel.Comments.Remove(comment);
         }
         protected override async Task OnInitializedAsync()
         {

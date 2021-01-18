@@ -116,26 +116,32 @@
                           @bind-value="@MyText"
                           @bind-value:event="oninput">@MyText</textarea>
             </div>
-            @if (wordModel != null)
-            {
-        <CascadingValue Value="@CurrentUserId">
 
-            @if (wordModel.Comments != null)
-            {
-                @foreach (var comment in wordModel.Comments)
+
+            <div class="form-group m-0 @(cssClassComment? "collapse" : "")">
+                @if (wordModel != null)
                 {
-                    <Comment commentModel="@comment" WordId="@wordModel.WordId"></Comment>
-                }
-            }
+                    <CascadingValue Value="@CurrentUserId">
 
-            @if (wordModel != null)
-            {
-                @if (wordModel.Comments != null)
-                {<span>@wordModel.Comments.Count comments </span>}
-            }
-            <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" @onclick="@CreateComment" />
-        </CascadingValue>
-            }
+                        @if (wordModel.Comments != null)
+                        {
+                            @foreach (var comment in wordModel.Comments)
+                            {
+                                <Comment commentModel="@comment" WordId="@wordModel.WordId" OnCommentDelete="RemoveCommentHandler"></Comment>
+                            }
+                        }
+
+                        @if (wordModel != null)
+                        {
+                            @if (wordModel.Comments != null)
+                            {<span>@wordModel.Comments.Count comments </span>}
+                        }
+                        <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" @onclick="@CreateComment" />
+                    </CascadingValue>
+                }
+            </div>
+
+
             @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
             {
                 <OtherPages FLangCode="@wordModel.WordLang" TLangCode="@wordModel.ToLang" Word="@wordModel.Title" Collapsed="@opCollapsed"></OtherPages>

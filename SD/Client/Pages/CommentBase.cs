@@ -85,7 +85,7 @@ namespace SD.Client.Pages
             loading = true;
             if (string.IsNullOrWhiteSpace(commentModel.CommentId))
             {
-               // await OnCommentDelete.InvokeAsync(commentModel);
+                await OnCommentDelete.InvokeAsync(commentModel);
             }
             else
             {

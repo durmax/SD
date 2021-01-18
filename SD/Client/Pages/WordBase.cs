@@ -19,7 +19,6 @@ namespace SD.Client.Pages
         NavigationManager NavigationManager { get; set; }
         [Inject]
         KnownLangsService KnownLangsService { get; set; }
-
         [Parameter]
         public bool Collapsed { set; get; } = true;    // hide by default
         //public bool Collapsed { set; get; } = true;    // hide by default
@@ -51,6 +50,7 @@ namespace SD.Client.Pages
         [Parameter]
         public string UserId { get; set; }
         public string CurrentUserId { get; set; }
+        public string CurrentUserName { get; set; }
 
         protected string cssClassUpdate = "d-none";
         protected bool cssClassComment { get; set; } = true;    // hide by default
@@ -282,6 +282,7 @@ namespace SD.Client.Pages
             if (user.Identity.IsAuthenticated)
             {
                 CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
+                CurrentUserName = user.Identity.Name;
             }
 
             if (wordModel == null)

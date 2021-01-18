@@ -12,15 +12,19 @@ namespace SD.Client.Pages
         [Inject]
         public CommentService CommentService { set; get; }
         [Inject]
+        public UserService UserService { set; get; }
+        [Inject]
         NavigationManager NavigationManager { get; set; }
         [Parameter]
         public string WordId { get; set; }
         [CascadingParameter]
         protected string CurrentUserId { get; set; }
-        protected bool cssClassComment { get; set; } = true;    // hide by default
         [Parameter]
-        public string cssClassDisplay { get; set; }           //= "d-none";
-        protected bool IsChanged { get; set; } =false;
+        public string CurrentUserName { get; set; }
+        protected string CommentUserName { get; set; }
+        protected bool cssClassComment { get; set; } = true;    // hide by default
+        protected string cssClassDisplay { get; set; }           //= "d-none";
+        protected bool IsChanged { get; set; } = false;
         protected bool IsDisabled { get; set; }
 
         [Parameter]
@@ -39,13 +43,13 @@ namespace SD.Client.Pages
         {
             get => _myText;
             set
-            {   
+            {
                 _myText = value;
                 commentModel.CommentText = value;
                 CalculateSize(value);
             }
         }
-    private void CalculateSize(string value)
+        private void CalculateSize(string value)
         {
             if (!string.IsNullOrWhiteSpace(value))
             {
@@ -57,6 +61,7 @@ namespace SD.Client.Pages
 
         protected async Task SaveComment()
         {
+            IsChanged = false;
             loading = true;
             if (string.IsNullOrEmpty(CurrentUserId))
             {
@@ -74,9 +79,12 @@ namespace SD.Client.Pages
                 {
                     commentModel.CommentText = MyText;
                     HttpResponseMessage respons = await CommentService.SaveComment(commentModel, WordId);
+                    if (!respons.IsSuccessStatusCode)
+                    {
+                        IsChanged = true;
+                    }
                 }
             }
-            IsChanged = false;
             loading = false;
         }
 
@@ -96,7 +104,7 @@ namespace SD.Client.Pages
                         HttpResponseMessage respons = await CommentService.RemoveComment(WordId, commentModel.CommentId);
                         if (respons.IsSuccessStatusCode)
                         {
-                          await OnCommentDelete.InvokeAsync(commentModel);  
+                            await OnCommentDelete.InvokeAsync(commentModel);
                         }
                     }
                 }
@@ -104,7 +112,18 @@ namespace SD.Client.Pages
             loading = false;
         }
 
-        
+        protected async Task<string> GetUser()
+        {
+            loading = true;
+            if (!string.IsNullOrWhiteSpace(commentModel.UserId) && CurrentUserId == commentModel.UserId)
+            {
+                loading = false;
+                return CurrentUserName;
+            }
+            var user = await UserService.GetUserById(commentModel.UserId);
+            loading = false;
+            return user.Name;
+        }
 
 
         protected override void OnParametersSet()
@@ -112,8 +131,9 @@ namespace SD.Client.Pages
             MyText = commentModel.CommentText;
         }
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
+            CommentUserName = await GetUser();
             if (commentModel.UserId != CurrentUserId)
             {
                 IsDisabled = true;

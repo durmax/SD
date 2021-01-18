@@ -22,6 +22,8 @@
                 }
                 @if (commentModel.CommentId != null)
                 {
+                    <a type="button" class="btn btn-link"
+                       href="MyWords/@commentModel.UserId/@CommentUserName">@CommentUserName</a>
                     <lable>  @commentModel.CreatedAt </lable>
                 }
 

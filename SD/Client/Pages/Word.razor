@@ -67,14 +67,14 @@
             }
 
             <button type="button" class="btn btn-light bg-transparent" @onclick="()=> cssClassComment = cssClassComment ? false : true">
+                @if (wordModel.Comments != null && wordModel.Comments.Count > 0)
+                {<span style="margin-right:4px">@wordModel.Comments.Count</span>}
                 <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
             </button>
             <button @onclick="@(()=>{ShareWithCollapsed=!ShareWithCollapsed;})" class="btn btn-light  bg-transparent dropdown-toggle" type="button">
                 <img width="20" height="20" src="@ShareWithClass" asp-append-version="true" />  <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
             </button>
-            @*<button type="button" class="btn btn-light bg-transparent d-flex" @onclick="AddWord">
-                    <img width="20" height="20" src="/icons/cloud-upload-alt-solid.svg" asp-append-version="true" /> <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
-                </button>*@
+
             @if (loading)
             {
                 <button type="button" class="btn btn-light bg-transparent">
@@ -127,16 +127,14 @@
                         {
                             @foreach (var comment in wordModel.Comments)
                             {
-                                <Comment commentModel="@comment" WordId="@wordModel.WordId" OnCommentDelete="RemoveCommentHandler"></Comment>
+                                <Comment commentModel="@comment" WordId="@wordModel.WordId" CurrentUserName="@CurrentUserName" OnCommentDelete="RemoveCommentHandler"></Comment>
                             }
+
                         }
 
-                        @if (wordModel != null)
-                        {
-                            @if (wordModel.Comments != null)
-                            {<span>@wordModel.Comments.Count comments </span>}
-                        }
-                        <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" @onclick="@CreateComment" />
+                        <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
+                            <span>Add Comment </span> <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" />
+                        </button>
                     </CascadingValue>
                 }
             </div>

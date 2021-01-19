@@ -12,8 +12,6 @@ namespace sd.Api.Services
 {
     public class CommentRepository : ICommentRepository
     {
-
-        //private readonly MongodbContext _context;
         private readonly IWordRepository _wordService;
 
         public CommentRepository(IWordRepository wordService)
@@ -22,24 +20,24 @@ namespace sd.Api.Services
             _wordService = wordService;
         }
 
-        public async Task<bool> RemoveComment(string wordId, string commentId)
-        {
-            try
-            {
-                WordModel word = await _wordService.GetWordById(wordId);
-                if (word == null) return false;
-                CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
-                if (comment != null)
-                    word.Comments.Remove(comment);
-                await _wordService.UpdateWord(wordId, word);
+        //public async Task<bool> RemoveComment(string wordId, string commentId)
+        //{
+        //    try
+        //    {
+        //        WordModel word = await _wordService.GetWordById(wordId);
+        //        if (word == null) return false;
+        //        CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
+        //        if (comment != null)
+        //            word.Comments.Remove(comment);
+        //        await _wordService.UpdateWord(wordId, word);
 
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+        //        return true;
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+        //}
 
         public async Task<bool> SaveComment(string wordId, CommentModel newComment)
         {

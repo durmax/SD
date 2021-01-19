@@ -17,15 +17,15 @@ namespace SD.Client.Pages
         NavigationManager NavigationManager { get; set; }
         [Parameter]
         public string WordId { get; set; }
+        [Parameter]
+        public string WordUserId { get; set; }
         [CascadingParameter]
         protected string CurrentUserId { get; set; }
         [Parameter]
         public string CurrentUserName { get; set; }
-        protected string CommentUserName { get; set; }
-        protected bool cssClassComment { get; set; } = true;    // hide by default
-        protected string cssClassDisplay { get; set; }           //= "d-none";
+
+        protected string cssDelCom { get; set; } = "d-none";
         protected bool IsChanged { get; set; } = false;
-        protected bool IsDisabled { get; set; }
 
         [Parameter]
         public CommentModel commentModel { get; set; }
@@ -33,6 +33,7 @@ namespace SD.Client.Pages
         [Parameter]
         public EventCallback<CommentModel> OnCommentDelete { get; set; }
 
+        protected string note;
         protected bool loading;
 
         protected int Rows = 1;
@@ -78,11 +79,17 @@ namespace SD.Client.Pages
                 if (commentModel.UserId == CurrentUserId)
                 {
                     commentModel.CommentText = MyText;
+                    commentModel.CommentOwnerName = CurrentUserName;
                     HttpResponseMessage respons = await CommentService.SaveComment(commentModel, WordId);
                     if (!respons.IsSuccessStatusCode)
                     {
                         IsChanged = true;
+                        note = "Comment is saved";
                     }
+                }
+                else
+                {
+                    note = "Not Saved, Not Allowed";
                 }
             }
             loading = false;
@@ -90,7 +97,6 @@ namespace SD.Client.Pages
 
         protected async Task RemoveComment()
         {
-            loading = true;
             if (string.IsNullOrWhiteSpace(commentModel.CommentId))
             {
                 await OnCommentDelete.InvokeAsync(commentModel);
@@ -99,31 +105,30 @@ namespace SD.Client.Pages
             {
                 if (!string.IsNullOrWhiteSpace(CurrentUserId))
                 {
-                    if (!string.IsNullOrWhiteSpace(commentModel.UserId) && CurrentUserId == commentModel.UserId)
+                    if (!string.IsNullOrWhiteSpace(commentModel.UserId) && (CurrentUserId == commentModel.UserId || CurrentUserId == WordUserId))
                     {
-                        HttpResponseMessage respons = await CommentService.RemoveComment(WordId, commentModel.CommentId);
-                        if (respons.IsSuccessStatusCode)
-                        {
-                            await OnCommentDelete.InvokeAsync(commentModel);
-                        }
+                        //HttpResponseMessage respons = await CommentService.RemoveComment(WordId, commentModel.CommentId);
+                        //if (respons.IsSuccessStatusCode)
+                        //{
+                        await OnCommentDelete.InvokeAsync(commentModel);
+                        // }
                     }
                 }
             }
-            loading = false;
         }
 
-        protected async Task<string> GetUser()
-        {
-            loading = true;
-            if (!string.IsNullOrWhiteSpace(commentModel.UserId) && CurrentUserId == commentModel.UserId)
-            {
-                loading = false;
-                return CurrentUserName;
-            }
-            var user = await UserService.GetUserById(commentModel.UserId);
-            loading = false;
-            return user.Name;
-        }
+        //protected async Task<string> GetUser()
+        //{
+        //    loading = true;
+        //    if (!string.IsNullOrWhiteSpace(commentModel.UserId) && CurrentUserId == commentModel.UserId)
+        //    {
+        //        loading = false;
+        //        return CurrentUserName;
+        //    }
+        //    var user = await UserService.GetUserById(commentModel.UserId);
+        //    loading = false;
+        //    return user.Name;
+        //}
 
 
         protected override void OnParametersSet()
@@ -131,13 +136,12 @@ namespace SD.Client.Pages
             MyText = commentModel.CommentText;
         }
 
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
-            CommentUserName = await GetUser();
-            if (commentModel.UserId != CurrentUserId)
+
+            if (commentModel.UserId == CurrentUserId || WordUserId == CurrentUserId)
             {
-                IsDisabled = true;
-                cssClassDisplay = "d-none";
+                cssDelCom = null;
             }
         }
     }

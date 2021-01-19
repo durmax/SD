@@ -46,20 +46,20 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpDelete("DeleteComment/{wordId}/{commentId}")]
-        public async Task<ActionResult> DeleteComment(string wordId, string commentId)
-        {
-            try
-            {
-                await _commentService.RemoveComment(wordId, commentId);
-                return StatusCode(StatusCodes.Status200OK);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error deleting comment");
-            }
-        }
+        //[HttpDelete("DeleteComment/{wordId}/{commentId}")]
+        //public async Task<ActionResult> DeleteComment(string wordId, string commentId)
+        //{
+        //    try
+        //    {
+        //        await _commentService.RemoveComment(wordId, commentId);
+        //        return StatusCode(StatusCodes.Status200OK);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError,
+        //            "Error deleting comment");
+        //    }
+        //}
 
     }
 }

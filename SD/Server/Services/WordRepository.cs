@@ -45,7 +45,8 @@ namespace sd.Api.Services
         private async Task<bool> IsFriendAsync(string currentUserId, string userId)
         {
             var user = await _context.Users.Find<UserModel>(u => u.UserId == userId).FirstOrDefaultAsync();
-            return  user.Friends.Contains(currentUserId);
+            if (user == null) return false;
+            return user.Friends.Contains(currentUserId);
         }
 
         public async Task<WordModel> GetWordById(string id)

@@ -123,11 +123,11 @@
                     {
                         <CascadingValue Value="@CurrentUserId">
 
-                            @if (wordModel.Comments != null)
+                            @if (wordComments != null)
                             {
-                                @foreach (var comment in wordModel.Comments)
+                                @foreach (var comment in wordComments)
                                 {
-                                    <Comment commentModel="@comment" WordId="@wordModel.WordId" CurrentUserName="@CurrentUserName" OnCommentDelete="RemoveCommentHandler"></Comment>
+                                    <Comment commentModel="@comment" WordId="@wordModel.WordId" CurrentUserName="@CurrentUserName" WordUserId="@wordModel.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
                                 }
 
                             }

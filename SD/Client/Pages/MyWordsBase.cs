@@ -28,12 +28,8 @@ namespace SD.Client.Pages
         protected string CurrentUserId { get; set; }
         [Parameter]
         public string UserName { get; set; }
-
         protected bool Collapsed { set; get; } = true;    // hide by default
-
-        //protected bool Collapsed = true;    // hide by default
         protected bool loading;
-
         protected bool CULiked { get; set; }
 
         protected string cssClassDelete;// = "d-none";

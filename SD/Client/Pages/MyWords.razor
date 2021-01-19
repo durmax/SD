@@ -40,12 +40,18 @@ else
                                 <div class="col-10">
                                     @{ CULiked = (word.Likes != null) ? word.Likes.Contains(CurrentUserId) : false;}
                                     <Like CurrentUserId="@CurrentUserId" WordId="@word.WordId" LikesCount="@word.Likes?.Count" CULiked="@CULiked"></Like>
+                                    <button type="button" class="btn btn-light bg-transparent" @onclick="() => { wordModel = word; Collapsed = false;}">
+                                        @if (word.Comments != null && word.Comments.Count > 0)
+                                        {<span style="margin-right:4px">@word.Comments.Count</span>}
+                                        <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
+                                    </button>
                                 </div>
                                 <div class="col-2 @cssClassDelete">
                                     <img style="float:right" width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" @onclick="async () => { wordModel = word; await DeleteWord(); }" />
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </li>
             }

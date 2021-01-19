@@ -24,10 +24,12 @@ namespace SD.Shared
 
         [BsonIgnoreIfNull]
         public List<CommentModel> Comments { get; set; }
-    }
 
-    public class CommentModelWithOwnerName : CommentModel
-    {
         public string CommentOwnerName { get; set; }
     }
+
+    //public class CommentModelWithOwnerName : CommentModel
+    //{
+    //    public string CommentOwnerName { get; set; }
+    //}
 }

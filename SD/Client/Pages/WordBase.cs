@@ -21,7 +21,6 @@ namespace SD.Client.Pages
         KnownLangsService KnownLangsService { get; set; }
         [Parameter]
         public bool Collapsed { set; get; } = true;    // hide by default
-        //public bool Collapsed { set; get; } = true;    // hide by default
 
         protected bool opCollapsed { set; get; } = false;    // show by default
 
@@ -53,9 +52,12 @@ namespace SD.Client.Pages
         public string CurrentUserName { get; set; }
 
         protected string cssClassUpdate = "d-none";
-        protected bool cssClassComment { get; set; }    // hide by default
+
+        [Parameter]
+        public bool cssClassComment { get; set; } = true;  // hide by default
         protected bool loading;
         protected string note;
+        protected List<CommentModel> wordComments { get; set; } = new List<CommentModel>();
 
         protected string foundWordIdToUpdate;
 
@@ -206,14 +208,14 @@ namespace SD.Client.Pages
             if (string.IsNullOrWhiteSpace(wordModel.Explain))
             {
                 MyText = null;
-                cssClassComment = true;
+                //cssClassComment = true;
             }
             else
             {
                 MyText = wordModel.Explain;
                 CalculateSize(MyText);
                 Rows = Rows < 3 ? Rows : Rows++;
-                cssClassComment = false;
+                //cssClassComment = false;
             }
         }
 
@@ -255,9 +257,6 @@ namespace SD.Client.Pages
                 CommentModel commentModel = new CommentModel();
                 commentModel = new CommentModel();
                 commentModel.UserId = CurrentUserId;
-                //commentModel.CommentId = Guid.NewGuid().ToString();
-                //commentModel.CreatedAt = DateTime.Now;
-                //commentModel.CommentText = "";
 
                 if (wordModel.Comments == null)
                 {
@@ -265,13 +264,24 @@ namespace SD.Client.Pages
                 }
                 wordModel.Comments.Add(commentModel);
             }
-
         }
-        
 
-        protected void RemoveCommentHandler(CommentModel comment)
+
+        protected async Task RemoveCommentHandlerAsync(CommentModel comment)
         {
+            loading = true;
             wordModel.Comments.Remove(comment);
+
+            HttpResponseMessage respons = await WordService.UpdateWord(wordModel);
+            if (!respons.IsSuccessStatusCode)
+            {
+                note = await respons.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                note = $"Comment of {comment.CommentOwnerName} is deleted";
+            }
+            loading = false;
         }
         protected override async Task OnInitializedAsync()
         {
@@ -292,7 +302,6 @@ namespace SD.Client.Pages
             await BuildKnownLangsAsync();
 
             wordModel.ShareWith = 3; // nothing
-
         }
 
         protected override void OnParametersSet()
@@ -300,6 +309,12 @@ namespace SD.Client.Pages
             note = null;
 
             SetMyText();
+
+            if (wordModel.Comments != null)
+            {
+                wordComments = wordModel.Comments;
+                wordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
+            }
 
             switch (wordModel.ShareWith)
             {

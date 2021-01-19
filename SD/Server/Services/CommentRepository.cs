@@ -16,28 +16,8 @@ namespace sd.Api.Services
 
         public CommentRepository(IWordRepository wordService)
         {
-            //_context = new MongodbContext(settings);
             _wordService = wordService;
         }
-
-        //public async Task<bool> RemoveComment(string wordId, string commentId)
-        //{
-        //    try
-        //    {
-        //        WordModel word = await _wordService.GetWordById(wordId);
-        //        if (word == null) return false;
-        //        CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
-        //        if (comment != null)
-        //            word.Comments.Remove(comment);
-        //        await _wordService.UpdateWord(wordId, word);
-
-        //        return true;
-        //    }
-        //    catch
-        //    {
-        //        return false;
-        //    }
-        //}
 
         public async Task<bool> SaveComment(string wordId, CommentModel newComment)
         {

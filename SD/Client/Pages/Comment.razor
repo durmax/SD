@@ -7,26 +7,13 @@
 {
     <div class="ml-2 mr-2">
         <div class="card mb-2">
-            <div class="card-body p-2">
-                <textarea disabled="@IsDisabled" @oninput="@(()=> {IsChanged=true;})" class="form-control text-wrap"
-                          rows="@Rows"
-                          @bind-value="@MyText"
-                          @bind-value:event="onchange">@MyText </textarea>
-            </div>
-            <div class="card-footer p-1">
-                @if (IsChanged)
-                {
-                    <button type="button" class="btn btn-link bg-transparent @cssClassDisplay" @onclick="@SaveComment">
-                        <img width="20" height="20" src="/icons/content-save-edit-outline.svg" asp-append-version="true" /> <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
-                    </button>
-                }
+            <div class="card-title pb-0">
                 @if (commentModel.CommentId != null)
                 {
                     <a type="button" class="btn btn-link"
                        href="MyWords/@commentModel.UserId/@CommentUserName">@CommentUserName</a>
                     <lable>  @commentModel.CreatedAt </lable>
                 }
-
                 <button type="button" style="float:right" class="btn btn-link bg-transparent @cssClassDisplay" @onclick="@(async () => await RemoveComment())">
                     <img width="20" height="20" src="/icons/bxs-message-x.svg" asp-append-version="true" />
                 </button>
@@ -39,6 +26,18 @@
                     </button>
                 }
             </div>
+            <div class="card-body p-2">
+                <textarea disabled="@IsDisabled" @oninput="@(()=> {IsChanged=true;})" class="form-control text-wrap"
+                          rows="@Rows"
+                          @bind-value="@MyText"
+                          @bind-value:event="onchange">@MyText </textarea>
+            </div>
+            @if (IsChanged)
+            {
+                <button type="button" class="btn btn-link bg-transparent @cssClassDisplay" @onclick="@SaveComment">
+                    <img width="20" height="20" src="/icons/content-save-edit-outline.svg" asp-append-version="true" /> <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
+                </button>
+            }
         </div>
     </div>
 }

@@ -13,12 +13,10 @@ namespace sd.Api.Controllers
     public class CommentController : ControllerBase
     {
         private readonly ICommentRepository _commentService;
-        private readonly IWordRepository _wordService;
 
-        public CommentController(ICommentRepository commentService, IWordRepository wordService)
+        public CommentController(ICommentRepository commentService)
         {
             _commentService = commentService;
-            _wordService = wordService;
         }
 
         [HttpPost]
@@ -45,21 +43,5 @@ namespace sd.Api.Controllers
                     ex.Message);
             }
         }
-
-        //[HttpDelete("DeleteComment/{wordId}/{commentId}")]
-        //public async Task<ActionResult> DeleteComment(string wordId, string commentId)
-        //{
-        //    try
-        //    {
-        //        await _commentService.RemoveComment(wordId, commentId);
-        //        return StatusCode(StatusCodes.Status200OK);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError,
-        //            "Error deleting comment");
-        //    }
-        //}
-
     }
 }

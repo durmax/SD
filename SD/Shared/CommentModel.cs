@@ -13,6 +13,7 @@ namespace SD.Shared
         public string CommentId { get; set; }
         [Required]
         public string UserId { get; set; }
+        public string CommentOwnerName { get; set; }
         [Required]
         public DateTime CreatedAt { get; set; }
         [BsonIgnoreIfNull]
@@ -24,7 +25,5 @@ namespace SD.Shared
 
         [BsonIgnoreIfNull]
         public List<CommentModel> Comments { get; set; }
-
-        public string CommentOwnerName { get; set; }
     }
 }

@@ -116,7 +116,6 @@ namespace sd.Api.Controllers
             }
         }
 
-
         [HttpPut]
         [Route("UpdateWord")]
         public async Task<ActionResult> UpdateWord(WordModel updatedWord)

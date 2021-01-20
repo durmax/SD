@@ -24,49 +24,10 @@ namespace sd.Api.Services
         }
         public async Task<Dictionary<string, Tuple<string, string>>> SearchUser(string CurrentUserId, string searchText)
         {
-            //string relation = null;
-            //UserModel crrUser = null;
-            //Dictionary<string, Tuple<string, string>> res = new Dictionary<string, Tuple<string, string>>();
-
             var foundUsers = await _context.Users
                 .Find(u => u.Name.ToLower().Contains(searchText.ToLower())).ToListAsync();
 
             return await GetRelationships(CurrentUserId, foundUsers);
-            //if (CurrentUserId != "0")
-            //{
-            //    crrUser = await GetUserById(CurrentUserId);
-            //    foundUsers.RemoveAll(u => u.UserId == CurrentUserId); //remove Sercher from list
-            //}
-
-            //foreach (var user in foundUsers)
-            //{
-            //    if (crrUser != null)
-            //    {
-            //        if (user.Friends == null) user.Friends = new List<string>();
-            //        if (user.FriendRequests == null) user.FriendRequests = new List<string>();
-
-            //        if (user.Friends.Contains(CurrentUserId))
-            //        {
-            //            relation = "Friends";
-            //        }
-
-            //        else if (user.FriendRequests.Contains(CurrentUserId))
-            //        {
-            //            relation = "CrrRequest";
-            //        }
-
-            //        else if (crrUser.FriendRequests.Contains(user.UserId))
-            //        {
-            //            relation = "UserRequest";
-            //        }
-            //    }
-
-            //    var userT = Tuple.Create(user.Name, relation);
-            //    res.Add(user.UserId, userT);
-
-            //    relation = null;
-            //}
-            //return res;
         }
 
         public async Task<Dictionary<string, Tuple<string, string>>> GetUsersWithRelationship(string CurrentUserId, List<string> userIds)

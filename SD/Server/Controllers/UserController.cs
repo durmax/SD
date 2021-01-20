@@ -105,7 +105,6 @@ namespace sd.Api.Controllers
             }
         }
 
-
         [HttpPut("UpdateUser/{id}")]
         public async Task<ActionResult<TransObj>> UpdateUser(string id, UserModel updatedUser)
         {
@@ -144,10 +143,6 @@ namespace sd.Api.Controllers
                     "Error deleting data");
             }
         }
-
-
-
-
 
         [HttpPost("AddFriendRequest/{userId}/{friendId}")]
         public async Task<ActionResult> AddFriendRequest(string userId, string friendId)

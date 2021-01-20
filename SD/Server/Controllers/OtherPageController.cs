@@ -68,8 +68,6 @@ namespace sd.Api.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError,
                     "Error creating new page record");
                 }
-
-
             }
             catch (Exception)
             {
@@ -77,7 +75,6 @@ namespace sd.Api.Controllers
                     "Error creating new page record");
             }
         }
-
 
         [HttpPost]
         [Route("Update")]

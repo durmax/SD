@@ -266,16 +266,20 @@ namespace SD.Client.Pages
         protected async Task RemoveCommentHandlerAsync(CommentModel comment)
         {
             loading = true;
-            wordModel.Comments.Remove(comment);
+            wordComments.Remove(comment);
+            if (wordModel.Comments!= null && wordModel.Comments.Contains(comment))
+            {
+                wordModel.Comments.Remove(comment);
 
-            HttpResponseMessage respons = await WordService.UpdateWord(wordModel);
-            if (!respons.IsSuccessStatusCode)
-            {
-                note = await respons.Content.ReadAsStringAsync();
-            }
-            else
-            {
-                note = $"Comment of {comment.CommentOwnerName} is deleted";
+                HttpResponseMessage respons = await WordService.UpdateWord(wordModel);
+                if (!respons.IsSuccessStatusCode)
+                {
+                    note = await respons.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    note = $"Comment of {comment.CommentOwnerName} is deleted";
+                }
             }
             loading = false;
         }

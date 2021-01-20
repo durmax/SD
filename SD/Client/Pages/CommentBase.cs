@@ -107,29 +107,11 @@ namespace SD.Client.Pages
                 {
                     if (!string.IsNullOrWhiteSpace(commentModel.UserId) && (CurrentUserId == commentModel.UserId || CurrentUserId == WordUserId))
                     {
-                        //HttpResponseMessage respons = await CommentService.RemoveComment(WordId, commentModel.CommentId);
-                        //if (respons.IsSuccessStatusCode)
-                        //{
                         await OnCommentDelete.InvokeAsync(commentModel);
-                        // }
                     }
                 }
             }
         }
-
-        //protected async Task<string> GetUser()
-        //{
-        //    loading = true;
-        //    if (!string.IsNullOrWhiteSpace(commentModel.UserId) && CurrentUserId == commentModel.UserId)
-        //    {
-        //        loading = false;
-        //        return CurrentUserName;
-        //    }
-        //    var user = await UserService.GetUserById(commentModel.UserId);
-        //    loading = false;
-        //    return user.Name;
-        //}
-
 
         protected override void OnParametersSet()
         {

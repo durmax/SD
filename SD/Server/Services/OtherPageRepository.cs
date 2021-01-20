@@ -13,9 +13,9 @@ namespace sd.Api.Services
     {
         private readonly MongodbContext _context = null;
 
-        public OtherPageRepository(IMongodbSettings settings)
+        public OtherPageRepository(MongodbContext mongodbContext)
         {
-            _context = new MongodbContext(settings);
+            _context = mongodbContext;
         }
 
         public async Task<IEnumerable<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)

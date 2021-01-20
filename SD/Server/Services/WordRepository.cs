@@ -13,9 +13,9 @@ namespace sd.Api.Services
     {
         private readonly MongodbContext _context;
 
-        public WordRepository(IMongodbSettings settings)
+        public WordRepository(MongodbContext mongodbContext)
         {
-            _context = new MongodbContext(settings);
+            _context = mongodbContext;
         }
 
         public async Task<List<WordModel>> GetAllWords(string CurrentUserId, string userId)

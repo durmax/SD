@@ -14,7 +14,7 @@ namespace sd.Api.Controllers
     {
         private readonly IUserRepository _userService;
 
-        public UserController(IUserRepository userService, IWordRepository wordService)
+        public UserController(IUserRepository userService)
         {
             _userService = userService;
         }

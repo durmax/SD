@@ -12,9 +12,9 @@ namespace sd.Api.Services
     {
         private readonly MongodbContext _context = null;
 
-        public UserRepository(IMongodbSettings settings)
+        public UserRepository(MongodbContext mongodbContext)
         {
-            _context = new MongodbContext(settings);
+            _context = mongodbContext;
         }
 
         public async Task<IEnumerable<UserModel>> GetAllUsers()

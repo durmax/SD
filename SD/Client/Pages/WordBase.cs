@@ -21,6 +21,7 @@ namespace SD.Client.Pages
         KnownLangsService KnownLangsService { get; set; }
         [Parameter]
         public bool Collapsed { set; get; } = true;    // hide by default
+        public bool CollapsedComm { set; get; } = true;
 
         protected bool opCollapsed { set; get; } = false;    // show by default
 
@@ -257,15 +258,10 @@ namespace SD.Client.Pages
                 CommentModel commentModel = new CommentModel();
                 commentModel = new CommentModel();
                 commentModel.UserId = CurrentUserId;
-
-                if (wordModel.Comments == null)
-                {
-                    wordModel.Comments = new List<CommentModel>();
-                }
-                wordModel.Comments.Add(commentModel);
+                wordComments.Add(commentModel);
+                CollapsedComm = false;
             }
         }
-
 
         protected async Task RemoveCommentHandlerAsync(CommentModel comment)
         {

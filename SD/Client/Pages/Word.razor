@@ -117,33 +117,38 @@
                               @bind-value="@MyText"
                               @bind-value:event="oninput">@MyText</textarea>
                 </div>
-
-                <div class="mt-2">
-                    @if (wordModel != null)
-                    {
-                        <CascadingValue Value="@CurrentUserId">
-
-                            @if (wordComments != null)
-                            {
-                                @foreach (var comment in wordComments)
-                                {
-                                    <Comment commentModel="@comment" WordId="@wordModel.WordId" CurrentUserName="@CurrentUserName" WordUserId="@wordModel.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
-                                }
-
-                            }
-
-                            <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
-                                <span>Add Comment </span> <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" />
-                            </button>
-                        </CascadingValue>
-                    }
-                </div>
             </div>
 
             @if (!(string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang)))
             {
                 <OtherPages FLangCode="@wordModel.WordLang" TLangCode="@wordModel.ToLang" Word="@wordModel.Title" Collapsed="@opCollapsed"></OtherPages>
             }
+
+            @*<div class="mt-2">*@
+            @if (wordModel != null)
+            {
+                <div class="card m-0 border-left-0 border-right-0">
+                    <CascadingValue Value="@CurrentUserId">
+                        <div class="btn-group" role="group">
+
+                            <button type="button" class="btn btn-light" @onclick="@(()=> { CollapsedComm = CollapsedComm ? false : true; })">
+                                <i class="float-right @(CollapsedComm? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
+                            </button>
+                        </div>
+                        <div class="card-body p-0 @(CollapsedComm? "collapse" : "")">
+
+                            @foreach (var comment in wordComments)
+                            {
+                                <Comment commentModel="@comment" WordId="@wordModel.WordId" CurrentUserName="@CurrentUserName" WordUserId="@wordModel.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
+                            }
+                        </div>
+                    </CascadingValue>
+                    <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
+                        <span>Add Comment </span> <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" />
+                    </button>
+                </div>
+            }
+            @*</div>*@
         </div>
     </div>
 </div>

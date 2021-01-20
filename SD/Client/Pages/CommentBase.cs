@@ -138,7 +138,6 @@ namespace SD.Client.Pages
 
         protected override void OnInitialized()
         {
-
             if (commentModel.UserId == CurrentUserId || WordUserId == CurrentUserId)
             {
                 cssDelCom = null;

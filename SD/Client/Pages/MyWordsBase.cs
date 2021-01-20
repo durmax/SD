@@ -78,7 +78,7 @@ namespace SD.Client.Pages
                 CurrentUserId ="0";
             }
         }
-        protected override async Task OnInitializedAsync()
+        protected async Task InitAsync()
         {
             await Auth();
             try
@@ -113,7 +113,7 @@ namespace SD.Client.Pages
         protected override async Task OnParametersSetAsync()
         {
             Words = null;
-            await OnInitializedAsync();
+            await InitAsync();
         }
     }
 }

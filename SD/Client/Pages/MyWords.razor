@@ -47,7 +47,9 @@ else
                                     </button>
                                 </div>
                                 <div class="col-2 @cssClassDelete">
-                                    <img style="float:right" width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" @onclick="async () => { wordModel = word; await DeleteWord(); }" />
+                                    <button type="button" style="float:right" class="btn btn-light bg-transparent" @onclick="async () => { wordModel = word; await DeleteWord(); }">
+                                        <img width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true"/>
+                                    </button>
                                 </div>
                             </div>
                         </div>

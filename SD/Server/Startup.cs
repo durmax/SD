@@ -22,7 +22,7 @@ namespace sd.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           services.Configure<MongodbSettings>(Configuration.GetSection(nameof(MongodbSettings)));
+            services.Configure<MongodbSettings>(Configuration.GetSection(nameof(MongodbSettings)));
 
             services.AddSingleton<IMongodbSettings>(sp =>
                                     sp.GetRequiredService<IOptions<MongodbSettings>>().Value);
@@ -31,8 +31,8 @@ namespace sd.Api
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IWordRepository, WordRepository>();
             services.AddTransient<ICommentRepository, CommentRepository>();
-            
-            services.AddSingleton<MongodbContext>(x => 
+
+            services.AddSingleton<MongodbContext>(x =>
                 new MongodbContext(x.GetRequiredService<IMongodbSettings>()));
 
             services.AddDataProtection();
@@ -43,8 +43,6 @@ namespace sd.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

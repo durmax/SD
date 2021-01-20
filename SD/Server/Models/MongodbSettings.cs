@@ -7,7 +7,6 @@
         public string UserCollectionName { get; set; }
         public string WordCollectionName { get; set; }
         public string OtherPageCollectionName { get; set; }
-        public string CommentCollectionName { get; set; }
     }
 
     public interface IMongodbSettings
@@ -17,6 +16,5 @@
         public string UserCollectionName { get; set; }
         public string WordCollectionName { get; set; }
         public string OtherPageCollectionName { get; set; }
-        public string CommentCollectionName { get; set; }
     }
 }

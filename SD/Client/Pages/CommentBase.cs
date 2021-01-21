@@ -83,7 +83,7 @@ namespace SD.Client.Pages
                     HttpResponseMessage respons = await CommentService.SaveComment(commentModel, WordId);
                     if (!respons.IsSuccessStatusCode)
                     {
-                        IsChanged = true;
+                        IsChanged = false;
                         note = "Comment is saved";
                     }
                 }

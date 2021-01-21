@@ -8,11 +8,11 @@
     </div>
     <div class="input-group">
 
-        <div class="input-group-append">
-            <button type="button" class="btn btn-outline-secondary bg-white text-dark" @onclick="NewWordAsync">
-                <i class="fas fa-plus"></i>
-            </button>
-        </div>
+        @*<div class="input-group-append">
+                <button type="button" class="btn btn-outline-secondary bg-white text-dark" @onclick="NewWordAsync">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>*@
 
         <input type="search" class="form-control font-weight-bold" placeholder=@languageContainer.Keys["NewWord"]
                id="wordId"
@@ -67,8 +67,6 @@
             }
 
             <button type="button" class="btn btn-light bg-transparent" @onclick="()=> cssClassComment = cssClassComment ? false : true">
-                @if (wordModel.Comments != null && wordModel.Comments.Count > 0)
-                {<span style="margin-right:4px">@wordModel.Comments.Count</span>}
                 <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
             </button>
             <button @onclick="@(()=>{ShareWithCollapsed=!ShareWithCollapsed;})" class="btn btn-light  bg-transparent dropdown-toggle" type="button">
@@ -123,31 +121,43 @@
             {
                 <OtherPages FLangCode="@wordModel.WordLang" TLangCode="@wordModel.ToLang" Word="@wordModel.Title" Collapsed="@opCollapsed"></OtherPages>
             }
-
-
-            @if (wordModel != null)
-            {
-                <div class="card m-0 border-left-0 border-right-0">
-                    <CascadingValue Value="@CurrentUserId">
-                        <div class="btn-group" role="group">
-
-                            <button type="button" class="btn btn-light" @onclick="@(()=> { CollapsedComm = CollapsedComm ? false : true; })">
-                                <i class="float-right @(CollapsedComm? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
-                            </button>
-                        </div>
-                        <div class="card-body p-0 @(CollapsedComm? "collapse" : "")">
-
-                            @foreach (var comment in wordComments)
-                            {
-                                <Comment commentModel="@comment" WordId="@wordModel.WordId" CurrentUserName="@CurrentUserName" WordUserId="@wordModel.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
-                            }
-                        </div>
-                    </CascadingValue>
-                    <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
-                        <span>Add Comment </span> <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" />
-                    </button>
-                </div>
-            }
         </div>
+    </div>
+    <div class="card-footer p-0">
+        <div class="row">
+            <div class="col-7">
+                   <Like CurrentUserId="@CurrentUserId" WordId="@wordModel.WordId" LikesCount="@wordModel.Likes?.Count" CULiked="@CULiked"></Like>
+            </div>
+
+            <div class="col-3">
+                <button type="button" class="btn btn-light bg-transparent" @onclick="() => {CollapsedComm = CollapsedComm ? false : true; }">
+                    <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
+                    @wordComments.Count
+                </button>
+            </div>
+
+
+            <div class="col-2 @cssClassDelete">
+                <button type="button" style="float:right" class="btn btn-light bg-transparent" @onclick="async () => { await DeleteWord(); }">
+                    <img width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" />
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card m-0 border-left-0 border-right-0 @(CollapsedComm? "collapse" : "")">
+        <CascadingValue Value="@CurrentUserId">
+            <div class="card-body p-0">
+
+                @foreach (var comment in wordComments)
+                {
+                    <Comment commentModel="@comment" WordId="@wordModel.WordId" CurrentUserName="@CurrentUserName" WordUserId="@wordModel.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
+                }
+
+                <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
+                    <span>Add Comment </span> <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" />
+                </button>
+            </div>
+        </CascadingValue>
     </div>
 </div>

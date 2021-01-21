@@ -24,7 +24,7 @@ namespace SD.Client.Pages
         [Parameter]
         public bool CULiked { get; set; }  // Current User has like
 
-        protected string CULikeClass;
+        protected string CULikeImg { get; set; }
 
         [Parameter]
         public string WordId { get; set; }
@@ -42,7 +42,7 @@ namespace SD.Client.Pages
             {
                 LikesCount = await WordService.Like(CurrentUserId, WordId);
                 CULiked = !CULiked;
-                CULikeClass = CULiked ? "text-primary" : null;
+                CULikeImg = CULiked ? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg";
             }
             else
             {
@@ -52,7 +52,7 @@ namespace SD.Client.Pages
 
         protected async Task GetLikedUsers(int? likesCount)
         {
-            if (!Collapsed && likesCount!=null)
+            if (!Collapsed && likesCount != null)
             {
                 likedUsers = await WordService.GetLikedUsers(CurrentUserId, WordId);
             }
@@ -60,8 +60,10 @@ namespace SD.Client.Pages
 
         protected override void OnInitialized()
         {
-            //CULikeClass = CULiked ? "border border-primary" : null;
+            // CULikeClass = CULiked ? "border border-primary" : null;
+            CULikeImg = CULiked ? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg";
             LikesCount = LikesCount > 0 ? LikesCount : null;
+
         }
     }
 }

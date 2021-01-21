@@ -21,7 +21,7 @@ namespace sd.Api.Services
         public async Task<List<WordModel>> GetAllWords(string CurrentUserId, string userId)
         {
             List<WordModel> words = new List<WordModel>();
-            words = await _context.Words.Find(w => w.UserId == userId).ToListAsync();
+            words = await _context.Words.Find(w => w.UserId == userId).Limit(10).ToListAsync();
             words = words.OrderByDescending(w => w.CreatedAt).ToList();
 
             if (CurrentUserId == userId)

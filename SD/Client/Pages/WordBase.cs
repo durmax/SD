@@ -46,6 +46,8 @@ namespace SD.Client.Pages
         protected string ShareWithClass { get; set; }
 
         protected bool ShareWithCollapsed = true;
+        protected bool CULiked { get; set; } 
+        protected string cssClassDelete;// = "d-none";
 
         [Parameter]
         public string UserId { get; set; }
@@ -108,8 +110,12 @@ namespace SD.Client.Pages
                     wordModel.Likes = null;
                 }
                 wordModel.Explain = MyText;
-                wordModel.Comments.RemoveAll(x => x.CommentId == null);
-                wordModel.Comments.RemoveAll(x => x.UserId != CurrentUserId);
+                if (wordModel.Comments != null)
+                {
+                    wordModel.Comments.RemoveAll(x => x.CommentId == null);
+                    wordModel.Comments.RemoveAll(x => x.UserId != CurrentUserId);
+                }
+
                 HttpResponseMessage respons = await WordService.AddWord(wordModel);
 
                 if (!respons.IsSuccessStatusCode)
@@ -206,18 +212,18 @@ namespace SD.Client.Pages
 
         private void SetMyText()
         {
-            if (string.IsNullOrWhiteSpace(wordModel.Explain))
-            {
-                MyText = null;
-                //cssClassComment = true;
-            }
-            else
-            {
+            //if (string.IsNullOrWhiteSpace(wordModel.Explain))
+            //{
+            //    MyText = null;
+            //    //cssClassComment = true;
+            //}
+            //else
+            //{
                 MyText = wordModel.Explain;
                 CalculateSize(MyText);
                 Rows = Rows < 3 ? Rows : Rows++;
                 //cssClassComment = false;
-            }
+            //}
         }
 
         private async Task SetLangsAsync()
@@ -267,7 +273,7 @@ namespace SD.Client.Pages
         {
             loading = true;
             wordComments.Remove(comment);
-            if (wordModel.Comments!= null && wordModel.Comments.Contains(comment))
+            if (wordModel.Comments != null && wordModel.Comments.Contains(comment))
             {
                 wordModel.Comments.Remove(comment);
 
@@ -279,6 +285,29 @@ namespace SD.Client.Pages
                 else
                 {
                     note = $"Comment of {comment.CommentOwnerName} is deleted";
+                }
+            }
+            loading = false;
+        }
+
+        protected async Task DeleteWord()
+        {
+            loading = true;
+
+            if (!string.IsNullOrWhiteSpace(wordModel.UserId))// is not a new word
+            {
+                //await Auth();
+                if (wordModel.UserId == CurrentUserId)
+                {
+                    var response = await WordService.RemoveWord(wordModel.WordId);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        //Words.Remove(wordModel);
+                    }
+                    else
+                    {
+                        //note = $"You can NOT delete {wordModel.Title}";
+                    }
                 }
             }
             loading = false;
@@ -296,8 +325,11 @@ namespace SD.Client.Pages
             {
                 await NewWordAsync();
             }
-
-            SetMyText();
+            else
+            {
+                SetMyText();
+                CULiked = (wordModel.Likes != null) ? wordModel.Likes.Contains(CurrentUserId) : false;
+            }
 
             await BuildKnownLangsAsync();
 

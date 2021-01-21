@@ -26,16 +26,16 @@ else
         }
     </div>
 
-    <div class="ml-5 mr-4">
-        <ol reversed class="list-group">
+    @*<div class="ml-5 mr-4">
+        <ol reversed class="list-group">*@
             @foreach (var word in Words)
             {
-                <li>
-                    <div class="card mb-2">
-                        <div class="card-body p-2" @onclick="() => { wordModel = word; Collapsed = false; }">
-                            @word.Title
-                        </div>
-                        <div class="card-footer p-1">
+                @*<li>*@
+                    @*<div class="card mb-2">
+                        <div class="card-body p-2">*@
+                            <Word wordModel="word"></Word>
+                        @*</div>*@
+                        @*<div class="card-footer p-1">
                             <div class="row">
                                 <div class="col-10">
                                     @{ CULiked = (word.Likes != null) ? word.Likes.Contains(CurrentUserId) : false;}
@@ -52,13 +52,13 @@ else
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </div>*@
 
-                    </div>
-                </li>
+                    @*</div>*@
+                @*</li>*@
             }
-        </ol>
-    </div>
+        @*</ol>
+    </div>*@
 }
 
 

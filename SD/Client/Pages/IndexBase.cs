@@ -60,9 +60,9 @@ namespace SD.Client.Pages
                     userModel.Name = user.Identity.Name;//user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
                     await UserService.AddUser(userModel);
                 }
-                if (userModel.FriendRequests != null)
-                {
-                    FriendRequestsCount = userModel?.FriendRequests.Count ?? 0;
+                //if (userModel.FriendRequests != null)
+                //{
+                    FriendRequestsCount = userModel?.FriendRequests?.Count ?? 0;
                     if (FriendRequestsCount > 0)
                     {
                         FriendRequestsDictionary = new Dictionary<string, string>();
@@ -72,7 +72,7 @@ namespace SD.Client.Pages
                             FriendRequestsDictionary.Add(user1.UserId, user1.Name);
                         }
                     }
-                }
+                //}
             }
         }
     }

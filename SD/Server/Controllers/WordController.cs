@@ -162,17 +162,21 @@ namespace sd.Api.Controllers
             try
             {
                 WordModel wordModel = await _wordService.GetWordById(wordId);
-                if (wordModel.Likes == null) wordModel.Likes = new List<string>();
-                if (!wordModel.Likes.Contains(userId))
+                if (wordModel != null)
                 {
-                    wordModel.Likes.Add(userId);
+                    if (wordModel.Likes == null) wordModel.Likes = new List<string>();
+                    if (!wordModel.Likes.Contains(userId))
+                    {
+                        wordModel.Likes.Add(userId);
+                    }
+                    else
+                    {
+                        wordModel.Likes.Remove(userId);
+                    }
+                    await _wordService.UpdateWord(wordModel.WordId, wordModel);
+                    return wordModel.Likes.Count();
                 }
-                else
-                {
-                    wordModel.Likes.Remove(userId);
-                }
-                await _wordService.UpdateWord(wordModel.WordId, wordModel);
-                return wordModel.Likes.Count();
+                else return -1;
             }
             catch (Exception ex)
             {

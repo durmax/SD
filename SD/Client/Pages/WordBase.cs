@@ -22,6 +22,7 @@ namespace SD.Client.Pages
         [Parameter]
         public bool Collapsed { set; get; } = true;    // hide by default
         public bool CollapsedComm { set; get; } = true;
+        public bool CollapsedLike { set; get; } = true;
 
         protected bool opCollapsed { set; get; } = false;    // show by default
 
@@ -46,7 +47,7 @@ namespace SD.Client.Pages
         protected string ShareWithClass { get; set; }
 
         protected bool ShareWithCollapsed = true;
-        protected bool CULiked { get; set; } 
+
         protected string cssClassDelete;// = "d-none";
 
         [Parameter]
@@ -219,10 +220,10 @@ namespace SD.Client.Pages
             //}
             //else
             //{
-                MyText = wordModel.Explain;
-                CalculateSize(MyText);
-                Rows = Rows < 3 ? Rows : Rows++;
-                //cssClassComment = false;
+            MyText = wordModel.Explain;
+            CalculateSize(MyText);
+            Rows = Rows < 3 ? Rows : Rows++;
+            //cssClassComment = false;
             //}
         }
 
@@ -312,6 +313,42 @@ namespace SD.Client.Pages
             }
             loading = false;
         }
+
+        /// <summary>
+        /// Like start
+        /// </summary>
+        public int? LikesCount { get; set; }
+        protected bool CULiked { get; set; } = false;
+        protected Dictionary<string, Tuple<string, string>> likedUsers;
+
+        protected async Task GetLikedUsers(int? likesCount)
+        {
+            if (!CollapsedLike && likesCount != null)
+            {
+                likedUsers = await WordService.GetLikedUsers(CurrentUserId, wordModel.WordId);
+            }
+        }
+        protected async Task Like()
+        {
+            if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")
+            {
+                LikesCount = await WordService.Like(CurrentUserId, wordModel.WordId);
+                CULiked = !CULiked;
+                //CULikeImg = CULiked ? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg";
+            }
+            else
+            {
+                NavigationManager.NavigateTo("authentication/login");
+            }
+        }
+       
+        /// <summary>
+        /// Like end
+        /// </summary>
+        /// <returns></returns>
+        
+        
+        
         protected override async Task OnInitializedAsync()
         {
             var user = (await authenticationStateTask).User;
@@ -328,7 +365,11 @@ namespace SD.Client.Pages
             else
             {
                 SetMyText();
-                CULiked = (wordModel.Likes != null) ? wordModel.Likes.Contains(CurrentUserId) : false;
+                if (wordModel.Likes != null)
+                {
+                    CULiked = wordModel.Likes.Contains(CurrentUserId);
+                    LikesCount = wordModel.Likes.Count;
+                }
             }
 
             await BuildKnownLangsAsync();

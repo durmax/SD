@@ -96,5 +96,25 @@ namespace sd.Api.Services
                 return false;
             }
         }
+
+        public async Task<int> Like(string userId, string wordId)
+        {
+            WordModel wordModel = await GetWordById(wordId);
+            if (wordModel != null)
+            {
+                if (wordModel.Likes == null) wordModel.Likes = new List<string>();
+                if (!wordModel.Likes.Contains(userId))
+                {
+                    wordModel.Likes.Add(userId);
+                }
+                else
+                {
+                    wordModel.Likes.Remove(userId);
+                }
+                await UpdateWord(wordModel.WordId, wordModel);
+                return wordModel.Likes.Count();
+            }
+            else return -1;
+        }
     }
 }

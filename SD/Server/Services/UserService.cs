@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using sd.Api.Interfaces;
 using SD.Shared;
 
 namespace sd.Api.Services

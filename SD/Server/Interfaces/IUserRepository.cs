@@ -10,7 +10,8 @@ namespace sd.Api.Interfaces
     {
         Task<IEnumerable<UserModel>> GetAllUsers();
         Task<UserModel> GetUserById(string id);
-        
+        Task<UserInfo> GetUserInfoById(string id);
+
         Task<bool> CheckEmail(string email);
         Task<TransObj> RegisterUserAsync(UserModel user);
         Task<TransObj> UpdateUser(string id, UserModel newUser);

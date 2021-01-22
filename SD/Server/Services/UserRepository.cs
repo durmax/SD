@@ -52,14 +52,43 @@ namespace sd.Api.Services
 
         public async Task<UserModel> GetUserById(string id)
         {
-            var user = await _context.Users.Find<UserModel>(u => u.UserId == id).FirstOrDefaultAsync();
-            return user;
+            try
+            {
+                return await _context.Users.Find<UserModel>(u => u.UserId == id).FirstOrDefaultAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<UserInfo> GetUserInfoById(string id)
+        {
+            try
+            {
+                UserModel user= await _context.Users.Find<UserModel>(u => u.UserId == id).FirstOrDefaultAsync();
+                return new UserInfo
+                {
+                    UserId = user.UserId,
+                    FriendRequests = user.FriendRequests
+                };
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public async Task<UserModel> GetUserByPost(TransObj status)
         {
-            var user = await _context.Users.Find<UserModel>(u => u.UserId == status.SetringVar).FirstOrDefaultAsync();
-            return user;
+            try
+            {
+                 return await _context.Users.Find<UserModel>(u => u.UserId == status.SetringVar).FirstOrDefaultAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public async Task<bool> CheckEmail(string email)

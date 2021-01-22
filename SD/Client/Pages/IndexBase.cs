@@ -19,7 +19,7 @@ namespace SD.Client.Pages
         [Inject]
         public ILanguageContainerService languageContainer { set; get; }
 
-        protected UserModel userModel { get; set; } = new UserModel();
+        protected UserInfo userInfo { get; set; } = new UserInfo();
         protected int? FriendRequestsCount { set; get; }
 
         protected bool Collapsed { get; set; } = true;    // hide by default
@@ -51,10 +51,11 @@ namespace SD.Client.Pages
                 UserId = user.FindFirst(c => c.Type == "oid")?.Value;
                 try
                 {
-                    userModel = await UserService.GetUserById(UserId);
+                    userInfo = await UserService.GetUserInfoById(UserId);
                 }
                 catch
                 {
+                    UserModel userModel = new UserModel();
                     userModel.UserId = UserId;
                     userModel.Email = user.FindFirst(c => c.Type == "email")?.Value;
                     userModel.Name = user.Identity.Name;//user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
@@ -62,16 +63,16 @@ namespace SD.Client.Pages
                 }
                 //if (userModel.FriendRequests != null)
                 //{
-                    FriendRequestsCount = userModel?.FriendRequests?.Count ?? 0;
-                    if (FriendRequestsCount > 0)
+                FriendRequestsCount = userInfo?.FriendRequests?.Count ?? 0;
+                if (FriendRequestsCount > 0)
+                {
+                    FriendRequestsDictionary = new Dictionary<string, string>();
+                    foreach (var id in userInfo.FriendRequests)
                     {
-                        FriendRequestsDictionary = new Dictionary<string, string>();
-                        foreach (var id in userModel.FriendRequests)
-                        {
-                            UserModel user1 = await UserService.GetUserById(id);
-                            FriendRequestsDictionary.Add(user1.UserId, user1.Name);
-                        }
+                        UserModel user1 = await UserService.GetUserById(id);
+                        FriendRequestsDictionary.Add(user1.UserId, user1.Name);
                     }
+                }
                 //}
             }
         }

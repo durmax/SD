@@ -34,6 +34,10 @@ namespace SD.Client.Services
             return await _httpClient.GetFromJsonAsync<UserModel>($"api/User/GetUserById/{id}");
         }
 
+        public async Task<UserInfo> GetUserInfoById(string id)
+        {
+            return await _httpClient.GetFromJsonAsync<UserInfo>($"api/User/GetUserInfoById/{id}");
+        }
         public async Task<HttpResponseMessage> AddUser(UserModel user)
         {
                 return await _httpClient.PostAsJsonAsync("api/User/Create", user);  

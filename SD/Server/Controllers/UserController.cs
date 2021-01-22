@@ -83,6 +83,22 @@ namespace sd.Api.Controllers
             }
         }
 
+        [HttpGet("GetUserInfoById/{id}")]
+        public async Task<ActionResult<UserInfo>> GetUserInfoById(string id)
+        {
+            try
+            {
+                var result = await _userService.GetUserInfoById(id);
+                if (result == null) return NotFound();
+                return result;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database");
+            }
+        }
+
         [HttpPost]
         [Route("Create")]
         public async Task<ActionResult<TransObj>> Create(UserModel user)

@@ -127,7 +127,7 @@
         <div class="row">
             <div class="col-6">
                 <button type="button" style="float:left" class="btn btn-light bg-transparent" @onclick="async () => { await Like(); }">
-                    <img width="20" height="20" src=@(CULiked? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg") asp-append-version="true"/>
+                    <img width="20" height="20" src=@(CULiked? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg") asp-append-version="true" />
                     @LikesCount
                 </button>
 
@@ -164,18 +164,21 @@
     </div>
 
     <div class="card m-0 border-left-0 border-right-0 @(CollapsedComm? "collapse" : "")">
-        <CascadingValue Value="@CurrentUserId">
-            <div class="card-body p-0">
+        @if (!CollapsedComm)
+        {
+            <CascadingValue Value="@CurrentUserId">
+                <div class="card-body p-0">
 
-                @foreach (var comment in wordComments)
-                {
-                    <Comment commentModel="@comment" WordId="@wordModel.WordId" CurrentUserName="@CurrentUserName" WordUserId="@wordModel.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
-                }
+                    @foreach (var comment in wordComments)
+                    {
+                        <Comment commentModel="@comment" WordId="@wordModel.WordId" CurrentUserName="@CurrentUserName" WordUserId="@wordModel.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
+                    }
 
-                <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
-                    <span>Add Comment </span> <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" />
-                </button>
-            </div>
-        </CascadingValue>
+                    <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
+                        <span>Add Comment </span> <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" />
+                    </button>
+                </div>
+            </CascadingValue>
+        }
     </div>
 </div>

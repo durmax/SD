@@ -15,12 +15,14 @@ namespace sd.Api.Controllers
     {
         private readonly IWordRepository _wordService;
         private readonly IUserRepository _userService;
+        private readonly ILikeWord _likeWord;
 
         public WordController(IWordRepository wordService, 
-            IUserRepository userService)
+            IUserRepository userService, ILikeWord likeWord)
         {
             _wordService = wordService;
             _userService = userService;
+            _likeWord = likeWord;
         }
 
         // GET: api/Word/GetWord/5
@@ -161,7 +163,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                    return await _wordService.Like(userId,wordId);
+                    return await _likeWord.Like(userId,wordId);
             }
             catch (Exception ex)
             {

@@ -26,14 +26,14 @@ namespace sd.Api
 
             services.AddSingleton<IMongodbSettings>(sp =>
                                     sp.GetRequiredService<IOptions<MongodbSettings>>().Value);
+            services.AddSingleton<MongodbContext>(x =>
+                                    new MongodbContext(x.GetRequiredService<IMongodbSettings>()));
 
             services.AddTransient<IOtherPageRepository, OtherPageRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IWordRepository, WordRepository>();
             services.AddTransient<ICommentRepository, CommentRepository>();
-
-            services.AddSingleton<MongodbContext>(x =>
-                new MongodbContext(x.GetRequiredService<IMongodbSettings>()));
+            services.AddTransient<ILikeWord, LikeWordService>();
 
             services.AddDataProtection();
 

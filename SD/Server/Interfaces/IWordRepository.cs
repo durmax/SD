@@ -12,6 +12,5 @@ namespace sd.Api.Interfaces
         Task<bool> AddWord(WordModel word);
         Task<bool> UpdateWord(string id, WordModel newWord);
         Task<bool> RemoveWord(string id);
-        Task<int> Like(string userId, string wordId);
     }
 }

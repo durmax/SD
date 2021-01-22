@@ -33,7 +33,8 @@ namespace sd.Api
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IWordRepository, WordRepository>();
             services.AddTransient<ICommentRepository, CommentRepository>();
-            services.AddTransient<ILikeWord, LikeWordService>();
+            services.AddTransient<ILikeWordService, LikeWordService>();
+            services.AddTransient<UserService>();
 
             services.AddDataProtection();
 

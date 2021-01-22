@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace sd.Api.Services
 {
-    public class LikeWordService : ILikeWord
+    public class LikeWordService : ILikeWordService
     {
         private IWordRepository _wordRepository;
         public LikeWordService(IWordRepository wordRepository)

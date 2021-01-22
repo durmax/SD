@@ -15,10 +15,10 @@ namespace sd.Api.Controllers
     {
         private readonly IWordRepository _wordService;
         private readonly IUserRepository _userService;
-        private readonly ILikeWord _likeWord;
+        private readonly ILikeWordService _likeWord;
 
         public WordController(IWordRepository wordService, 
-            IUserRepository userService, ILikeWord likeWord)
+            IUserRepository userService, ILikeWordService likeWord)
         {
             _wordService = wordService;
             _userService = userService;

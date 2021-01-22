@@ -11,10 +11,12 @@ namespace sd.Api.Services
     public class UserRepository : IUserRepository
     {
         private readonly MongodbContext _context = null;
+        private readonly UserService _userService;
 
-        public UserRepository(MongodbContext mongodbContext)
+        public UserRepository(MongodbContext mongodbContext, UserService userService)
         {
             _context = mongodbContext;
+            _userService = userService;
         }
 
         public async Task<IEnumerable<UserModel>> GetAllUsers()
@@ -32,81 +34,32 @@ namespace sd.Api.Services
 
         public async Task<Dictionary<string, Tuple<string, string>>> GetUsersWithRelationship(string CurrentUserId, List<string> userIds)
         {
-           var foundUsers = await _context.Users
-                 .Find(u => userIds.Contains(u.UserId)).ToListAsync();
-            
+            var foundUsers = await _context.Users
+                  .Find(u => userIds.Contains(u.UserId)).ToListAsync();
+
             return await GetRelationships(CurrentUserId, foundUsers);
         }
 
         public async Task<Dictionary<string, Tuple<string, string>>> GetRelationships(string CurrentUserId, List<UserModel> users)
         {
-            string relation = null;
-            UserModel crrUser = null;
-            Dictionary<string, Tuple<string, string>> res = new Dictionary<string, Tuple<string, string>>();
- 
             if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")
             {
-                crrUser = await GetUserById(CurrentUserId);
-                users.RemoveAll(u => u.UserId == CurrentUserId); //remove Sercher from list
+                UserModel crrUser = await GetUserById(CurrentUserId);
+                return _userService.GetRelationships(crrUser, users);
             }
-
-            foreach (var user in users)
-            {
-                if (crrUser != null)
-                {
-                    if (user.Friends == null) user.Friends = new List<string>();
-                    if (user.FriendRequests == null) user.FriendRequests = new List<string>();
-
-                    if (user.Friends.Contains(CurrentUserId))
-                    {
-                        relation = "Friends";
-                    }
-
-                    else if (user.FriendRequests.Contains(CurrentUserId))
-                    {
-                        relation = "CrrRequest";
-                    }
-
-                    else if (crrUser.FriendRequests.Contains(user.UserId))
-                    {
-                        relation = "UserRequest";
-                    }
-                }
-
-                var userT = Tuple.Create(user.Name, relation);
-                res.Add(user.UserId, userT);
-
-                relation = null;
-            }
-            return res;
+            else return null;
         }
 
         public async Task<UserModel> GetUserById(string id)
         {
-            bool userIsExist = await _context.Users.Find<UserModel>(u => u.UserId == id).AnyAsync();
-            if (userIsExist)
-            {
-                var user = await _context.Users.Find<UserModel>(u => u.UserId == id).FirstOrDefaultAsync();
-
-                // Decrypt the Password
-                //user.Password = _protector.Unprotect(user.Password);
-                return user;
-            }
-            else return null;
+            var user = await _context.Users.Find<UserModel>(u => u.UserId == id).FirstOrDefaultAsync();
+            return user;
         }
 
         public async Task<UserModel> GetUserByPost(TransObj status)
         {
-            bool userIsExist = await _context.Users.Find<UserModel>(u => u.UserId == status.SetringVar).AnyAsync();
-            if (userIsExist)
-            {
-                var user = await _context.Users.Find<UserModel>(u => u.UserId == status.SetringVar).FirstOrDefaultAsync();
-
-                // Decrypt the Password
-                //user.Password = _protector.Unprotect(user.Password);
-                return user;
-            }
-            else return null;
+            var user = await _context.Users.Find<UserModel>(u => u.UserId == status.SetringVar).FirstOrDefaultAsync();
+            return user;
         }
 
         public async Task<bool> CheckEmail(string email)
@@ -121,15 +74,9 @@ namespace sd.Api.Services
 
             if (!IsEmailExist)
             {
-                // Encrypt the Password value and store in Password property
-                //user.AccessToken = _protector.Protect(user.Email + user.Password);
-                //user.Password = _protector.Protect(user.Password);
-
                 user.CreatedAt = DateTime.Now;
-
                 await _context.Users.InsertOneAsync(user);
-                return new TransObj
-                { BoolVar = true, SetringVar = "User Details Inserted Successfully" };
+                return new TransObj { BoolVar = true, SetringVar = "User Details Inserted Successfully" };
             }
             else
             {
@@ -147,23 +94,14 @@ namespace sd.Api.Services
 
             if (oldVer.Email != newVer.Email)
             {
-                bool IsEmailExist = await CheckEmail(newVer.Email);
-                if (IsEmailExist)
-                {
+                if (await CheckEmail(newVer.Email))
                     return new TransObj { BoolVar = false, SetringVar = $"Sorry, {newVer.Email}  is already in use." };
-                }
-                else
-                {
-                    newVer.IsEmailReg = false;
-                }
+                else newVer.IsEmailReg = false;
             }
 
             try
             {
-
-                await _context.Users.FindOneAndReplaceAsync(
-      Builders<UserModel>.Filter.Eq("UserId", id), newVer);
-
+                await _context.Users.FindOneAndReplaceAsync(Builders<UserModel>.Filter.Eq("UserId", id), newVer);
             }
             catch
             {
@@ -177,8 +115,7 @@ namespace sd.Api.Services
         public async Task<bool> RemoveUser(string id)
         {
             MongoDB.Driver.DeleteResult DeleteRecored;
-            DeleteRecored = await _context.Users.DeleteOneAsync(
-              Builders<UserModel>.Filter.Eq("UserId", id));
+            DeleteRecored = await _context.Users.DeleteOneAsync(Builders<UserModel>.Filter.Eq("UserId", id));
             return DeleteRecored.IsAcknowledged;
         }
 
@@ -209,26 +146,31 @@ namespace sd.Api.Services
         }
         public async Task AddFriend(string UserId, string friendId)
         {
-            UserModel userModel = await GetUserById(UserId);
-            if (userModel.Friends == null) userModel.Friends = new List<string>();
+            UserModel userModel;
+            userModel = await GetUserById(UserId);
+            await AddToFriendsAsync(userModel, friendId);
 
+            userModel = await GetUserById(friendId);
+            await AddToFriendsAsync(userModel, UserId);
+        }
+
+        private async Task AddToFriendsAsync(UserModel userModel, string friendId)
+        {
             if (!userModel.Friends.Contains(friendId))
             {
+                if (userModel.Friends == null) userModel.Friends = new List<string>();
                 userModel.Friends.Add(friendId);
-                await UpdateUser(UserId, userModel);
+                await UpdateUser(userModel.UserId, userModel);
             }
-
-            UserModel friendModel = await GetUserById(friendId);
-            if (friendModel.Friends == null) friendModel.Friends = new List<string>();
-
-            if (!friendModel.Friends.Contains(UserId))
-            {
-                friendModel.Friends.Add(UserId);
-                await UpdateUser(friendId, friendModel);
-            }
-
         }
+
         public async Task RemoveFriend(string UserId, string friendId)
+        {
+            await RemoveFromFriendsAsync(UserId, friendId);
+            await RemoveFromFriendsAsync(friendId, UserId);
+        }
+
+        private async Task RemoveFromFriendsAsync(string UserId, string friendId)
         {
             UserModel userModel = await GetUserById(UserId);
             if (userModel != null)
@@ -237,16 +179,6 @@ namespace sd.Api.Services
                 {
                     userModel.Friends.RemoveAll(u => u.Contains(friendId));
                     await UpdateUser(UserId, userModel);
-                }
-            }
-
-            UserModel friendModel = await GetUserById(friendId);
-            if (friendModel != null)
-            {
-                if (friendModel.Friends != null)
-                {
-                    friendModel.Friends.RemoveAll(u => u.Contains(UserId));
-                    await UpdateUser(friendId, friendModel);
                 }
             }
         }

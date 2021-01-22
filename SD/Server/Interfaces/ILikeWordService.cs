@@ -2,7 +2,7 @@
 
 namespace sd.Api.Interfaces
 {
-   public interface ILikeWord
+   public interface ILikeWordService
     {
         Task<int> Like(string userId, string wordId);
     }

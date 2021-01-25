@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace sd.Api.Services
+namespace sd.Api.Repositories
 {
     public class WordRepository : IWordRepository
     {

@@ -34,9 +34,9 @@ namespace SD.Client.Services
             return await _httpClient.GetFromJsonAsync<UserModel>($"api/User/GetUserById/{id}");
         }
 
-        public async Task<UserInfo> GetUserInfoById(string id)
+        public async Task<Dictionary<string, string>> GetFriendRequestsById(string id)
         {
-            return await _httpClient.GetFromJsonAsync<UserInfo>($"api/User/GetUserInfoById/{id}");
+            return await _httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/User/GetFriendRequestsById/{id}");
         }
         public async Task<HttpResponseMessage> AddUser(UserModel user)
         {

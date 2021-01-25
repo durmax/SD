@@ -6,6 +6,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using sd.Api.Interfaces;
 using sd.Api.Models;
+using sd.Api.Repositories;
+using sd.Api.Helpers;
 using sd.Api.Services;
 
 namespace sd.Api
@@ -32,9 +34,9 @@ namespace sd.Api
             services.AddTransient<IOtherPageRepository, OtherPageRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IWordRepository, WordRepository>();
-            services.AddTransient<ICommentRepository, CommentRepository>();
+            services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<ILikeWordService, LikeWordService>();
-            services.AddTransient<UserService>();
+            services.AddTransient<GetRelationshipsService>();
 
             services.AddDataProtection();
 

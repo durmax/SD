@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace sd.Api.Services
 {
-    public class CommentRepository : ICommentRepository
+    public class CommentService : ICommentService
     {
         private readonly IWordRepository _wordService;
 
-        public CommentRepository(IWordRepository wordService)
+        public CommentService(IWordRepository wordService)
         {
             _wordService = wordService;
         }

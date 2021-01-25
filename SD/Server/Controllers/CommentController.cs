@@ -12,9 +12,9 @@ namespace sd.Api.Controllers
     [ApiController]
     public class CommentController : ControllerBase
     {
-        private readonly ICommentRepository _commentService;
+        private readonly ICommentService _commentService;
 
-        public CommentController(ICommentRepository commentService)
+        public CommentController(ICommentService commentService)
         {
             _commentService = commentService;
         }

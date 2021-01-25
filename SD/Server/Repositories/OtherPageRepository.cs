@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver.Linq;
 using System.Linq;
 
-namespace sd.Api.Services
+namespace sd.Api.Repositories
 {
     public class OtherPageRepository : IOtherPageRepository
     {
@@ -50,7 +50,7 @@ namespace sd.Api.Services
         {
             return await _context.OtherPages.Find<OtherPageModel>(u => u.OtherPageId == id).FirstOrDefaultAsync();
         }
-        async Task<IEnumerable<OtherPageModel>> FilterByLangs(string fromLang, string toLang)
+        private async Task<IEnumerable<OtherPageModel>> FilterByLangs(string fromLang, string toLang)
         {
 
             return await _context.OtherPages.AsQueryable<OtherPageModel>()

@@ -19,12 +19,9 @@ namespace SD.Client.Pages
         [Inject]
         public ILanguageContainerService languageContainer { set; get; }
 
-        protected UserInfo userInfo { get; set; } = new UserInfo();
-        protected int? FriendRequestsCount { set; get; }
-
         protected bool Collapsed { get; set; } = true;    // hide by default
 
-        protected Dictionary<string, string> FriendRequestsDictionary;
+        protected Dictionary<string, string> FriendRequestsDictionary = new Dictionary<string, string>();
 
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -51,7 +48,7 @@ namespace SD.Client.Pages
                 UserId = user.FindFirst(c => c.Type == "oid")?.Value;
                 try
                 {
-                    userInfo = await UserService.GetUserInfoById(UserId);
+                    FriendRequestsDictionary = await UserService.GetFriendRequestsById(UserId);
                 }
                 catch
                 {
@@ -61,19 +58,6 @@ namespace SD.Client.Pages
                     userModel.Name = user.Identity.Name;//user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
                     await UserService.AddUser(userModel);
                 }
-                //if (userModel.FriendRequests != null)
-                //{
-                FriendRequestsCount = userInfo?.FriendRequests?.Count ?? 0;
-                if (FriendRequestsCount > 0)
-                {
-                    FriendRequestsDictionary = new Dictionary<string, string>();
-                    foreach (var id in userInfo.FriendRequests)
-                    {
-                        UserModel user1 = await UserService.GetUserById(id);
-                        FriendRequestsDictionary.Add(user1.UserId, user1.Name);
-                    }
-                }
-                //}
             }
         }
     }

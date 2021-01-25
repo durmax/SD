@@ -1,10 +1,10 @@
 ﻿@page "/"
 @inherits IndexBase
 
-@if (userInfo != null && @FriendRequestsCount > 0)
+@if (FriendRequestsDictionary.Count > 0)
 {
     <button type="button" class="btn btn-primary mb-2" @onclick="()=> Collapsed = Collapsed ? false : true">
-        Friend Requests <span class="badge badge-light">@FriendRequestsCount</span>
+        Friend Requests <span class="badge badge-light">@FriendRequestsDictionary.Count</span>
         <span class="sr-only">Friend Requests</span>
     </button>
 
@@ -20,4 +20,5 @@
         </div>
     </div>
 }
+
 <Word UserId="@UserId" Collapsed="false"></Word>

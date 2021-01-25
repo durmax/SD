@@ -83,12 +83,12 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpGet("GetUserInfoById/{id}")]
-        public async Task<ActionResult<UserInfo>> GetUserInfoById(string id)
+        [HttpGet("GetFriendRequestsById/{id}")]
+        public async Task<ActionResult<Dictionary<string, string>>> GetFriendRequestsById(string id)
         {
             try
             {
-                var result = await _userService.GetUserInfoById(id);
+                var result = await _userService.GetFriendRequestsById(id);
                 if (result == null) return NotFound();
                 return result;
             }

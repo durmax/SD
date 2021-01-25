@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using sd.Api.Interfaces;
+using sd.Api.Helpers;
 using sd.Api.Models;
 using SD.Shared;
+using sd.Api.Interfaces;
 
-namespace sd.Api.Services
+namespace sd.Api.Repositories
 {
     public class UserRepository : IUserRepository
     {
         private readonly MongodbContext _context = null;
-        private readonly UserService _userService;
+        private readonly GetRelationshipsService _GetRelationshipsService;
 
-        public UserRepository(MongodbContext mongodbContext, UserService userService)
+        public UserRepository(MongodbContext mongodbContext, GetRelationshipsService GetRelationshipsService)
         {
             _context = mongodbContext;
-            _userService = userService;
+            _GetRelationshipsService = GetRelationshipsService;
         }
 
         public async Task<IEnumerable<UserModel>> GetAllUsers()
@@ -45,7 +46,7 @@ namespace sd.Api.Services
             if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")
             {
                 UserModel crrUser = await GetUserById(CurrentUserId);
-                return _userService.GetRelationships(crrUser, users);
+                return _GetRelationshipsService.GetRelationships(crrUser, users);
             }
             else return null;
         }
@@ -62,28 +63,31 @@ namespace sd.Api.Services
             }
         }
 
-        public async Task<UserInfo> GetUserInfoById(string id)
+        public async Task<Dictionary<string, string>> GetFriendRequestsById(string id)
         {
+            Dictionary<string, string> FriendRequestsDictionary = new Dictionary<string, string>();
             try
             {
-                UserModel user= await _context.Users.Find<UserModel>(u => u.UserId == id).FirstOrDefaultAsync();
-                return new UserInfo
+                UserModel user = await _context.Users.Find<UserModel>(u => u.UserId == id).FirstOrDefaultAsync();
+
+                foreach (var idFR in user.FriendRequests)
                 {
-                    UserId = user.UserId,
-                    FriendRequests = user.FriendRequests
-                };
+                    UserModel user1 = await GetUserById(idFR);
+                    FriendRequestsDictionary.Add(user1.UserId, user1.Name);
+                }
             }
             catch (Exception)
             {
                 return null;
             }
+            return FriendRequestsDictionary;
         }
 
         public async Task<UserModel> GetUserByPost(TransObj status)
         {
             try
             {
-                 return await _context.Users.Find<UserModel>(u => u.UserId == status.SetringVar).FirstOrDefaultAsync();
+                return await _context.Users.Find<UserModel>(u => u.UserId == status.SetringVar).FirstOrDefaultAsync();
             }
             catch (Exception)
             {

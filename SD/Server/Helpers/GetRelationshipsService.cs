@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using SD.Shared;
 
-namespace sd.Api.Services
+namespace sd.Api.Helpers
 {
-    public class UserService
+    public class GetRelationshipsService
     {
         public Dictionary<string, Tuple<string, string>> GetRelationships(UserModel CurrentUser, List<UserModel> users)
         {

@@ -64,12 +64,12 @@ namespace sd.Api.Controllers
         }
 
         // GET: api/Word/GetAllWords/1111/5e915b3a1c9d4400003f1fba
-        [HttpGet("GetAllWords/{CurrentUserId}/{userId}")]
-        public async Task<ActionResult<IEnumerable<WordModel>>> GetAllWords(string CurrentUserId, string userId)
+        [HttpGet("GetAllWords/{CurrentUserId}/{userId}/{pageSize}/{currentPage}")]
+        public async Task<ActionResult<IEnumerable<WordModel>>> GetAllWords(string CurrentUserId, string userId, int pageSize, int currentPage)
         {
             try
             {
-                return Ok(await _wordService.GetAllWords(CurrentUserId, userId));
+                return Ok(await _wordService.GetAllWords(CurrentUserId, userId, pageSize, currentPage));
             }
             catch (Exception ex)
             {

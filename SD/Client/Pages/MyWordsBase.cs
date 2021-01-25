@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
 using SD.Shared;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -26,13 +25,15 @@ namespace SD.Client.Pages
         [Parameter]
         public string UserId { get; set; }
         protected string CurrentUserId { get; set; }
+        
         [Parameter]
         public string UserName { get; set; }
         protected bool Collapsed { set; get; } = true;    // hide by default
         protected bool loading;
-        protected bool CULiked { get; set; }
+        //protected bool CULiked { get; set; }
 
         protected string cssClassDelete;// = "d-none";
+        protected int currentPage = 1;
 
         protected List<WordModel> Words { get; set; }
 
@@ -40,28 +41,28 @@ namespace SD.Client.Pages
         {
             Words.Add(newWord);
         }
-        protected async Task DeleteWord()
-        {
-            loading = true;
+        //protected async Task DeleteWord()
+        //{
+        //    loading = true;
 
-            if (!string.IsNullOrWhiteSpace(wordModel.UserId))// is not a new word
-            {
-                await Auth();
-                if (wordModel.UserId == CurrentUserId)
-                {
-                    var response = await WordService.RemoveWord(wordModel.WordId);
-                    if (response.IsSuccessStatusCode)
-                    {
-                      Words.Remove(wordModel);
-                    }
-                    else
-                    {
-                        //note = $"You can NOT delete {wordModel.Title}";
-                    }
-                }
-            }
-            loading = false;
-        }
+        //    if (!string.IsNullOrWhiteSpace(wordModel.UserId))// is not a new word
+        //    {
+        //        await Auth();
+        //        if (wordModel.UserId == CurrentUserId)
+        //        {
+        //            var response = await WordService.RemoveWord(wordModel.WordId);
+        //            if (response.IsSuccessStatusCode)
+        //            {
+        //                Words.Remove(wordModel);
+        //            }
+        //            else
+        //            {
+        //                //note = $"You can NOT delete {wordModel.Title}";
+        //            }
+        //        }
+        //    }
+        //    loading = false;
+        //}
 
         protected async Task Auth()
         {
@@ -75,7 +76,7 @@ namespace SD.Client.Pages
             else
             {
                 //NavigationManager.NavigateTo("authentication/login");
-                CurrentUserId ="0";
+                CurrentUserId = "0";
             }
         }
         protected async Task InitAsync()
@@ -99,7 +100,7 @@ namespace SD.Client.Pages
                     cssClassDelete = UserId == CurrentUserId ? null : "d-none";
                 }
 
-                Words = await WordService.GetAllWords(CurrentUserId, UserId);
+                Words = await WordService.GetAllWords(CurrentUserId, UserId, 10, currentPage);
             }
             catch
             {
@@ -108,6 +109,14 @@ namespace SD.Client.Pages
 
             wordModel.WordLang = await LocalStorageService.GetItemAsync<string>("FLang");
             wordModel.ToLang = await LocalStorageService.GetItemAsync<string>("TLang");
+        }
+
+        protected async Task GetNextPage()
+        {
+            loading = true;
+            currentPage++;
+            Words.AddRange(await WordService.GetAllWords(CurrentUserId, UserId, 10, currentPage));
+            loading = false;
         }
 
         protected override async Task OnParametersSetAsync()

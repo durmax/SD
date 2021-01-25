@@ -18,10 +18,10 @@ namespace sd.Api.Repositories
             _context = mongodbContext;
         }
 
-        public async Task<List<WordModel>> GetAllWords(string CurrentUserId, string userId)
+        public async Task<List<WordModel>> GetAllWords(string CurrentUserId, string userId, int pageSize, int currentPage)
         {
             List<WordModel> words = new List<WordModel>();
-            words = await _context.Words.Find(w => w.UserId == userId).Limit(10).ToListAsync();
+            words = await _context.Words.Find(w => w.UserId == userId).SortByDescending(d => d.CreatedAt).Skip((currentPage - 1) * pageSize).Limit(pageSize).ToListAsync();
             words = words.OrderByDescending(w => w.CreatedAt).ToList();
 
             if (CurrentUserId == userId)

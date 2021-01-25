@@ -7,58 +7,34 @@
 
 @if (Words == null)
 {
-    <div style="position:absolute; top:30vh; text-align:center" class="w-50">
-        <p>@languageContainer.Keys["WORDSloading"]</p>
-        <p><i class="fas fa-spin fa-spinner"></i></p>
-    </div>
+<div style="position:absolute; top:30vh; text-align:center" class="w-50">
+    <p>@languageContainer.Keys["WORDSloading"]</p>
+    <p><i class="fas fa-spin fa-spinner"></i></p>
+</div>
 }
 else
 {
-    <div class="sticky-top pb-1">
-        <Word wordModel="@wordModel" UserId="@UserId" OnWordSave="NewWordHandler" Collapsed="Collapsed"></Word>
-        @if (loading)
-        {
-            <div class="d-flex justify-content-center p-1">
-                <div class="spinner-border spinner-border-sm" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-            </div>
-        }
+<div class="sticky-top pb-1">
+    <Word wordModel="@wordModel" UserId="@UserId" OnWordSave="NewWordHandler" Collapsed="Collapsed"></Word>
+</div>
+
+@foreach (var word in Words)
+{
+<Word wordModel="word"></Word>
+}
+
+<button class="btn btn-outline-secondary bg-white text-dark m-2" type="button" @onclick="GetNextPage">
+    Load more Words
+</button>
+
+@if (loading)
+{
+<button type="button" class="btn btn-light">
+    <div class="spinner-border spinner-border-sm" role="status">
+        <span class="sr-only">Loading...</span>
     </div>
-
-    @*<div class="ml-5 mr-4">
-        <ol reversed class="list-group">*@
-            @foreach (var word in Words)
-            {
-                @*<li>*@
-                    @*<div class="card mb-2">
-                        <div class="card-body p-2">*@
-                            <Word wordModel="word"></Word>
-                        @*</div>*@
-                        @*<div class="card-footer p-1">
-                            <div class="row">
-                                <div class="col-10">
-                                    @{ CULiked = (word.Likes != null) ? word.Likes.Contains(CurrentUserId) : false;}
-                                    <Like CurrentUserId="@CurrentUserId" WordId="@word.WordId" LikesCount="@word.Likes?.Count" CULiked="@CULiked"></Like>
-                                    <button type="button" class="btn btn-light bg-transparent" @onclick="() => { wordModel = word; Collapsed = false;}">
-                                        @if (word.Comments != null && word.Comments.Count > 0)
-                                        {<span style="margin-right:4px">@word.Comments.Count</span>}
-                                        <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
-                                    </button>
-                                </div>
-                                <div class="col-2 @cssClassDelete">
-                                    <button type="button" style="float:right" class="btn btn-light bg-transparent" @onclick="async () => { wordModel = word; await DeleteWord(); }">
-                                        <img width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true"/>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>*@
-
-                    @*</div>*@
-                @*</li>*@
-            }
-        @*</ol>
-    </div>*@
+</button>
+}
 }
 
 

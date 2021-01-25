@@ -21,9 +21,9 @@ namespace SD.Client.Services
             return await _httpClient.PostAsJsonAsync("api/Word/AddWord", word);
         }
 
-        public async Task<List<WordModel>> GetAllWords(string CurrentUserId, string userId)
+        public async Task<List<WordModel>> GetAllWords(string CurrentUserId, string userId, int pageSize, int currentPage)
         {
-            return await _httpClient.GetFromJsonAsync<List<WordModel>>($"api/Word/GetAllWords/{CurrentUserId}/{userId}");
+            return await _httpClient.GetFromJsonAsync<List<WordModel>>($"api/Word/GetAllWords/{CurrentUserId}/{userId}/{pageSize}/{currentPage}");
         }
 
         public async Task<WordModel> GetWordById(string id)

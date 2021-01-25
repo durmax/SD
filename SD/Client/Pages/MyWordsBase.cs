@@ -30,8 +30,6 @@ namespace SD.Client.Pages
         public string UserName { get; set; }
         protected bool Collapsed { set; get; } = true;    // hide by default
         protected bool loading;
-
-        protected string cssClassDelete;// = "d-none";
         protected int currentPage = 1;
 
         protected List<WordModel> Words { get; set; }
@@ -52,7 +50,6 @@ namespace SD.Client.Pages
             if (user.Identity.IsAuthenticated)
             {
                 CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
-                cssClassDelete = null;
             }
             else
             {
@@ -75,10 +72,6 @@ namespace SD.Client.Pages
                     {
                         UserId = CurrentUserId;
                     }
-                }
-                else
-                {
-                    cssClassDelete = UserId == CurrentUserId ? null : "d-none";
                 }
 
                 Words = await WordService.GetAllWords(CurrentUserId, UserId, 10, currentPage);

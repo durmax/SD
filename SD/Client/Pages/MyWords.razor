@@ -20,7 +20,7 @@ else
 
 @foreach (var word in Words)
 {
-<Word wordModel="word"></Word>
+<Word wordModel="word" OnWordDelete="DeleteWordHandler"></Word>
 }
 
 <button class="btn btn-outline-secondary bg-white text-dark m-2" type="button" @onclick="GetNextPage">

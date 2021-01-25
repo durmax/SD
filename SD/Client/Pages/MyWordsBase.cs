@@ -30,7 +30,6 @@ namespace SD.Client.Pages
         public string UserName { get; set; }
         protected bool Collapsed { set; get; } = true;    // hide by default
         protected bool loading;
-        //protected bool CULiked { get; set; }
 
         protected string cssClassDelete;// = "d-none";
         protected int currentPage = 1;
@@ -41,28 +40,10 @@ namespace SD.Client.Pages
         {
             Words.Add(newWord);
         }
-        //protected async Task DeleteWord()
-        //{
-        //    loading = true;
-
-        //    if (!string.IsNullOrWhiteSpace(wordModel.UserId))// is not a new word
-        //    {
-        //        await Auth();
-        //        if (wordModel.UserId == CurrentUserId)
-        //        {
-        //            var response = await WordService.RemoveWord(wordModel.WordId);
-        //            if (response.IsSuccessStatusCode)
-        //            {
-        //                Words.Remove(wordModel);
-        //            }
-        //            else
-        //            {
-        //                //note = $"You can NOT delete {wordModel.Title}";
-        //            }
-        //        }
-        //    }
-        //    loading = false;
-        //}
+        protected void DeleteWordHandler(WordModel word)
+        {
+            Words.Remove(word);
+        }
 
         protected async Task Auth()
         {

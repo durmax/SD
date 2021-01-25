@@ -98,6 +98,9 @@ namespace SD.Client.Pages
         [Parameter]
         public EventCallback<WordModel> OnWordSave { get; set; }
 
+        [Parameter]
+        public EventCallback<WordModel> OnWordDelete { get; set; }
+
         protected async Task AddWord()
         {
             loading = true;
@@ -303,6 +306,7 @@ namespace SD.Client.Pages
                     var response = await WordService.RemoveWord(wordModel.WordId);
                     if (response.IsSuccessStatusCode)
                     {
+                        await OnWordDelete.InvokeAsync(wordModel);
                         //Words.Remove(wordModel);
                     }
                     else

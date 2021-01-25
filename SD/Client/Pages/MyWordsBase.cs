@@ -11,26 +11,22 @@ namespace SD.Client.Pages
     public class MyWordsBase : ComponentBase
     {
         [Inject]
-        public ILocalStorageService LocalStorageService { get; set; }
-
-        [Inject]
         public WordService WordService { set; get; }
         [Inject]
         NavigationManager NavigationManager { get; set; }
 
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
-        protected WordModel wordModel { get; set; } = new WordModel();
 
         [Parameter]
         public string UserId { get; set; }
         protected string CurrentUserId { get; set; }
-        
+
         [Parameter]
         public string UserName { get; set; }
         protected bool Collapsed { set; get; } = true;    // hide by default
         protected bool loading;
-        protected int currentPage = 1;
+        protected int currentPage = 0;
 
         protected List<WordModel> Words { get; set; }
 
@@ -53,7 +49,6 @@ namespace SD.Client.Pages
             }
             else
             {
-                //NavigationManager.NavigateTo("authentication/login");
                 CurrentUserId = "0";
             }
         }
@@ -74,21 +69,24 @@ namespace SD.Client.Pages
                     }
                 }
 
-                Words = await WordService.GetAllWords(CurrentUserId, UserId, 10, currentPage);
+                //Words = await WordService.GetAllWords(CurrentUserId, UserId, 10, currentPage);
+                await GetNextPage();
             }
             catch
             {
                 NavigationManager.NavigateTo("/");
             }
-
-            wordModel.WordLang = await LocalStorageService.GetItemAsync<string>("FLang");
-            wordModel.ToLang = await LocalStorageService.GetItemAsync<string>("TLang");
         }
 
         protected async Task GetNextPage()
         {
             loading = true;
             currentPage++;
+
+            if (Words == null)
+            {
+                Words = new List<WordModel>();
+            }
             Words.AddRange(await WordService.GetAllWords(CurrentUserId, UserId, 10, currentPage));
             loading = false;
         }

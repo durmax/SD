@@ -5,36 +5,27 @@
 
 <h3>@UserName</h3>
 
-@if (Words == null)
-{
-<div style="position:absolute; top:30vh; text-align:center" class="w-50">
-    <p>@languageContainer.Keys["WORDSloading"]</p>
-    <p><i class="fas fa-spin fa-spinner"></i></p>
-</div>
-}
-else
-{
 <div class="sticky-top pb-1">
-    <Word wordModel="@wordModel" UserId="@UserId" OnWordSave="NewWordHandler" Collapsed="Collapsed"></Word>
+    <Word UserId="@UserId" OnWordSave="NewWordHandler" Collapsed="Collapsed"></Word>
 </div>
 
 @foreach (var word in Words)
 {
-<Word wordModel="word" OnWordDelete="DeleteWordHandler"></Word>
+    <Word wordModel="word" OnWordDelete="DeleteWordHandler"></Word>
 }
 
-<button class="btn btn-outline-secondary bg-white text-dark m-2" type="button" @onclick="GetNextPage">
+<button class="btn btn-outline-secondary bg-white text-dark m-2 @( loading ? "d-none": null)" type="button" @onclick="GetNextPage">
     Load more Words
 </button>
 
 @if (loading)
 {
-<button type="button" class="btn btn-light">
-    <div class="spinner-border spinner-border-sm" role="status">
-        <span class="sr-only">Loading...</span>
-    </div>
-</button>
+    <button type="button" class="btn btn-light">
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </button>
 }
-}
+
 
 

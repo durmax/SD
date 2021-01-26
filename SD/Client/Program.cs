@@ -37,6 +37,7 @@ namespace SD.Client
             builder.Services.AddSingleton<LangCodeService>();
             builder.Services.AddSingleton<KnownLangsService>();
             builder.Services.AddSingleton<DefaultLangsService>();
+            builder.Services.AddSingleton<CurrentUserService>();
 
             builder.Services.AddTransient<UriService>();
             builder.Services.AddTransient<LinkModel>();
@@ -45,6 +46,8 @@ namespace SD.Client
             builder.Services.AddTransient<UserService>();
             builder.Services.AddTransient<WordService>();
             builder.Services.AddTransient<CommentService>();
+
+            
 
             builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
 

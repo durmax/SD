@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SD.Shared;
 using System.Collections.Generic;
 using AKSoftware.Localization.MultiLanguages;
+using System.Security.Claims;
 
 namespace SD.Client.Pages
 {
@@ -18,6 +19,8 @@ namespace SD.Client.Pages
         public UserService UserService { set; get; }
         [Inject]
         public ILanguageContainerService languageContainer { set; get; }
+        [Inject]
+        public CurrentUserService CurrUsrService { set; get; }
 
         protected bool Collapsed { get; set; } = true;    // hide by default
 
@@ -25,8 +28,6 @@ namespace SD.Client.Pages
 
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
-
-        protected string UserId { get; set; }
         protected List<WordModel> Words { get; set; }
         [Inject]
         public WordService WordService { set; get; }
@@ -46,7 +47,7 @@ namespace SD.Client.Pages
             {
                 Words = new List<WordModel>();
             }
-            var word = await WordService.GetWords(UserId, TLang, 10, currentPage);
+            var word = await WordService.GetWords(CurrUsrService.UserId, TLang, 10, currentPage);
             currentPage = word.Item1;
             Words.AddRange(word.Item2);
             loading = false;
@@ -69,15 +70,17 @@ namespace SD.Client.Pages
 
             if (user.Identity.IsAuthenticated)
             {
-                UserId = user.FindFirst(c => c.Type == "oid")?.Value;
+                CurrUsrService.UserId = user.FindFirst(c => c.Type == "oid")?.Value;
+                CurrUsrService.Name = user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value;
+                
                 try
                 {
-                    FriendRequestsDictionary = await UserService.GetFriendRequestsById(UserId);
+                    FriendRequestsDictionary = await UserService.GetFriendRequestsById(CurrUsrService.UserId);
                 }
                 catch
                 {
                     UserModel userModel = new UserModel();
-                    userModel.UserId = UserId;
+                    userModel.UserId = CurrUsrService.UserId;
                     userModel.Email = user.FindFirst(c => c.Type == "email")?.Value;
                     userModel.Name = user.Identity.Name;//user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
                     await UserService.AddUser(userModel);

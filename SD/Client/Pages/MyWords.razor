@@ -8,16 +8,13 @@
 <div class="sticky-top pb-1">
     <Word UserId="@UserId" OnWordSave="NewWordHandler" Collapsed="Collapsed"></Word>
 </div>
-
-@foreach (var word in Words)
+@if (Words != null)
 {
-    <Word wordModel="word" OnWordDelete="DeleteWordHandler"></Word>
+    @foreach (var word in Words)
+    {   
+        <Word wordModel="word" OnWordDelete="DeleteWordHandler"></Word>
+    }
 }
-
-<button class="btn btn-outline-secondary bg-white text-dark m-2 @( loading ? "d-none": null)" type="button" @onclick="GetNextPage">
-    Load more Words
-</button>
-
 @if (loading)
 {
     <button type="button" class="btn btn-light">
@@ -26,6 +23,10 @@
         </div>
     </button>
 }
-
-
+else
+{
+    <button class="btn btn-outline-secondary bg-white text-dark m-2" type="button" @onclick="GetNextPage">
+        Load more Words
+    </button>
+}
 

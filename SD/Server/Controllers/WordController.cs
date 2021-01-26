@@ -64,6 +64,21 @@ namespace sd.Api.Controllers
         }
 
         // GET: api/Word/GetAllWords/1111/5e915b3a1c9d4400003f1fba
+        [HttpGet("GetWords/{CurrentUserId}/{lang}/{pageSize}/{currentPage}")]
+        public async Task<ActionResult<Tuple<int, List<WordModel>>>> GetWords(string CurrentUserId, string lang, int pageSize, int currentPage)
+        {
+            try
+            {
+                return Ok(await _wordService.GetWords(CurrentUserId, lang, pageSize, currentPage));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
+        // GET: api/Word/GetAllWords/1111/5e915b3a1c9d4400003f1fba
         [HttpGet("GetAllWords/{CurrentUserId}/{userId}/{pageSize}/{currentPage}")]
         public async Task<ActionResult<IEnumerable<WordModel>>> GetAllWords(string CurrentUserId, string userId, int pageSize, int currentPage)
         {

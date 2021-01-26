@@ -27,6 +27,30 @@ namespace SD.Client.Pages
         private Task<AuthenticationState> authenticationStateTask { get; set; }
 
         protected string UserId { get; set; }
+        protected List<WordModel> Words { get; set; }
+        [Inject]
+        public WordService WordService { set; get; }
+        [Inject]
+        DefaultLangsService DefaultLangsService { get; set; }
+
+        protected bool loading = true;
+        protected int currentPage = 0;
+        protected string TLang = "";
+
+        protected async Task GetNextPage()
+        {
+            loading = true;
+            currentPage++;
+
+            if (Words == null)
+            {
+                Words = new List<WordModel>();
+            }
+            var word = await WordService.GetWords(UserId, TLang, 10, currentPage);
+            currentPage = word.Item1;
+            Words.AddRange(word.Item2);
+            loading = false;
+        }
 
         protected override async Task OnInitializedAsync()
         {
@@ -59,6 +83,8 @@ namespace SD.Client.Pages
                     await UserService.AddUser(userModel);
                 }
             }
+            TLang = DefaultLangsService.DefaultToLang;
+            await GetNextPage();
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
 using SD.Shared;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,6 +16,9 @@ namespace SD.Client.Pages
         [Inject]
         NavigationManager NavigationManager { get; set; }
 
+        [Inject]
+        DefaultLangsService DefaultLangsService { get; set; }
+
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
 
@@ -25,8 +29,10 @@ namespace SD.Client.Pages
         [Parameter]
         public string UserName { get; set; }
         protected bool Collapsed { set; get; } = true;    // hide by default
-        protected bool loading;
+        protected bool loading = true;
         protected int currentPage = 0;
+        protected string TLang="";
+           
 
         protected List<WordModel> Words { get; set; }
 
@@ -54,6 +60,7 @@ namespace SD.Client.Pages
         }
         protected async Task InitAsync()
         {
+            TLang= DefaultLangsService.DefaultToLang;
             await Auth();
             try
             {
@@ -68,8 +75,6 @@ namespace SD.Client.Pages
                         UserId = CurrentUserId;
                     }
                 }
-
-                //Words = await WordService.GetAllWords(CurrentUserId, UserId, 10, currentPage);
                 await GetNextPage();
             }
             catch
@@ -87,6 +92,10 @@ namespace SD.Client.Pages
             {
                 Words = new List<WordModel>();
             }
+            //var word = await WordService.GetWords(CurrentUserId, UserId, TLang, 10, currentPage);
+            //currentPage = word.Item1;
+            //Words.AddRange(word.Item2);
+
             Words.AddRange(await WordService.GetAllWords(CurrentUserId, UserId, 10, currentPage));
             loading = false;
         }

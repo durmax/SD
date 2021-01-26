@@ -198,7 +198,7 @@ namespace SD.Client.Pages
                 CreatedAt = DateTime.Now
             };
             wordModel.Explain = null;
-            SetMyText();
+            //SetMyText();
             ShareWithClass = "/icons/cloud-upload-alt-solid.svg";
 
             if (string.IsNullOrWhiteSpace(wordModel.WordLang) || string.IsNullOrWhiteSpace(wordModel.ToLang))
@@ -216,18 +216,15 @@ namespace SD.Client.Pages
 
         private void SetMyText()
         {
-            //if (string.IsNullOrWhiteSpace(wordModel.Explain))
-            //{
-            //    MyText = null;
-            //    //cssClassComment = true;
-            //}
-            //else
-            //{
-            MyText = wordModel.Explain;
-            CalculateSize(MyText);
-            Rows = Rows < 3 ? Rows : Rows++;
-            //cssClassComment = false;
-            //}
+            try
+            {
+                MyText = wordModel?.Explain;
+                CalculateSize(MyText);
+                Rows = Rows < 3 ? Rows : Rows++;
+            }
+            catch 
+            {
+            }
         }
 
         private async Task SetLangsAsync()
@@ -345,14 +342,14 @@ namespace SD.Client.Pages
                 NavigationManager.NavigateTo("authentication/login");
             }
         }
-       
+
         /// <summary>
         /// Like end
         /// </summary>
         /// <returns></returns>
-        
-        
-        
+
+
+
         protected override async Task OnInitializedAsync()
         {
             var user = (await authenticationStateTask).User;
@@ -387,13 +384,13 @@ namespace SD.Client.Pages
 
             SetMyText();
 
-            if (wordModel.Comments != null)
+            if (wordModel?.Comments != null)
             {
                 wordComments = wordModel.Comments;
                 wordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
             }
 
-            switch (wordModel.ShareWith)
+            switch (wordModel?.ShareWith)
             {
                 case 0:
                     ShareWithClass = "/icons/user-lock-solid.svg";

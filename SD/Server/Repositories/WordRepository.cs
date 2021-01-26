@@ -3,6 +3,7 @@ using MongoDB.Driver.Linq;
 using sd.Api.Interfaces;
 using sd.Api.Models;
 using SD.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace sd.Api.Repositories
         {
             List<WordModel> words = new List<WordModel>();
             words = await _context.Words.Find(w => w.UserId == userId).SortByDescending(d => d.CreatedAt).Skip((currentPage - 1) * pageSize).Limit(pageSize).ToListAsync();
-            words = words.OrderByDescending(w => w.CreatedAt).ToList();
+            //words = words.OrderByDescending(w => w.CreatedAt).ToList();
 
             if (CurrentUserId == userId)
             {
@@ -30,7 +31,7 @@ namespace sd.Api.Repositories
             }
             else
             {
-                if (await IsFriendAsync(CurrentUserId, userId))
+                if (await AreFriendAsync(CurrentUserId, userId))
                 {
                     words = words.Where(w => w.ShareWith > 0).Select(w => w).ToList();
                 }
@@ -42,11 +43,70 @@ namespace sd.Api.Repositories
             return words;
         }
 
-        private async Task<bool> IsFriendAsync(string currentUserId, string userId)
+        private async Task<bool> AreFriendAsync(string currentUserId, string userId)
         {
             var user = await _context.Users.Find<UserModel>(u => u.UserId == userId).FirstOrDefaultAsync();
-            if (user == null) return false;
-            return user.Friends.Contains(currentUserId);
+            if (user == null || user.Friends == null) return false;
+            return (bool)(user.Friends?.Contains(currentUserId));
+        }
+
+        private async Task<bool> IsWordShareAsync(WordModel word, string currentUserId)
+        {
+            bool areSame = currentUserId == word.UserId ? true : false;
+
+            if (areSame)
+            {
+                return true;
+            }
+
+            else
+            {
+                if (await AreFriendAsync(currentUserId, word.UserId))
+                {
+                    if (word.ShareWith > 0)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (word.ShareWith > 1)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        
+        public async Task<Tuple<int, List<WordModel>>> GetWords(string currentUserId, string lang, int pageSize, int currentPage)
+        {
+            List<WordModel> words = new List<WordModel>();
+            int newCurrentPage = currentPage;
+            Tuple<int, List<WordModel>> Res;
+
+            while (words.Count < pageSize)
+            {
+                WordModel word = await GetNextWordAsync(newCurrentPage, currentUserId, lang);
+                if (word != null)
+                {
+                    newCurrentPage++;
+                    words.Add(word);
+                }
+            }
+
+            Res = new Tuple<int, List<WordModel>>(newCurrentPage, words);
+
+            return Res;
+        }
+
+        private async Task<WordModel> GetNextWordAsync(int currentPage,string currentUserId, string lang)
+        {
+            WordModel word;
+            word = await _context.Words.Find(w => w.WordLang == lang).SortByDescending(d => d.CreatedAt).Skip(currentPage - 1).Limit(1).FirstOrDefaultAsync();
+
+            if (await IsWordShareAsync(word, currentUserId)) return word;
+            return null;
         }
 
         public async Task<WordModel> GetWordById(string id)

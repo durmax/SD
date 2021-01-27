@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components.Authorization;
 using SD.Shared;
 using SD.Client.Services;
 
@@ -17,9 +16,8 @@ namespace SD.Client.Pages
 
         [Inject]
         public UserService UserService { set; get; }
-
-        [CascadingParameter]
-        private Task<AuthenticationState> authenticationStateTask { get; set; }
+        [Inject]
+        public CurrentUserService CurrUsrService { set; get; }
 
         [Parameter]
         public string UserId { get; set; }
@@ -71,26 +69,24 @@ namespace SD.Client.Pages
                 }
             }
         }
+        private async Task AddUserAsync(string currUserId, string email, string name)
+        {
+            UserModel userModel = new UserModel();
+            userModel.UserId = currUserId;
+            userModel.Email = email;
+            userModel.Name = name;
+            await UserService.AddUser(userModel);
+        }
 
         protected async override Task OnInitializedAsync()
         {
-            try
-            {
-                var user = (await authenticationStateTask).User;
+            if (string.IsNullOrWhiteSpace(CurrentUserId)) CurrentUserId = await CurrUsrService.GetCurrUsrId();
 
-                if (user.Identity.IsAuthenticated)
-                {
-                    CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
-                    Email = user.FindFirst(c => c.Type == "email")?.Value;
-                }
-                else
-                {
-                    CurrentUserId = "0";
-                }
-            }
-            catch
+            if (CurrentUserId != "0")
             {
-                //NavigationManager.NavigateTo("/");
+                await AddUserAsync(CurrentUserId,
+                                   await CurrUsrService.GetCurrUsrEmail(),
+                                   await CurrUsrService.GetCurrUsrName());
             }
 
             if (string.IsNullOrWhiteSpace(UserId))

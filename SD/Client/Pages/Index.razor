@@ -13,7 +13,7 @@
             <div class="container">
                 @foreach (var item in FriendRequestsDictionary)
                 {
-                    <Friendship UserId="@CurrUsrService.UserId" friendId="@item.Key" friendName="@item.Value" friendshipState="UserRequest"></Friendship>
+                    <Friendship UserId="@currUserId" friendId="@item.Key" friendName="@item.Value" friendshipState="UserRequest"></Friendship>
                 }
 
             </div>
@@ -21,7 +21,7 @@
     </div>
 }
 
-<Word UserId="@CurrUsrService.UserId" Collapsed="false"></Word>
+<Word Collapsed="false"></Word>
 @if (Words != null)
 {
     @foreach (var word in Words)

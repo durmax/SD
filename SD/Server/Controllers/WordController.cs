@@ -63,7 +63,6 @@ namespace sd.Api.Controllers
             }
         }
 
-        // GET: api/Word/GetAllWords/1111/5e915b3a1c9d4400003f1fba
         [HttpGet("GetWords/{CurrentUserId}/{lang}/{pageSize}/{currentPage}")]
         public async Task<ActionResult<Tuple<int, List<WordModel>>>> GetWords(string CurrentUserId, string lang, int pageSize, int currentPage)
         {

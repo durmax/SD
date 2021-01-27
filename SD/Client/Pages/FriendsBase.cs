@@ -20,10 +20,7 @@ namespace SD.Client.Pages
         public UserService UserService { set; get; }
 
         [Inject]
-        NavigationManager NavigationManager { set; get; }
-
-        [CascadingParameter]
-        private Task<AuthenticationState> authenticationStateTask { get; set; }
+        CurrentUserService CurrUsrService { set; get; }
 
         protected string CurrentUserId { get; set; }
 
@@ -37,7 +34,7 @@ namespace SD.Client.Pages
         {
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
-                SearchDisplayClass = "";
+                SearchDisplayClass = null;
                 foundUsers = await UserService.SearchUser(CurrentUserId, SearchText);
             }
             else
@@ -49,29 +46,16 @@ namespace SD.Client.Pages
 
         protected async override Task OnInitializedAsync()
         {
-            try
+
+            if (await CurrUsrService.IsAuth())
             {
-                var user = (await authenticationStateTask).User;
+                CurrentUserId = await CurrUsrService.GetCurrUsrId();
+                FriendsDictionary = new Dictionary<string, string>();
+                FriendsDictionary = await UserService.GetAllFriends(CurrentUserId);
 
-                if (user.Identity.IsAuthenticated)
-                {
-                    CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
-                    //Email = user.FindFirst(c => c.Type == "email")?.Value;
-
-                    FriendsDictionary = new Dictionary<string, string>();
-                    FriendsDictionary = await UserService.GetAllFriends(CurrentUserId);
-
-                    FriendsCount = FriendsDictionary.Count();
-                }
-                else
-                {
-                    CurrentUserId = "0";
-                }
+                FriendsCount = FriendsDictionary.Count();
             }
-            catch
-            {
-                NavigationManager.NavigateTo("/");
-            }
+
         }
     }
 }

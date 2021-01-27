@@ -21,9 +21,18 @@ namespace SD.Client.Services
             return await _httpClient.PostAsJsonAsync("api/Word/AddWord", word);
         }
 
-        public async Task<Tuple<int, List<WordModel>>> GetWords(string CurrentUserId, string lang, int pageSize, int currentPage)
+        public async Task<Tuple<int, List<WordModel>>> GetWords(string currUsrId, string lang, int pageSize, int currentPage)
         {
-            return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordModel>>>($"api/Word/GetWords/{CurrentUserId}/{lang}/{pageSize}/{currentPage}");
+            //await GetCurrentUserId();
+            try
+            {
+                return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordModel>>>($"api/Word/GetWords/{currUsrId}/{lang}/{pageSize}/{currentPage}");
+            }
+            catch
+            {
+                return null;
+            }
+
         }
 
         public async Task<List<WordModel>> GetAllWords(string CurrentUserId, string userId, int pageSize, int currentPage)
@@ -40,7 +49,7 @@ namespace SD.Client.Services
         {
             try
             {
-              return await _httpClient.GetFromJsonAsync<WordModel>($"api/Word/GetWordByText/{userId}/{title}");
+                return await _httpClient.GetFromJsonAsync<WordModel>($"api/Word/GetWordByText/{userId}/{title}");
             }
             catch
             {

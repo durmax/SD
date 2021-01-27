@@ -1,9 +1,6 @@
-﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.AspNetCore.Components;
 using SD.Client.Services;
 using SD.Shared;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -18,21 +15,21 @@ namespace SD.Client.Pages
 
         [Inject]
         DefaultLangsService DefaultLangsService { get; set; }
-
-        [CascadingParameter]
-        private Task<AuthenticationState> authenticationStateTask { get; set; }
+        [Inject]
+        public CurrentUserService CurrUsrService { get; set; }
 
         [Parameter]
         public string UserId { get; set; }
-        protected string CurrentUserId { get; set; }
+        [Parameter]
+        public string currUsrId { get; set; }
 
         [Parameter]
         public string UserName { get; set; }
         protected bool Collapsed { set; get; } = true;    // hide by default
         protected bool loading = true;
         protected int currentPage = 0;
-        protected string TLang="";
-           
+        protected string TLang;
+
 
         protected List<WordModel> Words { get; set; }
 
@@ -45,36 +42,17 @@ namespace SD.Client.Pages
             Words.Remove(word);
         }
 
-        protected async Task Auth()
-        {
-            var user = (await authenticationStateTask).User;
-
-            if (user.Identity.IsAuthenticated)
-            {
-                CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
-            }
-            else
-            {
-                CurrentUserId = "0";
-            }
-        }
         protected async Task InitAsync()
         {
-            TLang= DefaultLangsService.DefaultToLang;
-            await Auth();
+            if (await CurrUsrService.IsAuth())
+                currUsrId = await CurrUsrService.GetCurrUsrId();
+            else
+                NavigationManager.NavigateTo("/");
+
+            TLang = DefaultLangsService.DefaultToLang;
+            
             try
             {
-                if (string.IsNullOrWhiteSpace(UserId))
-                {
-                    if (CurrentUserId == "0")
-                    {
-                        NavigationManager.NavigateTo("/");
-                    }
-                    else
-                    {
-                        UserId = CurrentUserId;
-                    }
-                }
                 await GetNextPage();
             }
             catch
@@ -92,11 +70,8 @@ namespace SD.Client.Pages
             {
                 Words = new List<WordModel>();
             }
-            //var word = await WordService.GetWords(CurrentUserId, UserId, TLang, 10, currentPage);
-            //currentPage = word.Item1;
-            //Words.AddRange(word.Item2);
 
-            Words.AddRange(await WordService.GetAllWords(CurrentUserId, UserId, 10, currentPage));
+            Words.AddRange(await WordService.GetAllWords(currUsrId, UserId, 10, currentPage));
             loading = false;
         }
 

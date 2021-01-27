@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using MongoDB.Bson;
 using SD.Client.Services;
 using SD.Shared;
 using System;
@@ -20,10 +19,6 @@ namespace SD.Client.Pages
 
         [Inject]
         protected LangCodeService LangCodeService { get; set; }
-
-
-        [CascadingParameter]
-        private Task<AuthenticationState> authenticationStateTask { get; set; }
 
         [Parameter]
         public string Id { get; set; }
@@ -133,8 +128,6 @@ namespace SD.Client.Pages
         {
             try
             {
-                var user = (await authenticationStateTask).User;
-                // add Authorization
                 otherPageModel =  await OtherPageService.GetOtherPageById(Id);
             }
             catch
@@ -156,6 +149,5 @@ namespace SD.Client.Pages
                 }
             }
         }
-
     }
 }

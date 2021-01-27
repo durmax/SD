@@ -1,6 +1,5 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
 using SD.Shared;
 using System;
@@ -12,8 +11,8 @@ namespace SD.Client.Pages
 {
     public class WordBase : ComponentBase
     {
-        [CascadingParameter]
-        private Task<AuthenticationState> authenticationStateTask { get; set; }
+        [Inject]
+        public CurrentUserService CurrUsrService { set; get; }
 
         [Inject]
         NavigationManager NavigationManager { get; set; }
@@ -297,7 +296,6 @@ namespace SD.Client.Pages
 
             if (!string.IsNullOrWhiteSpace(wordModel.UserId))// is not a new word
             {
-                //await Auth();
                 if (wordModel.UserId == CurrentUserId)
                 {
                     var response = await WordService.RemoveWord(wordModel.WordId);
@@ -352,11 +350,10 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            var user = (await authenticationStateTask).User;
-            if (user.Identity.IsAuthenticated)
+            if (await CurrUsrService.IsAuth())
             {
-                CurrentUserId = user.FindFirst(c => c.Type == "oid")?.Value;
-                CurrentUserName = user.Identity.Name;
+                CurrentUserId = await CurrUsrService.GetCurrUsrId();
+                CurrentUserName = await CurrUsrService.GetCurrUsrName();
             }
 
             if (wordModel == null)

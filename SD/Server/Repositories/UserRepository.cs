@@ -69,11 +69,13 @@ namespace sd.Api.Repositories
             try
             {
                 UserModel user = await _context.Users.Find<UserModel>(u => u.UserId == id).FirstOrDefaultAsync();
-
-                foreach (var idFR in user.FriendRequests)
+                if (user != null)
                 {
-                    UserModel user1 = await GetUserById(idFR);
-                    FriendRequestsDictionary.Add(user1.UserId, user1.Name);
+                    foreach (var idFR in user.FriendRequests)
+                    {
+                        UserModel user1 = await GetUserById(idFR);
+                        FriendRequestsDictionary.Add(user1.UserId, user1.Name);
+                    }
                 }
             }
             catch (Exception)

@@ -23,8 +23,6 @@ namespace sd.Api.Repositories
         {
             List<WordModel> words = new List<WordModel>();
             words = await _context.Words.Find(w => w.UserId == userId).SortByDescending(d => d.CreatedAt).Skip((currentPage - 1) * pageSize).Limit(pageSize).ToListAsync();
-            //words = words.OrderByDescending(w => w.CreatedAt).ToList();
-
             if (CurrentUserId == userId)
             {
                 return words;
@@ -88,9 +86,9 @@ namespace sd.Api.Repositories
             while (words.Count < pageSize)
             {
                 WordModel word = await GetNextWordAsync(newCurrentPage, currentUserId, lang);
+                newCurrentPage++;
                 if (word != null)
                 {
-                    newCurrentPage++;
                     words.Add(word);
                 }
             }

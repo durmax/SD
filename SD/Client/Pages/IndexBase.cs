@@ -1,12 +1,10 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
 using System.Threading.Tasks;
 using SD.Shared;
 using System.Collections.Generic;
 using AKSoftware.Localization.MultiLanguages;
-using System.Security.Claims;
 
 namespace SD.Client.Pages
 {
@@ -26,35 +24,46 @@ namespace SD.Client.Pages
 
         protected Dictionary<string, string> FriendRequestsDictionary = new Dictionary<string, string>();
 
-        [CascadingParameter]
-        private Task<AuthenticationState> authenticationStateTask { get; set; }
-        protected List<WordModel> Words { get; set; }
+        protected List<WordModel> Words { get; set; } = new List<WordModel>();
         [Inject]
         public WordService WordService { set; get; }
         [Inject]
         DefaultLangsService DefaultLangsService { get; set; }
 
-        protected bool loading = true;
+        protected string currUserId;
+        protected bool loading;
         protected int currentPage = 0;
-        protected string TLang = "";
+        protected string TLang;
 
         protected async Task GetNextPage()
         {
             loading = true;
-            currentPage++;
+            TLang = DefaultLangsService.DefaultToLang;
 
-            if (Words == null)
+            if (string.IsNullOrWhiteSpace(currUserId)) currUserId = await CurrUsrService.GetCurrUsrId();
+
+            currentPage++;
+            var word = await WordService.GetWords(currUserId, TLang, 10, currentPage);
+            if (word != null)
             {
-                Words = new List<WordModel>();
+                currentPage = word.Item1;
+                Words.AddRange(word.Item2);
             }
-            var word = await WordService.GetWords(CurrUsrService.UserId, TLang, 10, currentPage);
-            currentPage = word.Item1;
-            Words.AddRange(word.Item2);
             loading = false;
+        }
+
+        private async Task AddUserAsync(string currUserId, string email, string name)
+        {
+            UserModel userModel = new UserModel();
+            userModel.UserId = currUserId;
+            userModel.Email = email;
+            userModel.Name = name;
+            await UserService.AddUser(userModel);
         }
 
         protected override async Task OnInitializedAsync()
         {
+
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
 
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
@@ -66,28 +75,24 @@ namespace SD.Client.Pages
                 catch { }
             }
 
-            var user = (await authenticationStateTask).User;
+            if (string.IsNullOrWhiteSpace(currUserId)) currUserId = await CurrUsrService.GetCurrUsrId();
 
-            if (user.Identity.IsAuthenticated)
+            if (currUserId != "0")
             {
-                CurrUsrService.UserId = user.FindFirst(c => c.Type == "oid")?.Value;
-                CurrUsrService.Name = user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value;
-                
-                try
-                {
-                    FriendRequestsDictionary = await UserService.GetFriendRequestsById(CurrUsrService.UserId);
-                }
-                catch
-                {
-                    UserModel userModel = new UserModel();
-                    userModel.UserId = CurrUsrService.UserId;
-                    userModel.Email = user.FindFirst(c => c.Type == "email")?.Value;
-                    userModel.Name = user.Identity.Name;//user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value
-                    await UserService.AddUser(userModel);
-                }
+                await AddUserAsync(currUserId, 
+                                   await CurrUsrService.GetCurrUsrEmail(), 
+                                   await CurrUsrService.GetCurrUsrName());
             }
-            TLang = DefaultLangsService.DefaultToLang;
-            await GetNextPage();
+
+            try
+            {
+                FriendRequestsDictionary = await UserService.GetFriendRequestsById(currUserId);
+            }
+            catch
+            {
+
+            }
         }
+
     }
 }

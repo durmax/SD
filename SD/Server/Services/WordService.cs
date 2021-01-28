@@ -47,27 +47,6 @@ namespace sd.Api.Services
             return Res;
         }
 
-        //public async Task<Tuple<int, List<WordModel>>> GetWords(string currentUserId, string lang, int pageSize, int currentPage)
-        //{
-        //    List<WordModel> words = new List<WordModel>();
-        //    int newCurrentPage = currentPage;
-        //    Tuple<int, List<WordModel>> Res;
-
-        //    while (words.Count < pageSize)
-        //    {
-        //        WordModel word = await _wordRepository.GetWord(currentUserId, lang, newCurrentPage, 10);
-        //        newCurrentPage++;
-        //        if (word != null)
-        //        {
-        //            words.Add(word);
-        //        }
-        //    }
-
-        //    Res = new Tuple<int, List<WordModel>>(newCurrentPage, words);
-
-        //    return Res;
-        //}
-
         private async Task<bool> IsWordShareWithUser(WordModel word, string userId)
         {
             bool areSame = userId == word.UserId ? true : false;

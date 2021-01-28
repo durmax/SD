@@ -43,9 +43,9 @@ else
                         {
                             @if (otherPage.Type == opFilterVal)
                             {
-                                <a href="@otherPage.Link" target="popup" class="list-group-item list-group-item-action border-left-0 border-right-0" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
-                                    @otherPage.Host
-                                </a>
+                                <a href="@otherPage.Link" class="list-group-item pt-2 pb-2" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
+                                    <u> @otherPage.Host  </u>
+</a>
                             }
                         }
                     </div>

@@ -70,8 +70,12 @@ namespace SD.Client.Pages
             {
                 Words = new List<WordModel>();
             }
-
-            Words.AddRange(await WordService.GetAllWords(currUsrId, UserId, 10, currentPage));
+            var res = await WordService.GetPageWordsFromUserID(currUsrId, UserId, 10, currentPage);
+            if (res != null)
+            {
+                currentPage = res.Item1;
+                Words.AddRange(res.Item2);
+            }
             loading = false;
         }
 

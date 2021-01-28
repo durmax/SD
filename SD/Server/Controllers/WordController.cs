@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sd.Api.Interfaces;
 using SD.Shared;
+using sd.Api.Services;
 
 namespace sd.Api.Controllers
 {
@@ -13,16 +13,17 @@ namespace sd.Api.Controllers
     [ApiController]
     public class WordController : ControllerBase
     {
-        private readonly IWordRepository _wordService;
-        private readonly IUserRepository _userService;
+       // private readonly IWordRepository _wordRepository;
+        private readonly IUserRepository _userRepository;
         private readonly ILikeWordService _likeWord;
+        private readonly WordService _wordService;
 
-        public WordController(IWordRepository wordService, 
-            IUserRepository userService, ILikeWordService likeWord)
+        public WordController(IUserRepository userService, ILikeWordService likeWord, WordService wordService)
         {
-            _wordService = wordService;
-            _userService = userService;
+            //_wordRepository = wordRepository;
+            _userRepository = userService;
             _likeWord = likeWord;
+            _wordService = wordService;
         }
 
         // GET: api/Word/GetWord/5
@@ -63,12 +64,13 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpGet("GetWords/{CurrentUserId}/{lang}/{pageSize}/{currentPage}")]
-        public async Task<ActionResult<Tuple<int, List<WordModel>>>> GetWords(string CurrentUserId, string lang, int pageSize, int currentPage)
+        [HttpGet("GetPageWordsFromUserID/{CurrentUserId}/{userId}/{pageSize}/{currentPage}")]
+        public async Task<ActionResult<Tuple<int, List<WordModel>>>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
         {
             try
             {
-                return Ok(await _wordService.GetWords(CurrentUserId, lang, pageSize, currentPage));
+                //return Ok(await _wordRepository.GetAllWords(CurrentUserId, userId, pageSize, currentPage));
+                return Ok(await _wordService.GetPageWords(CurrentUserId, userId,null, pageSize, currentPage));
             }
             catch (Exception ex)
             {
@@ -77,13 +79,14 @@ namespace sd.Api.Controllers
             }
         }
 
-        // GET: api/Word/GetAllWords/1111/5e915b3a1c9d4400003f1fba
-        [HttpGet("GetAllWords/{CurrentUserId}/{userId}/{pageSize}/{currentPage}")]
-        public async Task<ActionResult<IEnumerable<WordModel>>> GetAllWords(string CurrentUserId, string userId, int pageSize, int currentPage)
+
+        [HttpGet("GetPageWordsFromAllUseres/{CurrentUserId}/{pageSize}/{currentPage}")]
+        public async Task<ActionResult<Tuple<int, List<WordModel>>>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)
         {
             try
             {
-                return Ok(await _wordService.GetAllWords(CurrentUserId, userId, pageSize, currentPage));
+                //return Ok(await _wordRepository.GetAllWords(CurrentUserId, userId, pageSize, currentPage));
+                return Ok(await _wordService.GetPageWords(CurrentUserId, null, null, pageSize, currentPage));
             }
             catch (Exception ex)
             {
@@ -192,7 +195,7 @@ namespace sd.Api.Controllers
             try
             {
                 WordModel word = await _wordService.GetWordById(wordId);
-                var result = await _userService.GetUsersWithRelationship(CurrentUserId, word.Likes);
+                var result = await _userRepository.GetUsersWithRelationship(CurrentUserId, word.Likes);
                 if (result == null) return NotFound();
                 return Ok(result);
             }

@@ -21,23 +21,33 @@ namespace SD.Client.Services
             return await _httpClient.PostAsJsonAsync("api/Word/AddWord", word);
         }
 
-        public async Task<Tuple<int, List<WordModel>>> GetWords(string currUsrId, string lang, int pageSize, int currentPage)
-        {
-            //await GetCurrentUserId();
-            try
-            {
-                return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordModel>>>($"api/Word/GetWords/{currUsrId}/{lang}/{pageSize}/{currentPage}");
-            }
-            catch
-            {
-                return null;
-            }
+        //public async Task<Tuple<int, List<WordModel>>> GetWords(string currUsrId, string lang, int pageSize, int currentPage)
+        //{
+        //    //await GetCurrentUserId();
+        //    try
+        //    {
+        //        return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordModel>>>($"api/Word/GetWords/{currUsrId}/{lang}/{pageSize}/{currentPage}");
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
 
+        //}
+
+        public async Task<Tuple<int, List<WordModel>>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
+        {
+            if (userId==null)
+            {
+                userId = CurrentUserId;
+            }
+            return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordModel>>>($"api/Word/GetPageWordsFromUserID/{CurrentUserId}/{userId}/{pageSize}/{currentPage}");
         }
 
-        public async Task<List<WordModel>> GetAllWords(string CurrentUserId, string userId, int pageSize, int currentPage)
+        public async Task<Tuple<int, List<WordModel>>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)
         {
-            return await _httpClient.GetFromJsonAsync<List<WordModel>>($"api/Word/GetAllWords/{CurrentUserId}/{userId}/{pageSize}/{currentPage}");
+
+            return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordModel>>>($"api/Word/GetPageWordsFromAllUseres/{CurrentUserId}/{pageSize}/{currentPage}");
         }
 
         public async Task<WordModel> GetWordById(string id)

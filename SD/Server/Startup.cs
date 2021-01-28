@@ -37,6 +37,7 @@ namespace sd.Api
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<ILikeWordService, LikeWordService>();
             services.AddTransient<GetRelationshipsService>();
+            services.AddTransient<WordService>();
 
             services.AddDataProtection();
 

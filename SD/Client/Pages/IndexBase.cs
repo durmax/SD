@@ -43,11 +43,11 @@ namespace SD.Client.Pages
             if (string.IsNullOrWhiteSpace(currUserId)) currUserId = await CurrUsrService.GetCurrUsrId();
 
             currentPage++;
-            var word = await WordService.GetWords(currUserId, TLang, 10, currentPage);
-            if (word != null)
+            var res = await WordService.GetPageWordsFromAllUseres(currUserId, 10, currentPage);
+            if (res != null)
             {
-                currentPage = word.Item1;
-                Words.AddRange(word.Item2);
+                currentPage = res.Item1;
+                Words.AddRange(res.Item2);
             }
             loading = false;
         }

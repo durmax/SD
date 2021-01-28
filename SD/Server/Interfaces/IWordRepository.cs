@@ -1,14 +1,12 @@
 ﻿using SD.Shared;
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace sd.Api.Interfaces
 {
     public interface IWordRepository
     {
-        Task<Tuple<int, List<WordModel>>> GetWords(string currentUserId, string lang, int pageSize, int currentPage);
-        Task<List<WordModel>> GetAllWords(string currentUserId, string userId, int pageSize, int currentPage);
+        Task<long> GetDocCount(string userId, string lang);
+        Task<WordModel> GetWord(string userId, string lang, int currentPage, int limit);
         Task<WordModel> GetWordById(string id);
         Task<WordModel> GetWordByText(string userId, string text);
         Task<bool> AddWord(WordModel word);

@@ -14,5 +14,11 @@
     <ProjectReference Include="..\Shared\SD.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\RelationshipServices\" />
+    <Folder Include="Services\UserServices\" />
+    <Folder Include="Services\WordServices\" />
+  </ItemGroup>
+
 
 </Project>

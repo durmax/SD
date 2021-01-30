@@ -18,39 +18,11 @@ namespace sd.Api.Repositories
             _context = mongodbContext;
         }
 
-        public async Task<IEnumerable<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
-        {
-            List<OtherPageResModel> res = new List<OtherPageResModel>();
-
-            var otherPages = await FilterByLangs(fromLang, toLang);
-
-            //otherPages.Sort((x, y) => x.Order.CompareTo(y.Order));
-
-            if (otherPages != null)
-            {
-                foreach (var otherPage in otherPages)
-                {
-                    if (!string.IsNullOrEmpty(otherPage.Pattern))
-                    {
-                        OtherPageResModel otherPageResModel = new OtherPageResModel();
-                        otherPageResModel.Pattern = otherPage.Pattern;
-                        otherPageResModel.Host = otherPage.Host;
-                        otherPageResModel.Type = otherPage.PageType;
-                        otherPageResModel.Eval = otherPage.Eval;
-                        res.Add(otherPageResModel);
-                    }
-                }
-                // return res;
-            }
-             
-            return res.OrderBy(o=> o.Eval);
-        }
-
         public async Task<OtherPageModel> GetOtherPageById(string id)
         {
             return await _context.OtherPages.Find<OtherPageModel>(u => u.OtherPageId == id).FirstOrDefaultAsync();
         }
-        private async Task<IEnumerable<OtherPageModel>> FilterByLangs(string fromLang, string toLang)
+        public async Task<IEnumerable<OtherPageModel>> FilterByLangs(string fromLang, string toLang)
         {
 
             return await _context.OtherPages.AsQueryable<OtherPageModel>()

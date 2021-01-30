@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sd.Api.Interfaces;
+using sd.Api.Services;
 using SD.Shared;
 
 namespace sd.Api.Controllers
@@ -11,8 +12,8 @@ namespace sd.Api.Controllers
     [ApiController]
     public class OtherPageController : ControllerBase
     {
-        private readonly IOtherPageRepository _otherPageService;
-        public OtherPageController(IOtherPageRepository otherPageService)
+        private readonly OtherPageService _otherPageService;
+        public OtherPageController(OtherPageService otherPageService)
         {
             _otherPageService = otherPageService;
         }

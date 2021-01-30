@@ -14,16 +14,19 @@ namespace sd.Api.Controllers
     public class WordController : ControllerBase
     {
        // private readonly IWordRepository _wordRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly UserService _userService;
         private readonly ILikeWordService _likeWord;
         private readonly WordService _wordService;
+        private readonly RelationshipService _relationshipService;
 
-        public WordController(IUserRepository userService, ILikeWordService likeWord, WordService wordService)
+        public WordController(UserService userService, ILikeWordService likeWord, 
+            WordService wordService, RelationshipService relationshipService)
         {
             //_wordRepository = wordRepository;
-            _userRepository = userService;
+            _userService = userService;
             _likeWord = likeWord;
             _wordService = wordService;
+            _relationshipService = relationshipService;
         }
 
         // GET: api/Word/GetWord/5
@@ -195,7 +198,10 @@ namespace sd.Api.Controllers
             try
             {
                 WordModel word = await _wordService.GetWordById(wordId);
-                var result = await _userRepository.GetUsersWithRelationship(CurrentUserId, word.Likes);
+                
+                var foundUsers = await _userService.GetUsers(word.Likes);
+                var result = await _relationshipService.GetRelationships(CurrentUserId, foundUsers);
+
                 if (result == null) return NotFound();
                 return Ok(result);
             }

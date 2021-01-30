@@ -36,8 +36,10 @@ namespace sd.Api
             services.AddTransient<IWordRepository, WordRepository>();
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<ILikeWordService, LikeWordService>();
-            services.AddTransient<GetRelationshipsService>();
+            services.AddTransient<IRelationshipRepository, RelationshipRepository>();
             services.AddTransient<WordService>();
+            services.AddTransient<RelationshipService>();
+            services.AddTransient<UserService>();
 
             services.AddDataProtection();
 

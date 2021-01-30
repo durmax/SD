@@ -9,12 +9,13 @@ namespace sd.Api.Services
     public class WordService
     {
         private readonly IWordRepository _wordRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly RelationshipService _relationshipService;
 
-        public WordService(IWordRepository wordRepository, IUserRepository userRepository)
+
+        public WordService(IWordRepository wordRepository, RelationshipService relationshipService)
         {
             _wordRepository = wordRepository;
-            _userRepository = userRepository;
+            _relationshipService = relationshipService;
         }
 
         public async Task<Tuple<int, List<WordModel>>> GetPageWords(string currentUserId, string userId, string lang, int pageSize, int currentPage)
@@ -58,7 +59,7 @@ namespace sd.Api.Services
 
             else
             {
-                if (await AreFriendAsync(userId, word.UserId))
+                if (await _relationshipService.AreFrinds(userId, word.UserId)!="0")
                 {
                     if (word.ShareWith > 0)
                     {
@@ -76,12 +77,12 @@ namespace sd.Api.Services
             return false;
         }
 
-        private async Task<bool> AreFriendAsync(string currentUserId, string userId)
-        {
-            var user = await _userRepository.GetUserById(userId);
-            if (user == null || user.Friends == null) return false;
-            return (bool)(user.Friends?.Contains(currentUserId));
-        }
+        //private async Task<bool> AreFriendAsync(string currentUserId, string userId)
+        //{
+        //    var user = await _userRepository.GetUserById(userId);
+        //    if (user == null || user.Friends == null) return false;
+        //    return (bool)(user.Friends?.Contains(currentUserId));
+        //}
 
         public async Task<WordModel> GetWordById(string id)
         {

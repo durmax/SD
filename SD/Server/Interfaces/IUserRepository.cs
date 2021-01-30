@@ -10,21 +10,11 @@ namespace sd.Api.Interfaces
     {
         Task<IEnumerable<UserModel>> GetAllUsers();
         Task<UserModel> GetUserById(string id);
-        Task<Dictionary<string, string>> GetFriendRequestsById(string id);
-
         Task<bool> CheckEmail(string email);
-        Task<TransObj> RegisterUserAsync(UserModel user);
-        Task<TransObj> UpdateUser(string id, UserModel newUser);
+        Task RegisterUserAsync(UserModel user);
+        Task UpdateUser(string id, UserModel newUser);
         Task<bool> RemoveUser(string id);
-
-        Task AddFriendRequest(string userId, string friendId);
-        Task AddFriend(string UserId, string friendId);
-        Task RemoveFriend(string UserId, string friendId);
-        Task RemoveFriendRequest(string UserId, string friendId);
-
-        Task<Dictionary<string, string>> GetAllFriends(string userId);
-
-        Task<Dictionary<string, Tuple<string, string>>> SearchUser(string searcherId, string searchText);
-        Task<Dictionary<string, Tuple<string, string>>> GetUsersWithRelationship(string searcherId, List<string> userIds);
+        Task<List<UserModel>> SearchUser(string searcherId, string searchText);
+        Task<List<UserModel>> GetUsers(List<string> userIds);
     }
 }

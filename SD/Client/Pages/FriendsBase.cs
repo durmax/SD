@@ -20,6 +20,9 @@ namespace SD.Client.Pages
         public UserService UserService { set; get; }
 
         [Inject]
+        public RelationshipService RelationshipService { set; get; }
+
+        [Inject]
         CurrentUserService CurrUsrService { set; get; }
 
         protected string CurrentUserId { get; set; }
@@ -51,7 +54,7 @@ namespace SD.Client.Pages
             {
                 CurrentUserId = await CurrUsrService.GetCurrUsrId();
                 FriendsDictionary = new Dictionary<string, string>();
-                FriendsDictionary = await UserService.GetAllFriends(CurrentUserId);
+                FriendsDictionary = await RelationshipService.GetAllFriends(CurrentUserId);
 
                 FriendsCount = FriendsDictionary.Count();
             }

@@ -19,11 +19,13 @@ namespace sd.Api.Models
                     _database = client.GetDatabase(_settings.DatabaseName);
             }
             catch
-            {}
+            { }
         }
 
         public IMongoCollection<UserModel> Users =>
             _database.GetCollection<UserModel>(_settings.UserCollectionName);
+        public IMongoCollection<RelationshipModel> Relationships =>
+             _database.GetCollection<RelationshipModel>(_settings.RelationshipCollectionName);
         public IMongoCollection<WordModel> Words =>
             _database.GetCollection<WordModel>(_settings.WordCollectionName);
         public IMongoCollection<OtherPageModel> OtherPages =>

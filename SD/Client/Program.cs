@@ -47,6 +47,7 @@ namespace SD.Client
             builder.Services.AddTransient<UserService>();
             builder.Services.AddTransient<WordService>();
             builder.Services.AddTransient<CommentService>();
+            builder.Services.AddTransient<RelationshipService>();
 
             
 

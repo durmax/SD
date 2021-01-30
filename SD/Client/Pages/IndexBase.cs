@@ -16,6 +16,8 @@ namespace SD.Client.Pages
         [Inject]
         public UserService UserService { set; get; }
         [Inject]
+        public RelationshipService RelationshipService { set; get; }
+        [Inject]
         public ILanguageContainerService languageContainer { set; get; }
         [Inject]
         public CurrentUserService CurrUsrService { set; get; }
@@ -86,7 +88,7 @@ namespace SD.Client.Pages
 
             try
             {
-                FriendRequestsDictionary = await UserService.GetFriendRequestsById(currUserId);
+                FriendRequestsDictionary = await RelationshipService.GetFriendRequestsById(currUserId);
             }
             catch
             {

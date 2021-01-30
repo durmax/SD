@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using sd.Api.Interfaces;
+using sd.Api.Services;
 using SD.Shared;
 
 namespace sd.Api.Controllers
@@ -12,11 +12,13 @@ namespace sd.Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userService;
+        private readonly UserService _userRepository;
+        private readonly RelationshipService _relationshipService;
 
-        public UserController(IUserRepository userService)
-        {
-            _userService = userService;
+        public UserController(UserService userService, RelationshipService relationshipService) 
+        { 
+            _userRepository = userService;
+            _relationshipService = relationshipService;
         }
 
         // GET: api/User
@@ -25,7 +27,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                return Ok(await _userService.GetAllUsers());
+                return Ok(await _userRepository.GetAllUsers());
             }
             catch (Exception)
             {
@@ -37,25 +39,12 @@ namespace sd.Api.Controllers
         [HttpGet("GetUsersByText/{CurrentUserId}/{searchText}")]
         public async Task<ActionResult<Dictionary<string, Tuple<string, string>>>> GetUsersByText(string CurrentUserId, string searchText)
         {
+            List<UserModel> foundUsers;  
             try
             {
-                var result = await _userService.SearchUser(CurrentUserId, searchText);
-                if (result == null) return NotFound();
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database");
-            }
-        }
+                foundUsers = await _userRepository.SearchUser(CurrentUserId, searchText);
 
-        [HttpGet("GetAllFriends/{userId}")]
-        public async Task<ActionResult<Dictionary<string, string>>> GetAllFriends(string userId)
-        {
-            try
-            {
-                var result = await _userService.GetAllFriends(userId);
+                 var result = await _relationshipService.GetRelationships(CurrentUserId, foundUsers);
                 if (result == null) return NotFound();
                 return Ok(result);
             }
@@ -72,23 +61,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var result = await _userService.GetUserById(id);
-                if (result == null) return NotFound();
-                return result;
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database");
-            }
-        }
-
-        [HttpGet("GetFriendRequestsById/{id}")]
-        public async Task<ActionResult<Dictionary<string, string>>> GetFriendRequestsById(string id)
-        {
-            try
-            {
-                var result = await _userService.GetFriendRequestsById(id);
+                var result = await _userRepository.GetUserById(id);
                 if (result == null) return NotFound();
                 return result;
             }
@@ -110,7 +83,7 @@ namespace sd.Api.Controllers
                 if (string.IsNullOrWhiteSpace(user.UserId) || string.IsNullOrWhiteSpace(user.Email))
                     return BadRequest();
 
-                TransObj status = await _userService.RegisterUserAsync(user);
+                TransObj status = await _userRepository.RegisterUserAsync(user);
                 return Ok(status);
 
             }
@@ -130,7 +103,7 @@ namespace sd.Api.Controllers
             }
             try
             {
-                return Ok(await _userService.UpdateUser(id, updatedUser));
+                return Ok(await _userRepository.UpdateUser(id, updatedUser));
             }
             catch (Exception ex)
             {
@@ -144,14 +117,14 @@ namespace sd.Api.Controllers
         {
             try
             {
-                UserModel userToDelete = await _userService.GetUserById(id);
+                UserModel userToDelete = await _userRepository.GetUserById(id);
 
                 if (userToDelete == null)
                 {
                     return NotFound($"User with Id = {id} not found");
                 }
 
-                return Ok(await _userService.RemoveUser(id));
+                return Ok(await _userRepository.RemoveUser(id));
             }
             catch (Exception)
             {
@@ -159,63 +132,5 @@ namespace sd.Api.Controllers
                     "Error deleting data");
             }
         }
-
-        [HttpPost("AddFriendRequest/{userId}/{friendId}")]
-        public async Task<ActionResult> AddFriendRequest(string userId, string friendId)
-        {
-            try
-            {
-                await _userService.AddFriendRequest(userId, friendId);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
-        }
-        [HttpPost("RemoveFriendRequest/{UserId}/{friendId}")]
-        public async Task<ActionResult> RemoveFriendRequest(string UserId, string friendId)
-        {
-            try
-            {
-                await _userService.RemoveFriendRequest(UserId, friendId);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
-        }
-        [HttpPost("AddFriend/{UserId}/{friendId}")]
-        public async Task<ActionResult> AddFriend(string UserId, string friendId)
-        {
-            try
-            {
-                await _userService.AddFriend(UserId, friendId);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
-        }
-        [HttpPost("RemoveFriend/{UserId}/{friendId}")]
-        public async Task<ActionResult> RemoveFriend(string UserId, string friendId)
-        {
-            try
-            {
-                await _userService.RemoveFriend(UserId, friendId);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
-        }
-
     }
 }

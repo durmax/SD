@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using SD.Client.Services;
+using SD.Shared;
+using System;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -17,8 +19,10 @@ namespace SD.Client.Pages
         [Parameter]
         public string friendshipState { get; set; }
 
+        //[Inject]
+        //public UserService UserService { set; get; }
         [Inject]
-        public UserService UserService { set; get; }
+        public RelationshipService RelationshipService { set; get; }
         [Inject]
         NavigationManager NavigationManager { set; get; }
 
@@ -28,7 +32,14 @@ namespace SD.Client.Pages
 
             if (UserId != "0" && !string.IsNullOrWhiteSpace(ToUserId))
             {
-                var res = await UserService.AddFriendRequest(UserId, ToUserId);
+                RelationshipModel relationship = new RelationshipModel()
+                {
+                    RelationshipId = Guid.NewGuid().ToString(),
+                    Reletion = Reletion.FriendRequest,
+                    UserId1 = UserId,
+                    UserId2 = ToUserId
+                };
+                var res = await RelationshipService.AddRelationship(relationship);
                 if (res.IsSuccessStatusCode)
                 {
                     friendshipState = "CrrRequest";
@@ -47,7 +58,7 @@ namespace SD.Client.Pages
             waitBool = true;
             if (!string.IsNullOrWhiteSpace(friendId))
             {
-                var res = await UserService.RemoveFriend(UserId, friendId);
+                var res = await RelationshipService.RemoveFriendship(UserId, friendId);
                 if (res.IsSuccessStatusCode)
                 {
                     friendshipState = null;
@@ -62,7 +73,14 @@ namespace SD.Client.Pages
 
             if (!string.IsNullOrWhiteSpace(friendId))
             {
-                var res = await UserService.AddFriend(UserId, friendId);
+                RelationshipModel relationship = new RelationshipModel()
+                {
+                    RelationshipId = Guid.NewGuid().ToString(),
+                    Reletion = Reletion.Friend,
+                    UserId1 = UserId,
+                    UserId2 = friendId
+                };
+                var res = await RelationshipService.AddRelationship(relationship);
 
                 if (res.IsSuccessStatusCode)
                 {
@@ -78,7 +96,7 @@ namespace SD.Client.Pages
 
             if (!string.IsNullOrWhiteSpace(friendId))
             {
-                var res = await UserService.RemoveFriendRequest(UserId, friendId);
+                var res = await RelationshipService.RemoveFriendship(UserId, friendId);
                 if (res.IsSuccessStatusCode)
                 {
                     friendshipState = null;

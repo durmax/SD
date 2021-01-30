@@ -1,9 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace SD.Shared
 {
-    public class Relationship
+    public class RelationshipModel
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.String)]
+        public string RelationshipId { get; set; }
         [Required]
         public string UserId1 { get; set; }
 
@@ -18,9 +23,9 @@ namespace SD.Shared
     public enum Reletion
     {
         Block, 
-        Follower,
+        Follow,
         FriendRequest,
-        Friend,
+        Friend
     }
 
 }

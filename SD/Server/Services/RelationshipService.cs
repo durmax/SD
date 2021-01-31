@@ -22,6 +22,11 @@ namespace sd.Api.Services
             return await _relationshipRepository.GetRelationshipById(id);
         }
 
+        public async Task<string> GetRelationshipId(string userId1, Reletion reletion, string userId2)
+        {
+            return await _relationshipRepository.GetRelationshipId(userId1, reletion, userId2);
+        }
+
         public async Task<string> AreFrinds(string userId1, string userId2)
         {
             return await _relationshipRepository.GetRelationshipId(userId1, Reletion.Friend, userId2);

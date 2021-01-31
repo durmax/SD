@@ -35,9 +35,9 @@ namespace SD.Client.Services
         {
             return await _httpClient.DeleteAsync($"api/Relationship/RemoveRelationship/{id}");
         }
-        public async Task<HttpResponseMessage> RemoveFriendship(string UserId, string friendId)
+        public async Task<HttpResponseMessage> RemoveFriendship(string UserId, Reletion reletion, string friendId)
         {
-            return await _httpClient.DeleteAsync($"api/Relationship/RemoveFriendship/{UserId}/{friendId}");
+            return await _httpClient.DeleteAsync($"api/Relationship/RemoveFriendship/{UserId}/{reletion}/{friendId}");
         }
 
         public async Task<HttpResponseMessage> AddRelationship(RelationshipModel relationship)

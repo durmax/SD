@@ -82,12 +82,13 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpDelete("RemoveFriendship/{UserId}/{friendId}")]
-        public async Task<ActionResult> RemoveFriendship(string UserId, string friendId)
+        [HttpDelete("RemoveFriendship/{UserId}/{reletion}/{friendId}")]
+        public async Task<ActionResult> RemoveFriendship(string userId, Reletion reletion, string friendId)
         {
             try
             {
-                await _relationshipService.RemoveFriendship(UserId,friendId);
+                var rId = await _relationshipService.GetRelationshipId(userId, reletion, friendId);
+                await _relationshipService.RemoveRelationship(rId);
                 return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception)

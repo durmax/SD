@@ -17,11 +17,11 @@ namespace SD.Shared
 
         [Required]
         public string UserId2 { get; set; }
-
     }
 
     public enum Reletion
     {
+        None,
         Block, 
         Follow,
         FriendRequest,

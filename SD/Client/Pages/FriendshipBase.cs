@@ -58,7 +58,7 @@ namespace SD.Client.Pages
             waitBool = true;
             if (!string.IsNullOrWhiteSpace(friendId))
             {
-                var res = await RelationshipService.RemoveFriendship(UserId, friendId);
+                var res = await RelationshipService.RemoveFriendship(UserId,Reletion.Friend, friendId);
                 if (res.IsSuccessStatusCode)
                 {
                     friendshipState = null;
@@ -96,7 +96,7 @@ namespace SD.Client.Pages
 
             if (!string.IsNullOrWhiteSpace(friendId))
             {
-                var res = await RelationshipService.RemoveFriendship(UserId, friendId);
+                var res = await RelationshipService.RemoveFriendship(UserId,Reletion.FriendRequest, friendId);
                 if (res.IsSuccessStatusCode)
                 {
                     friendshipState = null;

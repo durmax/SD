@@ -35,7 +35,7 @@ namespace SD.Client.Pages
                 RelationshipModel relationship = new RelationshipModel()
                 {
                     RelationshipId = Guid.NewGuid().ToString(),
-                    Reletion = Reletion.FriendRequest,
+                    Reletion = Relation.FriendRequestTo,
                     UserId1 = UserId,
                     UserId2 = ToUserId
                 };
@@ -58,7 +58,7 @@ namespace SD.Client.Pages
             waitBool = true;
             if (!string.IsNullOrWhiteSpace(friendId))
             {
-                var res = await RelationshipService.RemoveFriendship(UserId,Reletion.Friend, friendId);
+                var res = await RelationshipService.RemoveFriendship(UserId,Relation.Friend, friendId);
                 if (res.IsSuccessStatusCode)
                 {
                     friendshipState = null;
@@ -76,7 +76,7 @@ namespace SD.Client.Pages
                 RelationshipModel relationship = new RelationshipModel()
                 {
                     RelationshipId = Guid.NewGuid().ToString(),
-                    Reletion = Reletion.Friend,
+                    Reletion = Relation.Friend,
                     UserId1 = UserId,
                     UserId2 = friendId
                 };
@@ -96,7 +96,7 @@ namespace SD.Client.Pages
 
             if (!string.IsNullOrWhiteSpace(friendId))
             {
-                var res = await RelationshipService.RemoveFriendship(UserId,Reletion.FriendRequest, friendId);
+                var res = await RelationshipService.RemoveFriendship(UserId,Relation.FriendRequestTo, friendId);
                 if (res.IsSuccessStatusCode)
                 {
                     friendshipState = null;

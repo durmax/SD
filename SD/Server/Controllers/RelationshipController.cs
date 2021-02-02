@@ -83,7 +83,7 @@ namespace sd.Api.Controllers
         }
 
         [HttpDelete("RemoveFriendship/{UserId}/{reletion}/{friendId}")]
-        public async Task<ActionResult> RemoveFriendship(string userId, Reletion reletion, string friendId)
+        public async Task<ActionResult> RemoveFriendship(string userId, Relation reletion, string friendId)
         {
             try
             {
@@ -122,7 +122,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var result = await _relationshipService.FrindRequestsToUser(id);
+                var result = await _relationshipService.FriendRequestsToUser(id);
 
                 if (result == null) return NotFound();
 

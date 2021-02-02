@@ -22,14 +22,14 @@ namespace sd.Api.Services
             return await _relationshipRepository.GetRelationshipById(id);
         }
 
-        public async Task<string> GetRelationshipId(string userId1, Reletion reletion, string userId2)
+        public async Task<string> GetRelationshipId(string userId1, Relation reletion, string userId2)
         {
             return await _relationshipRepository.GetRelationshipId(userId1, reletion, userId2);
         }
 
         public async Task<string> AreFrinds(string userId1, string userId2)
         {
-            return await _relationshipRepository.GetRelationshipId(userId1, Reletion.Friend, userId2);
+            return await _relationshipRepository.GetRelationshipId(userId1, Relation.Friend, userId2);
         }
 
         public async Task<bool> AddRelationship(RelationshipModel relationship)
@@ -54,8 +54,8 @@ namespace sd.Api.Services
 
         public async Task<bool> RemoveFriendship(string UserId, string friendId)
         {
-            string relationshipId = await _relationshipRepository.GetRelationshipId(UserId, Reletion.Friend, friendId);
-           return await _relationshipRepository.RemoveRelationship(relationshipId);
+            string relationshipId = await _relationshipRepository.GetRelationshipId(UserId, Relation.Friend, friendId);
+            return await _relationshipRepository.RemoveRelationship(relationshipId);
         }
 
         public async Task<Dictionary<string, string>> GetAllFriends(string userId)
@@ -69,22 +69,21 @@ namespace sd.Api.Services
                 {
                     if (!friendsIds.ContainsKey(relation.UserId1))
                     {
-                        var user = await _userService.GetUserById(relation.UserId1);
+                        var user = await _userService.GetUserById(relation.UserId1) ?? throw new NullReferenceException();
                         friendsIds.Add(relation.UserId1, user.Name);
                     }
                     if (!friendsIds.ContainsKey(relation.UserId2))
                     {
-                        var user = await _userService.GetUserById(relation.UserId2);
+                        var user = await _userService.GetUserById(relation.UserId2) ?? throw new NullReferenceException();
                         friendsIds.Add(relation.UserId2, user.Name);
                     }
                 }
-
                 friendsIds.Remove(userId);
             }
             return friendsIds;
         }
 
-
+        // This method must Improve
         public async Task<Dictionary<string, Tuple<string, string>>> GetRelationships(string CurrentUserId, List<UserModel> users)
         {
             string relation = null;
@@ -100,8 +99,8 @@ namespace sd.Api.Services
 
                 if (CurrentUserId != null)
                 {
-                    var r1 = await FrindRequestsToUser(user.UserId);
-                    var r2 = await FrindRequestsToUser(CurrentUserId);
+                    var r1 = await FriendRequestsToUser(user.UserId);
+                    var r2 = await FriendRequestsToUser(CurrentUserId);
 
                     if (r1.ContainsKey(CurrentUserId)) relation = "CrrRequest";
 
@@ -120,20 +119,44 @@ namespace sd.Api.Services
                 relation = null;
             }
             return res;
-        }
+        } //    ||
+        //     \  /
+        //      \/
+        //public async Task<UserRelationshipsWithOneUser> GetRelationships(string CurrentUserId, List<UserModel> users)
+        //{
+        //    if (CurrentUserId == null || users == null) throw new ArgumentNullException();
 
-        public async Task<Dictionary<string, string>> FrindRequestsToUser(string userId)
+        //    UserRelationshipsWithOneUser relationship=null;
+
+        //    if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")
+        //    {
+        //        users.RemoveAll(u => u.UserId == CurrentUserId); //remove Sercher from list
+        //    }
+
+        //    foreach (var user in users)
+        //    {
+        //        List<Relation> relations = await _relationshipRepository.GetRelationshipsBetweenTwoUsers(CurrentUserId, user.UserId);
+
+        //         relationship = new UserRelationshipsWithOneUser(user.UserId, user.Name, relations);
+
+        //        relations = null;
+        //    }
+
+        //    return relationship;
+        //}
+
+        public async Task<Dictionary<string, string>> FriendRequestsToUser(string userId)
         {
-            List<RelationshipModel> relationships = await _relationshipRepository.FrindRequestsToUser(userId);
+            List<RelationshipModel> relationships = await _relationshipRepository.FriendRequestsToUser(userId);
 
-            Dictionary<string, string> frindRequests = new Dictionary<string, string>();
+            Dictionary<string, string> friendRequests = new Dictionary<string, string>();
 
             foreach (var relation in relationships)
             {
                 var user = await _userService.GetUserById(relation.UserId2);
-                frindRequests.Add(relation.UserId1, user.Name);
+                friendRequests.Add(relation.UserId1, user.Name);
             }
-            return frindRequests;
+            return friendRequests;
         }
     }
 }

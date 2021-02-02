@@ -29,18 +29,17 @@ namespace sd.Api.Services
 
             while (words.Count < pageSize)
             {
-                if (wordsCount < newCurrentPage )
+                if (wordsCount < newCurrentPage)
                 {
                     break;
                 }
                 word = await _wordRepository.GetWord(userId, lang, newCurrentPage, 1);
-                if (word!= null)
+                if (word != null)
                 {
                     if (await IsWordShareWithUser(word, currentUserId)) words.Add(word);
                 }
-                
-                newCurrentPage++;
 
+                newCurrentPage++;
             }
 
             Res = new Tuple<int, List<WordModel>>(newCurrentPage, words);
@@ -59,7 +58,7 @@ namespace sd.Api.Services
 
             else
             {
-                if (await _relationshipService.AreFrinds(userId, word.UserId)!="0")
+                if (await _relationshipService.AreFrinds(userId, word.UserId) != "0")
                 {
                     if (word.ShareWith > 0)
                     {
@@ -77,16 +76,9 @@ namespace sd.Api.Services
             return false;
         }
 
-        //private async Task<bool> AreFriendAsync(string currentUserId, string userId)
-        //{
-        //    var user = await _userRepository.GetUserById(userId);
-        //    if (user == null || user.Friends == null) return false;
-        //    return (bool)(user.Friends?.Contains(currentUserId));
-        //}
-
         public async Task<WordModel> GetWordById(string id)
         {
-          return await _wordRepository.GetWordById(id);
+            return await _wordRepository.GetWordById(id);
         }
 
         public async Task<WordModel> GetWordByText(string userId, string text)
@@ -99,17 +91,14 @@ namespace sd.Api.Services
             return await _wordRepository.AddWord(word);
         }
 
-
         public async Task<bool> UpdateWord(string wordId, WordModel updatedWord)
         {
-            return await _wordRepository.UpdateWord(wordId,  updatedWord);
+            return await _wordRepository.UpdateWord(wordId, updatedWord);
         }
-
 
         public async Task<bool> RemoveWord(string id)
         {
             return await _wordRepository.RemoveWord(id);
         }
-
-        }
+    }
 }

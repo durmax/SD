@@ -56,8 +56,9 @@ namespace sd.Api.Services
         {
             WordModel word = await _wordService.GetWordById(wordId);
             CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
-
+            if (comment == null) return 0;
             if (comment == null) comment.Likes = new List<string>();
+            
             if (!comment.Likes.Contains(userId))
             {
                 comment.Likes.Add(userId);

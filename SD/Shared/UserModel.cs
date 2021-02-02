@@ -17,19 +17,15 @@ namespace SD.Shared
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-        public string EmailRegCode { get; set; }
         public bool IsEmailReg { get; set; }
+        public string EmailRegCode { get; set; }
         [BsonIgnoreIfNull]
         public int AccountLavel { get; set; }
-        [BsonIgnoreIfNull]
-        public string FirstLang { get; set; }
-        [BsonIgnoreIfNull]
-        public string LearnLangs { get; set; }
-        [BsonIgnoreIfNull]
-        public List<string> FriendRequests { get; set; }
-        [BsonIgnoreIfNull]
-        public List<string> Friends { get; set; }
-        [BsonIgnoreIfNull]
-        public string Role { get; set; }
+        //[BsonIgnoreIfNull]
+        //public string FirstLang { get; set; }
+        //[BsonIgnoreIfNull]
+        //public string LearnLangs { get; set; }
+        //[BsonIgnoreIfNull]
+        //public string Role { get; set; }
     }
 }

@@ -12,7 +12,7 @@ namespace SD.Client.Pages
         public UserModel userModel = new UserModel();
         public Dictionary<string, string> foundUsers;
 
-        protected int? FriendsCount { set; get; }
+        //protected int? FriendsCount { set; get; }
 
         [Inject]
         public UserService UserService { set; get; }
@@ -106,8 +106,6 @@ namespace SD.Client.Pages
                     Registered = false;
                     await SaveUserData();
                 }
-
-                FriendsCount = userModel?.Friends.Count ?? 0;
             }
         }
     }

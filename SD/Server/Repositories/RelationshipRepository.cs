@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using SD.Shared;
 using sd.Api.Models;
 using MongoDB.Driver;
+using System;
 
 namespace sd.Api.Repositories
 {
@@ -41,12 +42,12 @@ namespace sd.Api.Repositories
 
         public async Task<List<RelationshipModel>> GetAllFrindsRelationships(string userId)
         {
-            return await _context.Relationships.Find<RelationshipModel>(r => (r.UserId1 == userId || r.UserId2 == userId) && r.Reletion == Reletion.Friend).ToListAsync();
+            return await _context.Relationships.Find<RelationshipModel>(r => (r.UserId1 == userId || r.UserId2 == userId) && r.Reletion == Relation.Friend).ToListAsync();
         }
 
-        public async Task<List<RelationshipModel>> FrindRequestsToUser(string userId)
+        public async Task<List<RelationshipModel>> FriendRequestsToUser(string userId)
         {
-            return await _context.Relationships.Find<RelationshipModel>(r => r.UserId2 == userId && r.Reletion == Reletion.FriendRequest).ToListAsync();
+            return await _context.Relationships.Find<RelationshipModel>(r => r.UserId2 == userId && r.Reletion == Relation.FriendRequestTo).ToListAsync();
         }
 
         public async Task<RelationshipModel> GetRelationshipById(string id)
@@ -54,7 +55,7 @@ namespace sd.Api.Repositories
             return await _context.Relationships.Find<RelationshipModel>(r => r.RelationshipId == id).FirstOrDefaultAsync();
         }
 
-        private FilterDefinition<RelationshipModel> GetFilter(string userId1, Reletion reletion, string userId2)
+        private FilterDefinition<RelationshipModel> GetFilter(string userId1, Relation reletion, string userId2)
         {
             FilterDefinition<RelationshipModel> filter = Builders<RelationshipModel>.Filter.Empty;
 
@@ -70,12 +71,23 @@ namespace sd.Api.Repositories
 
             return filter;
         }
-        public async Task<string> GetRelationshipId(string userId1, Reletion reletion, string userId2)
+        public async Task<string> GetRelationshipId(string userId1, Relation relation, string userId2)
         {
-            RelationshipModel relationship = await _context.Relationships.Find(GetFilter(userId1, reletion, userId2)).FirstOrDefaultAsync();
+            RelationshipModel relationship = await _context.Relationships.Find(GetFilter(userId1, relation, userId2)).FirstOrDefaultAsync();
             if (relationship == null) return "0";
             return relationship.RelationshipId;
         }
 
+        public async Task<List<Relation>> GetRelationshipsBetweenTwoUsers(string userId1, string userId2)
+        {
+            List<Relation> relations = new List<Relation>();
+            foreach (Relation relation in Enum.GetValues(typeof(Relation)))
+            {
+                RelationshipModel relationship = await _context.Relationships.Find(GetFilter(userId1, relation, userId2)).FirstOrDefaultAsync();
+                if (relationship != null) relations.Add(relationship.Reletion);
+            }
+
+            return relations;
+        }
     }
 }

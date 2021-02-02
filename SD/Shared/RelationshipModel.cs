@@ -13,18 +13,19 @@ namespace SD.Shared
         public string UserId1 { get; set; }
 
         [Required]
-        public Reletion Reletion { get; set; }
+        public Relation Reletion { get; set; }
 
         [Required]
         public string UserId2 { get; set; }
     }
 
-    public enum Reletion
+    public enum Relation
     {
         None,
         Block, 
         Follow,
-        FriendRequest,
+        FriendRequestTo,
+        FriendRequestFrom,
         Friend
     }
 

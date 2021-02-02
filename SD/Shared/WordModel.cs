@@ -24,9 +24,9 @@ namespace SD.Shared
         public string WordLang { get; set; }
         [StringLength(10)]
         public string ToLang { get; set; }
-        [BsonIgnoreIfNull]
-        [StringLength(10)]
-        public string Type { get; set; }
+        //[BsonIgnoreIfNull]
+        //[StringLength(10)]
+        //public string Type { get; set; }
         [BsonIgnoreIfNull]
         public string Explain { get; set; }
         [BsonIgnoreIfNull]

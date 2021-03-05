@@ -56,7 +56,7 @@ namespace SD.Client.Pages
         }
         protected override async Task OnInitializedAsync()
         {
-
+            if (!CurrUsrService.isAuthTested) await CurrUsrService.GetAuth();
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
 
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")

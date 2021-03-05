@@ -35,7 +35,14 @@ namespace sd.Api.Repositories
         public async Task<WordModel> GetWord(string userId, string lang, int currentPage, int limit)
         {
             var filter = GetFilter(null, userId, lang);
-            return await _context.Words.Find(filter).SortByDescending(d => d.CreatedAt).Skip(currentPage - 1).Limit(limit).FirstOrDefaultAsync();
+            try
+            {
+                return await _context.Words.Find(filter).SortByDescending(d => d.CreatedAt).Skip(currentPage - 1).Limit(limit).FirstOrDefaultAsync();
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public async Task<WordModel> GetWordById(string id)

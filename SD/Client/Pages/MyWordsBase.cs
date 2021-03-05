@@ -51,14 +51,14 @@ namespace SD.Client.Pages
 
             TLang = DefaultLangsService.DefaultToLang;
             
-            try
-            {
+            //try
+            //{
                 await GetNextPage();
-            }
-            catch
-            {
-                NavigationManager.NavigateTo("/");
-            }
+            //}
+            //catch
+            //{
+            //    NavigationManager.NavigateTo("/");
+            //}
         }
 
         protected async Task GetNextPage()

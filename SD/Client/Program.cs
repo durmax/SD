@@ -38,7 +38,7 @@ namespace SD.Client
             builder.Services.AddSingleton<KnownLangsService>();
             builder.Services.AddSingleton<DefaultLangsService>();
 
-            builder.Services.AddTransient<CurrentUserService>();
+            builder.Services.AddScoped<CurrentUserService>();
 
             builder.Services.AddTransient<UriService>();
             builder.Services.AddTransient<LinkModel>();

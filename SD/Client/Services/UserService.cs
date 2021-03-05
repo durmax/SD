@@ -21,9 +21,12 @@ namespace SD.Client.Services
         {
             return await _httpClient.GetFromJsonAsync<List<UserModel>>("api/User");
         }
-        public async Task<Dictionary<string, Tuple<string, string>>> SearchUser(string CurrentUserId, string SearchText)
+        public async Task<IEnumerable<UserRelationshipsWithOneUser>> SearchUser(string CurrentUserId, string SearchText)
         {
-            return await _httpClient.GetFromJsonAsync<Dictionary<string, Tuple<string, string>>>($"api/User/GetUsersByText/{CurrentUserId}/{SearchText}");
+            IEnumerable<UserRelationshipsWithOneUser> u = new List<UserRelationshipsWithOneUser>();
+
+            u= await _httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUser>>($"api/User/GetUsersByTextNew/{CurrentUserId}/{SearchText}");
+            return u;
         }
         public async Task<Dictionary<string, string>> GetAllFriends(string id)
         {

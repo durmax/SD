@@ -15,6 +15,9 @@ namespace SD.Shared
         [Required]
         public Relation Reletion { get; set; }
 
+        public bool Follow { get; set; }
+        public bool Block { get; set; }
+
         [Required]
         public string UserId2 { get; set; }
     }
@@ -22,8 +25,6 @@ namespace SD.Shared
     public enum Relation
     {
         None,
-        Block, 
-        Follow,
         FriendRequestTo,
         FriendRequestFrom,
         Friend

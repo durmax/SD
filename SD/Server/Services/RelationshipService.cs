@@ -122,28 +122,31 @@ namespace sd.Api.Services
         } //    ||
         //     \  /
         //      \/
-        //public async Task<UserRelationshipsWithOneUser> GetRelationships(string CurrentUserId, List<UserModel> users)
-        //{
-        //    if (CurrentUserId == null || users == null) throw new ArgumentNullException();
+        public async Task<List<UserRelationshipsWithOneUser>> GetRelationshipsNew(string CurrentUserId, List<UserModel> users)
+        {
+            if (CurrentUserId == null || users == null) throw new ArgumentNullException();
 
-        //    UserRelationshipsWithOneUser relationship=null;
+            List<UserRelationshipsWithOneUser> relationships = new List<UserRelationshipsWithOneUser>();
+            
+            if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")
+            {
+                users.RemoveAll(u => u.UserId == CurrentUserId); //remove Sercher from list
+            }
 
-        //    if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")
-        //    {
-        //        users.RemoveAll(u => u.UserId == CurrentUserId); //remove Sercher from list
-        //    }
+            foreach (var user in users)
+            {
+                Relation relation = await _relationshipRepository.GetRelationshipsBetweenTwoUsers(CurrentUserId, user.UserId);
+                var s = new UserRelationshipsWithOneUser(user.UserId, user.Name, relation);
+                if (s!=null)
+                {
+                          relationships.Add(s );
+                }
 
-        //    foreach (var user in users)
-        //    {
-        //        List<Relation> relations = await _relationshipRepository.GetRelationshipsBetweenTwoUsers(CurrentUserId, user.UserId);
+                relation = Relation.None;
+            }
 
-        //         relationship = new UserRelationshipsWithOneUser(user.UserId, user.Name, relations);
-
-        //        relations = null;
-        //    }
-
-        //    return relationship;
-        //}
+            return relationships;
+        }
 
         public async Task<Dictionary<string, string>> FriendRequestsToUser(string userId)
         {

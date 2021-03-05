@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +13,12 @@ namespace sd.Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userRepository;
+        private readonly UserService _userService;
         private readonly RelationshipService _relationshipService;
 
         public UserController(UserService userService, RelationshipService relationshipService) 
         { 
-            _userRepository = userService;
+            _userService = userService;
             _relationshipService = relationshipService;
         }
 
@@ -27,7 +28,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                return Ok(await _userRepository.GetAllUsers());
+                return Ok(await _userService.GetAllUsers());
             }
             catch (Exception)
             {
@@ -42,11 +43,31 @@ namespace sd.Api.Controllers
             List<UserModel> foundUsers;  
             try
             {
-                foundUsers = await _userRepository.SearchUser(CurrentUserId, searchText);
+                foundUsers = await _userService.SearchUser(CurrentUserId, searchText);
 
                  var result = await _relationshipService.GetRelationships(CurrentUserId, foundUsers);
                 if (result == null) return NotFound();
                 return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database");
+            }
+        }
+
+        // GET: api/User/GetUsersByText/Dured
+        [HttpGet("GetUsersByTextNew/{CurrentUserId}/{searchText}")]
+        public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUser>>> GetUsersByTextNew(string CurrentUserId, string searchText)
+        {
+            List<UserModel> foundUsers;
+            try
+            {
+                foundUsers = await _userService.SearchUser(CurrentUserId, searchText);
+
+                IEnumerable<UserRelationshipsWithOneUser> result = await _relationshipService.GetRelationshipsNew(CurrentUserId, foundUsers);
+                if (result == null) return NotFound();
+                return Ok(result.AsEnumerable());
             }
             catch (Exception)
             {
@@ -61,7 +82,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var result = await _userRepository.GetUserById(id);
+                var result = await _userService.GetUserById(id);
                 if (result == null) return NotFound();
                 return result;
             }
@@ -83,7 +104,7 @@ namespace sd.Api.Controllers
                 if (string.IsNullOrWhiteSpace(user.UserId) || string.IsNullOrWhiteSpace(user.Email))
                     return BadRequest();
 
-                TransObj status = await _userRepository.RegisterUserAsync(user);
+                TransObj status = await _userService.RegisterUserAsync(user);
                 return Ok(status);
 
             }
@@ -103,7 +124,7 @@ namespace sd.Api.Controllers
             }
             try
             {
-                return Ok(await _userRepository.UpdateUser(id, updatedUser));
+                return Ok(await _userService.UpdateUser(id, updatedUser));
             }
             catch (Exception ex)
             {
@@ -117,14 +138,14 @@ namespace sd.Api.Controllers
         {
             try
             {
-                UserModel userToDelete = await _userRepository.GetUserById(id);
+                UserModel userToDelete = await _userService.GetUserById(id);
 
                 if (userToDelete == null)
                 {
                     return NotFound($"User with Id = {id} not found");
                 }
 
-                return Ok(await _userRepository.RemoveUser(id));
+                return Ok(await _userService.RemoveUser(id));
             }
             catch (Exception)
             {

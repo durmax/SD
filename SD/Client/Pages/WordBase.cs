@@ -39,6 +39,8 @@ namespace SD.Client.Pages
         [Parameter]
         public WordModel wordModel { get; set; }
 
+
+
         protected string LangsStr { get; set; }
 
         protected List<string> KnownLangs { get; set; }
@@ -51,8 +53,8 @@ namespace SD.Client.Pages
 
         [Parameter]
         public string UserId { get; set; }
-        public string CurrentUserId { get; set; }
-        public string CurrentUserName { get; set; }
+        public string CurrUserId { get; set; }
+        public string CurrUserName { get; set; }
 
         protected string cssClassUpdate = "d-none";
 
@@ -103,11 +105,11 @@ namespace SD.Client.Pages
         protected async Task AddWord()
         {
             loading = true;
-            if (!string.IsNullOrWhiteSpace(CurrentUserId))
+            if (!string.IsNullOrWhiteSpace(CurrUserId))
             {
-                if (string.IsNullOrWhiteSpace(wordModel.UserId) || CurrentUserId != wordModel.UserId)
+                if (string.IsNullOrWhiteSpace(wordModel.UserId) || CurrUserId != wordModel.UserId)
                 {
-                    wordModel.UserId = CurrentUserId;
+                    wordModel.UserId = CurrUserId;
                     wordModel.WordId = Guid.NewGuid().ToString();
                     wordModel.CreatedAt = DateTime.Now;
                     wordModel.Likes = null;
@@ -116,7 +118,7 @@ namespace SD.Client.Pages
                 if (wordModel.Comments != null)
                 {
                     wordModel.Comments.RemoveAll(x => x.CommentId == null);
-                    wordModel.Comments.RemoveAll(x => x.UserId != CurrentUserId);
+                    wordModel.Comments.RemoveAll(x => x.UserId != CurrUserId);
                 }
 
                 HttpResponseMessage respons = await WordService.AddWord(wordModel);
@@ -135,7 +137,7 @@ namespace SD.Client.Pages
                     note = $"{wordModel.Title} is Saved";
                     if ((int)respons.StatusCode == 200)
                     {
-                        if (CurrentUserId == UserId)
+                        if (CurrUserId == UserId)
                         {
                             await OnWordSave.InvokeAsync(wordModel);
                         }
@@ -152,9 +154,9 @@ namespace SD.Client.Pages
 
         protected async Task UpdateWord()
         {
-            if (!string.IsNullOrWhiteSpace(CurrentUserId))
+            if (!string.IsNullOrWhiteSpace(CurrUserId))
             {
-                if (string.IsNullOrWhiteSpace(wordModel.UserId) || CurrentUserId != wordModel.UserId)
+                if (string.IsNullOrWhiteSpace(wordModel.UserId) || CurrUserId != wordModel.UserId)
                 {
                     await AddWord();
                 }
@@ -193,7 +195,7 @@ namespace SD.Client.Pages
                 WordId = Guid.NewGuid().ToString(),
                 WordLang = DefaultLangsService.DefaultWordLang,
                 ToLang = DefaultLangsService.DefaultToLang,
-                UserId = CurrentUserId,
+                UserId = CurrUserId,
                 CreatedAt = DateTime.Now
             };
             wordModel.Explain = null;
@@ -255,7 +257,7 @@ namespace SD.Client.Pages
 
         protected void CreateComment()
         {
-            if (string.IsNullOrEmpty(CurrentUserId))
+            if (string.IsNullOrEmpty(CurrUserId))
             {
                 NavigationManager.NavigateTo("/authentication/login");
             }
@@ -263,7 +265,7 @@ namespace SD.Client.Pages
             {
                 CommentModel commentModel = new CommentModel();
                 commentModel = new CommentModel();
-                commentModel.UserId = CurrentUserId;
+                commentModel.UserId = CurrUserId;
                 wordComments.Add(commentModel);
                 CollapsedComm = false;
             }
@@ -296,13 +298,12 @@ namespace SD.Client.Pages
 
             if (!string.IsNullOrWhiteSpace(wordModel.UserId))// is not a new word
             {
-                if (wordModel.UserId == CurrentUserId)
+                if (wordModel.UserId == CurrUserId)
                 {
                     var response = await WordService.RemoveWord(wordModel.WordId);
                     if (response.IsSuccessStatusCode)
                     {
                         await OnWordDelete.InvokeAsync(wordModel);
-                        //Words.Remove(wordModel);
                     }
                     else
                     {
@@ -324,14 +325,14 @@ namespace SD.Client.Pages
         {
             if (!CollapsedLike && likesCount != null)
             {
-                likedUsers = await WordService.GetLikedUsers(CurrentUserId, wordModel.WordId);
+                likedUsers = await WordService.GetLikedUsers(CurrUserId, wordModel.WordId);
             }
         }
         protected async Task Like()
         {
-            if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")
+            if (!string.IsNullOrWhiteSpace(CurrUserId) && CurrUserId != "0")
             {
-                LikesCount = await WordService.Like(CurrentUserId, wordModel.WordId);
+                LikesCount = await WordService.Like(CurrUserId, wordModel.WordId);
                 CULiked = !CULiked;
                 //CULikeImg = CULiked ? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg";
             }
@@ -350,11 +351,8 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            if (await CurrUsrService.IsAuth())
-            {
-                CurrentUserId = await CurrUsrService.GetCurrUsrId();
-                CurrentUserName = await CurrUsrService.GetCurrUsrName();
-            }
+            CurrUserId = CurrUsrService.id;
+            CurrUserName = CurrUsrService.name;
 
             if (wordModel == null)
             {
@@ -365,7 +363,7 @@ namespace SD.Client.Pages
                 SetMyText();
                 if (wordModel.Likes != null)
                 {
-                    CULiked = wordModel.Likes.Contains(CurrentUserId);
+                    CULiked = wordModel.Likes.Contains(CurrUserId);
                     LikesCount = wordModel.Likes.Count;
                 }
             }

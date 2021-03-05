@@ -31,9 +31,9 @@
         <div class="card">
             <div class="card-body">
                 <div class="container">
-                    @foreach (var foudUser in foundUsers)
+                    @foreach (var user in foundUsers)
                     {
-                        <Friendship UserId="@CurrentUserId" friendId="@foudUser.Key" friendName="@foudUser.Value.Item1" friendshipState="@foudUser.Value.Item2"></Friendship>
+                        <Friendship UserId="@currUserId" friendId="@user.UserId" friendName="@user.RelationalUserName" friendshipState="CrrRequest"></Friendship>
                     }
                     @if (sendFriendReqWait)
                     {
@@ -61,23 +61,23 @@
         }
         else
         {
-    <div class="card pt-1">
-        <div class="card-header"> <a href="Friends"> @languageContainer.Keys["YouHave"] <span class="badge badge-primary">@FriendsCount</span> @languageContainer.Keys["Friends"]</a></div>
+            <div class="card pt-1">
+                <div class="card-header"> <a href="Friends"> @languageContainer.Keys["YouHave"] <span class="badge badge-primary">@FriendsCount</span> @languageContainer.Keys["Friends"]</a></div>
 
-        @if (FriendsDictionary != null)
-        {
-            <div class="card-body">
-                <div class="container">
-                    @foreach (var foudUser in FriendsDictionary)
-                    {
-                        <Friendship UserId="@CurrentUserId" friendId="@foudUser.Key" friendName="@foudUser.Value" friendshipState="Friends"></Friendship>
-                    }
+                @if (FriendsDictionary != null)
+                {
+                    <div class="card-body">
+                        <div class="container">
+                            @foreach (var foudUser in FriendsDictionary)
+                            {
+                                <Friendship UserId="@currUserId" friendId="@foudUser.Key" friendName="@foudUser.Value" friendshipState="Friends"></Friendship>
+                            }
 
-                </div>
+                        </div>
+                    </div>
+
+                }
             </div>
-
-        }
-    </div>
         }
     </Authorized>
 </AuthorizeView>

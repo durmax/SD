@@ -46,7 +46,7 @@ namespace SD.Client.Services
 
         public async Task<Tuple<int, List<WordModel>>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)
         {
-
+            CurrentUserId ??= "0";
             return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordModel>>>($"api/Word/GetPageWordsFromAllUseres/{CurrentUserId}/{pageSize}/{currentPage}");
         }
 

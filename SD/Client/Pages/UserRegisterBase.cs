@@ -21,9 +21,9 @@ namespace SD.Client.Pages
 
         [Parameter]
         public string UserId { get; set; }
-        protected string Email { get; set; }
+        //protected string Email { get; set; }
 
-        protected string CurrentUserId { get; set; }
+        protected string currUserId { get; set; }
         protected string cssDisplayNotCurrentUser = "d-none";
 
         protected string Info { get; set; }
@@ -80,18 +80,16 @@ namespace SD.Client.Pages
 
         protected async override Task OnInitializedAsync()
         {
-            if (string.IsNullOrWhiteSpace(CurrentUserId)) CurrentUserId = await CurrUsrService.GetCurrUsrId();
-
-            if (CurrentUserId != "0")
+            //if (!CurrUsrService.isAuthTested) await CurrUsrService.GetAuth();
+            currUserId = CurrUsrService.id;
+            if (currUserId != "0")
             {
-                await AddUserAsync(CurrentUserId,
-                                   await CurrUsrService.GetCurrUsrEmail(),
-                                   await CurrUsrService.GetCurrUsrName());
+                await AddUserAsync(currUserId, CurrUsrService.email, CurrUsrService.name);
             }
 
             if (string.IsNullOrWhiteSpace(UserId))
             {
-                UserId = CurrentUserId;
+                UserId = currUserId;
                 cssDisplayNotCurrentUser = null;
             }
 

@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace SD.Shared
 {
     public class UserRelationshipsWithOneUser
     {
-        public string UserId;
-        public string RelationalUserName;
-        public List<Relation> Relations;
-        public UserRelationshipsWithOneUser(string userId, string userName, List<Relation> relations)
+        public string UserId { get; set; }
+        public string RelationalUserName { get; set; }
+        public Relation Relation { get; set; }
+
+        public UserRelationshipsWithOneUser(string userId, string userName, Relation relation)
         {
             UserId = userId;
             RelationalUserName = userName;
-            Relations = relations;
+            Relation = relation;
         }
 
     }

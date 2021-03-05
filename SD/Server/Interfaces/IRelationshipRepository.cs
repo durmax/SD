@@ -17,6 +17,6 @@ namespace sd.Api.Interfaces
         Task<List<RelationshipModel>> GetAllFrindsRelationships(string userId);
         // Task<List<Relationship>> FrindRequestsFromUser(string userId);
         Task<List<RelationshipModel>> FriendRequestsToUser(string userId);
-        Task<List<Relation>> GetRelationshipsBetweenTwoUsers(string userId1, string userId2);
+        Task<Relation> GetRelationshipsBetweenTwoUsers(string userId1, string userId2);
     }
 }

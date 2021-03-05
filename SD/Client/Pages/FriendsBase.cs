@@ -1,16 +1,15 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
 using System.Linq;
+using SD.Shared;
 
 namespace SD.Client.Pages
 {
     public class FriendsBase : ComponentBase
     {
-        public Dictionary<string, Tuple<string, string>> foundUsers;
+        public IEnumerable<UserRelationshipsWithOneUser> foundUsers { set; get; }
 
         protected int? FriendsCount { set; get; }
 
@@ -25,7 +24,7 @@ namespace SD.Client.Pages
         [Inject]
         CurrentUserService CurrUsrService { set; get; }
 
-        protected string CurrentUserId { get; set; }
+        protected string currUserId { get; set; }
 
         protected bool sendFriendReqWait = false;
 
@@ -38,7 +37,7 @@ namespace SD.Client.Pages
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 SearchDisplayClass = null;
-                foundUsers = await UserService.SearchUser(CurrentUserId, SearchText);
+                foundUsers = await UserService.SearchUser(currUserId, SearchText);
             }
             else
             {
@@ -49,16 +48,15 @@ namespace SD.Client.Pages
 
         protected async override Task OnInitializedAsync()
         {
+                if (CurrUsrService.isAuthenticated)
+                {
+                    currUserId = CurrUsrService.id;
 
-            if (await CurrUsrService.IsAuth())
-            {
-                CurrentUserId = await CurrUsrService.GetCurrUsrId();
-                FriendsDictionary = new Dictionary<string, string>();
-                FriendsDictionary = await RelationshipService.GetAllFriends(CurrentUserId);
+                    FriendsDictionary = new Dictionary<string, string>();
+                    FriendsDictionary = await RelationshipService.GetAllFriends(currUserId);
 
-                FriendsCount = FriendsDictionary.Count();
-            }
-
+                    FriendsCount = FriendsDictionary.Count();
+                }
         }
     }
 }

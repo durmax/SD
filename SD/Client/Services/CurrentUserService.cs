@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
+using SD.Shared;
 using System.Threading.Tasks;
 
 namespace SD.Client.Services
@@ -7,50 +8,42 @@ namespace SD.Client.Services
     public class CurrentUserService
     {
         private readonly AuthenticationStateProvider _authenticationStateProvider;
+        private readonly UserService _userService;
 
-        public CurrentUserService(AuthenticationStateProvider authenticationStateProvider)
+        public CurrentUserService(AuthenticationStateProvider authenticationStateProvider, UserService userService)
         {
             _authenticationStateProvider = authenticationStateProvider;
+            _userService = userService;
         }
 
-        public async Task<bool> IsAuth()
+        public string id;
+        public string name;
+        public string email;
+        public bool isAuthenticated;
+        public bool isAuthTested;
+
+        public async Task GetAuth()
         {
             var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-            return authState.User.Identity.IsAuthenticated;
-        }
-
-        public async Task<string> GetCurrUsrId()
-        {
-            string id = "0";
-
-            var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
+            isAuthenticated= authState.User.Identity.IsAuthenticated;
+            if (isAuthenticated)
             {
                 id = authState.User.FindFirst(c => c.Type == "oid")?.Value;
-            }
-            return id;
-        }
-
-        public async Task<string> GetCurrUsrName()
-        {
-            string name = "";
-            var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-            {
                 name = authState.User.Identity.Name;
-            }
-            return name;
-        }
-
-        public async Task<string> GetCurrUsrEmail()
-        {
-            string email = "";
-            var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity.IsAuthenticated)
-            {
                 email = authState.User.FindFirst(c => c.Type == "email")?.Value;
             }
-            return email;
+
+            await AddUserAsync(id, email, name);
+
+            isAuthTested = true;
+        }
+        private async Task AddUserAsync(string currUserId, string email, string name)
+        {
+            UserModel userModel = new UserModel();
+            userModel.UserId = currUserId;
+            userModel.Email = email;
+            userModel.Name = name;
+            await _userService.AddUser(userModel);
         }
     }
 }

@@ -12,9 +12,6 @@ namespace SD.Client.Pages
     {
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
-
-        [Inject]
-        public UserService UserService { set; get; }
         [Inject]
         public RelationshipService RelationshipService { set; get; }
         [Inject]
@@ -32,7 +29,6 @@ namespace SD.Client.Pages
         [Inject]
         DefaultLangsService DefaultLangsService { get; set; }
 
-        protected string currUserId;
         protected bool loading;
         protected int currentPage = 0;
         protected string TLang;
@@ -41,11 +37,8 @@ namespace SD.Client.Pages
         {
             loading = true;
             TLang = DefaultLangsService.DefaultToLang;
-
-            if (string.IsNullOrWhiteSpace(currUserId)) currUserId = await CurrUsrService.GetCurrUsrId();
-
             currentPage++;
-            var res = await WordService.GetPageWordsFromAllUseres(currUserId, 10, currentPage);
+            var res = await WordService.GetPageWordsFromAllUseres(CurrUsrService.id, 10, currentPage);
             if (res != null)
             {
                 currentPage = res.Item1;
@@ -53,16 +46,14 @@ namespace SD.Client.Pages
             }
             loading = false;
         }
-
-        private async Task AddUserAsync(string currUserId, string email, string name)
+        protected void NewWordHandler(WordModel newWord)
         {
-            UserModel userModel = new UserModel();
-            userModel.UserId = currUserId;
-            userModel.Email = email;
-            userModel.Name = name;
-            await UserService.AddUser(userModel);
+            Words.Add(newWord);
         }
-
+        protected void DeleteWordHandler(WordModel word)
+        {
+            Words.Remove(word);
+        }
         protected override async Task OnInitializedAsync()
         {
 
@@ -77,18 +68,9 @@ namespace SD.Client.Pages
                 catch { }
             }
 
-            if (string.IsNullOrWhiteSpace(currUserId)) currUserId = await CurrUsrService.GetCurrUsrId();
-
-            if (currUserId != "0")
-            {
-                await AddUserAsync(currUserId, 
-                                   await CurrUsrService.GetCurrUsrEmail(), 
-                                   await CurrUsrService.GetCurrUsrName());
-            }
-
             try
             {
-                FriendRequestsDictionary = await RelationshipService.GetFriendRequestsById(currUserId);
+                FriendRequestsDictionary = await RelationshipService.GetFriendRequestsById(CurrUsrService.id);
             }
             catch
             {

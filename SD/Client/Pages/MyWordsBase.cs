@@ -20,8 +20,6 @@ namespace SD.Client.Pages
 
         [Parameter]
         public string UserId { get; set; }
-        [Parameter]
-        public string currUsrId { get; set; }
 
         [Parameter]
         public string UserName { get; set; }
@@ -44,10 +42,12 @@ namespace SD.Client.Pages
 
         protected async Task InitAsync()
         {
-            if (await CurrUsrService.IsAuth())
-                currUsrId = await CurrUsrService.GetCurrUsrId();
-            else
-                NavigationManager.NavigateTo("/");
+            //if (string.IsNullOrWhiteSpace(currUserId))
+            //{
+            //    currUserId = CurrUsrService.id;
+            //}
+            //else
+            //    NavigationManager.NavigateTo("/");
 
             TLang = DefaultLangsService.DefaultToLang;
             
@@ -70,7 +70,7 @@ namespace SD.Client.Pages
             {
                 Words = new List<WordModel>();
             }
-            var res = await WordService.GetPageWordsFromUserID(currUsrId, UserId, 10, currentPage);
+            var res = await WordService.GetPageWordsFromUserID(CurrUsrService.id, UserId, 10, currentPage);
             if (res != null)
             {
                 currentPage = res.Item1;

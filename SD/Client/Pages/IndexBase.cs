@@ -77,6 +77,5 @@ namespace SD.Client.Pages
 
             }
         }
-
     }
 }

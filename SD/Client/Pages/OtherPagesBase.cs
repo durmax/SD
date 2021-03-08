@@ -104,8 +104,11 @@ namespace SD.Client.Pages
         }
         protected override async Task OnParametersSetAsync()
         {
-            opRes = null;
+            if (!Collapsed)
+            {
+              opRes = null;
             await GetOpRes();
+            }  
         }
 
         protected override void OnInitialized()

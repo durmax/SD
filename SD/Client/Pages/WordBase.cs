@@ -23,8 +23,6 @@ namespace SD.Client.Pages
         public bool CollapsedComm { set; get; } = true;
         public bool CollapsedLike { set; get; } = true;
 
-        protected bool opCollapsed { set; get; } = false;    // show by default
-
         [Inject]
         public WordService WordService { set; get; }
 
@@ -53,13 +51,11 @@ namespace SD.Client.Pages
 
         [Parameter]
         public string UserId { get; set; }
-        public string CurrUserId { get; set; }
-        public string CurrUserName { get; set; }
 
         protected string cssClassUpdate = "d-none";
 
         [Parameter]
-        public bool cssClassComment { get; set; } = true;  // hide by default
+        public bool cssClassComment { get; set; } = false; 
         protected bool loading;
         protected string note;
         protected List<CommentModel> wordComments { get; set; } = new List<CommentModel>();
@@ -105,11 +101,11 @@ namespace SD.Client.Pages
         protected async Task AddWord()
         {
             loading = true;
-            if (!string.IsNullOrWhiteSpace(CurrUserId))
+            if (!string.IsNullOrWhiteSpace(CurrUsrService.id))
             {
-                if (string.IsNullOrWhiteSpace(wordModel.UserId) || CurrUserId != wordModel.UserId)
+                if (string.IsNullOrWhiteSpace(wordModel.UserId) || CurrUsrService.id != wordModel.UserId)
                 {
-                    wordModel.UserId = CurrUserId;
+                    wordModel.UserId = CurrUsrService.id;
                     wordModel.WordId = Guid.NewGuid().ToString();
                     wordModel.CreatedAt = DateTime.Now;
                     wordModel.Likes = null;
@@ -118,7 +114,7 @@ namespace SD.Client.Pages
                 if (wordModel.Comments != null)
                 {
                     wordModel.Comments.RemoveAll(x => x.CommentId == null);
-                    wordModel.Comments.RemoveAll(x => x.UserId != CurrUserId);
+                    wordModel.Comments.RemoveAll(x => x.UserId != CurrUsrService.id);
                 }
 
                 HttpResponseMessage respons = await WordService.AddWord(wordModel);
@@ -137,7 +133,7 @@ namespace SD.Client.Pages
                     note = $"{wordModel.Title} is Saved";
                     if ((int)respons.StatusCode == 200)
                     {
-                        if (CurrUserId == UserId)
+                        if (CurrUsrService.id == UserId)
                         {
                             await OnWordSave.InvokeAsync(wordModel);
                         }
@@ -154,9 +150,9 @@ namespace SD.Client.Pages
 
         protected async Task UpdateWord()
         {
-            if (!string.IsNullOrWhiteSpace(CurrUserId))
+            if (!string.IsNullOrWhiteSpace(CurrUsrService.id))
             {
-                if (string.IsNullOrWhiteSpace(wordModel.UserId) || CurrUserId != wordModel.UserId)
+                if (string.IsNullOrWhiteSpace(wordModel.UserId) || CurrUsrService.id != wordModel.UserId)
                 {
                     await AddWord();
                 }
@@ -195,7 +191,7 @@ namespace SD.Client.Pages
                 WordId = Guid.NewGuid().ToString(),
                 WordLang = DefaultLangsService.DefaultWordLang,
                 ToLang = DefaultLangsService.DefaultToLang,
-                UserId = CurrUserId,
+                UserId = CurrUsrService.id,
                 CreatedAt = DateTime.Now
             };
             wordModel.Explain = null;
@@ -215,16 +211,19 @@ namespace SD.Client.Pages
             wordModel.Title = title.Trim();
         }
 
-        private void SetMyText()
+        protected void SetMyText()
         {
-            try
+            if (!cssClassComment && string.IsNullOrWhiteSpace(MyText))
             {
-                MyText = wordModel?.Explain;
-                CalculateSize(MyText);
-                Rows = Rows < 3 ? Rows : Rows++;
-            }
-            catch 
-            {
+                try
+                {
+                    MyText = wordModel?.Explain;
+                    CalculateSize(MyText);
+                    Rows = Rows < 3 ? Rows : Rows++;
+                }
+                catch
+                {
+                }
             }
         }
 
@@ -257,7 +256,7 @@ namespace SD.Client.Pages
 
         protected void CreateComment()
         {
-            if (string.IsNullOrEmpty(CurrUserId))
+            if (string.IsNullOrEmpty(CurrUsrService.id))
             {
                 NavigationManager.NavigateTo("/authentication/login");
             }
@@ -265,7 +264,7 @@ namespace SD.Client.Pages
             {
                 CommentModel commentModel = new CommentModel();
                 commentModel = new CommentModel();
-                commentModel.UserId = CurrUserId;
+                commentModel.UserId = CurrUsrService.id;
                 wordComments.Add(commentModel);
                 CollapsedComm = false;
             }
@@ -298,7 +297,7 @@ namespace SD.Client.Pages
 
             if (!string.IsNullOrWhiteSpace(wordModel.UserId))// is not a new word
             {
-                if (wordModel.UserId == CurrUserId)
+                if (wordModel.UserId == CurrUsrService.id)
                 {
                     var response = await WordService.RemoveWord(wordModel.WordId);
                     if (response.IsSuccessStatusCode)
@@ -325,14 +324,14 @@ namespace SD.Client.Pages
         {
             if (!CollapsedLike && likesCount != null)
             {
-                likedUsers = await WordService.GetLikedUsers(CurrUserId, wordModel.WordId);
+                likedUsers = await WordService.GetLikedUsers(CurrUsrService.id, wordModel.WordId);
             }
         }
         protected async Task Like()
         {
-            if (!string.IsNullOrWhiteSpace(CurrUserId) && CurrUserId != "0")
+            if (!string.IsNullOrWhiteSpace(CurrUsrService.id) && CurrUsrService.id != "0")
             {
-                LikesCount = await WordService.Like(CurrUserId, wordModel.WordId);
+                LikesCount = await WordService.Like(CurrUsrService.id, wordModel.WordId);
                 CULiked = !CULiked;
                 //CULikeImg = CULiked ? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg";
             }
@@ -347,30 +346,31 @@ namespace SD.Client.Pages
         /// </summary>
         /// <returns></returns>
 
-
+        protected async Task OnCollapsedAsync()
+        {
+            Collapsed = !Collapsed;
+            if (!Collapsed)
+            {
+                SetMyText();
+                await BuildKnownLangsAsync();
+                wordModel.ShareWith = 3; // nothing
+            }
+        }
 
         protected override async Task OnInitializedAsync()
         {
-            CurrUserId = CurrUsrService.id;
-            CurrUserName = CurrUsrService.name;
-
             if (wordModel == null)
             {
                 await NewWordAsync();
             }
             else
             {
-                SetMyText();
                 if (wordModel.Likes != null)
                 {
-                    CULiked = wordModel.Likes.Contains(CurrUserId);
+                    CULiked = wordModel.Likes.Contains(CurrUsrService.id);
                     LikesCount = wordModel.Likes.Count;
                 }
             }
-
-            await BuildKnownLangsAsync();
-
-            wordModel.ShareWith = 3; // nothing
         }
 
         protected override void OnParametersSet()

@@ -19,7 +19,7 @@ namespace SD.Client.Pages
         [Inject]
         KnownLangsService KnownLangsService { get; set; }
         [Parameter]
-        public bool Collapsed { set; get; } = true;    // hide by default
+        public bool Collapsed { set; get; } //= true;    // hide by default
         public bool CollapsedComm { set; get; } = true;
         public bool CollapsedLike { set; get; } = true;
 
@@ -37,10 +37,6 @@ namespace SD.Client.Pages
         [Parameter]
         public WordModel wordModel { get; set; }
 
-
-
-        protected string LangsStr { get; set; }
-
         protected List<string> KnownLangs { get; set; }
 
         protected string ShareWithClass { get; set; }
@@ -55,7 +51,7 @@ namespace SD.Client.Pages
         protected string cssClassUpdate = "d-none";
 
         [Parameter]
-        public bool cssClassComment { get; set; } = false; 
+        public bool cssClassComment { get; set; } = false;
         protected bool loading;
         protected string note;
         protected List<CommentModel> wordComments { get; set; } = new List<CommentModel>();
@@ -243,14 +239,14 @@ namespace SD.Client.Pages
 
         private async Task BuildKnownLangsAsync()
         {
-            if (KnownLangsService.KnownLangs.Count == 0)
-            {
-                LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
 
-                KnownLangsService.GetLangsFromLocalAsync(LangsStr, wordModel.WordLang, wordModel.ToLang);
+            if (string.IsNullOrWhiteSpace(KnownLangsService.LangsStr))
+            {
+                KnownLangsService.LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
             }
 
-            KnownLangs = new List<string>();
+            KnownLangsService.GetLangsFromLocalAsync(wordModel.WordLang, wordModel.ToLang);
+            KnownLangs ??= new List<string>();
             KnownLangs = KnownLangsService.KnownLangs;
         }
 
@@ -346,13 +342,13 @@ namespace SD.Client.Pages
         /// </summary>
         /// <returns></returns>
 
-        protected async Task OnCollapsedAsync()
+        protected void OnCollapsed()
         {
             Collapsed = !Collapsed;
+
             if (!Collapsed)
             {
                 SetMyText();
-                await BuildKnownLangsAsync();
                 wordModel.ShareWith = 3; // nothing
             }
         }
@@ -371,6 +367,8 @@ namespace SD.Client.Pages
                     LikesCount = wordModel.Likes.Count;
                 }
             }
+
+            await BuildKnownLangsAsync();
         }
 
         protected override void OnParametersSet()

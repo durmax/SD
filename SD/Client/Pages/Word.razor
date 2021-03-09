@@ -31,7 +31,7 @@
                @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})" />
 
         <div class="input-group-append">
-            <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="OnCollapsedAsync">
+            <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="OnCollapsed">
                 <i class="float-right @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
             </button>
         </div>

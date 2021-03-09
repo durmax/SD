@@ -23,12 +23,12 @@
         </div>
     }
 }
-    <Word Collapsed="false" OnWordSave="NewWordHandler"></Word>
+    <Word Collapsed="false" OnWordSave="@NewWordHandler"></Word>
     @if (Words != null)
     {
         @foreach (var word in Words)
         {
-            <Word wordModel="word" OnWordDelete="DeleteWordHandler"></Word>
+            <Word wordModel="word" Collapsed="true" OnWordDelete="DeleteWordHandler"></Word>
         }
     }
     @if (loading)

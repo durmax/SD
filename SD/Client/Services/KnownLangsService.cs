@@ -4,14 +4,16 @@ namespace SD.Client.Services
 {
     public class KnownLangsService
     {
+        public string LangsStr { get; set; }
         public List<string> KnownLangs = new List<string>();
 
-        public void GetLangsFromLocalAsync(string langsStr, string wLang, string tLang)
+        public void GetLangsFromLocalAsync( string wLang, string tLang)
         {
-            langsStr += "," + wLang + "," + tLang;
-            if (!string.IsNullOrWhiteSpace(langsStr))
+            LangsStr += "," + wLang + "," + tLang;
+
+            if (!string.IsNullOrWhiteSpace(LangsStr))
             {
-                string[] langArray = langsStr.Split(",");
+                string[] langArray = LangsStr.Split(",");
 
                 foreach (var lan in langArray)
                 {

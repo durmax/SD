@@ -132,6 +132,7 @@ namespace SD.Client.Pages
                         if (CurrUsrService.id == UserId)
                         {
                             await OnWordSave.InvokeAsync(wordModel);
+                            MyText = null;
                         }
                         await NewWordAsync();
                     }

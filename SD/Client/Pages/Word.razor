@@ -28,14 +28,8 @@
                id="wordId"
                value="@wordModel.Title"
                @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"
-               @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})" />
-
-        <div class="input-group-append">
-            <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="OnCollapsed">
-                <i class="float-right @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
-            </button>
-        </div>
-
+               @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})"
+               @onclick="@(() => {if (Collapsed) OnCollapsed();})" />
     </div>
 
     <div class=@(Collapsed ? "collapse" : "")>
@@ -108,7 +102,7 @@
                 </div>
             </div>
 
-            <div class="form-group @(cssClassComment? "collapse" : "")">
+            <div class=" @(cssClassComment? "collapse" : "")">
                 <div class="m-0">
                     <textarea class="form-control text-wrap"
                               rows="@Rows"
@@ -126,10 +120,9 @@
 
     @if (wordModel != null)
     {
-
         <div class="card-footer p-0">
             <div class="row">
-                <div class="col-6">
+                <div class="col-4">
                     <button type="button" style="float:left" class="btn btn-light bg-transparent" @onclick="async () => { await Like(); }">
                         <img width="20" height="20" src=@(CULiked ? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg") asp-append-version="true" />
                         @LikesCount
@@ -143,7 +136,15 @@
                     }
                 </div>
 
-                <div class="col-6">
+                <div type="button" style="float:right" class="col-4 btn btn-light bg-transparent" @onclick="OnCollapsed">
+                    @* <i class="@(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>*@
+                    @if (!Collapsed)
+                    {
+                        <i class="oi oi-collapse-up"></i>
+                    }
+                </div>
+
+                <div class="col-4">
                     <button type="button" style="float:right" class="btn btn-light bg-transparent" @onclick="() => { CollapsedComm = CollapsedComm ? false : true; }">
                         <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
                         @wordComments.Count
@@ -180,6 +181,5 @@
                 </CascadingValue>
             }
         </div>
-
     }
 </div>

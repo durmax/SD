@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SD.Shared;
 using System.Collections.Generic;
 using AKSoftware.Localization.MultiLanguages;
+using System.Linq;
 
 namespace SD.Client.Pages
 {
@@ -43,6 +44,7 @@ namespace SD.Client.Pages
             {
                 currentPage = res.Item1;
                 Words.AddRange(res.Item2);
+                //Words = Words.Union(res.Item2).Distinct().ToList();
             }
             loading = false;
         }

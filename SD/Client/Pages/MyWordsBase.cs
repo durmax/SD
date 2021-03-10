@@ -2,6 +2,7 @@
 using SD.Client.Services;
 using SD.Shared;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -50,10 +51,10 @@ namespace SD.Client.Pages
             //    NavigationManager.NavigateTo("/");
 
             TLang = DefaultLangsService.DefaultToLang;
-            
+
             //try
             //{
-                await GetNextPage();
+            await GetNextPage();
             //}
             //catch
             //{
@@ -75,6 +76,7 @@ namespace SD.Client.Pages
             {
                 currentPage = res.Item1;
                 Words.AddRange(res.Item2);
+                //Words= Words.Union(res.Item2).ToList();
             }
             loading = false;
         }

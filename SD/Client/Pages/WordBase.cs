@@ -126,14 +126,14 @@ namespace SD.Client.Pages
                 }
                 else
                 {
-                    note = $"{wordModel.Title} is Saved";
                     if ((int)respons.StatusCode == 200)
                     {
-                        if (CurrUsrService.id == UserId)
-                        {
+                        note = $"{wordModel.Title} is Saved";
+                        MyText = "";
+                        //if (CurrUsrService.id == UserId)
+                        //{
                             await OnWordSave.InvokeAsync(wordModel);
-                            MyText = null;
-                        }
+                        //}
                         await NewWordAsync();
                     }
                 }

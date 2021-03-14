@@ -32,14 +32,14 @@ namespace sd.Api
                                     new MongodbContext(x.GetRequiredService<IMongodbSettings>()));
 
             services.AddSingleton<IOtherPageRepository, OtherPageRepository>();
-            services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IWordRepository, WordRepository>();
-            services.AddTransient<ICommentService, CommentService>();
-            services.AddTransient<ILikeWordService, LikeWordService>();
-            services.AddTransient<IRelationshipRepository, RelationshipRepository>();
-            services.AddTransient<WordService>();
-            services.AddTransient<RelationshipService>();
-            services.AddTransient<UserService>();
+            services.AddSingleton<IUserRepository, UserRepository>();
+            services.AddSingleton<IWordRepository, WordRepository>();
+            services.AddSingleton<ICommentService, CommentService>();
+            services.AddSingleton<ILikeWordService, LikeWordService>();
+            services.AddSingleton<IRelationshipRepository, RelationshipRepository>();
+            services.AddSingleton<WordService>();
+            services.AddSingleton<RelationshipService>();
+            services.AddSingleton<UserService>();
             services.AddSingleton<OtherPageService>();
 
             services.AddDataProtection();

@@ -33,7 +33,7 @@ namespace SD.Client.Services
             {
                 OPResModels = await _httpClient.GetFromJsonAsync<List<OtherPageResModel>>($"api/OtherPage/{fromLang}/{toLang}");
             }
-            catch (AccessTokenNotAvailableException exception)
+            catch
             {
                 //exception.RedirectToLogin();
             }

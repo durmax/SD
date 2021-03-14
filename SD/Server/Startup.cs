@@ -31,7 +31,7 @@ namespace sd.Api
             services.AddSingleton<MongodbContext>(x =>
                                     new MongodbContext(x.GetRequiredService<IMongodbSettings>()));
 
-            services.AddTransient<IOtherPageRepository, OtherPageRepository>();
+            services.AddSingleton<IOtherPageRepository, OtherPageRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IWordRepository, WordRepository>();
             services.AddTransient<ICommentService, CommentService>();
@@ -40,6 +40,7 @@ namespace sd.Api
             services.AddTransient<WordService>();
             services.AddTransient<RelationshipService>();
             services.AddTransient<UserService>();
+            services.AddSingleton<OtherPageService>();
 
             services.AddDataProtection();
 
@@ -60,10 +61,11 @@ namespace sd.Api
 
             app.UseCors(builder =>
             {
-                builder.WithOrigins("https://localhost:44331",
+                builder.WithOrigins(
+                    "https://localhost:44331",
                     "https://lingoclub.netlify.app",
                     "https://www.lingoclub.net")
-                       .WithMethods("GET", "POST", "PUT", "DELETE")
+                       .AllowAnyMethod()
                        .AllowAnyHeader();
             });
 

@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace SD.Client.Services
 {
-    public class UserService 
+    public class UserService
     {
         private readonly HttpClient _httpClient;
 
         public UserService(HttpClient httpClient)
-        {   
+        {
             _httpClient = httpClient;
         }
 
@@ -23,10 +23,7 @@ namespace SD.Client.Services
         }
         public async Task<IEnumerable<UserRelationshipsWithOneUser>> SearchUser(string CurrentUserId, string SearchText)
         {
-            IEnumerable<UserRelationshipsWithOneUser> u = new List<UserRelationshipsWithOneUser>();
-
-            u= await _httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUser>>($"api/User/GetUsersByTextNew/{CurrentUserId}/{SearchText}");
-            return u;
+            return await _httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUser>>($"api/User/GetUsersByTextNew/{CurrentUserId}/{SearchText}");
         }
         public async Task<Dictionary<string, string>> GetAllFriends(string id)
         {
@@ -43,7 +40,7 @@ namespace SD.Client.Services
         }
         public async Task<HttpResponseMessage> AddUser(UserModel user)
         {
-                return await _httpClient.PostAsJsonAsync("api/User/Create", user);  
+            return await _httpClient.PostAsJsonAsync("api/User/Create", user);
         }
 
         public async Task<HttpResponseMessage> RemoveUser(string id)
@@ -58,7 +55,7 @@ namespace SD.Client.Services
 
         public async Task<HttpResponseMessage> AddFriendRequest(string userId, string friendId)
         {
-            return await _httpClient.PostAsync($"api/User/AddFriendRequest/{userId}/{friendId}",null);
+            return await _httpClient.PostAsync($"api/User/AddFriendRequest/{userId}/{friendId}", null);
         }
         public async Task<HttpResponseMessage> RemoveFriendRequest(string userId, string friendId)
         {

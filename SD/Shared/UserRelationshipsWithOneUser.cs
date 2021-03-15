@@ -7,6 +7,10 @@ namespace SD.Shared
         public string UserId { get; set; }
         public string RelationalUserName { get; set; }
         public Relation Relation { get; set; }
+       
+        public UserRelationshipsWithOneUser()
+        {
+        }
 
         public UserRelationshipsWithOneUser(string userId, string userName, Relation relation)
         {

@@ -67,7 +67,7 @@ namespace sd.Api.Controllers
 
                 IEnumerable<UserRelationshipsWithOneUser> result = await _relationshipService.GetRelationshipsNew(CurrentUserId, foundUsers);
                 if (result == null) return NotFound();
-                return Ok(result.AsEnumerable());
+                return Ok(result);
             }
             catch (Exception)
             {

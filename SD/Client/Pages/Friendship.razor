@@ -8,13 +8,13 @@
     <div class="col-4">
 
         @{
-            switch (friendshipState)
+            switch (Relationship)
             {
-                case "NotImportant":
+                //case "NotImportant":
 
-                    break;
+                //    break;
 
-                case "Friends":
+                case SD.Shared.Relation.Friend:
 
                     <button type="button" class="btn btn-link"
                             @onclick="@(async () => { await RemoveFriend(friendId); })">
@@ -22,14 +22,14 @@
                     </button>
                     break;
 
-                case "CrrRequest":
+                case SD.Shared.Relation.FriendRequestTo:
 
                     <div class="btn btn-link">
                         <i class="fas fa-paper-plane"></i>
                     </div>
                     break;
 
-                case "UserRequest":
+                case SD.Shared.Relation.FriendRequestFrom:
 
                     <div class="input-group">
                         <div class="input-group-prepend">

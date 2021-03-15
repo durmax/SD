@@ -17,10 +17,7 @@ namespace SD.Client.Pages
         public string friendName { get; set; }
 
         [Parameter]
-        public string friendshipState { get; set; }
-
-        //[Inject]
-        //public UserService UserService { set; get; }
+        public Relation Relationship { get; set; }
         [Inject]
         public RelationshipService RelationshipService { set; get; }
         [Inject]
@@ -42,9 +39,8 @@ namespace SD.Client.Pages
                 var res = await RelationshipService.AddRelationship(relationship);
                 if (res.IsSuccessStatusCode)
                 {
-                    friendshipState = "CrrRequest";
+                   Relationship = Relation.FriendRequestTo;
                 }
-
             }
             else
             {
@@ -61,7 +57,7 @@ namespace SD.Client.Pages
                 var res = await RelationshipService.RemoveFriendship(UserId,Relation.Friend, friendId);
                 if (res.IsSuccessStatusCode)
                 {
-                    friendshipState = null;
+                    Relationship = Relation.None;
                 }
             }
             waitBool = false;
@@ -85,7 +81,7 @@ namespace SD.Client.Pages
                 if (res.IsSuccessStatusCode)
                 {
                     await RemoveFriendRequest();
-                    friendshipState = "Friends";
+                    Relationship = Relation.Friend;
                 }
             }
             waitBool = false;
@@ -99,7 +95,7 @@ namespace SD.Client.Pages
                 var res = await RelationshipService.RemoveFriendship(UserId,Relation.FriendRequestTo, friendId);
                 if (res.IsSuccessStatusCode)
                 {
-                    friendshipState = null;
+                    Relationship = Relation.None;
                 }
             }
             waitBool = false;

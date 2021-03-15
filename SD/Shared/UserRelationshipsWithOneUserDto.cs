@@ -2,17 +2,17 @@
 
 namespace SD.Shared
 {
-    public class UserRelationshipsWithOneUser
+    public class UserRelationshipsWithOneUserDto
     {
         public string UserId { get; set; }
         public string RelationalUserName { get; set; }
         public Relation Relation { get; set; }
        
-        public UserRelationshipsWithOneUser()
+        public UserRelationshipsWithOneUserDto()
         {
         }
 
-        public UserRelationshipsWithOneUser(string userId, string userName, Relation relation)
+        public UserRelationshipsWithOneUserDto(string userId, string userName, Relation relation)
         {
             UserId = userId;
             RelationalUserName = userName;

@@ -122,11 +122,11 @@ namespace sd.Api.Services
         } //    ||
         //     \  /
         //      \/
-        public async Task<List<UserRelationshipsWithOneUser>> GetRelationshipsNew(string CurrentUserId, List<UserModel> users)
+        public async Task<List<UserRelationshipsWithOneUserDto>> GetRelationshipsNew(string CurrentUserId, List<UserModel> users)
         {
             if (CurrentUserId == null || users == null) throw new ArgumentNullException();
 
-            List<UserRelationshipsWithOneUser> relationships = new List<UserRelationshipsWithOneUser>();
+            List<UserRelationshipsWithOneUserDto> relationships = new List<UserRelationshipsWithOneUserDto>();
             
             if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")
             {
@@ -136,7 +136,7 @@ namespace sd.Api.Services
             foreach (var user in users)
             {
                 Relation relation = await _relationshipRepository.GetRelationshipsBetweenTwoUsers(CurrentUserId, user.UserId);
-                var s = new UserRelationshipsWithOneUser(user.UserId, user.Name, relation);
+                var s = new UserRelationshipsWithOneUserDto(user.UserId, user.Name, relation);
                 if (s!=null)
                 {
                           relationships.Add(s );

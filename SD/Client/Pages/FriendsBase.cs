@@ -9,7 +9,7 @@ namespace SD.Client.Pages
 {
     public class FriendsBase : ComponentBase
     {
-        public IEnumerable<UserRelationshipsWithOneUser> foundUsers { set; get; }
+        public IEnumerable<UserRelationshipsWithOneUserDto> foundUsers { set; get; }
 
         protected int? FriendsCount { set; get; }
 

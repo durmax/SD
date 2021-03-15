@@ -58,14 +58,14 @@ namespace sd.Api.Controllers
 
         // GET: api/User/GetUsersByText/Dured
         [HttpGet("GetUsersByTextNew/{CurrentUserId}/{searchText}")]
-        public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUser>>> GetUsersByTextNew(string CurrentUserId, string searchText)
+        public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetUsersByTextNew(string CurrentUserId, string searchText)
         {
             List<UserModel> foundUsers;
             try
             {
                 foundUsers = await _userService.SearchUser(CurrentUserId, searchText);
 
-                IEnumerable<UserRelationshipsWithOneUser> result = await _relationshipService.GetRelationshipsNew(CurrentUserId, foundUsers);
+                IEnumerable<UserRelationshipsWithOneUserDto> result = await _relationshipService.GetRelationshipsNew(CurrentUserId, foundUsers);
                 if (result == null) return NotFound();
                 return Ok(result);
             }

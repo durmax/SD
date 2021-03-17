@@ -219,7 +219,7 @@ namespace sd.Api.Controllers
         }
 
         [HttpGet("GetLikedUsers/{CurrentUserId}/{wordId}")]
-        public async Task<ActionResult<Dictionary<string, Tuple<string, string>>>> GetLikes(string CurrentUserId, string wordId)
+        public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetLikes(string CurrentUserId, string wordId)
         {
             try
             {

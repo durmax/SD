@@ -83,46 +83,7 @@ namespace sd.Api.Services
             return friendsIds;
         }
 
-        // This method must Improve
-        public async Task<Dictionary<string, Tuple<string, string>>> GetRelationships(string CurrentUserId, List<UserModel> users)
-        {
-            string relation = null;
-            Dictionary<string, Tuple<string, string>> res = new Dictionary<string, Tuple<string, string>>();
-
-            if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")
-            {
-                users.RemoveAll(u => u.UserId == CurrentUserId); //remove Sercher from list
-            }
-
-            foreach (var user in users)
-            {
-
-                if (CurrentUserId != null)
-                {
-                    var r1 = await FriendRequestsToUser(user.UserId);
-                    var r2 = await FriendRequestsToUser(CurrentUserId);
-
-                    if (r1.ContainsKey(CurrentUserId)) relation = "CrrRequest";
-
-                    else if (r2.ContainsKey(CurrentUserId)) relation = "UserRequest";
-
-                    else if (await AreFrinds(user.UserId, CurrentUserId) != "0")
-                    {
-                        relation = "Friends";
-                    }
-
-                }
-
-                var userT = Tuple.Create(user.Name, relation);
-                res.Add(user.UserId, userT);
-
-                relation = null;
-            }
-            return res;
-        } //    ||
-        //     \  /
-        //      \/
-        public async Task<List<UserRelationshipsWithOneUserDto>> GetRelationshipsNew(string CurrentUserId, List<UserModel> users)
+        public async Task<List<UserRelationshipsWithOneUserDto>> GetRelationships(string CurrentUserId, List<UserModel> users)
         {
             if (CurrentUserId == null || users == null) throw new ArgumentNullException();
 

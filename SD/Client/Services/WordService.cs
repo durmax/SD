@@ -81,9 +81,10 @@ namespace SD.Client.Services
         {
             return await _httpClient.GetFromJsonAsync<int>($"api/Word/Like/{userId}/{wordId}", null);
         }
-        public async Task<Dictionary<string, Tuple<string, string>>> GetLikedUsers(string userId, string wordId)
+
+        public async Task<IEnumerable<UserRelationshipsWithOneUserDto>> GetLikedUsers(string userId, string wordId)
         {
-            return await _httpClient.GetFromJsonAsync<Dictionary<string, Tuple<string, string>>>($"api/Word/GetLikedUsers/{userId}/{wordId}");
+            return await _httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{userId}/{wordId}");
         }
     }
 }

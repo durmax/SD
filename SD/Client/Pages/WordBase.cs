@@ -311,7 +311,7 @@ namespace SD.Client.Pages
         /// </summary>
         public int? LikesCount { get; set; }
         protected bool CULiked { get; set; } = false;
-        protected Dictionary<string, Tuple<string, string>> likedUsers;
+        protected IEnumerable<UserRelationshipsWithOneUserDto> likedUsers;
 
         protected async Task GetLikedUsers(int? likesCount)
         {

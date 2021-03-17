@@ -159,7 +159,7 @@
             {
                 @foreach (var foudUser in likedUsers)
                 {
-                    <Friendship UserId="@CurrentUser.id" friendId="@foudUser.Key" friendName="@foudUser.Value.Item1" friendshipState="NotImportant"></Friendship>
+                    <Friendship UserId="@CurrentUser.id" friendId="@foudUser.UserId" friendName="@foudUser.RelationalUserName" Relationship="foudUser.Relation"></Friendship>
                 }
             }
         </div>

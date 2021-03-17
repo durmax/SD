@@ -65,7 +65,7 @@ namespace sd.Api.Controllers
             {
                 foundUsers = await _userService.SearchUser(CurrentUserId, searchText);
 
-                IEnumerable<UserRelationshipsWithOneUserDto> result = await _relationshipService.GetRelationshipsNew(CurrentUserId, foundUsers);
+                IEnumerable<UserRelationshipsWithOneUserDto> result = await _relationshipService.GetRelationships(CurrentUserId, foundUsers);
                 if (result == null) return NotFound();
                 return Ok(result);
             }

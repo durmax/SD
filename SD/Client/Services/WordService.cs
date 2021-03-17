@@ -21,23 +21,9 @@ namespace SD.Client.Services
             return await _httpClient.PostAsJsonAsync("api/Word/AddWord", word);
         }
 
-        //public async Task<Tuple<int, List<WordModel>>> GetWords(string currUsrId, string lang, int pageSize, int currentPage)
-        //{
-        //    //await GetCurrentUserId();
-        //    try
-        //    {
-        //        return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordModel>>>($"api/Word/GetWords/{currUsrId}/{lang}/{pageSize}/{currentPage}");
-        //    }
-        //    catch
-        //    {
-        //        return null;
-        //    }
-
-        //}
-
         public async Task<Tuple<int, List<WordDto>>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
         {
-            if (userId==null)
+            if (userId == null)
             {
                 userId = CurrentUserId;
             }

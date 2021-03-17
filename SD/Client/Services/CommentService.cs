@@ -20,7 +20,7 @@ namespace SD.Client.Services
             return await _httpClient.PostAsJsonAsync($"api/Comment/SaveComment/{WordId}", comment);
         }
 
-        public async Task<HttpResponseMessage> RemoveComment(string currUsr,  string wordId, string commentId)
+        public async Task<HttpResponseMessage> RemoveComment(string currUsr, string wordId, string commentId)
         {
             if (string.IsNullOrEmpty(wordId) || string.IsNullOrEmpty(commentId))
             {

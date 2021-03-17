@@ -23,28 +23,28 @@
         </div>
     }
 }
-    <Word Collapsed="false" OnWordSave="@NewWordHandler"></Word>
-    @if (Words != null)
+<Word Collapsed="false" OnWordSave="@NewWordHandler"></Word>
+@if (Words != null)
+{
+    @foreach (var word in Words)
     {
-        @foreach (var word in Words)
-        {
-            <Word wordDto="word" Collapsed="true" OnWordDelete="DeleteWordHandler"></Word>
-        }
+        <Word wordDto="word" Collapsed="true" OnWordDelete="DeleteWordHandler"></Word>
     }
-    @if (loading)
+}
+@if (loading)
+{
+    <button type="button" class="btn btn-light">
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </button>
+}
+else
+{
+    @if (CurrentUser.isAuthTested)
     {
-        <button type="button" class="btn btn-light">
-            <div class="spinner-border spinner-border-sm" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
+        <button class="btn btn-outline-secondary bg-white text-dark m-2" type="button" @onclick="GetNextPage">
+            Load more Words
         </button>
     }
-    else
-    {
-        @if (CurrentUser.isAuthTested)
-        {
-            <button class="btn btn-outline-secondary bg-white text-dark m-2" type="button" @onclick="GetNextPage">
-                Load more Words
-            </button>
-        }
-    }
+}

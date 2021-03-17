@@ -101,19 +101,7 @@ namespace SD.Client.Pages
             loading = true;
             if (!string.IsNullOrWhiteSpace(CurrentUser.id))
             {
-                if (string.IsNullOrWhiteSpace(wordDto.UserId) || CurrentUser.id != wordDto.UserId)
-                {
-                    //    wordModel.UserId = CurrentUser.id;
-                    //    wordModel.WordId = Guid.NewGuid().ToString();
-                    //    wordModel.CreatedAt = DateTime.Now;
-                    //    wordModel.Likes = null;
-                }
                 wordDto.Explain = MyText;
-                //if (wordModel.Comments != null)
-                //{
-                //    wordModel.Comments.RemoveAll(x => x.CommentId == null);
-                //    wordModel.Comments.RemoveAll(x => x.UserId != CurrUsrService.id);
-                //}
 
                 HttpResponseMessage respons = await WordService.AddWord(wordDto);
 
@@ -132,10 +120,7 @@ namespace SD.Client.Pages
                     {
                         note = $"{wordDto.Title} is Saved";
                         MyText = "";
-                        //if (CurrUsrService.id == UserId)
-                        //{
                         await OnWordSave.InvokeAsync(wordDto);
-                        //}
                         await NewWordAsync();
                     }
                 }
@@ -385,15 +370,7 @@ namespace SD.Client.Pages
         protected override void OnParametersSet()
         {
             note = null;
-
             SetMyText();
-
-            //if (wordModel?.Comments != null)
-            //{
-            //    wordComments = wordModel.Comments;
-            //    wordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
-            //}
-
             switch (wordDto?.ShareWith)
             {
                 case 0:

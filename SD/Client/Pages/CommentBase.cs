@@ -107,6 +107,7 @@ namespace SD.Client.Pages
                 {
                     if (!string.IsNullOrWhiteSpace(commentModel.UserId) && (CurrentUserId == commentModel.UserId || CurrentUserId == WordUserId))
                     {
+                        await CommentService.RemoveComment(CurrentUserId, WordId, commentModel.CommentId);
                         await OnCommentDelete.InvokeAsync(commentModel);
                     }
                 }

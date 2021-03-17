@@ -19,8 +19,22 @@ namespace sd.Api.Controllers
             _commentService = commentService;
         }
 
+        [HttpGet("GetWordComments/{wordId}")]
+        public async Task<ActionResult<OtherPageResModel>> GetWordComments(string wordId)
+        {
+            try
+            {
+                return Ok(await _commentService.GetWordComments(wordId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
         [HttpPost]
-        [Route("SaveComment/{WordId}")]
+        [Route("SaveComment/{wordId}")]
         public async Task<ActionResult> SaveComment(string wordId, CommentModel comment)
         {
             if (await _commentService.SaveComment(wordId, comment))
@@ -41,6 +55,19 @@ namespace sd.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ex.Message);
+            }
+        }
+        [HttpDelete("DeleteComment/{currUsr}/{wordId}/{commentId}")]
+        public async Task<ActionResult<bool>> DeleteComment(string currUsr, string wordId, string commentId)
+        {
+            try
+            {
+                return Ok(await _commentService.Remove( currUsr,  wordId,  commentId));
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error deleting data");
             }
         }
     }

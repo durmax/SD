@@ -22,7 +22,7 @@ namespace SD.Client.Pages
         public RelationshipService RelationshipService { set; get; }
 
         [Inject]
-        CurrentUserService CurrUsrService { set; get; }
+        CurrentUser CurrentUser { set; get; }
 
         protected string currUserId { get; set; }
 
@@ -48,9 +48,9 @@ namespace SD.Client.Pages
 
         protected async override Task OnInitializedAsync()
         {
-                if (CurrUsrService.isAuthenticated)
+                if (CurrentUser.isAuthenticated)
                 {
-                    currUserId = CurrUsrService.id;
+                    currUserId = CurrentUser.id;
 
                     FriendsDictionary = new Dictionary<string, string>();
                     FriendsDictionary = await RelationshipService.GetAllFriends(currUserId);

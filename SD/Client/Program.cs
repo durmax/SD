@@ -8,6 +8,7 @@ using SD.Client.Services;
 using SD.Client.Models;
 using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
+using SD.Shared;
 
 namespace SD.Client
 {
@@ -37,6 +38,8 @@ namespace SD.Client
             builder.Services.AddSingleton<LangCodeService>();
             builder.Services.AddSingleton<KnownLangsService>();
             builder.Services.AddSingleton<DefaultLangsService>();
+            builder.Services.AddSingleton<CurrentUser>();
+
 
             builder.Services.AddScoped<CurrentUserService>();
 

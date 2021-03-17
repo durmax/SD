@@ -9,6 +9,8 @@ using sd.Api.Models;
 using sd.Api.Repositories;
 using sd.Api.Helpers;
 using sd.Api.Services;
+using SD.Shared;
+using AutoMapper;
 
 namespace sd.Api
 {
@@ -42,9 +44,12 @@ namespace sd.Api
             services.AddSingleton<UserService>();
             services.AddSingleton<OtherPageService>();
 
+            services.AddSingleton<CurrentUser>();
+
             services.AddDataProtection();
 
             services.AddControllers();
+            services.AddAutoMapper(typeof(Startup));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

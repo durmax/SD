@@ -16,7 +16,7 @@ namespace SD.Client.Services
             _httpClient = httpClient;
         }
 
-        public async Task<HttpResponseMessage> AddWord(WordModel word)
+        public async Task<HttpResponseMessage> AddWord(WordDto word)
         {
             return await _httpClient.PostAsJsonAsync("api/Word/AddWord", word);
         }
@@ -35,35 +35,35 @@ namespace SD.Client.Services
 
         //}
 
-        public async Task<Tuple<int, List<WordModel>>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
+        public async Task<Tuple<int, List<WordDto>>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
         {
             if (userId==null)
             {
                 userId = CurrentUserId;
             }
-            return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordModel>>>($"api/Word/GetPageWordsFromUserID/{CurrentUserId}/{userId}/{pageSize}/{currentPage}");
+            return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordDto>>>($"api/Word/GetPageWordsFromUserID/{CurrentUserId}/{userId}/{pageSize}/{currentPage}");
         }
 
-        public async Task<Tuple<int, List<WordModel>>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)
+        public async Task<Tuple<int, List<WordDto>>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)
         {
             CurrentUserId ??= "0";
-            return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordModel>>>($"api/Word/GetPageWordsFromAllUseres/{CurrentUserId}/{pageSize}/{currentPage}");
+            return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordDto>>>($"api/Word/GetPageWordsFromAllUseres/{CurrentUserId}/{pageSize}/{currentPage}");
         }
 
-        public async Task<WordModel> GetWordById(string id)
+        public async Task<WordDto> GetWordById(string id)
         {
-            return await _httpClient.GetFromJsonAsync<WordModel>($"api/Word/GetWord/{id}");
+            return await _httpClient.GetFromJsonAsync<WordDto>($"api/Word/GetWord/{id}");
         }
 
-        public async Task<WordModel> GetWordByText(string userId, string title)
+        public async Task<WordDto> GetWordByText(string userId, string title)
         {
             try
             {
-                return await _httpClient.GetFromJsonAsync<WordModel>($"api/Word/GetWordByText/{userId}/{title}");
+                return await _httpClient.GetFromJsonAsync<WordDto>($"api/Word/GetWordByText/{userId}/{title}");
             }
             catch
             {
-                return new WordModel();
+                return new WordDto();
             }
         }
 
@@ -72,7 +72,7 @@ namespace SD.Client.Services
             return await _httpClient.DeleteAsync($"api/Word/DeleteWord/{id}");
         }
 
-        public async Task<HttpResponseMessage> UpdateWord(WordModel newWord)
+        public async Task<HttpResponseMessage> UpdateWord(WordDto newWord)
         {
             return await _httpClient.PutAsJsonAsync($"api/Word/UpdateWord", newWord);
         }

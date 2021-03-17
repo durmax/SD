@@ -20,11 +20,14 @@ namespace SD.Client.Pages
         [Inject]
         public CurrentUserService CurrUsrService { set; get; }
 
+        [Inject]
+        public CurrentUser CurrentUser{ set; get; }
+
         protected bool Collapsed { get; set; } = true;    // hide by default
 
         protected Dictionary<string, string> FriendRequestsDictionary = new Dictionary<string, string>();
 
-        protected List<WordModel> Words { get; set; } = new List<WordModel>();
+        protected List<WordDto> Words { get; set; } = new List<WordDto>();
         [Inject]
         public WordService WordService { set; get; }
         [Inject]
@@ -39,7 +42,7 @@ namespace SD.Client.Pages
             loading = true;
             TLang = DefaultLangsService.DefaultToLang;
             currentPage++;
-            var res = await WordService.GetPageWordsFromAllUseres(CurrUsrService.id, 10, currentPage);
+            var res = await WordService.GetPageWordsFromAllUseres(CurrentUser.id, 10, currentPage);
             if (res != null)
             {
                 currentPage = res.Item1;
@@ -48,17 +51,17 @@ namespace SD.Client.Pages
             }
             loading = false;
         }
-        protected void NewWordHandler(WordModel newWord)
+        protected void NewWordHandler(WordDto newWord)
         {
             Words.Add(newWord);
         }
-        protected void DeleteWordHandler(WordModel word)
+        protected void DeleteWordHandler(WordDto word)
         {
             Words.Remove(word);
         }
         protected override async Task OnInitializedAsync()
         {
-            if (!CurrUsrService.isAuthTested) await CurrUsrService.GetAuth();
+            if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();
 
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
 
@@ -73,7 +76,7 @@ namespace SD.Client.Pages
 
             try
             {
-                FriendRequestsDictionary = await RelationshipService.GetFriendRequestsById(CurrUsrService.id);
+                FriendRequestsDictionary = await RelationshipService.GetFriendRequestsById(CurrentUser.id);
             }
             catch
             {

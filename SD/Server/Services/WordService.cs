@@ -1,4 +1,5 @@
-﻿using sd.Api.Interfaces;
+﻿using AutoMapper;
+using sd.Api.Interfaces;
 using SD.Shared;
 using System;
 using System.Collections.Generic;
@@ -10,20 +11,24 @@ namespace sd.Api.Services
     {
         private readonly IWordRepository _wordRepository;
         private readonly RelationshipService _relationshipService;
+        private readonly CurrentUser _currentUser;
+        private readonly IMapper _mapper;
 
-
-        public WordService(IWordRepository wordRepository, RelationshipService relationshipService)
+        public WordService(IWordRepository wordRepository, RelationshipService relationshipService, CurrentUser currentUser, IMapper mapper)
         {
             _wordRepository = wordRepository;
             _relationshipService = relationshipService;
+            _currentUser = currentUser;
+            _mapper = mapper;
         }
 
-        public async Task<Tuple<int, List<WordModel>>> GetPageWords(string currentUserId, string userId, string lang, int pageSize, int currentPage)
+        public async Task<Tuple<int, List<WordDto>>> GetPageWords(string currentUserId, string userId, string lang, int pageSize, int currentPage)
         {
-            List<WordModel> words = new List<WordModel>();
+            List<WordDto> words = new List<WordDto>();
             WordModel word;
+            WordDto wordDto;
             int newCurrentPage = currentPage;
-            Tuple<int, List<WordModel>> Res;
+            Tuple<int, List<WordDto>> Res;
 
             long wordsCount = await _wordRepository.GetDocCount(userId, lang);
 
@@ -36,19 +41,39 @@ namespace sd.Api.Services
                 word = await _wordRepository.GetWord(userId, lang, newCurrentPage, 1);
                 if (word != null)
                 {
-                    if (await IsWordShareWithUser(word, currentUserId)) words.Add(word);
+                    wordDto = _mapper.Map<WordDto>(word);
+                    if (await IsWordShareWithUser(wordDto, currentUserId))
+                    {
+                        //maping
+                        //wordDto = new WordDto
+                        //{
+                        //    WordId = word.WordId,
+                        //    UserId = word.UserId,
+                        //    UserName = "nnnn",
+                        //    Title = word.Title,
+                        //    WordLang = word.WordLang,
+                        //    ToLang = word.ToLang,
+                        //    Explain = word.Explain,
+                        //    ShareWith = word.ShareWith,
+                        //    IsILiked = true,
+                        //    LikesCount = word.Likes.Count,
+                        //    CommentsCont = word.Comments.Count,
+                        //};
+                        
+                        words.Add(wordDto);
+                    }
                 }
-
                 newCurrentPage++;
             }
 
-            Res = new Tuple<int, List<WordModel>>(newCurrentPage, words);
+            Res = new Tuple<int, List<WordDto>>(newCurrentPage, words);
 
             return Res;
         }
 
-        private async Task<bool> IsWordShareWithUser(WordModel word, string userId)
+        private async Task<bool> IsWordShareWithUser(WordDto wordDto, string userId)
         {
+            var word = _mapper.Map<WordModel>(wordDto);
             bool areSame = userId == word.UserId ? true : false;
 
             if (areSame)
@@ -76,24 +101,45 @@ namespace sd.Api.Services
             return false;
         }
 
+        public async Task<WordDto> GetWordDtoById(string id)
+        {
+            var word = await _wordRepository.GetWordById(id);
+            return _mapper.Map<WordDto>(word);
+        }
         public async Task<WordModel> GetWordById(string id)
         {
-            return await _wordRepository.GetWordById(id);
+           return await _wordRepository.GetWordById(id);
+             
         }
 
-        public async Task<WordModel> GetWordByText(string userId, string text)
+        public async Task<WordDto> GetWordByText(string userId, string text)
         {
-            return await _wordRepository.GetWordByText(userId, text);
+            var word = await _wordRepository.GetWordByText(userId, text);
+            return _mapper.Map<WordDto>(word);
         }
 
-        public async Task<bool> AddWord(WordModel word)
+        public async Task<bool> AddWord(WordDto wordDto)
         {
-            return await _wordRepository.AddWord(word);
+            return await _wordRepository.AddWord(_mapper.Map<WordModel>(wordDto));
         }
 
-        public async Task<bool> UpdateWord(string wordId, WordModel updatedWord)
+        public async Task<bool> UpdateWord(string wordId, WordDto updatedWordDto)
         {
-            return await _wordRepository.UpdateWord(wordId, updatedWord);
+            var word = _mapper.Map<WordModel>(updatedWordDto);
+            if (string.IsNullOrWhiteSpace(word.UserId))
+            {
+                word.UserId = _currentUser.id;
+                word.WordId = Guid.NewGuid().ToString();
+                word.CreatedAt = DateTime.Now;
+                word.Likes = null;
+            }
+
+            if (word.Comments != null)
+            {
+                word.Comments.RemoveAll(x => x.CommentId == null);
+                word.Comments.RemoveAll(x => x.UserId != _currentUser.id);
+            }
+            return await _wordRepository.UpdateWord(wordId, word);
         }
 
         public async Task<bool> RemoveWord(string id)

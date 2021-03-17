@@ -58,7 +58,7 @@ namespace sd.Api.Services
             CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
             if (comment == null) return 0;
             if (comment == null) comment.Likes = new List<string>();
-            
+
             if (!comment.Likes.Contains(userId))
             {
                 comment.Likes.Add(userId);
@@ -69,6 +69,30 @@ namespace sd.Api.Services
             }
             await SaveComment(wordId, comment);
             return comment.Likes.Count();
+        }
+
+        public async Task<bool> Remove(string currUsr, string wordId, string commentId)
+        {
+            WordModel word = await _wordService.GetWordById(wordId);
+
+            CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
+            if (comment == null) return false;
+            if (comment.UserId != currUsr) return false;
+
+            if (word.Comments.Contains(comment))
+            {
+                word.Comments.Remove(comment);
+                await _wordService.UpdateWord(wordId, word);
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<IEnumerable<CommentModel>> GetWordComments(string wordId)
+        {
+             WordModel word = await _wordService.GetWordById(wordId);
+            //if (word.UserId != currUsr) return null;
+            return word.Comments;
         }
     }
 }

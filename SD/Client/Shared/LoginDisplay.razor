@@ -1,7 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inject ILanguageContainerService languageContainer
-@inject SD.Client.Services.CurrentUserService     CurrUsrService
+@inject SD.Client.Services.CurrentUserService CurrUsrService
+@inject SD.Shared.CurrentUser CurrentUser
 
 
 @inject NavigationManager Navigation
@@ -28,6 +29,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (!CurrUsrService.isAuthTested) await CurrUsrService.GetAuth();
+        if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();
     }
 }

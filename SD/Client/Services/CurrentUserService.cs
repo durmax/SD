@@ -9,33 +9,31 @@ namespace SD.Client.Services
     {
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly UserService _userService;
+        private readonly CurrentUser _currentUser;
 
-        public CurrentUserService(AuthenticationStateProvider authenticationStateProvider, UserService userService)
+        public CurrentUserService(AuthenticationStateProvider authenticationStateProvider, 
+            UserService userService, CurrentUser currentUser)
         {
             _authenticationStateProvider = authenticationStateProvider;
             _userService = userService;
+            _currentUser = currentUser;
         }
 
-        public string id;
-        public string name;
-        public string email;
-        public bool isAuthenticated;
-        public bool isAuthTested;
-
+        
         public async Task GetAuth()
         {
             var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-            isAuthenticated= authState.User.Identity.IsAuthenticated;
-            if (isAuthenticated)
+            _currentUser.isAuthenticated = authState.User.Identity.IsAuthenticated;
+            if (_currentUser.isAuthenticated)
             {
-                id = authState.User.FindFirst(c => c.Type == "oid")?.Value;
-                name = authState.User.Identity.Name;
-                email = authState.User.FindFirst(c => c.Type == "email")?.Value;
+                _currentUser.id = authState.User.FindFirst(c => c.Type == "oid")?.Value;
+                _currentUser.name = authState.User.Identity.Name;
+                _currentUser.email = authState.User.FindFirst(c => c.Type == "email")?.Value;
             }
 
-            await AddUserAsync(id, email, name);
+            await AddUserAsync(_currentUser.id, _currentUser.email, _currentUser.name);
 
-            isAuthTested = true;
+            _currentUser.isAuthTested = true;
         }
         private async Task AddUserAsync(string currUserId, string email, string name)
         {

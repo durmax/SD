@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using SD.Client.Services;
 using SD.Shared;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -11,13 +11,11 @@ namespace SD.Client.Pages
     {
         [Inject]
         public WordService WordService { set; get; }
-        [Inject]
-        NavigationManager NavigationManager { get; set; }
 
         [Inject]
         DefaultLangsService DefaultLangsService { get; set; }
         [Inject]
-        public CurrentUserService CurrUsrService { get; set; }
+        public CurrentUser CurrentUser { get; set; }
 
         [Parameter]
         public string UserId { get; set; }
@@ -30,15 +28,36 @@ namespace SD.Client.Pages
         protected string TLang;
 
 
-        protected List<WordModel> Words { get; set; }
+        protected List<WordDto> Words { get; set; }
 
-        protected void NewWordHandler(WordModel newWord)
+        protected void NewWordHandler(WordDto wordDto)
         {
-            Words.Add(newWord);
+            //var newWord = new WordModel
+            //{
+            //    WordId = wordDto.WordId,
+            //    WordLang = wordDto.WordLang,
+            //    ToLang = wordDto.ToLang,
+            //    UserId = wordDto.UserId,
+            //    Explain = wordDto.Explain,
+            //    ShareWith = wordDto.ShareWith,
+            //    Title = wordDto.Title
+            //};
+
+            Words.Add(wordDto);
         }
-        protected void DeleteWordHandler(WordModel word)
+        protected void DeleteWordHandler(WordDto wordDto)
         {
-            Words.Remove(word);
+            //var newWord = new WordModel
+            //{
+            //    WordId = wordDto.WordId,
+            //    WordLang = wordDto.WordLang,
+            //    ToLang = wordDto.ToLang,
+            //    UserId = wordDto.UserId,
+            //    Explain = wordDto.Explain,
+            //    ShareWith = wordDto.ShareWith,
+            //    Title = wordDto.Title
+            //};
+            Words.Remove(wordDto);
         }
 
         protected async Task InitAsync()
@@ -69,14 +88,29 @@ namespace SD.Client.Pages
 
             if (Words == null)
             {
-                Words = new List<WordModel>();
+                Words = new List<WordDto>();
             }
-            var res = await WordService.GetPageWordsFromUserID(CurrUsrService.id, UserId, 10, currentPage);
+            var res = await WordService.GetPageWordsFromUserID(CurrentUser.id, UserId, 10, currentPage);
             if (res != null)
             {
                 currentPage = res.Item1;
-                Words.AddRange(res.Item2);
-                //Words= Words.Union(res.Item2).ToList();
+                foreach (var w in res.Item2)
+                {
+                    //var wordDto = new WordDto
+                    //{
+                    //    WordId = w.WordId,
+                    //    WordLang = w.WordLang,
+                    //    ToLang = w.ToLang,
+                    //    UserId = w.UserId,
+                    //    Title = w.Title,
+                    //    Explain = w.Explain,
+                    //    CommentsCont = w.CommentsCont,
+                    //    IsILiked = w.IsILiked,
+                    //    LikesCount = w.LikesCount,
+                    //    ShareWith = w.ShareWith
+                    //};
+                    Words.Add(w);
+                }
             }
             loading = false;
         }

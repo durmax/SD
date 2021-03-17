@@ -6,13 +6,13 @@
 <h3>@UserName</h3>
 
 <div class="sticky-top pb-1">
-    <Word UserId="@CurrUsrService.id" OnWordSave="NewWordHandler" Collapsed="Collapsed"></Word>
+    <Word UserId="@CurrentUser.id" OnWordSave="NewWordHandler" Collapsed="Collapsed"></Word>
 </div>
 @if (Words != null)
 {
     @foreach (var word in Words)
-    {   
-        <Word wordModel="word" Collapsed="true" OnWordDelete="DeleteWordHandler"></Word>
+    {
+        <Word wordDto="word" Collapsed="true" OnWordDelete="DeleteWordHandler"></Word>
     }
 }
 @if (loading)

@@ -18,6 +18,8 @@ namespace SD.Client.Pages
         public UserService UserService { set; get; }
         [Inject]
         public CurrentUserService CurrUsrService { set; get; }
+        [Inject]
+        public CurrentUser CurrentUser { set; get; }
 
         [Parameter]
         public string UserId { get; set; }
@@ -81,10 +83,10 @@ namespace SD.Client.Pages
         protected async override Task OnInitializedAsync()
         {
             //if (!CurrUsrService.isAuthTested) await CurrUsrService.GetAuth();
-            currUserId = CurrUsrService.id;
+            currUserId = CurrentUser.id;
             if (currUserId != "0")
             {
-                await AddUserAsync(currUserId, CurrUsrService.email, CurrUsrService.name);
+                await AddUserAsync(currUserId, CurrentUser.email, CurrentUser.name);
             }
 
             if (string.IsNullOrWhiteSpace(UserId))

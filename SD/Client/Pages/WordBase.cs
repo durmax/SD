@@ -358,8 +358,12 @@ namespace SD.Client.Pages
                 wordComments = new List<CommentModel>();
                 if (wordDto?.WordId != null)
                 {
-                    wordComments = (List<CommentModel>)await CommentService.GetWordComments(wordDto?.WordId);
-                    wordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
+                    try
+                    {
+                        wordComments = (List<CommentModel>)await CommentService.GetWordComments(wordDto?.WordId);
+                        wordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
+                    }
+                    catch {}
                 }
             }
         }

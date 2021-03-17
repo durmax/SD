@@ -300,6 +300,7 @@ namespace SD.Client.Pages
 
         protected async Task GetLikedUsers(int? likesCount)
         {
+            CollapsedLike = !CollapsedLike;
             if (!CollapsedLike && likesCount != null)
             {
                 likedUsers = await WordService.GetLikedUsers(CurrentUser.id, wordDto.WordId);

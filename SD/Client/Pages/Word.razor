@@ -121,37 +121,36 @@
     @if (wordDto != null)
     {
         <div class="card-footer p-0">
-            <div class="row">
-                <div class="col-4">
+            <div class="row  fs-6">
+                <div class="col-5">
                     <button type="button" style="float:left" class="btn btn-light bg-transparent" @onclick="async () => { await Like(); }">
                         <img width="20" height="20" src=@(CULiked ? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg") asp-append-version="true" />
-                        @LikesCount
+
                     </button>
 
                     @if (LikesCount != null && (CULiked ? LikesCount > 1 : LikesCount > 0))
                     {
-                        <button type="button" class="btn btn-light bg-transparent" @onclick="async () => { CollapsedLike = (CollapsedLike) ? false : true; await GetLikedUsers(LikesCount); }">
-                            <i class="@(CollapsedLike ? "oi oi-caret-bottom" : "oi oi-caret-top") pt-1 pl-1"></i>
+                        <button type="button" class="btn btn-light bg-transparent" @onclick="async () => { await GetLikedUsers(LikesCount); }">
+                            @LikesCount <i>likes</i>
                         </button>
                     }
                 </div>
 
-                <div type="button" style="float:right" class="col-4 btn btn-light bg-transparent" @onclick="OnCollapsed">
-                    @* <i class="@(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>*@
+                <div type="button" style="float:right" class="col-2 btn btn-light bg-transparent" @onclick="OnCollapsed">
                     @if (!Collapsed)
                     {
                         <i class="oi oi-collapse-up"></i>
                     }
                 </div>
 
-                <div class="col-4">
+                <div class="col-5">
                     <button type="button" style="float:right" class="btn btn-light bg-transparent" @onclick="GetWordCommentsAsync">
+                        @if (wordDto.CommentsCount > 0)
+                        {@wordDto.CommentsCount <i>Comments </i>}
+
                         <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
-                        @wordDto.CommentsCount
                     </button>
                 </div>
-
-
             </div>
         </div>
         <div class=@(CollapsedLike ? "collapse" : "")>

@@ -8,15 +8,11 @@ namespace sd.Api.Mappings
     {
         public AutoMapperProfile()
         {
-
             CreateMap<WordModel, WordDto>()
-                .ForMember(dto => dto.CommentsCount, exp => exp.MapFrom(w=> w.Comments.Count))
-                .ForMember(dto => dto.LikesCount, exp => exp.MapFrom(w=> w.Likes.Count))
-                ;
-            CreateMap<IEnumerable<WordModel>, IEnumerable<WordDto>>();
+                .ForMember(dto => dto.CommentsCount, exp => exp.MapFrom(w => w.Comments.Count))
+                .ForMember(dto => dto.LikesCount, exp => exp.MapFrom(w => w.Likes.Count));
 
             CreateMap<WordDto, WordModel>();
-            CreateMap<IEnumerable<WordDto>, IEnumerable<WordModel>>();
         }
     }
 }

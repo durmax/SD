@@ -14,7 +14,6 @@ namespace sd.Api.Controllers
     [ApiController]
     public class WordController : ControllerBase
     {
-        // private readonly IWordRepository _wordRepository;
         private readonly UserService _userService;
         private readonly ILikeWordService _likeWord;
         private readonly WordService _wordService;
@@ -24,7 +23,6 @@ namespace sd.Api.Controllers
             WordService wordService, RelationshipService relationshipService
             )
         {
-            //_wordRepository = wordRepository;
             _userService = userService;
             _likeWord = likeWord;
             _wordService = wordService;
@@ -89,7 +87,6 @@ namespace sd.Api.Controllers
         {
             try
             {
-                //return int: newCurrentPage, List<WordModel>: words
                 return Ok(await _wordService.GetPageWords(CurrentUserId, null, null, pageSize, currentPage));
             }
             catch (Exception ex)

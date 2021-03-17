@@ -44,22 +44,7 @@ namespace sd.Api.Services
                     wordDto = _mapper.Map<WordDto>(word);
                     if (await IsWordShareWithUser(wordDto, currentUserId))
                     {
-                        //maping
-                        //wordDto = new WordDto
-                        //{
-                        //    WordId = word.WordId,
-                        //    UserId = word.UserId,
-                        //    UserName = "nnnn",
-                        //    Title = word.Title,
-                        //    WordLang = word.WordLang,
-                        //    ToLang = word.ToLang,
-                        //    Explain = word.Explain,
-                        //    ShareWith = word.ShareWith,
-                        //    IsILiked = true,
-                        //    LikesCount = word.Likes.Count,
-                        //    CommentsCont = word.Comments.Count,
-                        //};
-                        
+                        if (word.Likes!=null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
                         words.Add(wordDto);
                     }
                 }

@@ -44,8 +44,6 @@ namespace sd.Api
             services.AddSingleton<UserService>();
             services.AddSingleton<OtherPageService>();
 
-            services.AddSingleton<CurrentUser>();
-
             services.AddDataProtection();
 
             services.AddControllers();

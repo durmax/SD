@@ -41,6 +41,7 @@ namespace sd.Api.Services
 
         public async Task<TransObj> RegisterUserAsync(UserModel user)
         {
+            var transObj = new TransObj();
             bool IsEmailExist = await CheckEmail(user.Email);
 
             if (!IsEmailExist)
@@ -48,13 +49,13 @@ namespace sd.Api.Services
                 user.CreatedAt = DateTime.Now;
 
                 await _userRepository.RegisterUserAsync(user);
-
-                return new TransObj { BoolVar = true, SetringVar = "User Details Inserted Successfully" };
+                transObj.BoolVar = true; transObj.SetringVar = "User Details Inserted Successfully";
             }
             else
             {
-                return new TransObj { BoolVar = false, SetringVar = $"Sorry, {user.Email}  is already in use." };
+                transObj.BoolVar = false; transObj.SetringVar = $"Sorry, {user.Email}  is already in use.";
             }
+            return transObj;
         }
 
 
@@ -75,7 +76,7 @@ namespace sd.Api.Services
 
             try
             {
-                await _userRepository.UpdateUser(id,newVer);
+                await _userRepository.UpdateUser(id, newVer);
             }
             catch
             {

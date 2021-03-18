@@ -23,10 +23,9 @@ namespace SD.Client.Services
 
         public async Task<Tuple<int, List<WordDto>>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
         {
-            if (userId == null)
-            {
-                userId = CurrentUserId;
-            }
+            CurrentUserId ??= "0";
+            userId ??= CurrentUserId;
+
             return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordDto>>>($"api/Word/GetPageWordsFromUserID/{CurrentUserId}/{userId}/{pageSize}/{currentPage}");
         }
 
@@ -70,6 +69,7 @@ namespace SD.Client.Services
 
         public async Task<IEnumerable<UserRelationshipsWithOneUserDto>> GetLikedUsers(string userId, string wordId)
         {
+            userId ??= "0";
             return await _httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{userId}/{wordId}");
         }
     }

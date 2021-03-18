@@ -23,6 +23,7 @@ namespace SD.Client.Services
         }
         public async Task<IEnumerable<UserRelationshipsWithOneUserDto>> SearchUser(string CurrentUserId, string SearchText)
         {
+            CurrentUserId ??= "0";
             return await _httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/User/GetUsersByTextNew/{CurrentUserId}/{SearchText}");
         }
         public async Task<Dictionary<string, string>> GetAllFriends(string id)

@@ -18,7 +18,7 @@ namespace sd.Api.Controllers
         private readonly ILikeWordService _likeWord;
         private readonly WordService _wordService;
         private readonly RelationshipService _relationshipService;
-  
+
         public WordController(UserService userService, ILikeWordService likeWord,
             WordService wordService, RelationshipService relationshipService
             )
@@ -72,7 +72,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-              return Ok(await _wordService.GetPageWords(CurrentUserId, userId, null, pageSize, currentPage));
+                return Ok(await _wordService.GetPageWords(CurrentUserId, userId, null, pageSize, currentPage));
             }
             catch (Exception ex)
             {
@@ -100,34 +100,6 @@ namespace sd.Api.Controllers
         [Route("AddWord")]
         public async Task<ActionResult<string>> Create(WordDto word)
         {
-
-            //maping
-            //var word = new WordModel();
-            //{
-            //    WordId = wordDto.WordId,
-            //    UserId = wordDto.UserId,
-            //    Title = wordDto.Title,
-            //    WordLang = wordDto.WordLang,
-            //    ToLang = wordDto.ToLang,
-            //    Explain = wordDto.Explain,
-            //    ShareWith = wordDto.ShareWith,
-            //};
-
-            //if (string.IsNullOrWhiteSpace(word.UserId))
-            //{
-            //    word.UserId = _currentUser.id;
-            //    word.WordId = Guid.NewGuid().ToString();
-            //    word.CreatedAt = DateTime.Now;
-            //    word.Likes = null;
-            //}
-
-            //if (word.Comments != null)
-            //{
-            //    word.Comments.RemoveAll(x => x.CommentId == null);
-            //    word.Comments.RemoveAll(x => x.UserId != _currentUser.id);
-            //}
-
-
             try
             {
                 if (word == null)
@@ -137,7 +109,7 @@ namespace sd.Api.Controllers
 
                 if (await _wordService.GetWordDtoById(word.WordId) != null)
                 {
-                    await _wordService.UpdateWord(word.WordId, word);
+                    await _wordService.UpdateWord(word);
                     return StatusCode(StatusCodes.Status202Accepted,
                        "Updated");
                 }
@@ -168,16 +140,11 @@ namespace sd.Api.Controllers
         [Route("UpdateWord")]
         public async Task<ActionResult> UpdateWord(WordDto updatedWord)
         {
-            string id = updatedWord.WordId;
             try
             {
-                var wordToUpdate = await _wordService.GetWordDtoById(id);
+                var wordToUpdate = await _wordService.GetWordDtoById(updatedWord.WordId);
 
-                if (wordToUpdate == null)
-                    return StatusCode(StatusCodes.Status404NotFound,
-                      $"{updatedWord.Title} is not found");
-
-                int statusCode = await _wordService.UpdateWord(id, updatedWord) ? 200 : 500;
+                int statusCode = await _wordService.UpdateWord(updatedWord) ? 200 : 500;
 
                 return StatusCode(statusCode);
 

@@ -11,14 +11,12 @@ namespace sd.Api.Services
     {
         private readonly IWordRepository _wordRepository;
         private readonly RelationshipService _relationshipService;
-        private readonly CurrentUser _currentUser;
         private readonly IMapper _mapper;
 
-        public WordService(IWordRepository wordRepository, RelationshipService relationshipService, CurrentUser currentUser, IMapper mapper)
+        public WordService(IWordRepository wordRepository, RelationshipService relationshipService, IMapper mapper)
         {
             _wordRepository = wordRepository;
             _relationshipService = relationshipService;
-            _currentUser = currentUser;
             _mapper = mapper;
         }
 
@@ -50,7 +48,7 @@ namespace sd.Api.Services
                 }
                 newCurrentPage++;
             }
-
+            
             Res = new Tuple<int, List<WordDto>>(newCurrentPage, words);
 
             return Res;
@@ -105,26 +103,21 @@ namespace sd.Api.Services
 
         public async Task<bool> AddWord(WordDto wordDto)
         {
-            return await _wordRepository.AddWord(_mapper.Map<WordModel>(wordDto));
+            var word = _mapper.Map<WordModel>(wordDto);
+            word.CreatedAt = DateTime.Now;
+            return await _wordRepository.AddWord(word);
         }
 
-        public async Task<bool> UpdateWord(string wordId, WordDto updatedWordDto)
-        {
+        public async Task<bool> UpdateWord(WordDto updatedWordDto)
+        {     
+            var oldWord = await _wordRepository.GetWordById(updatedWordDto.WordId);
+            if (oldWord == null) return false;
+            
             var word = _mapper.Map<WordModel>(updatedWordDto);
-            if (string.IsNullOrWhiteSpace(word.UserId))
-            {
-                word.UserId = _currentUser.id;
-                word.WordId = Guid.NewGuid().ToString();
-                word.CreatedAt = DateTime.Now;
-                word.Likes = null;
-            }
-
-            if (word.Comments != null)
-            {
-                word.Comments.RemoveAll(x => x.CommentId == null);
-                word.Comments.RemoveAll(x => x.UserId != _currentUser.id);
-            }
-            return await _wordRepository.UpdateWord(wordId, word);
+            word.Comments = oldWord.Comments;
+            word.Likes = oldWord.Likes;
+            word.CreatedAt = DateTime.Now;
+            return await _wordRepository.UpdateWord(updatedWordDto.WordId, word);
         }
 
         public async Task<bool> RemoveWord(string id)

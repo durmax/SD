@@ -88,11 +88,10 @@ namespace sd.Api.Services
             return false;
         }
 
-        public async Task<IEnumerable<CommentModel>> GetWordComments(string wordId)
+        public async Task<IEnumerable<CommentModel?>> GetWordComments(string wordId)
         {
              WordModel word = await _wordService.GetWordById(wordId);
-            //if (word.UserId != currUsr) return null;
-            return word.Comments;
+            return word?.Comments;
         }
     }
 }

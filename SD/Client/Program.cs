@@ -30,7 +30,8 @@ namespace SD.Client
                 config.Authentication.ClientId = "cbae27bd-5b20-43c3-931a-c125881b56a4";
                 config.Authentication.ValidateAuthority = true;
                 config.Cache.CacheLocation = "localStorage";
-               // config.Authentication.PostLogoutRedirectUri = "lingoclub.net";
+                config.Authentication.PostLogoutRedirectUri = "/";
+ 
                 //https://docs.microsoft.com/en-us/aspnet/core/security/blazor/webassembly/standalone-with-microsoft-accounts?view=aspnetcore-3.1
             });
 

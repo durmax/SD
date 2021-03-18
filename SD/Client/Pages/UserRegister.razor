@@ -28,6 +28,9 @@
                            @bind="userModel.Name" />
                 </div>
 
+                <div class="col-sm-10">
+                    <p class="form-control"> @userModel.Email </p>
+                </div>
             </div>
             <div class="card-footer">
                 <div class="col-sm-10">
@@ -35,8 +38,8 @@
                 </div>
             </div>
 
-           @* <div class="card-header"> <a href="Friends"> @languageContainer.Keys["YouHave"] <span class="badge badge-primary">@FriendsCount</span> @languageContainer.Keys["Friends"]</a></div>*@
-           
+            @* <div class="card-header"> <a href="Friends"> @languageContainer.Keys["YouHave"] <span class="badge badge-primary">@FriendsCount</span> @languageContainer.Keys["Friends"]</a></div>*@
+
         </div>
     </Authorized>
 </AuthorizeView>

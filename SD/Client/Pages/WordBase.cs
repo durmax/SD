@@ -81,6 +81,10 @@ namespace SD.Client.Pages
                 Rows = Math.Max(Rows, 2);
                 Rows = Math.Min(Rows, 20);
             }
+            else
+            {
+                Rows = 2;
+            }
         }
 
         protected void Reverse()
@@ -119,7 +123,6 @@ namespace SD.Client.Pages
                     if ((int)respons.StatusCode == 200)
                     {
                         note = $"{wordDto.Title} is Saved";
-                        MyText = "";
                         await OnWordSave.InvokeAsync(wordDto);
                         await NewWordAsync();
                     }
@@ -179,7 +182,8 @@ namespace SD.Client.Pages
                 UserId = CurrentUser.id
             };
             wordDto.Explain = null;
-            //SetMyText();
+            MyText = null;
+            SetMyText();
             ShareWithClass = "/icons/cloud-upload-alt-solid.svg";
 
             if (string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang))
@@ -197,7 +201,7 @@ namespace SD.Client.Pages
 
         protected void SetMyText()
         {
-            if (!cssClassComment && string.IsNullOrWhiteSpace(MyText))
+            if (!cssClassComment)
             {
                 try
                 {

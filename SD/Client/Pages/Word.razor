@@ -27,6 +27,7 @@
         <input type="search" class="form-control font-weight-bold" placeholder=@languageContainer.Keys["NewWord"]
                id="wordId"
                value="@wordDto.Title"
+               @onkeyup="KeyupAsync"
                @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"
                @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})"
                @onclick="@(() => {if (Collapsed) OnCollapsed();})" />

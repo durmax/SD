@@ -1,5 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using SD.Client.Services;
 using SD.Shared;
 using System;
@@ -11,6 +13,8 @@ namespace SD.Client.Pages
 {
     public class WordBase : ComponentBase
     {
+        [Inject]
+        IJSRuntime jsRuntime { set; get; }
         [Inject]
         public CurrentUserService CurrUsrService { set; get; }
         [Inject]
@@ -70,6 +74,18 @@ namespace SD.Client.Pages
             {
                 _myText = value;
                 CalculateSize(value);
+            }
+        }
+
+        [Inject]
+        protected NavigationManager UriHelper { get; set; }
+        protected async Task KeyupAsync(KeyboardEventArgs e)
+        {    
+            string url = "https://www.arabdict.com/ar/deutsch-arabisch/" + wordDto.Title;
+
+            if (e.Key=="Enter")
+            {
+                await jsRuntime.InvokeAsync<object>("window.open", url, "popup");
             }
         }
 

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using SD.Client.Models;
+﻿using SD.Client.Models;
 using SD.Shared;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -50,22 +48,24 @@ namespace SD.Client.Services
                 {
                     if (!string.IsNullOrEmpty(otherPage.Pattern))
                     {
-                        _reqLinkP.Pattern = otherPage.Pattern;
-                        _reqLinkP.Word = word;
-                        _reqLinkP.FLangCode = fromLang;
-                        _reqLinkP.TLangCode = toLang;
-
-                        string newLink = _uriService.UriBuild(_reqLinkP);
-
-
+                        string newLink = BuildLink(otherPage.Pattern, word, fromLang, toLang);
                             OtherPageResModel otherPageResModel = otherPage;
                             otherPageResModel.Link = newLink;
                             res.Add(otherPageResModel);
-                        
                     }
                 }
             }
             return res;
+        }
+
+        public string BuildLink(string pattern, string word, string fromLang, string toLang)
+        {
+            _reqLinkP.Pattern = pattern;
+            _reqLinkP.Word = word;
+            _reqLinkP.FLangCode = fromLang;
+            _reqLinkP.TLangCode = toLang;
+
+            return _uriService.UriBuild(_reqLinkP);
         }
 
         public async Task<OtherPageModel> GetOtherPageById(string id)

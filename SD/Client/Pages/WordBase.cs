@@ -16,6 +16,8 @@ namespace SD.Client.Pages
         [Inject]
         IJSRuntime jsRuntime { set; get; }
         [Inject]
+        OtherPageService OtherPageService { set; get; }
+        [Inject]
         public CurrentUserService CurrUsrService { set; get; }
         [Inject]
         public CurrentUser CurrentUser { set; get; }
@@ -60,6 +62,9 @@ namespace SD.Client.Pages
         public bool cssClassComment { get; set; } = false;
         protected bool loading;
         protected string note;
+
+        private string favLink { get; set; }
+
         protected List<CommentModel> wordComments { get; set; }
 
         protected string foundWordIdToUpdate;
@@ -80,10 +85,12 @@ namespace SD.Client.Pages
         [Inject]
         protected NavigationManager UriHelper { get; set; }
         protected async Task KeyupAsync(KeyboardEventArgs e)
-        {    
-            string url = "https://www.arabdict.com/ar/deutsch-arabisch/" + wordDto.Title;
+        {
+            //string url = "https://www.arabdict.com/ar/deutsch-arabisch/" + wordDto.Title;
 
-            if (e.Key=="Enter")
+            string url = OtherPageService.BuildLink(favLink, wordDto.Title, wordDto.WordLang, wordDto.ToLang);
+
+            if (e.Key == "Enter")
             {
                 await jsRuntime.InvokeAsync<object>("window.open", url, "popup");
             }
@@ -140,7 +147,7 @@ namespace SD.Client.Pages
                     {
                         note = $"{wordDto.Title} is Saved";
                         await OnWordSave.InvokeAsync(wordDto);
-                        await NewWordAsync();
+                        NewWordAsync();
                     }
                 }
             }
@@ -204,7 +211,7 @@ namespace SD.Client.Pages
 
             if (string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang))
             {
-                await SetLangsAsync();
+              await  SetLangsAsync();
             }
         }
 
@@ -369,7 +376,7 @@ namespace SD.Client.Pages
                         wordComments = (List<CommentModel>)await CommentService.GetWordComments(wordDto?.WordId);
                         wordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
                     }
-                    catch {}
+                    catch { }
                 }
             }
         }
@@ -377,7 +384,7 @@ namespace SD.Client.Pages
         {
             if (wordDto == null)
             {
-                await NewWordAsync();
+                NewWordAsync();
             }
             else
             {
@@ -388,7 +395,7 @@ namespace SD.Client.Pages
             await BuildKnownLangsAsync();
         }
 
-        protected override void OnParametersSet()
+        protected override async Task OnParametersSetAsync()
         {
             note = null;
             SetMyText();
@@ -407,6 +414,8 @@ namespace SD.Client.Pages
                     ShareWithClass = "/icons/cloud-upload-alt-solid.svg";
                     break;
             }
+
+            favLink = await LocalStorageService.GetItemAsync<string>("fav" + "-" + DefaultLangsService.DefaultWordLang + "-" + DefaultLangsService.DefaultToLang);
         }
     }
 }

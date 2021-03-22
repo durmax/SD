@@ -19,9 +19,10 @@ namespace SD.Client.Pages
         public ILanguageContainerService languageContainer { set; get; }
         [Inject]
         public CurrentUserService CurrUsrService { set; get; }
-
         [Inject]
         public CurrentUser CurrentUser{ set; get; }
+        [Inject]
+        public DefaultLangsService DefaultLangsService { get; set; }
 
         protected bool Collapsed { get; set; } = true;    // hide by default
 
@@ -30,8 +31,7 @@ namespace SD.Client.Pages
         protected List<WordDto> Words { get; set; } = new List<WordDto>();
         [Inject]
         public WordService WordService { set; get; }
-        [Inject]
-        DefaultLangsService DefaultLangsService { get; set; }
+
 
         protected bool loading;
         protected int currentPage = 0;
@@ -62,7 +62,6 @@ namespace SD.Client.Pages
         protected override async Task OnInitializedAsync()
         {
             if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();
-
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
 
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
@@ -73,16 +72,13 @@ namespace SD.Client.Pages
                 }
                 catch { }
             }
-
             try
             {
                 FriendRequestsDictionary = await RelationshipService.GetFriendRequestsById(CurrentUser.id);
             }
             catch
             {
-
             }
-            
         }
     }
 }

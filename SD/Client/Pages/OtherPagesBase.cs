@@ -102,6 +102,11 @@ namespace SD.Client.Pages
                 }
             }
         }
+
+        protected async Task Favorite(string pattern)
+        {
+            await LocalStorageService.SetItemAsync("fav" + "-" + FLangCode + "-" + TLangCode, pattern);
+        }
         protected override async Task OnParametersSetAsync()
         {
             if (!Collapsed)

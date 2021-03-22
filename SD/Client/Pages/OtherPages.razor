@@ -38,17 +38,22 @@ else
 
                 @if (opRes != null)
                 {
-                    <div class="list-group">
-                        @foreach (var otherPage in opRes)
+                    @foreach (var otherPage in opRes)
+                    {
+                        @if (otherPage.Type == opFilterVal)
                         {
-                            @if (otherPage.Type == opFilterVal)
-                            {
-                                <a href="@otherPage.Link" class="list-group-item pt-2 pb-2" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
-                                    <u>@otherPage.Host</u>
-                                </a>
-                            }
+                            <div class="d-flex">
+                                <div style="width: 90%">
+                                    <a href="@otherPage.Link" class="list-group-item pt-2 pb-2" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
+                                        <u>@otherPage.Host</u>
+                                    </a>
+                                </div>
+
+                                <button style="width: 10%" class="btn btn-light bg-transparent" @onclick="@(async() => {await Favorite(otherPage.Pattern);})"><img width="20" height="20" src="/icons/crown-solid.svg" asp-append-version="true" /></button>
+                            </div>
+
                         }
-                    </div>
+                    }
                 }
             </div>
         </div>

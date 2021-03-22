@@ -19,7 +19,6 @@ namespace SD.Client.Services
             _currentUser = currentUser;
         }
 
-        
         public async Task GetAuth()
         {
             var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();

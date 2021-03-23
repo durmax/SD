@@ -18,10 +18,15 @@ namespace SD.Client.Pages
 
         protected IEnumerable<OtherPageResModel> otherPageModels;
         protected IEnumerable<OtherPageResModel> opRes;
-        protected string opFilterVal;
+        protected string opFilterVal = "Dict";
+
+        protected string FavSite { get; private set; }
+        protected string FavSiteOpc { get; set; } = "0.3";
 
         [Parameter]
         public bool Collapsed { get; set; } = true;    // hide by default
+        [Parameter]
+        public bool CanSetFavSite { get; set; }
 
         [Parameter]
         public string Word { get; set; }
@@ -57,6 +62,8 @@ namespace SD.Client.Pages
         }
 
         public bool langChanged { get; set; } = false;
+        public string Info { get; private set; }
+
         protected async Task GetP()
         {
             Collapsed = Collapsed ? false : true;
@@ -103,22 +110,31 @@ namespace SD.Client.Pages
             }
         }
 
-        protected async Task Favorite(string pattern)
+        protected async Task Favorite(OtherPageResModel otherPage)
         {
-            await LocalStorageService.SetItemAsync("fav" + "-" + FLangCode + "-" + TLangCode, pattern);
+            if (CanSetFavSite)
+            {
+                await LocalStorageService.SetItemAsync("fav" + "-" + FLangCode + "-" + TLangCode, otherPage.Pattern);
+                FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + FLangCode + "-" + TLangCode);
+            }
+            else
+            {
+                Info = "/Languages";
+            }
         }
         protected override async Task OnParametersSetAsync()
         {
             if (!Collapsed)
             {
-              opRes = null;
-            await GetOpRes();
-            }  
+                opRes = null;
+                await GetOpRes();
+                FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + FLangCode + "-" + TLangCode);
+            }
         }
-
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
-            opFilterVal = "Dict";
+            if (string.IsNullOrWhiteSpace(FavSite))
+                FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + FLangCode + "-" + TLangCode);
         }
     }
 }

@@ -63,7 +63,7 @@ namespace SD.Client.Pages
         protected bool loading;
         protected string note;
 
-        private string favLink { get; set; }
+        private string FavSite { get; set; }
 
         protected List<CommentModel> wordComments { get; set; }
 
@@ -86,13 +86,14 @@ namespace SD.Client.Pages
         protected NavigationManager UriHelper { get; set; }
         protected async Task KeyupAsync(KeyboardEventArgs e)
         {
-            //string url = "https://www.arabdict.com/ar/deutsch-arabisch/" + wordDto.Title;
-
-            string url = OtherPageService.BuildLink(favLink, wordDto.Title, wordDto.WordLang, wordDto.ToLang);
-
-            if (e.Key == "Enter")
+            if (!string.IsNullOrWhiteSpace(FavSite) && wordDto != null)
             {
-                await jsRuntime.InvokeAsync<object>("window.open", url, "popup");
+                string url = OtherPageService.BuildLink(FavSite, wordDto.Title, wordDto.WordLang, wordDto.ToLang);
+
+                if (e.Key == "Enter")
+                {
+                    await jsRuntime.InvokeAsync<object>("window.open", url, "popup");
+                }
             }
         }
 
@@ -147,7 +148,7 @@ namespace SD.Client.Pages
                     {
                         note = $"{wordDto.Title} is Saved";
                         await OnWordSave.InvokeAsync(wordDto);
-                        NewWordAsync();
+                        await NewWordAsync();
                     }
                 }
             }
@@ -211,7 +212,7 @@ namespace SD.Client.Pages
 
             if (string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang))
             {
-              await  SetLangsAsync();
+                await SetLangsAsync();
             }
         }
 
@@ -380,11 +381,33 @@ namespace SD.Client.Pages
                 }
             }
         }
+        private async Task GetFavLinkAsync()
+        {
+            string fl;
+            string tl;
+
+            if (wordDto != null)
+            {
+                fl = wordDto.WordLang;
+                tl = wordDto.ToLang;
+            }
+            else
+            {
+                fl = DefaultLangsService.DefaultWordLang;
+                tl = DefaultLangsService.DefaultToLang;
+            }
+            try
+            {
+                FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + fl + "-" + tl);
+            }
+            catch { }
+        }
+
         protected override async Task OnInitializedAsync()
         {
             if (wordDto == null)
             {
-                NewWordAsync();
+                await NewWordAsync();
             }
             else
             {
@@ -415,7 +438,7 @@ namespace SD.Client.Pages
                     break;
             }
 
-            favLink = await LocalStorageService.GetItemAsync<string>("fav" + "-" + DefaultLangsService.DefaultWordLang + "-" + DefaultLangsService.DefaultToLang);
+            await GetFavLinkAsync();
         }
     }
 }

@@ -37,7 +37,7 @@
         </div>
     </div>
 </div>
-<div class=card>
+<div class="card mt-2">
     <div class="card-header"><b>@languageContainer.Keys["LList"]</b></div>
 
     <div class="card-body">
@@ -59,29 +59,66 @@
             </div>
         </div>
 
-        <div class="row pb-2">
 
-            @if (KnownLangs != null)
-            {
+        @if (KnownLangs != null)
+        {
 
-                <ul class="list-group">
+            <div class="list-group">
 
-                    @foreach (var item in KnownLangs)
-                    {
-                        <li @key="item"
-                            class="list-group-item">
-                            <label class="form-check-label">
-                                @item
-                            </label>
-                            <button type="button" class="btn btn-link"
-                                    @onclick="(() => RemoveKnownLang(item))">
-                                <i class="fas fa-backspace"></i>
-                            </button>
-                        </li>
-                    }
-                </ul>
+                @foreach (var item in KnownLangs)
+                {
+                    <div @key="item"
+                         class="list-group-item">
+                        <label class="form-check-label">
+                            @item
+                        </label>
+                        <button type="button" class="btn btn-link"
+                                @onclick="(() => RemoveKnownLang(item))">
+                            <i class="fas fa-backspace"></i>
+                        </button>
 
-            }
-        </div>
+                    </div>
+                }
+            </div>
+        }
+
     </div>
 </div>
+@if (KnownLangs != null)
+{
+    <div class="card mt-2">
+        <div class="input-group">
+            <select class="bg-transparent rounded-0 border-0" @bind="fl">
+                @foreach (var item in KnownLangs)
+                {
+                    if (item == SelectedFL.Key)
+                    {
+                        <option selected value="@SelectedFL.Key">@item</option>
+                    }
+                    else
+                    {
+                        <option value="@item">@item</option>
+                    }
+                }
+            </select>
+            <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
+                <i class="fas fa-exchange-alt"></i>
+            </button>
+            <select class="bg-transparent rounded-0 border-0" @bind="tl">
+                @foreach (var item in KnownLangs)
+                {
+                    if (item == SelectedTL.Key)
+                    {
+                        <option selected value="@SelectedTL.Key">@item</option>
+                    }
+                    else
+                    {
+                        <option value="@item">@item</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <OtherPages FLangCode="@fl" TLangCode="@tl" Collapsed="false" CanSetFavSite="true"></OtherPages>
+    </div>
+}

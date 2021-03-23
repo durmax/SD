@@ -34,6 +34,17 @@ namespace SD.Client.Pages
         private LangCode STL;
         private LangCode LToAdd;
 
+        protected string fl { get; set; }
+        protected string tl { get; set; }
+
+
+        protected void Reverse()
+        {
+            string l = fl;
+            fl = tl;
+            tl = l;
+        }
+
         protected LangCode SelectedFL
         {
             get { return SFL; }
@@ -183,8 +194,8 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            string tl = "en";
-            string fl = "de";
+             tl = "en";
+             fl = "de";
             try
             {
                 fl = await LocalStorageService.GetItemAsync<string>("FLang");

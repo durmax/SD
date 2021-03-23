@@ -112,7 +112,7 @@ namespace SD.Client.Pages
 
         protected async Task Favorite(OtherPageResModel otherPage)
         {
-            if (CanSetFavSite)
+            if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
             {
                 await LocalStorageService.SetItemAsync("fav" + "-" + FLangCode + "-" + TLangCode, otherPage.Pattern);
                 FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + FLangCode + "-" + TLangCode);

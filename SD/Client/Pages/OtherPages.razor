@@ -56,7 +56,7 @@ else
                                     }
                                     else
                                     {
-                                        if (CanSetFavSite)
+                                        if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
                                         {
                                             <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage); })"><img width="20" height="20" src="/icons/crown-solid.svg" asp-append-version="true" style="opacity: 0.3;" /></button>
                                         }

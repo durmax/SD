@@ -30,8 +30,7 @@
                value="@wordDto.Title"
                @onkeyup="KeyupAsync"
                @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"
-               @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})"
-               @onclick="@(() => {if (Collapsed) OnCollapsed();})" />
+               @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})"/>
 
         <div class="input-group-append">
             <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="OnCollapsed">

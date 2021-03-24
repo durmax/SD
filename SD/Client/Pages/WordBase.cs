@@ -216,11 +216,23 @@ namespace SD.Client.Pages
             }
         }
 
-        protected void WordChanged(string title)
+        protected async Task WordChangedAsync(string title)
         {
-            //opCollapsed = false;
+            cssClassUpdate = "d-none";
             note = null;
             wordDto.Title = title.Trim();
+            if (title.Length > 2)
+            {
+                SameWords = await WordService.GetWordsContainText(CurrentUser.id, title);
+            }
+            else SameWords = null;
+        }
+
+        protected async Task SetWord(string title)
+        {
+            wordDto = await WordService.GetWordByText(CurrentUser.id, title);
+            MyText = wordDto.Explain;
+            SameWords = null;
         }
 
         protected void SetMyText()
@@ -325,6 +337,7 @@ namespace SD.Client.Pages
         public int? LikesCount { get; set; }
         protected bool CULiked { get; set; } = false;
         protected IEnumerable<UserRelationshipsWithOneUserDto> likedUsers;
+        protected IEnumerable<string> SameWords { get; set; }
 
         protected async Task GetLikedUsers(int? likesCount)
         {

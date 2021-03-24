@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using sd.Api.Interfaces;
 using SD.Shared;
 using sd.Api.Services;
-using AutoMapper;
 
 namespace sd.Api.Controllers
 {
@@ -48,7 +47,6 @@ namespace sd.Api.Controllers
             }
         }
 
-        // GET: api/Word/GetWord/5
         [HttpGet("GetWordByText/{userId}/{title}")]
         public async Task<ActionResult<WordDto>> GetWord(string userId, string title)
         {
@@ -59,6 +57,21 @@ namespace sd.Api.Controllers
                 if (result == null) return NotFound();
 
                 return result;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
+        [HttpGet("GetWordsContainText/{userId}/{title}")]
+        public async Task<ActionResult<IEnumerable<string>>> GetWordsContainText(string userId, string title)
+        {
+            try
+            {
+                var ws = await _wordService.GetWordsContainText(userId, title);
+                return Ok(ws);
             }
             catch (Exception ex)
             {

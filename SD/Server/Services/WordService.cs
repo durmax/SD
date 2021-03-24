@@ -101,6 +101,17 @@ namespace sd.Api.Services
             return _mapper.Map<WordDto>(word);
         }
 
+        public async Task<IEnumerable<string>> GetWordsContainText(string userId, string text)
+        {
+            List<string> res = new List<string>();
+            var words = await _wordRepository.GetWordsContainText(userId, text);
+            foreach (var w in words)
+            {
+                res.Add(w.Title);
+            }
+            return res;
+        }
+
         public async Task<bool> AddWord(WordDto wordDto)
         {
             var word = _mapper.Map<WordModel>(wordDto);

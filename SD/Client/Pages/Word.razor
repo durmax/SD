@@ -29,8 +29,7 @@
                id="wordId"
                value="@wordDto.Title"
                @onkeyup="KeyupAsync"
-               @onchange="@(async (ui) => { WordChanged((string)ui.Value); })"
-               @oninput="@(()=>{ note = ""; cssClassUpdate = "d-none";})"/>
+               @oninput="@(async (ui) => {await WordChangedAsync(ui.Value.ToString()); })" />
 
         <div class="input-group-append">
             <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="OnCollapsed">
@@ -90,6 +89,17 @@
             <button class="btn btn-light bg-transparent" @onclick="@(async() => {ShareWithCollapsed = true; wordDto.ShareWith = 2; ShareWithClass = "/icons/globe-solid.svg"; await AddWord();})">@languageContainer.Keys["Public"] <img width="20" height="20" src="/icons/globe-solid.svg" asp-append-version="true" /></button>
         </div>
 
+        <div class="d-flex">
+            @if (SameWords != null && !string.IsNullOrWhiteSpace(wordDto.Title))
+            {
+                @foreach (var w in SameWords)
+                {
+                    <a herf="" class="d-block p-1" @onclick="async ()  => { await SetWord(w); }">
+                        <u class="text-primary"> @w </u>
+                    </a>
+                }
+            }
+        </div>
     </div>
 
     <div class=@(Collapsed ? "collapse" : "")>

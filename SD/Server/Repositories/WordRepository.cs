@@ -3,6 +3,7 @@ using MongoDB.Driver.Linq;
 using sd.Api.Interfaces;
 using sd.Api.Models;
 using SD.Shared;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace sd.Api.Repositories
@@ -52,6 +53,18 @@ namespace sd.Api.Repositories
         public async Task<WordModel> GetWordByText(string userId, string text)
         {
             return await _context.Words.Find<WordModel>(u => u.Title == text && u.UserId == userId).FirstOrDefaultAsync();
+        }
+        public async Task<IEnumerable<WordModel>> GetWordsContainText(string userId, string text)
+        {
+            FilterDefinition<WordModel> filter = Builders<WordModel>.Filter.Empty;
+
+           if (!string.IsNullOrWhiteSpace(userId) && !string.IsNullOrWhiteSpace(text))
+            {
+                filter &= Builders<WordModel>.Filter.Where(x => 
+                x.UserId==userId &&
+                x.Title.ToUpperInvariant().StartsWith(text.ToUpperInvariant()));
+            }
+            return await _context.Words.Find(filter).ToListAsync();
         }
 
         public async Task<bool> AddWord(WordModel word)

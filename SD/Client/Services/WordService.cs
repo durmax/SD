@@ -51,6 +51,18 @@ namespace SD.Client.Services
                 return new WordDto();
             }
         }
+        public async Task<List<string>> GetWordsContainText(string userId, string title)
+        {
+            try
+            {
+                var w= await _httpClient.GetFromJsonAsync<List<string>>($"api/Word/GetWordsContainText/{userId}/{title}");
+                return w;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
 
         public async Task<HttpResponseMessage> RemoveWord(string id)
         {

@@ -54,10 +54,12 @@ namespace SD.Client.Pages
         protected void NewWordHandler(WordDto newWord)
         {
             Words.Add(newWord);
+            currentPage++;
         }
         protected void DeleteWordHandler(WordDto word)
         {
             Words.Remove(word);
+            currentPage--;
         }
         protected override async Task OnInitializedAsync()
         {

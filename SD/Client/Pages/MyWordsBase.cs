@@ -23,7 +23,7 @@ namespace SD.Client.Pages
         public string UserName { get; set; }
         protected bool Collapsed { set; get; } = true;    // hide by default
         protected bool loading = true;
-        protected int currentPage;
+        protected int currentPage = 0;
         protected string TLang;
 
         protected List<WordDto> Words { get; set; }
@@ -31,10 +31,12 @@ namespace SD.Client.Pages
         protected void NewWordHandler(WordDto wordDto)
         {
             Words.Add(wordDto);
+            currentPage++;
         }
         protected void DeleteWordHandler(WordDto wordDto)
         {
             Words.Remove(wordDto);
+            currentPage--;
         }
 
         protected async Task InitAsync()

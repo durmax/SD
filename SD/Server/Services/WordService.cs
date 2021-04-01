@@ -42,13 +42,13 @@ namespace sd.Api.Services
                     wordDto = _mapper.Map<WordDto>(word);
                     if (await IsWordShareWithUser(wordDto, currentUserId))
                     {
-                        if (word.Likes!=null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
+                        if (word.Likes != null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
                         words.Add(wordDto);
                     }
                 }
                 newCurrentPage++;
             }
-            
+
             Res = new Tuple<int, List<WordDto>>(newCurrentPage, words);
 
             return Res;
@@ -63,7 +63,6 @@ namespace sd.Api.Services
             {
                 return true;
             }
-
             else
             {
                 if (await _relationshipService.AreFrinds(userId, word.UserId) != "0")
@@ -91,8 +90,8 @@ namespace sd.Api.Services
         }
         public async Task<WordModel> GetWordById(string id)
         {
-           return await _wordRepository.GetWordById(id);
-             
+            return await _wordRepository.GetWordById(id);
+
         }
 
         public async Task<WordDto> GetWordByText(string userId, string text)
@@ -112,18 +111,20 @@ namespace sd.Api.Services
             return res;
         }
 
-        public async Task<bool> AddWord(WordDto wordDto)
+        public async Task<string> AddWord(WordDto wordDto)
         {
             var word = _mapper.Map<WordModel>(wordDto);
+            word.WordId = Guid.NewGuid().ToString();
             word.CreatedAt = DateTime.Now;
-            return await _wordRepository.AddWord(word);
+            if (await _wordRepository.AddWord(word)) return word.WordId;
+            else return null;
         }
 
         public async Task<bool> UpdateWord(WordDto updatedWordDto)
-        {     
+        {
             var oldWord = await _wordRepository.GetWordById(updatedWordDto.WordId);
             if (oldWord == null) return false;
-            
+
             var word = _mapper.Map<WordModel>(updatedWordDto);
             word.Comments = oldWord.Comments;
             word.Likes = oldWord.Likes;

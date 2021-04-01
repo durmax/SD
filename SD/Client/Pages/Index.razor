@@ -23,28 +23,33 @@
         </div>
     }
 }
-<Word Collapsed="false" OnWordSave="@NewWordHandler"></Word>
-@if (Words != null)
+
+<button class="btn btn-link" @onclick="@(() => { NewWordsCount++; })">Add new word</button>
+@for (int i = 0; i < NewWordsCount; i++)
 {
-    @foreach (var word in Words)
+    <Word Collapsed="false" OnWordSave="@NewWordHandler"></Word>
+}
+    @if (Words != null)
     {
-        <Word wordDto="word" Collapsed="true" OnWordDelete="DeleteWordHandler"></Word>
+        @foreach (var word in Words)
+        {
+            <Word wordDto="word" Collapsed="true" OnWordDelete="DeleteWordHandler"></Word>
+        }
     }
-}
-@if (loading)
-{
-    <button type="button" class="btn btn-light">
-        <div class="spinner-border spinner-border-sm" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </button>
-}
-else
-{
-    @if (CurrentUser.isAuthTested)
+    @if (loading)
     {
-        <button class="btn btn-outline-secondary bg-white text-dark m-2" type="button" @onclick="GetNextPage">
-            Load more Words
+        <button type="button" class="btn btn-light">
+            <div class="spinner-border spinner-border-sm" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
         </button>
     }
-}
+    else
+    {
+        @if (CurrentUser.isAuthTested)
+        {
+            <button class="btn btn-outline-secondary bg-white text-dark m-2" type="button" @onclick="GetNextPage">
+                Load more Words
+            </button>
+        }
+    }

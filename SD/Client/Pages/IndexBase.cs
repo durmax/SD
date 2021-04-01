@@ -29,6 +29,8 @@ namespace SD.Client.Pages
         protected Dictionary<string, string> FriendRequestsDictionary = new Dictionary<string, string>();
 
         protected List<WordDto> Words { get; set; } = new List<WordDto>();
+        protected int NewWordsCount { get; set; } = 1;
+
         [Inject]
         public WordService WordService { set; get; }
 

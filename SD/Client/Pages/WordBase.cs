@@ -52,6 +52,7 @@ namespace SD.Client.Pages
         protected bool ShareWithCollapsed = true;
 
         protected string cssClassDelete;// = "d-none";
+        protected string cssClassCard = "border border-dark";
 
         [Parameter]
         public string UserId { get; set; }
@@ -147,6 +148,7 @@ namespace SD.Client.Pages
                     if ((int)respons.StatusCode == 200)
                     {
                         note = $"{wordDto.Title} is Saved";
+                        wordDto.WordId = await respons.Content.ReadAsStringAsync();
                         await OnWordSave.InvokeAsync(wordDto);
                         await NewWordAsync();
                     }
@@ -200,7 +202,7 @@ namespace SD.Client.Pages
         {
             wordDto = new WordDto
             {
-                WordId = Guid.NewGuid().ToString(),
+               // WordId = Guid.NewGuid().ToString(),
                 WordLang = DefaultLangsService.DefaultWordLang,
                 ToLang = DefaultLangsService.DefaultToLang,
                 UserId = CurrentUser.id

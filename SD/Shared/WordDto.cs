@@ -5,7 +5,7 @@ namespace SD.Shared
 {
     public class WordDto
     {
-        [Required]
+        //[Required]
         public string WordId { get; set; }
         [Required]
         public string UserId { get; set; }

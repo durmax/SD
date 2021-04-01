@@ -117,14 +117,16 @@ namespace sd.Api.Controllers
             {
                 if (word == null)
                     return BadRequest();
-                if (string.IsNullOrWhiteSpace(word.UserId) || string.IsNullOrWhiteSpace(word.WordId) || string.IsNullOrWhiteSpace(word.Title))
+                if (string.IsNullOrWhiteSpace(word.UserId) || string.IsNullOrWhiteSpace(word.Title))
                     return BadRequest();
-
-                if (await _wordService.GetWordDtoById(word.WordId) != null)
+                if (!string.IsNullOrWhiteSpace(word.WordId))
                 {
-                    await _wordService.UpdateWord(word);
-                    return StatusCode(StatusCodes.Status202Accepted,
-                       "Updated");
+                    if (await _wordService.GetWordDtoById(word.WordId) != null)
+                    {
+                        await _wordService.UpdateWord(word);
+                        return StatusCode(StatusCodes.Status202Accepted,
+                           "Updated");
+                    }
                 }
 
                 var wordToInsert = await _wordService.GetWordByText(word.UserId, word.Title);
@@ -134,13 +136,10 @@ namespace sd.Api.Controllers
                     return StatusCode(StatusCodes.Status302Found,
                        $"{wordToInsert?.WordId}");    // returen word id that found
                 }
+                word.WordId = await _wordService.AddWord(word);
+                int statusCode = !string.IsNullOrWhiteSpace(word.WordId) ? StatusCodes.Status200OK : StatusCodes.Status500InternalServerError;
 
-                int statusCode = await _wordService.AddWord(word) ? 200 : 500;
-
-                return StatusCode(statusCode);
-
-                //return CreatedAtAction(nameof(GetWord),
-                //    new { id = createdWord }, createdWord);
+                return StatusCode(statusCode, word.WordId);
             }
             catch (Exception)
             {
@@ -157,7 +156,7 @@ namespace sd.Api.Controllers
             {
                 var wordToUpdate = await _wordService.GetWordDtoById(updatedWord.WordId);
 
-                int statusCode = await _wordService.UpdateWord(updatedWord) ? 200 : 500;
+                int statusCode = await _wordService.UpdateWord(updatedWord) ? StatusCodes.Status200OK : StatusCodes.Status500InternalServerError;
 
                 return StatusCode(statusCode);
 

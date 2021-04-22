@@ -18,14 +18,14 @@
 
                     <button type="button" class="btn btn-link"
                             @onclick="@(async () => { await RemoveFriend(friendId); })">
-                        <i class="fas fa-user-minus"></i>
+                        <img width="20" height="20" src="/icons/user-minus-solid.svg" asp-append-version="true" />
                     </button>
                     break;
 
                 case SD.Shared.Relation.FriendRequestTo:
 
                     <div class="btn btn-link">
-                        <i class="fas fa-paper-plane"></i>
+                        <img width="20" height="20" src="/icons/paper-plane-solid.svg" asp-append-version="true" />
                     </div>
                     break;
 
@@ -35,12 +35,12 @@
                         <div class="input-group-prepend">
                             <button type="button" class="btn btn-link"
                                     @onclick="@(async () => { await AddFriend(); })">
-                                <i class="fas fa-user-check"></i>
+                                <img width="20" height="20" src="/icons/user-check-solid.svg" asp-append-version="true" />
                             </button>
 
                             <button type="button" class="btn btn-link"
                                     @onclick="@(async () => { await RemoveFriendRequest(); })">
-                                <i class="fas fa-user-times"></i>
+                                <img width="20" height="20" src="/icons/user-times-solid.svg" asp-append-version="true" />
                             </button>
                         </div>
                     </div>
@@ -50,7 +50,7 @@
 
                     <button type="button" class="btn btn-link"
                             @onclick="@(async () => { await SendFriendRequest(friendId); })">
-                        <i class="fas fa-user-plus"></i>
+                        <img width="20" height="20" src="/icons/user-plus-solid.svg" asp-append-version="true" />
                     </button>
                     break;
             }

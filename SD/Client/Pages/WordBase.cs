@@ -158,6 +158,7 @@ namespace SD.Client.Pages
             {
                 NavigationManager.NavigateTo("/authentication/login");
             }
+            SameWords = null;
             loading = false;
         }
 

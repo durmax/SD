@@ -16,11 +16,11 @@ else
             <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Dict";   Collapsed = false;   await GetOpRes(); })">
                 <i class="oi oi-book"></i>
             </button>
-            <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Trans";  Collapsed = false; await GetOpRes();})">
-                <img src="/icons/translate-black-24dp.svg" asp-append-version="true" />
-            </button>
             <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Vocab";  Collapsed = false; await GetOpRes();})">
                 <img src="/icons/abc.svg" asp-append-version="true" width="24" height="24" />
+            </button>
+            <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Trans";  Collapsed = false; await GetOpRes();})">
+                <img src="/icons/translate-black-24dp.svg" asp-append-version="true" />
             </button>
             <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Search"; Collapsed = false; await GetOpRes();})">
                 <img src="/icons/image_search-24px.svg" asp-append-version="true" />

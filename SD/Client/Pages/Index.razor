@@ -1,57 +1,68 @@
 ﻿@page "/"
 @inherits IndexBase
 
-@if (CurrentUser.isAuthTested)
-{
-    @if (FriendRequestsDictionary.Count > 0)
-    {
-        <button type="button" class="btn btn-primary mb-2" @onclick="() => Collapsed = Collapsed ? false : true">
-            Friend Requests <span class="badge badge-light">@FriendRequestsDictionary.Count</span>
-            <span class="sr-only">Friend Requests</span>
-        </button>
-
-        <div class="card @(Collapsed ? "collapse" : "")">
-            <div class="card-body">
-                <div class="container">
-                    @foreach (var item in FriendRequestsDictionary)
-                    {
-                        <Friendship UserId="@CurrentUser.id" friendId="@item.Key" friendName="@item.Value" friendshipState="UserRequest"></Friendship>
-                    }
-
-                </div>
-            </div>
-        </div>
-    }
-}
-
-<button class="btn btn-link" @onclick="@(() => { NewWords.Add(true) ; })">Add new word</button>
-@foreach (var collapsed in NewWords)
-{
-    <Word Collapsed="@collapsed" OnWordSave="@NewWordHandler"></Word>
-}
-
-@if (Words != null)
-{
-    @foreach (var word in Words)
-    {
-        <Word wordDto="word" Collapsed="true" OnWordDelete="DeleteWordHandler"></Word>
-    }
-}
-
-@if (loading)
-{
-    <button type="button" class="btn btn-light">
-        <div class="spinner-border spinner-border-sm" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </button>
-}
-else
-{
+<div style="max-width:550px">
     @if (CurrentUser.isAuthTested)
     {
-        <button class="btn btn-outline-secondary bg-white text-dark m-2" type="button" @onclick="GetNextPage">
-            Load more Words
+        @if (FriendRequestsDictionary.Count > 0)
+        {
+            <button type="button" class="btn btn-primary mb-2" @onclick="() => CollapsedFriend = CollapsedFriend ? false : true">
+                Friend Requests <span class="badge badge-light">@FriendRequestsDictionary.Count</span>
+                <span class="sr-only">Friend Requests</span>
+            </button>
+
+            <div class="card @(CollapsedFriend ? "collapse" : "")">
+                <div class="card-body">
+                    <div class="container">
+                        @foreach (var item in FriendRequestsDictionary)
+                        {
+                            <Friendship UserId="@CurrentUser.id" friendId="@item.Key" friendName="@item.Value" friendshipState="UserRequest"></Friendship>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+    <button type="button" class="btn btn-light bg-transparent" @onclick="@(() => { NewWords.Add(false) ; })">
+        <img width="30" height="30" src="/icons/form-new-24-regular.svg" asp-append-version="true" />
+    </button>
+    <button type="button" class="btn btn-light bg-transparent" @onclick="@(() => { NewWords.Add(true) ; })">
+        <img width="30" height="30" src="/icons/form-new-28-filled.svg" asp-append-version="true" />
+    </button>
+    <button type="button" class="btn btn-light bg-transparent float-right" @onclick="@(() => {if(NewWords.Count>1) NewWords.Remove(NewWords.Last()) ; })">
+        <img width="30" height="30" src="/icons/document-header-remove-24-regular.svg" asp-append-version="true" />
+    </button>
+
+    @foreach (var collapsed in NewWords)
+    {
+        <Word Collapsed="@collapsed" OnWordSave="@NewWordHandler"></Word>
+    }
+
+    @if (Words != null)
+    {
+        @foreach (var word in Words)
+        {
+            <Word wordDto="word" Collapsed="true" OnWordDelete="DeleteWordHandler"></Word>
+        }
+    }
+
+    @if (loading)
+    {
+        <button type="button" class="btn btn-light">
+            <div class="spinner-border spinner-border-sm" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
         </button>
     }
-}
+    else
+    {
+        @if (CurrentUser.isAuthTested)
+        {
+            <button class="btn btn-outline-secondary bg-white text-dark m-2" type="button" @onclick="GetNextPage">
+                Load more Words
+            </button>
+        }
+    }
+</div>

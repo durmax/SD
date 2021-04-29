@@ -24,7 +24,7 @@ namespace SD.Client.Pages
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
 
-        protected bool Collapsed { get; set; } = true;    // hide by default
+        protected bool CollapsedFriend { get; set; } = true;    // hide by default
 
         protected Dictionary<string, string> FriendRequestsDictionary = new Dictionary<string, string>();
 

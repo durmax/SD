@@ -1,7 +1,7 @@
 ﻿@page "/"
 @inherits IndexBase
 
-<div style="max-width:550px">
+<div>
     @if (CurrentUser.isAuthTested)
     {
         @if (FriendRequestsDictionary.Count > 0)

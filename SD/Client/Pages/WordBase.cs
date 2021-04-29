@@ -217,6 +217,7 @@ namespace SD.Client.Pages
             {
                 await SetLangsAsync();
             }
+            cssClassCard = "border-primary";
         }
 
         protected async Task WordChangedAsync(string title)

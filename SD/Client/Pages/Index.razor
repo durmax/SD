@@ -24,8 +24,8 @@
     }
 }
 
-<button class="btn btn-link" @onclick="@(() => { NewWordsCount++; })">Add new word</button>
-@for (int i = 0; i < NewWordsCount; i++)
+<button class="btn btn-link" @onclick="@(() => { NewWords.Add(new SD.Shared.WordDto()) ; })">Add new word</button>
+@foreach (var word in NewWords)
 {
     <Word Collapsed="true" OnWordSave="@NewWordHandler"></Word>
 }

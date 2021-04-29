@@ -203,7 +203,7 @@ namespace SD.Client.Pages
         {
             wordDto = new WordDto
             {
-               // WordId = Guid.NewGuid().ToString(),
+                // WordId = Guid.NewGuid().ToString(),
                 WordLang = DefaultLangsService.DefaultWordLang,
                 ToLang = DefaultLangsService.DefaultToLang,
                 UserId = CurrentUser.id
@@ -421,7 +421,7 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            if (wordDto == null)
+            if (wordDto == null || string.IsNullOrWhiteSpace(wordDto.WordId))
             {
                 await NewWordAsync();
             }

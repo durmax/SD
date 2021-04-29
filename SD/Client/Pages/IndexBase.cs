@@ -29,7 +29,7 @@ namespace SD.Client.Pages
         protected Dictionary<string, string> FriendRequestsDictionary = new Dictionary<string, string>();
 
         protected List<WordDto> Words { get; set; } = new List<WordDto>();
-        protected List<WordDto> NewWords { get; set; } = new List<WordDto>();
+        protected List<bool> NewWords { get; set; } = new List<bool>();
 
         [Inject]
         public WordService WordService { set; get; }
@@ -65,7 +65,7 @@ namespace SD.Client.Pages
         }
         protected override async Task OnInitializedAsync()
         {
-            NewWords.Add(new WordDto());
+            NewWords.Add(false);
 
             if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");

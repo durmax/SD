@@ -24,10 +24,10 @@
     }
 }
 
-<button class="btn btn-link" @onclick="@(() => { NewWords.Add(new SD.Shared.WordDto()) ; })">Add new word</button>
-@foreach (var word in NewWords)
+<button class="btn btn-link" @onclick="@(() => { NewWords.Add(true) ; })">Add new word</button>
+@foreach (var collapsed in NewWords)
 {
-    <Word Collapsed="true" OnWordSave="@NewWordHandler"></Word>
+    <Word Collapsed="@collapsed" OnWordSave="@NewWordHandler"></Word>
 }
 
 @if (Words != null)

@@ -21,7 +21,6 @@ namespace SD.Client.Pages
         public CurrentUserService CurrUsrService { set; get; }
         [Inject]
         public CurrentUser CurrentUser { set; get; }
-
         [Inject]
         NavigationManager NavigationManager { get; set; }
         [Inject]
@@ -48,9 +47,6 @@ namespace SD.Client.Pages
         protected List<string> KnownLangs { get; set; }
 
         protected string ShareWithClass { get; set; }
-
-        protected bool ShareWithCollapsed = true;
-
         protected string cssClassDelete;// = "d-none";
         protected string cssClassCard = "border border-dark";
 
@@ -59,8 +55,6 @@ namespace SD.Client.Pages
 
         protected string cssClassUpdate = "d-none";
 
-        [Parameter]
-        public bool cssClassComment { get; set; } = false;
         protected bool loading;
         protected string note;
 
@@ -124,6 +118,13 @@ namespace SD.Client.Pages
 
         [Parameter]
         public EventCallback<WordDto> OnWordDelete { get; set; }
+
+        protected async Task OnSelectedAsync(int selection)
+        {
+            wordDto.ShareWith = (ShareWith)selection;
+            ShareWithClass = "/icons/Save" + selection + ".svg";
+            await AddWord();
+        }
 
         protected async Task AddWord()
         {
@@ -212,6 +213,7 @@ namespace SD.Client.Pages
             MyText = null;
             SetMyText();
             ShareWithClass = "/icons/cloud-upload-alt-solid.svg";
+            wordDto.ShareWith = ShareWith.Save; // nothing
 
             if (string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang))
             {
@@ -241,17 +243,14 @@ namespace SD.Client.Pages
 
         protected void SetMyText()
         {
-            if (!cssClassComment)
+            try
             {
-                try
-                {
-                    MyText = wordDto?.Explain;
-                    CalculateSize(MyText);
-                    Rows = Rows < 3 ? Rows : Rows++;
-                }
-                catch
-                {
-                }
+                MyText = wordDto?.Explain;
+                CalculateSize(MyText);
+                Rows = Rows < 3 ? Rows : Rows++;
+            }
+            catch
+            {
             }
         }
 
@@ -377,7 +376,7 @@ namespace SD.Client.Pages
             if (!Collapsed)
             {
                 SetMyText();
-                wordDto.ShareWith = 3; // nothing
+                wordDto.ShareWith = ShareWith.Save;  // nothing
             }
         }
 
@@ -428,6 +427,7 @@ namespace SD.Client.Pages
             }
             else
             {
+                ShareWithClass = "/icons/Save" + (int)wordDto.ShareWith + ".svg";
                 CULiked = wordDto.IsILiked;
                 LikesCount = wordDto.LikesCount;
             }
@@ -439,22 +439,6 @@ namespace SD.Client.Pages
         {
             note = null;
             SetMyText();
-            switch (wordDto?.ShareWith)
-            {
-                case 0:
-                    ShareWithClass = "/icons/user-lock-solid.svg";
-                    break;
-                case 1:
-                    ShareWithClass = "/icons/user-friends-solid.svg";
-                    break;
-                case 2:
-                    ShareWithClass = "/icons/globe-solid.svg";
-                    break;
-                default:
-                    ShareWithClass = "/icons/cloud-upload-alt-solid.svg";
-                    break;
-            }
-
             await GetFavLinkAsync();
         }
     }

@@ -62,12 +62,27 @@
                 </select>
             }
 
-            <button type="button" class="btn btn-light bg-transparent" @onclick="()=> {cssClassComment = !cssClassComment; SetMyText(); }">
-                <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
-            </button>
-            <button @onclick="@(()=>{ShareWithCollapsed=!ShareWithCollapsed;})" class="btn btn-light  bg-transparent dropdown-toggle" type="button">
-                <img width="20" height="20" src="@ShareWithClass" asp-append-version="true" />  <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
-            </button>
+            @{ var list = new List<string> { languageContainer.Keys["OnlyMe"], languageContainer.Keys["Friends"], languageContainer.Keys["Public"] }; }
+
+            <Dropdown TItem="int" imgSrc="@ShareWithClass" OnSelected="@OnSelectedAsync">
+                <InitialTip>@languageContainer.Keys[wordDto.ShareWith.ToString()]</InitialTip>
+                <ChildContent>
+                    <div class="d-block">
+                        <img width="20" height="20" src="/icons/Save0.svg" asp-append-version="true" />
+                        <DropdownListItem Item=0> @list[0]</DropdownListItem>
+                    </div>
+
+                    <div class="d-block">
+                        <img width="20" height="20" src="/icons/Save1.svg" asp-append-version="true" />
+                        <DropdownListItem Item=1> @list[1]</DropdownListItem>
+                    </div>
+
+                    <div class="d-block">
+                        <img width="20" height="20" src="/icons/Save2.svg" asp-append-version="true" />
+                        <DropdownListItem Item=2> @list[2]</DropdownListItem>
+                    </div>
+                </ChildContent>
+            </Dropdown>
 
 
         </div>
@@ -83,11 +98,6 @@
                 </div>
             </button>
         }
-        <div class="btn-group @(ShareWithCollapsed ? "collapse" : "")">
-            <button class="btn btn-light bg-transparent" @onclick="@(async() => {ShareWithCollapsed = true; wordDto.ShareWith = 0; ShareWithClass = "/icons/user-lock-solid.svg"; await AddWord();})">@languageContainer.Keys["OnlyMe"] <img width="20" height="20" src="/icons/user-lock-solid.svg" asp-append-version="true" /></button>
-            <button class="btn btn-light bg-transparent" @onclick="@(async() => {ShareWithCollapsed = true; wordDto.ShareWith = 1; ShareWithClass = "/icons/user-friends-solid.svg";  await AddWord();})">@languageContainer.Keys["Friends"] <img width="20" height="20" src="/icons/user-friends-solid.svg" asp-append-version="true" /></button>
-            <button class="btn btn-light bg-transparent" @onclick="@(async() => {ShareWithCollapsed = true; wordDto.ShareWith = 2; ShareWithClass = "/icons/globe-solid.svg"; await AddWord();})">@languageContainer.Keys["Public"] <img width="20" height="20" src="/icons/globe-solid.svg" asp-append-version="true" /></button>
-        </div>
 
         <div class="d-flex">
             @if (SameWords != null && !string.IsNullOrWhiteSpace(wordDto.Title))
@@ -118,14 +128,11 @@
                     </button>
                 </div>
             </div>
-
-            <div class=" @(cssClassComment? "collapse" : "")">
-                <div class="m-0">
-                    <textarea class="form-control"
-                              rows="@Rows"
-                              @bind-value="@MyText"
-                              @bind-value:event="oninput">@MyText</textarea>
-                </div>
+            <div class="m-0">
+                <textarea class="form-control"
+                          rows="@Rows"
+                          @bind-value="@MyText"
+                          @bind-value:event="oninput">@MyText</textarea>
             </div>
 
             @if (!(string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang)))

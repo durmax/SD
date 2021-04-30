@@ -10,13 +10,21 @@ namespace SD.Shared
         [Required]
         public string UserId { get; set; }
         public string UserName { get; set; }
-        public String Title { get; set; }
+        public string Title { get; set; }
         public string WordLang { get; set; }
         public string ToLang { get; set; }
         public string Explain { get; set; }
-        public int ShareWith { get; set; }
+        public ShareWith ShareWith { get; set; }
         public bool IsILiked { get; set; }
         public int LikesCount { get; set; }
         public int CommentsCount { get; set; }
+    }
+
+    public enum ShareWith
+    {
+        OnlyMe = 0,
+        Friends = 1,
+        Public = 2,
+        Save = 3
     }
 }

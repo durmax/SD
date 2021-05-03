@@ -3,7 +3,7 @@
 <div class="dropdown">
     <button class="btn btn-light  bg-transparent dropdown-toggle" data-toggle="dropdown" type="button" @onclick="e => this.show=!this.show "
             aria-haspopup="true" aria-expanded="false">
-        <img width="20" height="20" src="@imgSrc" asp-append-version="true" /> @Tip
+         @Tip
     </button>
     <CascadingValue name="Dropdown" Value="@this">
         <div class="dropdown-menu @(show? "show":"")">

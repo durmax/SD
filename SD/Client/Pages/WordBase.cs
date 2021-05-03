@@ -122,7 +122,7 @@ namespace SD.Client.Pages
         protected async Task OnSelectedAsync(int selection)
         {
             wordDto.ShareWith = (ShareWith)selection;
-            ShareWithClass = "/icons/Save" + selection + ".svg";
+            ShareWithClass = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
             await AddWord();
         }
 
@@ -212,7 +212,7 @@ namespace SD.Client.Pages
             wordDto.Explain = null;
             MyText = null;
             SetMyText();
-            ShareWithClass = "/icons/cloud-upload-alt-solid.svg";
+            //ShareWithClass = "/icons/cloud-upload-alt-solid.svg";
             wordDto.ShareWith = ShareWith.Save; // nothing
 
             if (string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang))
@@ -356,7 +356,6 @@ namespace SD.Client.Pages
             {
                 LikesCount = await WordService.Like(CurrentUser.id, wordDto.WordId);
                 CULiked = !CULiked;
-                //CULikeImg = CULiked ? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg";
             }
             else
             {
@@ -376,7 +375,6 @@ namespace SD.Client.Pages
             if (!Collapsed)
             {
                 SetMyText();
-                wordDto.ShareWith = ShareWith.Save;  // nothing
             }
         }
 
@@ -427,7 +425,7 @@ namespace SD.Client.Pages
             }
             else
             {
-                ShareWithClass = "/icons/Save" + (int)wordDto.ShareWith + ".svg";
+                ShareWithClass = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
                 CULiked = wordDto.IsILiked;
                 LikesCount = wordDto.LikesCount;
             }
@@ -437,6 +435,7 @@ namespace SD.Client.Pages
 
         protected override async Task OnParametersSetAsync()
         {
+            ShareWithClass = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
             note = null;
             SetMyText();
             await GetFavLinkAsync();

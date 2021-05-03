@@ -65,21 +65,30 @@
             @{ var list = new List<string> { languageContainer.Keys["OnlyMe"], languageContainer.Keys["Friends"], languageContainer.Keys["Public"] }; }
 
             <Dropdown TItem="int" imgSrc="@ShareWithClass" OnSelected="@OnSelectedAsync">
-                <InitialTip>@languageContainer.Keys[wordDto.ShareWith.ToString()]</InitialTip>
+                <InitialTip>
+                    <img width="20" height="20" src="@ShareWithClass"/>
+                    @languageContainer.Keys[wordDto.ShareWith.ToString()]
+                </InitialTip>
                 <ChildContent>
                     <div class="d-block">
-                        <img width="20" height="20" src="/icons/Save0.svg" asp-append-version="true" />
-                        <DropdownListItem Item=0> @list[0]</DropdownListItem>
+                        <DropdownListItem Item=0>
+                            <img width="20" height="20" src="/icons/SaveOnlyMe.svg"/>
+                            @list[0]
+                        </DropdownListItem>
                     </div>
 
                     <div class="d-block">
-                        <img width="20" height="20" src="/icons/Save1.svg" asp-append-version="true" />
-                        <DropdownListItem Item=1> @list[1]</DropdownListItem>
+                        <DropdownListItem Item=1>
+                            <img width="20" height="20" src="/icons/SaveFriends.svg"/>
+                            @list[1]
+                        </DropdownListItem>
                     </div>
 
                     <div class="d-block">
-                        <img width="20" height="20" src="/icons/Save2.svg" asp-append-version="true" />
-                        <DropdownListItem Item=2> @list[2]</DropdownListItem>
+                        <DropdownListItem Item=2>
+                            <img width="20" height="20" src="/icons/SavePublic.svg" />
+                            @list[2]
+                        </DropdownListItem>
                     </div>
                 </ChildContent>
             </Dropdown>

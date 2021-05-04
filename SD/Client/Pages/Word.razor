@@ -64,7 +64,7 @@
 
             @{ var list = new List<string> { languageContainer.Keys["OnlyMe"], languageContainer.Keys["Friends"], languageContainer.Keys["Public"] }; }
 
-            <Dropdown TItem="int" imgSrc="@ShareWithClass" OnSelected="@OnSelectedAsync">
+            <Dropdown TItem="int" OnSelected="@OnSelectedAsync">
                 <InitialTip>
                     <img width="20" height="20" src="@ShareWithClass"/>
                     @languageContainer.Keys[wordDto.ShareWith.ToString()]

@@ -19,13 +19,12 @@
     public RenderFragment ChildContent { get; set; }
     [Parameter]
     public EventCallback<TItem> OnSelected { get; set; }
-    [Parameter]
-    public string imgSrc { get; set; }
 
     private bool show = false;
     private RenderFragment Tip;
 
     protected override void OnInitialized() { this.Tip = InitialTip; }
+
     public async Task HandleSelect(TItem item, RenderFragment<TItem> contentFragment)
     {
         this.Tip = contentFragment.Invoke(item);

@@ -122,7 +122,6 @@ namespace SD.Client.Pages
         protected async Task OnSelectedAsync(int selection)
         {
             wordDto.ShareWith = (ShareWith)selection;
-            ShareWithClass = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
             await AddWord();
         }
 
@@ -212,7 +211,7 @@ namespace SD.Client.Pages
             wordDto.Explain = null;
             MyText = null;
             SetMyText();
-            //ShareWithClass = "/icons/cloud-upload-alt-solid.svg";
+            ShareWithClass = "/icons/SaveSave.svg";
             wordDto.ShareWith = ShareWith.Save; // nothing
 
             if (string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang))
@@ -425,7 +424,6 @@ namespace SD.Client.Pages
             }
             else
             {
-                ShareWithClass = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
                 CULiked = wordDto.IsILiked;
                 LikesCount = wordDto.LikesCount;
             }
@@ -434,7 +432,7 @@ namespace SD.Client.Pages
         }
 
         protected override async Task OnParametersSetAsync()
-        {
+        { 
             ShareWithClass = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
             note = null;
             SetMyText();

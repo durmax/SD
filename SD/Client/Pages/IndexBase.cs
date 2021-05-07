@@ -20,7 +20,7 @@ namespace SD.Client.Pages
         [Inject]
         public CurrentUserService CurrUsrService { set; get; }
         [Inject]
-        public CurrentUser CurrentUser{ set; get; }
+        public CurrentUser CurrentUser { set; get; }
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
 
@@ -58,6 +58,13 @@ namespace SD.Client.Pages
             Words.Insert(0, newWord);
             currentPage++;
         }
+        protected void OldWordHandler(WordDto oldWord)
+        {
+            if (!Words.Exists(w => w.WordId == oldWord.WordId))
+            {
+                Words.Insert(0, oldWord);
+            }
+        }
         protected void DeleteWordHandler(WordDto word)
         {
             Words.Remove(word);
@@ -65,7 +72,7 @@ namespace SD.Client.Pages
         }
         protected override async Task OnInitializedAsync()
         {
-            NewWords.Add(false);
+            NewWords.Insert(0, false);
 
             if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");

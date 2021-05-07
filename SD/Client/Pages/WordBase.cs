@@ -48,7 +48,6 @@ namespace SD.Client.Pages
 
         protected string ShareWithClass { get; set; }
         protected string cssClassDelete;// = "d-none";
-        protected string cssClassCard = "border border-dark";
 
         [Parameter]
         public string UserId { get; set; }
@@ -115,6 +114,8 @@ namespace SD.Client.Pages
 
         [Parameter]
         public EventCallback<WordDto> OnWordSave { get; set; }
+        [Parameter]
+        public EventCallback<WordDto> OnWordFound { get; set; }
 
         [Parameter]
         public EventCallback<WordDto> OnWordDelete { get; set; }
@@ -218,7 +219,6 @@ namespace SD.Client.Pages
             {
                 await SetLangsAsync();
             }
-            cssClassCard = "border-primary";
         }
 
         protected async Task WordChangedAsync(string title)
@@ -235,9 +235,8 @@ namespace SD.Client.Pages
 
         protected async Task SetWord(string title)
         {
-            wordDto = await WordService.GetWordByText(CurrentUser.id, title);
-            MyText = wordDto.Explain;
-            SameWords = null;
+            var wDto = await WordService.GetWordByText(CurrentUser.id, title);
+            await OnWordFound.InvokeAsync(wDto);
         }
 
         protected void SetMyText()

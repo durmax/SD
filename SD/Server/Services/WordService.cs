@@ -11,18 +11,20 @@ namespace sd.Api.Services
     {
         private readonly IWordRepository _wordRepository;
         private readonly RelationshipService _relationshipService;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public WordService(IWordRepository wordRepository, RelationshipService relationshipService, IMapper mapper)
+        public WordService(IWordRepository wordRepository, RelationshipService relationshipService, IUserRepository userRepository, IMapper mapper)
         {
             _wordRepository = wordRepository;
             _relationshipService = relationshipService;
+            _userRepository = userRepository;
             _mapper = mapper;
         }
 
         public async Task<Tuple<int, List<WordDto>>> GetPageWords(string currentUserId, string userId, string lang, int pageSize, int currentPage)
         {
-            List<WordDto> words = new List<WordDto>();
+            List<WordDto> wordDtos = new List<WordDto>();
             WordModel word;
             WordDto wordDto;
             int newCurrentPage = currentPage;
@@ -30,7 +32,7 @@ namespace sd.Api.Services
 
             long wordsCount = await _wordRepository.GetDocCount(userId, lang);
 
-            while (words.Count < pageSize)
+            while (wordDtos.Count < pageSize)
             {
                 if (wordsCount < newCurrentPage)
                 {
@@ -43,13 +45,18 @@ namespace sd.Api.Services
                     if (await IsWordShareWithUser(wordDto, currentUserId))
                     {
                         if (word.Likes != null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
-                        words.Add(wordDto);
+                        if (currentUserId != wordDto.UserId)
+                        {
+                            var user = await _userRepository.GetUserById(wordDto.UserId);
+                            wordDto.UserName = user.Name;
+                        }
+                        wordDtos.Add(wordDto);
                     }
                 }
                 newCurrentPage++;
             }
 
-            Res = new Tuple<int, List<WordDto>>(newCurrentPage, words);
+            Res = new Tuple<int, List<WordDto>>(newCurrentPage, wordDtos);
 
             return Res;
         }

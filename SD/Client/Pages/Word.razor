@@ -6,7 +6,12 @@
     @note
 }
 
-<div class="card @cssClassCard">
+
+<div class="card mt-1 @cssClassCard">
+    @if (!string.IsNullOrEmpty(wordDto.UserName))
+    {
+        <a class="border-bottom border-secondary bg-light" href="MyWords/@wordDto.UserId/@wordDto.UserName">@wordDto.UserName</a>
+    }
     <div class="input-group">
         @if (KnownLangs != null)
         {
@@ -66,20 +71,20 @@
 
             <Dropdown TItem="int" OnSelected="@OnSelectedAsync">
                 <InitialTip>
-                    <img width="20" height="20" src="@ShareWithClass"/>
+                    <img width="20" height="20" src="@ShareWithClass" />
                     @languageContainer.Keys[wordDto.ShareWith.ToString()]
                 </InitialTip>
                 <ChildContent>
                     <div class="d-block">
                         <DropdownListItem Item=0>
-                            <img width="20" height="20" src="/icons/SaveOnlyMe.svg"/>
+                            <img width="20" height="20" src="/icons/SaveOnlyMe.svg" />
                             @list[0]
                         </DropdownListItem>
                     </div>
 
                     <div class="d-block">
                         <DropdownListItem Item=1>
-                            <img width="20" height="20" src="/icons/SaveFriends.svg"/>
+                            <img width="20" height="20" src="/icons/SaveFriends.svg" />
                             @list[1]
                         </DropdownListItem>
                     </div>

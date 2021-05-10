@@ -348,12 +348,13 @@ namespace SD.Client.Pages
                 likedUsers = await WordService.GetLikedUsers(CurrentUser.id, wordDto.WordId);
             }
         }
-        protected async Task Like()
+        protected async Task LikeAsync()
         {
             if (!string.IsNullOrWhiteSpace(CurrentUser.id) && CurrentUser.id != "0")
             {
-                LikesCount = await WordService.Like(CurrentUser.id, wordDto.WordId);
                 CULiked = !CULiked;
+                LikesCount += CULiked ? 1 : -1;
+                await WordService.Like(CurrentUser.id, wordDto.WordId);
             }
             else
             {

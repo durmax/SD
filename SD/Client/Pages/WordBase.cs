@@ -204,16 +204,15 @@ namespace SD.Client.Pages
         {
             wordDto = new WordDto
             {
-                // WordId = Guid.NewGuid().ToString(),
                 WordLang = DefaultLangsService.DefaultWordLang,
                 ToLang = DefaultLangsService.DefaultToLang,
-                UserId = CurrentUser.id
+                UserId = CurrentUser.id,
+                ShareWith = wordDto?.ShareWith ?? ShareWith.Public 
             };
             wordDto.Explain = null;
             MyText = null;
             SetMyText();
-            ShareWithClass = "/icons/SaveSave.svg";
-            wordDto.ShareWith = ShareWith.Save; // nothing
+            ShareWithClass = "/icons/Save" + wordDto.ShareWith.ToString();
 
             if (string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang))
             {

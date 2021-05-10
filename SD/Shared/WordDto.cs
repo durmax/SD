@@ -25,6 +25,5 @@ namespace SD.Shared
         OnlyMe = 0,
         Friends = 1,
         Public = 2,
-        Save = 3
     }
 }

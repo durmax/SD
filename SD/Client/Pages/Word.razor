@@ -73,32 +73,38 @@
             <Dropdown TItem="int" OnSelected="@OnSelectedAsync">
                 <InitialTip>
                     <img width="20" height="20" src="@ShareWithClass" />
-                    @languageContainer.Keys[wordDto.ShareWith.ToString()]
+                    
                 </InitialTip>
                 <ChildContent>
                     <div class="d-block">
+
                         <DropdownListItem Item=0>
                             <img width="20" height="20" src="/icons/SaveOnlyMe.svg" />
-                            @list[0]
                         </DropdownListItem>
+                        @list[0]
                     </div>
 
                     <div class="d-block">
                         <DropdownListItem Item=1>
                             <img width="20" height="20" src="/icons/SaveFriends.svg" />
-                            @list[1]
                         </DropdownListItem>
+                        @list[1]
                     </div>
 
                     <div class="d-block">
                         <DropdownListItem Item=2>
                             <img width="20" height="20" src="/icons/SavePublic.svg" />
-                            @list[2]
                         </DropdownListItem>
+                        @list[2]
                     </div>
                 </ChildContent>
             </Dropdown>
+            <button type="button" class="btn btn-light bg-transparent" @onclick="async () => { await AddWord(); }">
+                <img width="20" height="20" src="/icons/SaveSave.svg" asp-append-version="true" />
+            </button>
         </div>
+
+
         <button type="button" style="float:right" class="@cssClassDelete btn btn-light bg-transparent" @onclick="async () => { await DeleteWord(); }">
             <img width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" />
         </button>

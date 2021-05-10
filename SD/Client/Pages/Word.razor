@@ -112,12 +112,12 @@
             </button>
         }
 
-        <div class="d-flex">
+        <div style="max-width:500px">
             @if (SameWords != null && !string.IsNullOrWhiteSpace(wordDto.Title))
             {
                 @foreach (var w in SameWords)
                 {
-                    <a herf="" class="d-block p-1" @onclick="async ()  => { await SetWord(w); }">
+                    <a herf="" class="m-1" @onclick="async ()  => { await SetWord(w); }">
                         <u class="text-primary"> @w </u>
                     </a>
                 }
@@ -160,7 +160,7 @@
         <div class="card-footer p-0">
             <div class="row  fs-6">
                 <div class="col-5">
-                    <button type="button" style="float:left" class="btn btn-light bg-transparent" @onclick="async () => { await Like(); }">
+                    <button type="button" style="float:left" class="btn btn-light bg-transparent" @onclick="async () => { await LikeAsync(); }">
                         <img width="20" height="20" src=@(CULiked ? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg") asp-append-version="true" />
 
                     </button>

@@ -9,7 +9,9 @@
 <div class="card mt-1 @(string.IsNullOrEmpty(wordDto.WordId)? "border-primary": "border-dark") ">
     @if (!string.IsNullOrEmpty(wordDto.UserName))
     {
-        <a class="border-bottom border-secondary bg-light" href="MyWords/@wordDto.UserId/@wordDto.UserName">@wordDto.UserName</a>
+        <div class="card-header p-0">
+            <a class="text-decoration-none" href="MyWords/@wordDto.UserId/@wordDto.UserName">@wordDto.UserName</a>
+        </div>
     }
     <div class="input-group">
         @if (KnownLangs != null)

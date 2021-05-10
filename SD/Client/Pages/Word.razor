@@ -10,7 +10,7 @@
     @if (!string.IsNullOrEmpty(wordDto.UserName))
     {
         <div class="card-header p-0">
-            <a class="text-decoration-none" href="MyWords/@wordDto.UserId/@wordDto.UserName">@wordDto.UserName</a>
+            <a class="text-decoration-none pl-1" href="MyWords/@wordDto.UserId/@wordDto.UserName">@wordDto.UserName</a>
         </div>
     }
     <div class="input-group">
@@ -98,8 +98,6 @@
                     </div>
                 </ChildContent>
             </Dropdown>
-
-
         </div>
         <button type="button" style="float:right" class="@cssClassDelete btn btn-light bg-transparent" @onclick="async () => { await DeleteWord(); }">
             <img width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" />

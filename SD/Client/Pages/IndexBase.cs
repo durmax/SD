@@ -39,6 +39,24 @@ namespace SD.Client.Pages
         protected int currentPage = 0;
         protected string TLang;
 
+        protected void OnSelectedAsync(int selection)
+        {
+            switch (selection)
+            {
+                case 0:
+                    NewWords.Insert(0, false);
+                    break;
+                case 1:
+                    NewWords.Insert(0, true);
+                    break;
+                case 2:
+                    if (NewWords.Count > 1) NewWords.Remove(NewWords.Last());
+                    break;
+                default:
+                    break;
+            }
+        }
+
         protected async Task GetNextPage()
         {
             loading = true;

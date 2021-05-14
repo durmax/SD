@@ -71,29 +71,22 @@
                 <Dropdown TItem="int" OnSelected="@OnSelectedAsync">
                     <InitialTip>
                         <img width="20" height="20" src="@ShareWithImageSRC" />
-
                     </InitialTip>
                     <ChildContent>
-                        <div class="d-block">
-
+                        <div class="d-block p-2">
                             <DropdownListItem Item=0>
-                                <img width="20" height="20" src="/icons/SaveOnlyMe.svg" />
+                                <img width="20" height="20" src="/icons/SaveOnlyMe.svg" />   @list[0]
                             </DropdownListItem>
-                            @list[0]
                         </div>
-
-                        <div class="d-block">
+                        <div class="d-block p-2">
                             <DropdownListItem Item=1>
-                                <img width="20" height="20" src="/icons/SaveFriends.svg" />
+                                <img width="20" height="20" src="/icons/SaveFriends.svg" />  @list[1]
                             </DropdownListItem>
-                            @list[1]
                         </div>
-
-                        <div class="d-block">
+                        <div class="d-block p-2">
                             <DropdownListItem Item=2>
-                                <img width="20" height="20" src="/icons/SavePublic.svg" />
+                                <img width="20" height="20" src="/icons/SavePublic.svg" />  @list[2]
                             </DropdownListItem>
-                            @list[2]
                         </div>
                     </ChildContent>
                 </Dropdown>

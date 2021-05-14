@@ -125,6 +125,7 @@ namespace SD.Client.Pages
         protected async Task OnSelectedAsync(int selection)
         {
             wordDto.ShareWith = (ShareWith)selection;
+            ShareWithImageSRC = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
             await AddWord();
         }
 

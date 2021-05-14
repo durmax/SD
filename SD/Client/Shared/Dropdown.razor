@@ -27,7 +27,7 @@
 
     public async Task HandleSelect(TItem item, RenderFragment<TItem> contentFragment)
     {
-        this.Tip = contentFragment.Invoke(item);
+       //this.Tip = contentFragment.Invoke(item);
         this.show = false;
         StateHasChanged();
         await this.OnSelected.InvokeAsync(item);

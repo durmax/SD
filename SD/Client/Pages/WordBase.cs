@@ -48,7 +48,7 @@ namespace SD.Client.Pages
 
         protected List<string> KnownLangs { get; set; }
 
-        protected string ShareWithClass { get; set; }
+        protected string ShareWithImageSRC { get; set; }
         protected string cssClassDelete;// = "d-none";
 
         [Parameter]
@@ -214,7 +214,7 @@ namespace SD.Client.Pages
             wordDto.Explain = null;
             MyText = null;
             SetMyText();
-            ShareWithClass = "/icons/Save" + wordDto.ShareWith.ToString();
+            ShareWithImageSRC = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
 
             if (string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang))
             {
@@ -438,7 +438,7 @@ namespace SD.Client.Pages
 
         protected override async Task OnParametersSetAsync()
         { 
-            ShareWithClass = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
+            ShareWithImageSRC = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
             note = null;
             SetMyText();
             await GetFavLinkAsync();

@@ -25,6 +25,8 @@ namespace SD.Client.Pages
         NavigationManager NavigationManager { get; set; }
         [Inject]
         KnownLangsService KnownLangsService { get; set; }
+
+        public string showWord { set; get; }
         [Parameter]
         public bool Collapsed { set; get; } //= true;    // hide by default
         public bool CollapsedComm { set; get; } = true;
@@ -313,7 +315,7 @@ namespace SD.Client.Pages
         {
             loading = true;
 
-            if (!string.IsNullOrWhiteSpace(wordDto.UserId))// is not a new word
+            if (!string.IsNullOrWhiteSpace(wordDto.WordId) && !string.IsNullOrWhiteSpace(wordDto.UserId))// is not a new word
             {
                 if (wordDto.UserId == CurrentUser.id)
                 {
@@ -327,6 +329,10 @@ namespace SD.Client.Pages
                         //note = $"You can NOT delete {wordModel.Title}";
                     }
                 }
+            }
+            else
+            {
+                showWord = "collapse";
             }
             loading = false;
         }

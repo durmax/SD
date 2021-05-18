@@ -26,7 +26,7 @@ namespace SD.Client.Pages
         [Inject]
         KnownLangsService KnownLangsService { get; set; }
 
-        public string showWord { set; get; }
+        public bool RemoveNewWord { set; get; }
         [Parameter]
         public bool Collapsed { set; get; } //= true;    // hide by default
         public bool CollapsedComm { set; get; } = true;
@@ -333,7 +333,7 @@ namespace SD.Client.Pages
             }
             else
             {
-                showWord = "collapse";
+                RemoveNewWord = true;
             }
             loading = false;
         }

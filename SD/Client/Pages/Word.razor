@@ -1,8 +1,11 @@
 ﻿@inject ILanguageContainerService languageContainer
 @inherits WordBase
 
-<div class="@showWord">
-     @if (!string.IsNullOrWhiteSpace(@note)) { @note  }
+
+@if (!RemoveNewWord)
+{
+    @if (!string.IsNullOrWhiteSpace(@note))
+    {@note}
 
     <div class="card mt-1 @(string.IsNullOrEmpty(wordDto.WordId)? "border-primary": "border-dark")">
         @if (!string.IsNullOrEmpty(wordDto.UserName))
@@ -218,4 +221,4 @@
             </div>
         }
     </div>
-</div>
+}

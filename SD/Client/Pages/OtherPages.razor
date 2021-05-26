@@ -11,29 +11,9 @@
 }
 else
 {
-    <div class="card m-0 border-left-0 border-right-0">
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Dict";   Collapsed = false;   await GetOpRes(); })">
-                <i class="oi oi-book"></i>
-            </button>
-            <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Vocab";  Collapsed = false; await GetOpRes();})">
-                <img src="/icons/abc.svg" asp-append-version="true" width="24" height="24" />
-            </button>
-            <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Trans";  Collapsed = false; await GetOpRes();})">
-                <img src="/icons/translate-black-24dp.svg" asp-append-version="true" />
-            </button>
-            <button type="button" class="btn btn-light" @onclick="@(async() => {opFilterVal = "Search"; Collapsed = false; await GetOpRes();})">
-                <img src="/icons/image_search-24px.svg" asp-append-version="true" />
-            </button>
+    <div class="card m-0 border-left-0 border-right-0 overflow-auto" style="max-height:200px">
 
-            <div class="input-group-append">
-                <button type="button" class="btn btn-light" @onclick="GetP">
-                    <i class="float-right @(Collapsed? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class=@(Collapsed? "collapse" : "")>
+        <div class="@(Collapsed? "collapse" : "")">
 
             <div class="card-body p-0">
 
@@ -41,30 +21,30 @@ else
                 {
                     @foreach (var otherPage in opRes)
                     {
-                        @if (otherPage.Type == opFilterVal)
-                        {
-                            <div class="d-flex">
-                                <div class="flex-grow-1 pl-1 pt-1" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
-                                    <a href="@otherPage.Link">
-                                        <u>@otherPage.Host</u>
-                                    </a>
-                                </div>
-                                <div class="float-right m-0">
-                                    @if (!string.IsNullOrWhiteSpace(FavSite) && FavSite.Contains(otherPage.Host))
-                                    {
-                                        <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage); })"><img width="20" height="20" src="/icons/crown-solid.svg" asp-append-version="true" /></button>
-                                    }
-                                    else
-                                    {
-                                        if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
-                                        {
-                                            <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage); })"><img width="20" height="20" src="/icons/crown-solid.svg" asp-append-version="true" style="opacity: 0.3;" /></button>
-                                        }
-                                    }
-                                </div>
+                        <div class="d-flex">
+                            <div class="flex-grow-1 pl-1 pt-1" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
+                                <a href="@otherPage.Link">
+                                    <u>@otherPage.Host</u>
+                                </a>
                             </div>
-                            <hr class="m-0">
-                        }
+                            <div class="float-right m-0">
+                                @if (!string.IsNullOrWhiteSpace(FavSite) && FavSite.Contains(otherPage.Host))
+                                {
+                                    <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage); })"><img width="20" height="20" src="/icons/crown-solid.svg" asp-append-version="true" /></button>
+                                }
+                                else
+                                {
+                                    if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
+                                    {
+                                        <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage); })"><img width="20" height="20" src="/icons/crown-solid.svg" asp-append-version="true" style="opacity: 0.3;" /></button>
+                                    }
+                                }
+                                <button class="btn btn-light bg-transparent" @onclick="@(async ()=> { await OtherPagesSort(otherPage.Host); })">
+                                    <i class="float-right oi oi-arrow-top"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <hr class="m-0">
                     }
                     @if (!string.IsNullOrWhiteSpace(Info))
                     {

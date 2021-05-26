@@ -19,13 +19,11 @@ namespace sd.Api.Services
         public async Task<IEnumerable<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
         {
             List<OtherPageResModel> res = new List<OtherPageResModel>();
-
             var otherPages = await _otherPageRepository.FilterByLangs(fromLang, toLang);
-
-            //otherPages.Sort((x, y) => x.Order.CompareTo(y.Order));
 
             if (otherPages != null)
             {
+                int i = 0;
                 foreach (var otherPage in otherPages)
                 {
                     if (!string.IsNullOrEmpty(otherPage.Pattern))
@@ -34,7 +32,7 @@ namespace sd.Api.Services
                         otherPageResModel.Pattern = otherPage.Pattern;
                         otherPageResModel.Host = otherPage.Host;
                         otherPageResModel.Type = otherPage.PageType;
-                        otherPageResModel.Eval = otherPage.Eval;
+                        otherPageResModel.Eval = otherPage.Eval == 0 ? i++ : otherPage.Eval;
                         res.Add(otherPageResModel);
                     }
                 }

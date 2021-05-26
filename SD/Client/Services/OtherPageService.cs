@@ -22,7 +22,7 @@ namespace SD.Client.Services
             _reqLinkP = reqLinkP;
         }
 
-        public async Task<IEnumerable<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
+        public async Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
         {
 
             List<OtherPageResModel> OPResModels = null;

@@ -16,9 +16,8 @@ namespace SD.Client.Pages
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
 
-        protected IEnumerable<OtherPageResModel> otherPageModels;
-        protected IEnumerable<OtherPageResModel> opRes;
-        protected string opFilterVal = "Dict";
+        protected List<OtherPageResModel> otherPageModels { get; set; }
+        protected IEnumerable<OtherPageResModel> opRes { get; set; }
 
         protected string FavSite { get; private set; }
         protected string FavSiteOpc { get; set; } = "0.3";
@@ -64,13 +63,21 @@ namespace SD.Client.Pages
         public bool langChanged { get; set; } = false;
         public string Info { get; private set; }
 
-        protected async Task GetP()
+        protected async Task OtherPagesSort(string Host)
         {
-            Collapsed = Collapsed ? false : true;
-            //if (opRes == null)
-            //{
-            await GetOpRes();
-            //}
+            otherPageModels.Find(p => p.Host == Host).Eval--;
+            otherPageModels.Find(p => p.Host == Host).Eval--;
+            otherPageModels.Sort((x, y) => x.Eval.CompareTo(y.Eval));
+
+            int i = -1;
+            foreach (var otherPage in otherPageModels)
+            {
+                i++;
+                otherPage.Eval = i;
+            }
+            await LocalStorageService.SetItemAsync(FLangCode + "-" + TLangCode, otherPageModels);
+            opRes = null;
+            opRes = OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
         }
 
         protected async Task GetOpRes()
@@ -85,7 +92,7 @@ namespace SD.Client.Pages
                     var OPStr = await LocalStorageService.GetItemAsync<string>(FLangCode + "-" + TLangCode);
                     if (!string.IsNullOrEmpty(OPStr) && OPStr != "null")
                     {
-                        otherPageModels = JsonConvert.DeserializeObject<IEnumerable<OtherPageResModel>>(OPStr);
+                        otherPageModels = JsonConvert.DeserializeObject<List<OtherPageResModel>>(OPStr);
                     }
                     else
                     {

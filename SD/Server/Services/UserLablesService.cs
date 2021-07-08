@@ -20,8 +20,8 @@ namespace sd.Api.Services
 
         public async Task<bool> SetUserLabels(string userId, string lablesStr)
         {
-           var lables= ConvertToList(lablesStr);
-            
+            var lables = ConvertToList(lablesStr);
+
             foreach (var item in lables)
             {
                 lablesStr += "," + item;
@@ -29,9 +29,15 @@ namespace sd.Api.Services
 
             var userConfigs = await _userConfigRepository.GetUserConfigs(userId);
 
-            userConfigs.Labels = lablesStr;
-            await _userConfigRepository.SetUserConfigs(userConfigs);
-            return true;
+            if (userConfigs != null)
+            {
+                userConfigs.Labels = lablesStr;
+            }
+            else
+            {
+                return false;
+            }
+            return await _userConfigRepository.SetUserConfigs(userConfigs);
         }
 
         private IEnumerable<string> ConvertToList(string lablesStr)

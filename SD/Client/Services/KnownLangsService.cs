@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SD.Shared;
 
 namespace SD.Client.Services
 {
@@ -11,21 +12,7 @@ namespace SD.Client.Services
         {
             LangsStr += "," + wLang + "," + tLang;
 
-            if (!string.IsNullOrWhiteSpace(LangsStr))
-            {
-                string[] langArray = LangsStr.Split(",");
-
-                foreach (var lan in langArray)
-                {
-                    if (!string.IsNullOrWhiteSpace(lan) && lan != "null")
-                    {
-                        if (!KnownLangs.Contains(lan))
-                        {
-                            KnownLangs.Add(lan);
-                        }
-                    }
-                }
-            }
+            KnownLangs.AddRange(ListStringConverter.ToList(LangsStr));
         }
     }
 }

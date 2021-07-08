@@ -30,5 +30,7 @@ namespace sd.Api.Models
             _database.GetCollection<WordModel>(_settings.WordCollectionName);
         public IMongoCollection<OtherPageModel> OtherPages =>
             _database.GetCollection<OtherPageModel>(_settings.OtherPageCollectionName);
+        public IMongoCollection<UserConfigModel> UsersConfigs =>
+            _database.GetCollection<UserConfigModel>(_settings.UsersConfigsCollectionName);
     }
 }

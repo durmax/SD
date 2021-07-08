@@ -1,7 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace SD.Shared
@@ -21,11 +20,5 @@ namespace SD.Shared
         public string EmailRegCode { get; set; }
         [BsonIgnoreIfNull]
         public int AccountLavel { get; set; }
-        //[BsonIgnoreIfNull]
-        //public string FirstLang { get; set; }
-        //[BsonIgnoreIfNull]
-        //public string LearnLangs { get; set; }
-        //[BsonIgnoreIfNull]
-        //public string Role { get; set; }
     }
 }

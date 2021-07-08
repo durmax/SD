@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.Collections.Generic;
 
 namespace SD.Shared
 {
@@ -14,6 +15,9 @@ namespace SD.Shared
 
         [BsonIgnoreIfNull]
         public string LearnLangs { get; set; }
+
+        [BsonIgnoreIfNull]
+        public Dictionary<string, string> FavDict { get; set; }
 
         [BsonIgnoreIfNull]
         public string Labels { get; set; }

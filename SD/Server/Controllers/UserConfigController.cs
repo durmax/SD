@@ -12,19 +12,17 @@ namespace sd.Api.Controllers
     [ApiController]
     public class UserConfigController : ControllerBase
     {
-        private readonly UserLablesService _userLablesService;
         private readonly UserConfigService _userConfigService;
 
-        public UserConfigController(UserLablesService userLablesService, UserConfigService userConfigService)
+        public UserConfigController(UserConfigService userConfigService)
         {
-            _userLablesService = userLablesService;
             _userConfigService = userConfigService;
         }
 
         [HttpGet("GetUserLables")]
         public async Task<IEnumerable<string>> GetUserLables(string userId)
         {
-            return await _userLablesService.GetUserLabels(userId);
+            return await _userConfigService.GetUserLabels(userId);
         }
 
         [HttpPost]
@@ -48,15 +46,15 @@ namespace sd.Api.Controllers
         }
 
         [HttpGet]
-        [Route("SetUserLabels/{userId}/{labels}")]
-        public async Task<ActionResult<TransObj>> SetUserLabels(string userId, string labels)
+        [Route("SetUserLabels/{userId}/{label}")]
+        public async Task<ActionResult<TransObj>> SetUserLabels(string userId, string label)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(labels) || string.IsNullOrWhiteSpace(userId))
+                if (string.IsNullOrWhiteSpace(label) || string.IsNullOrWhiteSpace(userId))
                     return BadRequest();
 
-                var status = await _userLablesService.SetUserLabels(userId, labels);
+                var status = await _userConfigService.AddUserLabel(userId, label);
                 return Ok(status);
             }
             catch (Exception)

@@ -70,5 +70,10 @@ namespace SD.Client.Services
         {
             return await _httpClient.PostAsync($"api/User/RemoveFriend/{userId}/{friendId}", null);
         }
+
+        public async Task<HttpResponseMessage> AddUserConfig(UserConfigModel userConfigModel)
+        {
+            return await _httpClient.PostAsJsonAsync($"api/UserConfig/Create/", userConfigModel);
+        }
     }
 }

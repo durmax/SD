@@ -33,15 +33,15 @@ namespace sd.Api
             //services.AddSingleton<MongodbContext>(x => new MongodbContext(x.GetRequiredService<IMongodbSettings>()));
             services.AddSingleton<MongodbContext>();
 
-            services.AddSingleton<IOtherPageRepository, OtherPageRepository>();
-            services.AddSingleton<IUserRepository, UserRepository>();
-            services.AddSingleton<IWordRepository, WordRepository>();
-            services.AddSingleton<ICommentService, CommentService>();
-            services.AddSingleton<ILikeWordService, LikeWordService>();
-            services.AddSingleton<IRelationshipRepository, RelationshipRepository>();
-            services.AddSingleton<WordService>();
-            services.AddSingleton<RelationshipService>();
-            services.AddSingleton<UserService>();
+            services.AddScoped<IOtherPageRepository, OtherPageRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IWordRepository, WordRepository>();
+            services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<ILikeWordService, LikeWordService>();
+            services.AddScoped<IRelationshipRepository, RelationshipRepository>();
+            services.AddScoped<WordService>();
+            services.AddScoped<RelationshipService>();
+            services.AddScoped<UserService>();
             services.AddSingleton<OtherPageService>();
 
             services.AddDataProtection();

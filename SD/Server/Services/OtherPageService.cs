@@ -48,17 +48,17 @@ namespace sd.Api.Services
 
         public async Task<TransObj> RegisterOtherPage(OtherPageModel otherPage)
         {
-            return await _otherPageRepository.RegisterOtherPage(otherPage);
+            return await _otherPageRepository.Create(otherPage);
         }
 
         public async Task<TransObj> UpdateOtherPage(string id, OtherPageModel newOtherPage)
         {
-            return await _otherPageRepository.UpdateOtherPage(id, newOtherPage);
+            return await _otherPageRepository.Update(id, newOtherPage);
         }
 
         public async Task<bool> RemoveOtherPage(string id)
         {
-            return await _otherPageRepository.RemoveOtherPage(id);
+            return await _otherPageRepository.Delete(id);
         }
     }
 }

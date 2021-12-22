@@ -33,7 +33,7 @@ namespace sd.Api.Repositories
                    ).ToListAsync();
         }
 
-        public async Task<TransObj> RegisterOtherPage(OtherPageModel otherPage)
+        public async Task<TransObj> Create(OtherPageModel otherPage)
         {
             // Add custom model validation error
             bool IsExist = await _context.OtherPages.Find<OtherPageModel>(u => u.Host == otherPage.Host).AnyAsync();
@@ -50,7 +50,7 @@ namespace sd.Api.Repositories
             }
         }
 
-        public async Task<TransObj> UpdateOtherPage(string id, OtherPageModel newOtherPage)
+        public async Task<TransObj> Update(string id, OtherPageModel newOtherPage)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace sd.Api.Repositories
             return new TransObj { BoolVar = true, SetringVar = "Your data updated successfully" };
         }
 
-        public async Task<bool> RemoveOtherPage(string id)
+        public async Task<bool> Delete(string id)
         {
             DeleteResult DeleteRecored;
             DeleteRecored = await _context.OtherPages.DeleteOneAsync(

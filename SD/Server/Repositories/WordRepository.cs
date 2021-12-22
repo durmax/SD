@@ -58,7 +58,7 @@ namespace sd.Api.Repositories
             return await _context.Words.Find(filter).ToListAsync();
         }
 
-        public async Task<bool> AddWord(WordModel word)
+        public async Task<bool> Create(WordModel word)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace sd.Api.Repositories
             }
         }
 
-        public async Task<bool> UpdateWord(string wordId, WordModel updatedWord)
+        public async Task<bool> Update(string wordId, WordModel updatedWord)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace sd.Api.Repositories
             }
         }
 
-        public async Task<bool> RemoveWord(string id)
+        public async Task<bool> Delete(string id)
         {
             try
             {

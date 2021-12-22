@@ -123,7 +123,7 @@ namespace sd.Api.Services
             var word = _mapper.Map<WordModel>(wordDto);
             word.WordId = Guid.NewGuid().ToString();
             word.CreatedAt = DateTime.Now;
-            if (await _wordRepository.AddWord(word)) return word.WordId;
+            if (await _wordRepository.Create(word)) return word.WordId;
             else return null;
         }
 
@@ -136,12 +136,12 @@ namespace sd.Api.Services
             word.Comments = oldWord.Comments;
             word.Likes = oldWord.Likes;
             word.CreatedAt = DateTime.Now;
-            return await _wordRepository.UpdateWord(updatedWordDto.WordId, word);
+            return await _wordRepository.Update(updatedWordDto.WordId, word);
         }
 
         public async Task<bool> RemoveWord(string id)
         {
-            return await _wordRepository.RemoveWord(id);
+            return await _wordRepository.Delete(id);
         }
     }
 }

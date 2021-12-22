@@ -10,13 +10,13 @@ namespace sd.Api.Interfaces
 
         Task<string> GetRelationshipId(string UserId1, Relation reletion, string UserId2);
 
-        Task<bool> AddRelationship(RelationshipModel relationship);
-        Task<bool> UpdatRelationship(string oldRelationshipId, RelationshipModel newRelationship);
-        Task<bool> RemoveRelationship(string oldRelationshipId);
-
         Task<List<RelationshipModel>> GetAllFrindsRelationships(string userId);
         // Task<List<Relationship>> FrindRequestsFromUser(string userId);
         Task<List<RelationshipModel>> FriendRequestsToUser(string userId);
         Task<Relation> GetRelationshipsBetweenTwoUsers(string userId1, string userId2);
+
+        Task<bool> Create(RelationshipModel relationship);
+        Task<bool> Updat(string oldRelationshipId, RelationshipModel newRelationship);
+        Task<bool> Delete(string oldRelationshipId);
     }
 }

@@ -17,7 +17,7 @@ namespace sd.Api.Repositories
             _context = mongodbContext;
         }
 
-        public async Task<bool> AddRelationship(RelationshipModel relationship)
+        public async Task<bool> Create(RelationshipModel relationship)
         {
             try
             {
@@ -29,12 +29,12 @@ namespace sd.Api.Repositories
                 return false;
             }
         }
-        public async Task<bool> UpdatRelationship(string oldRelationshipId, RelationshipModel newRelationship)
+        public async Task<bool> Updat(string oldRelationshipId, RelationshipModel newRelationship)
         {
             await _context.Relationships.FindOneAndReplaceAsync(r => r.RelationshipId == oldRelationshipId, newRelationship);
             return true;
         }
-        public async Task<bool> RemoveRelationship(string oldRelationshipId)
+        public async Task<bool> Delete(string oldRelationshipId)
         {
             await _context.Relationships.DeleteOneAsync(r => r.RelationshipId == oldRelationshipId);
             return true;

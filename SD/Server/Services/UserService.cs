@@ -48,7 +48,7 @@ namespace sd.Api.Services
             {
                 user.CreatedAt = DateTime.Now;
 
-                await _userRepository.RegisterUserAsync(user);
+                await _userRepository.Create(user);
                 transObj.BoolVar = true; transObj.SetringVar = "User Details Inserted Successfully";
             }
             else
@@ -76,7 +76,7 @@ namespace sd.Api.Services
 
             try
             {
-                await _userRepository.UpdateUser(id, newVer);
+                await _userRepository.Update(id, newVer);
             }
             catch
             {
@@ -88,7 +88,7 @@ namespace sd.Api.Services
 
         public async Task<bool> RemoveUser(string id)
         {
-            return await _userRepository.RemoveUser(id);
+            return await _userRepository.Delete(id);
         }
     }
 }

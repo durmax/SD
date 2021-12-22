@@ -37,25 +37,25 @@ namespace sd.Api.Services
             bool res = false;
             if (await AreFrinds(relationship.UserId1, relationship.UserId2) != null)
             {
-                res = await _relationshipRepository.AddRelationship(relationship);
+                res = await _relationshipRepository.Create(relationship);
             }
             return res;
         }
 
         public async Task<bool> UpdatRelationship(string oldRelationshipId, RelationshipModel newRelationship)
         {
-            return await _relationshipRepository.UpdatRelationship(oldRelationshipId, newRelationship);
+            return await _relationshipRepository.Updat(oldRelationshipId, newRelationship);
         }
 
         public async Task<bool> RemoveRelationship(string relationshipId)
         {
-            return await _relationshipRepository.RemoveRelationship(relationshipId);
+            return await _relationshipRepository.Delete(relationshipId);
         }
 
         public async Task<bool> RemoveFriendship(string UserId, string friendId)
         {
             string relationshipId = await _relationshipRepository.GetRelationshipId(UserId, Relation.Friend, friendId);
-            return await _relationshipRepository.RemoveRelationship(relationshipId);
+            return await _relationshipRepository.Delete(relationshipId);
         }
 
         public async Task<Dictionary<string, string>> GetAllFriends(string userId)

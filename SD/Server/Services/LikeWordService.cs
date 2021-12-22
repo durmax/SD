@@ -29,7 +29,7 @@ namespace sd.Api.Services
                 {
                     wordModel.Likes.Remove(userId);
                 }
-                await _wordRepository.UpdateWord(wordModel.WordId, wordModel);
+                await _wordRepository.Update(wordModel.WordId, wordModel);
                 return wordModel.Likes.Count();
             }
             else return -1;

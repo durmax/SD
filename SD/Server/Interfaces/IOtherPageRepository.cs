@@ -9,8 +9,8 @@ namespace sd.Api.Interfaces
         //Task<IEnumerable<OtherPageResModel>> GetOPResModels(string fromLang, string toLang);
         Task<IEnumerable<OtherPageModel>> FilterByLangs(string fromLang, string toLang);
         Task<OtherPageModel> GetOtherPageById(string id);
-        Task<TransObj> RegisterOtherPage(OtherPageModel otherPage);
-        Task<TransObj> UpdateOtherPage(string id, OtherPageModel newOtherPage);
-        Task<bool> RemoveOtherPage(string id);
+        Task<TransObj> Create(OtherPageModel otherPage);
+        Task<TransObj> Update(string id, OtherPageModel newOtherPage);
+        Task<bool> Delete(string id);
     }
 }

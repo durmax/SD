@@ -41,7 +41,7 @@ namespace sd.Api.Services
                     }
 
                     word.Comments.Add(newComment);
-                    await _wordService.UpdateWord(wordId, word);
+                    await _wordService.Update(wordId, word);
                     return true;
                 }
                 else return false;
@@ -71,7 +71,7 @@ namespace sd.Api.Services
             return comment.Likes.Count();
         }
 
-        public async Task<bool> Remove(string currUsr, string wordId, string commentId)
+        public async Task<bool> Delete(string currUsr, string wordId, string commentId)
         {
             WordModel word = await _wordService.GetWordById(wordId);
 
@@ -82,7 +82,7 @@ namespace sd.Api.Services
             if (word.Comments.Contains(comment))
             {
                 word.Comments.Remove(comment);
-                await _wordService.UpdateWord(wordId, word);
+                await _wordService.Update(wordId, word);
                 return true;
             }
             return false;

@@ -62,7 +62,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                return Ok(await _commentService.Remove( currUsr,  wordId,  commentId));
+                return Ok(await _commentService.Delete( currUsr,  wordId,  commentId));
             }
             catch (Exception)
             {

@@ -50,17 +50,17 @@ namespace sd.Api.Repositories
             return await _context.Users.Find<UserModel>(u => u.Email == email).AnyAsync();
         }
 
-        public async Task RegisterUserAsync(UserModel user)
+        public async Task Create(UserModel user)
         {
             await _context.Users.InsertOneAsync(user);
         }
 
-        public async Task UpdateUser(string id, UserModel newVer)
+        public async Task Update(string id, UserModel newVer)
         {
             await _context.Users.FindOneAndReplaceAsync(Builders<UserModel>.Filter.Eq("UserId", id), newVer);
         }
 
-        public async Task<bool> RemoveUser(string id)
+        public async Task<bool> Delete(string id)
         {
             MongoDB.Driver.DeleteResult DeleteRecored;
             DeleteRecored = await _context.Users.DeleteOneAsync(Builders<UserModel>.Filter.Eq("UserId", id));

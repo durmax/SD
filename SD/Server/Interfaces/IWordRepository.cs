@@ -11,8 +11,9 @@ namespace sd.Api.Interfaces
         Task<WordModel> GetWordById(string id);
         Task<WordModel> GetWordByText(string userId, string text);
         Task<IEnumerable<WordModel>> GetWordsContainText(string userId, string text);
-        Task<bool> AddWord(WordModel word);
-        Task<bool> UpdateWord(string id, WordModel newWord);
-        Task<bool> RemoveWord(string id);
+
+        Task<bool> Create(WordModel word);
+        Task<bool> Update(string id, WordModel newWord);
+        Task<bool> Delete(string id);
     }
 }

@@ -9,6 +9,6 @@ namespace sd.Api.Interfaces
         Task<IEnumerable<CommentModel>> GetWordComments(string wordId);
         Task<bool> SaveComment(string wordId, CommentModel newComment);
         Task<int> Like(string userId, string wordId, string commentId);
-        Task<bool> Remove(string currUsr, string wordId, string commentId);
+        Task<bool> Delete(string currUsr, string wordId, string commentId);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using sd.Api.Helpers;
 using sd.Api.Interfaces;
 using sd.Api.Models;
 using SD.Shared;
@@ -19,23 +20,13 @@ namespace sd.Api.Repositories
 
         public async Task<long> GetDocCount(string userId, string lang)
         {
-            var filter = GetFilter(null, userId, lang);
+            var filter = WordHelper.GetFilter(null, userId, lang);
             return await _context.Words.CountDocumentsAsync(filter);
         }
 
-        private FilterDefinition<WordModel> GetFilter(string wordId, string userId, string lang)
+        public async Task<WordModel?> GetWord(string userId, string lang, int currentPage, int limit)
         {
-            FilterDefinition<WordModel> filter = Builders<WordModel>.Filter.Empty;
-            if (wordId != null) filter &= Builders<WordModel>.Filter.Eq(x => x.WordId, wordId);
-            if (userId != null) filter &= Builders<WordModel>.Filter.Eq(x => x.UserId, userId);
-            if (lang != null) filter &= Builders<WordModel>.Filter.Eq(x => x.ToLang, lang);
-
-            return filter;
-        }
-
-        public async Task<WordModel> GetWord(string userId, string lang, int currentPage, int limit)
-        {
-            var filter = GetFilter(null, userId, lang);
+            var filter = WordHelper.GetFilter(null, userId, lang);
             try
             {
                 return await _context.Words.Find(filter).SortByDescending(d => d.CreatedAt).Skip(currentPage - 1).Limit(limit).FirstOrDefaultAsync();

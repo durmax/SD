@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace sd.Api.Helpers
+namespace sd.Api.Services
 {
     public class LikeWordService : ILikeWordService
     {

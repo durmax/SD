@@ -7,9 +7,7 @@ using Microsoft.Extensions.Options;
 using sd.Api.Interfaces;
 using sd.Api.Models;
 using sd.Api.Repositories;
-using sd.Api.Helpers;
 using sd.Api.Services;
-using SD.Shared;
 using AutoMapper;
 
 namespace sd.Api

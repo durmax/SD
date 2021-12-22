@@ -40,7 +40,7 @@ namespace sd.Api
             services.AddScoped<WordService>();
             services.AddScoped<RelationshipService>();
             services.AddScoped<UserService>();
-            services.AddSingleton<OtherPageService>();
+            services.AddScoped<OtherPageService>();
 
             services.AddDataProtection();
 

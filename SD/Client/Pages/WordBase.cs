@@ -230,7 +230,9 @@ namespace SD.Client.Pages
             wordDto.Title = title.Trim();
             if (title.Length > 2)
             {
+                loading = true;
                 SameWords = await WordService.GetWordsContainText(CurrentUser.id, title);
+                loading = false;
             }
             else SameWords = null;
         }

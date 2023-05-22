@@ -18,6 +18,7 @@ namespace SD.Shared
         public bool IsILiked { get; set; }
         public int LikesCount { get; set; }
         public int CommentsCount { get; set; }
+        public int Score { get; set; }
     }
 
     public enum ShareWith

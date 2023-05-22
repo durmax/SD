@@ -47,5 +47,8 @@ namespace SD.Shared
 
         [BsonIgnoreIfNull]
         public List<CommentModel> Comments { get; set; }
+
+        [BsonIgnoreIfNull]
+        public int Score { get; set; }
     }
 }

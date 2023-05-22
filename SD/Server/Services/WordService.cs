@@ -122,7 +122,7 @@ namespace sd.Api.Services
         {
             var word = _mapper.Map<WordModel>(wordDto);
             word.WordId = Guid.NewGuid().ToString();
-            word.CreatedAt = DateTime.Now;
+            word.Score = word.Score++;
             if (await _wordRepository.Create(word)) return word.WordId;
             else return null;
         }

@@ -29,7 +29,7 @@ namespace sd.Api.Repositories
             var filter = WordHelper.GetFilter(null, userId, lang);
             try
             {
-                return await _context.Words.Find(filter).SortByDescending(d => d.Score).Skip(currentPage - 1).Limit(limit).FirstOrDefaultAsync();
+                return await _context.Words.Find(filter).SortByDescending(d => d.Score).SortByDescending(d => d.CreatedAt).Skip(currentPage - 1).Limit(limit).FirstOrDefaultAsync();
             }
             catch
             {

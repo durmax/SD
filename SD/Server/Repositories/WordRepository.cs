@@ -27,9 +27,10 @@ namespace sd.Api.Repositories
         public async Task<WordModel?> GetWord(string userId, string lang, int currentPage, int limit)
         {
             var filter = WordHelper.GetFilter(null, userId, lang);
+            var sort = Builders<WordModel>.Sort.Descending("Score").Descending("CreatedAt");
             try
             {
-                return await _context.Words.Find(filter).SortByDescending(d => d.Score).SortByDescending(d => d.CreatedAt).Skip(currentPage - 1).Limit(limit).FirstOrDefaultAsync();
+                return await _context.Words.Find(filter).Sort(sort).Skip(currentPage - 1).Limit(limit).FirstOrDefaultAsync();
             }
             catch
             {

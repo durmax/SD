@@ -104,6 +104,8 @@ namespace sd.Api.Services
         public async Task<WordDto> GetWordByText(string userId, string text)
         {
             var word = await _wordRepository.GetWordByText(userId, text);
+            word.Score++;
+            if (word != null) await _wordRepository.Update(word.WordId, word);
             return _mapper.Map<WordDto>(word);
         }
 
@@ -122,7 +124,7 @@ namespace sd.Api.Services
         {
             var word = _mapper.Map<WordModel>(wordDto);
             word.WordId = Guid.NewGuid().ToString();
-            word.Score = word.Score++;
+            word.CreatedAt = DateTime.Now;
             if (await _wordRepository.Create(word)) return word.WordId;
             else return null;
         }

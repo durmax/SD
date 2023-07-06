@@ -8,7 +8,7 @@ using SD.Shared;
 
 namespace sd.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class CommentController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace sd.Api.Controllers
             _commentService = commentService;
         }
 
-        [HttpGet("GetWordComments/{wordId}")]
+        [HttpGet("{wordId}")]
         public async Task<ActionResult<OtherPageResModel>> GetWordComments(string wordId)
         {
             try
@@ -34,7 +34,7 @@ namespace sd.Api.Controllers
         }
 
         [HttpPost]
-        [Route("SaveComment/{wordId}")]
+        [Route("{wordId}")]
         public async Task<ActionResult> SaveComment(string wordId, CommentModel comment)
         {
             if (await _commentService.SaveComment(wordId, comment))
@@ -44,7 +44,7 @@ namespace sd.Api.Controllers
                 $"Error to save comment");
         }
 
-        [HttpGet("LikeComment/{userId}/{WordId}/{commentId}")]
+        [HttpGet("{userId}/{WordId}/{commentId}")]
         public async Task<ActionResult<int>> LikeComment(string userId, string wordId, string commentId)
         {
             try
@@ -57,7 +57,7 @@ namespace sd.Api.Controllers
                     ex.Message);
             }
         }
-        [HttpDelete("DeleteComment/{currUsr}/{wordId}/{commentId}")]
+        [HttpDelete("{currUsr}/{wordId}/{commentId}")]
         public async Task<ActionResult<bool>> DeleteComment(string currUsr, string wordId, string commentId)
         {
             try

@@ -8,7 +8,7 @@ using SD.Shared;
 
 namespace sd.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class UserConfigController : ControllerBase
     {
@@ -19,14 +19,13 @@ namespace sd.Api.Controllers
             _userConfigService = userConfigService;
         }
 
-        [HttpGet("GetUserLables")]
+        [HttpGet]
         public async Task<IEnumerable<string>> GetUserLables(string userId)
         {
             return await _userConfigService.GetUserLabels(userId);
         }
 
         [HttpPost]
-        [Route("Create")]
         public async Task<ActionResult<TransObj>> Create(UserConfigModel userConfigModel)
         {
             try
@@ -46,7 +45,7 @@ namespace sd.Api.Controllers
         }
 
         [HttpGet]
-        [Route("SetUserLabels/{userId}/{label}")]
+        [Route("{userId}/{label}")]
         public async Task<ActionResult<TransObj>> SetUserLabels(string userId, string label)
         {
             try

@@ -8,7 +8,7 @@ using SD.Shared;
 
 namespace sd.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class RelationshipController : ControllerBase
     {
@@ -21,7 +21,7 @@ namespace sd.Api.Controllers
             //_userService = userService;
         }
 
-        [HttpGet("GetRelationshipById/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<RelationshipModel>> GetRelationshipById(string id)
         {
             try
@@ -39,7 +39,7 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpPost("AddRelationship")]
+        [HttpPost]
         public async Task<ActionResult<bool>> AddRelationship(RelationshipModel relationship)
         {
             try
@@ -53,7 +53,7 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpPost("UpdatRelationship/{oldRelationshipId}")]
+        [HttpPost("{oldRelationshipId}")]
         public async Task<ActionResult<bool>> UpdatRelationship(string oldRelationshipId, RelationshipModel newRelationship)
         {
             try
@@ -67,7 +67,7 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpDelete("RemoveRelationship/{id}")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> RemoveRelationship(string id)
         {
             try
@@ -82,7 +82,7 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpDelete("RemoveFriendship/{UserId}/{reletion}/{friendId}")]
+        [HttpDelete("{UserId}/{reletion}/{friendId}")]
         public async Task<ActionResult> RemoveFriendship(string userId, Relation reletion, string friendId)
         {
             try
@@ -99,7 +99,7 @@ namespace sd.Api.Controllers
         }
 
 
-        [HttpGet("GetAllFriends/{userId}")]
+        [HttpGet("{userId}")]
         public async Task<ActionResult<Dictionary<string, string>>> GetAllFriends(string userId)
         {
             try
@@ -117,7 +117,7 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpGet("GetFriendRequestsById/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Dictionary<string, string>>> GetFriendRequestsById(string id)
         {
             try

@@ -59,7 +59,7 @@ namespace SD.Client.Services
         {
             try
             {
-                var w= await _httpClient.GetFromJsonAsync<List<string>>($"api/Word/GetWordsContainText/{userId}/{title}");
+                var w = await _httpClient.GetFromJsonAsync<List<string>>($"api/Word/GetWordsContainText/{userId}/{title}");
                 return w;
             }
             catch (Exception e)
@@ -89,19 +89,41 @@ namespace SD.Client.Services
             return await _httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{userId}/{wordId}");
         }
 
-        public async Task <List<string>> GetLanguageToolWords(string wordLang, string str)
+        public async Task<List<string>> GetLanguageToolWords(string wordLang, string str)
         {
-            wordLang= wordLang == "de"? "de-DE": "en-US";
+            switch (wordLang)
+            {
+                case "de":
+                    wordLang = "de-DE";
+                    break;
+                case "en":
+                    wordLang = "en-US";
+                    break;
+                default:
+                    wordLang = string.Empty;
+                    break;
+            }
 
-            var response = await _httpClient.GetFromJsonAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text=/{str}");
+            if (!string.IsNullOrEmpty(wordLang))
+            {
+                try
+                {
+                    var response = await _httpClient.GetFromJsonAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text={str}");
 
-            // Extract the list of string values from Matches.Replacements.Value
-            List<string> replacementValues = response.Matches
-                .SelectMany(match => match.Replacements)
-                .Select(replacement => replacement.Value)
-                .ToList();
+                    // Extract the list of string values from Matches.Replacements.Value
+                    return response.Matches
+                        .SelectMany(match => match.Replacements)
+                        .Select(replacement => replacement.Value) //.Where(value =>  value.ToLower() != str.ToLower())
+                        .ToList();
 
-            return replacementValues;
+                }
+                catch
+                {
+                    return null;
+                }
+
+            }
+            return null;
         }
     }
 }

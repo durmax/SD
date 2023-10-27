@@ -1,9 +1,13 @@
-﻿using SD.Shared;
+﻿using SD.Client.Models;
+using SD.Shared;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 
 namespace SD.Client.Services
 {
@@ -83,6 +87,21 @@ namespace SD.Client.Services
         {
             userId ??= "0";
             return await _httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{userId}/{wordId}");
+        }
+
+        public async Task <List<string>> GetLanguageToolWords(string wordLang, string str)
+        {
+            wordLang= wordLang == "de"? "de-DE": "en-US";
+
+            var response = await _httpClient.GetFromJsonAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text=/{str}");
+
+            // Extract the list of string values from Matches.Replacements.Value
+            List<string> replacementValues = response.Matches
+                .SelectMany(match => match.Replacements)
+                .Select(replacement => replacement.Value)
+                .ToList();
+
+            return replacementValues;
         }
     }
 }

@@ -231,7 +231,11 @@ namespace SD.Client.Pages
             if (title.Length > 2)
             {
                 loading = true;
+
                 SameWords = await WordService.GetWordsContainText(CurrentUser.id, title);
+
+                LanguageToolWords = await WordService.GetLanguageToolWords(wordDto.WordLang, title);
+
                 loading = false;
             }
             else SameWords = null;
@@ -347,6 +351,7 @@ namespace SD.Client.Pages
         protected bool CULiked { get; set; } = false;
         protected IEnumerable<UserRelationshipsWithOneUserDto> likedUsers;
         protected IEnumerable<string> SameWords { get; set; }
+        protected IEnumerable<string> LanguageToolWords { get; set; }
 
         protected async Task GetLikedUsers(int? likesCount)
         {

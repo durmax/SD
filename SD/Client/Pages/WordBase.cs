@@ -282,7 +282,9 @@ namespace SD.Client.Pages
                 KnownLangsService.LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
             }
 
-            KnownLangsService.GetLangsFromLocalAsync(wordDto.WordLang, wordDto.ToLang);
+            KnownLangsService.AddKnownLang(wordDto.WordLang);
+            KnownLangsService.AddKnownLang(wordDto.ToLang);
+
             KnownLangs ??= new List<string>();
             KnownLangs = KnownLangsService.KnownLangs;
         }

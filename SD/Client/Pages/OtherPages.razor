@@ -15,11 +15,11 @@ else
 
         <div class="@(Collapsed? "collapse" : "")">
 
-            <div class="card-body p-0">
+            <div class="card-body p-0 d-flex flex-column" dropzone="move" ondragover="event.preventDefault();" @ondrop="Drop">
 
                 @if (opRes != null)
                 {
-                    @foreach (var otherPage in opRes)
+@*                     @foreach (var otherPage in opRes)
                     {
                         <div class="d-flex">
                             <div class="flex-grow-1 pl-1 pt-1" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
@@ -45,7 +45,13 @@ else
                             </div>
                         </div>
                         <hr class="m-0">
+                    } *@
+
+                    @foreach (var otherPage in opRes)
+                    {
+                        <OtherPage otherPage=@otherPage FavSite="@FavSite" CanSetFavSite="@CanSetFavSite" FLangCode="@FLangCode" TLangCode="@TLangCode" OnDragStart="HandleDragStart" />
                     }
+                    
                     @if (!string.IsNullOrWhiteSpace(Info))
                     {
                         <a class="btn-light float-right" href="@Info"> to set favorite site go to @languageContainer.Keys["LangConfig"] </a>

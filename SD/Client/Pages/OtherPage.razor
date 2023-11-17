@@ -1,0 +1,23 @@
+﻿@inherits OtherPageBase
+
+<div class="d-flex" draggable="true" @ondragstart= "DragStart">
+    <div class="flex-grow-1 pl-1 pt-1" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
+        <a href="@otherPage.Link">
+            <u>@otherPage.Host</u>
+        </a>
+    </div>
+    <div class="float-right m-0">
+        @if (!string.IsNullOrWhiteSpace(FavSite) && FavSite.Contains(otherPage.Host))
+        {
+            <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage); })"><img width="20" height="20" src="/icons/crown-solid.svg" asp-append-version="true" /></button>
+        }
+        else
+        {
+            if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
+            {
+                <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage); })"><img width="20" height="20" src="/icons/crown-solid.svg" asp-append-version="true" style="opacity: 0.3;" /></button>
+            }
+        }
+    </div>
+</div>
+<hr class="m-0">

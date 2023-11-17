@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Newtonsoft.Json;
 using SD.Client.Services;
 using SD.Shared;
@@ -20,7 +21,6 @@ namespace SD.Client.Pages
         protected IEnumerable<OtherPageResModel> opRes { get; set; }
 
         protected string FavSite { get; private set; }
-        protected string FavSiteOpc { get; set; } = "0.3";
 
         [Parameter]
         public bool Collapsed { get; set; } = true;    // hide by default
@@ -63,17 +63,30 @@ namespace SD.Client.Pages
         public bool langChanged { get; set; } = false;
         public string Info { get; private set; }
 
-        protected async Task OtherPagesSort(string Host)
+        double oldScreenY = 0;
+        OtherPageResModel dragedOtherPage;
+        protected async Task HandleDragStart(DragEventArgs e)
         {
-            otherPageModels.Find(p => p.Host == Host).Eval--;
-            otherPageModels.Find(p => p.Host == Host).Eval--;
+            oldScreenY = e.ScreenY;
+            dragedOtherPage = otherPageModels.Find(p => p.Eval == e.Button);
+        }
+
+        protected async Task Drop(DragEventArgs e)
+        {
+            await OtherPagesSortByEval(dragedOtherPage, e.ScreenY);
+        }
+        protected async Task OtherPagesSortByEval(OtherPageResModel otherPage, double newScreenY)
+        {
+            var x = (int)(oldScreenY - newScreenY) / 25;
+            otherPageModels.Find(p => p.Host == otherPage.Host).Eval = otherPage.Eval - x;
+
             otherPageModels.Sort((x, y) => x.Eval.CompareTo(y.Eval));
 
             int i = -1;
-            foreach (var otherPage in otherPageModels)
+            foreach (var oPage in otherPageModels)
             {
                 i++;
-                otherPage.Eval = i;
+                oPage.Eval = i;
             }
             await LocalStorageService.SetItemAsync(FLangCode + "-" + TLangCode, otherPageModels);
             opRes = null;
@@ -114,19 +127,6 @@ namespace SD.Client.Pages
                         opRes = OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
                     }
                 }
-            }
-        }
-
-        protected async Task Favorite(OtherPageResModel otherPage)
-        {
-            if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
-            {
-                await LocalStorageService.SetItemAsync("fav" + "-" + FLangCode + "-" + TLangCode, otherPage.Pattern);
-                FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + FLangCode + "-" + TLangCode);
-            }
-            else
-            {
-                Info = "/Languages";
             }
         }
         protected override async Task OnParametersSetAsync()

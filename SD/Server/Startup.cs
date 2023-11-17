@@ -64,7 +64,7 @@ namespace sd.Api
             app.UseCors(builder =>
             {
                 builder.WithOrigins(
-                    "https://localhost:44331",
+                    "https://localhost:51473",
                     "https://lingoclub.netlify.app",
                     "https://www.lingoclub.net")
                        .AllowAnyMethod()

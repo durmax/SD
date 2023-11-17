@@ -6,11 +6,17 @@ namespace SD.Client.Services
     public class KnownLangsService
     {
         public string LangsStr { get; set; }
+
         public List<string> KnownLangs = new List<string>();
 
-        public void GetLangsFromLocalAsync( string wLang, string tLang)
+        public void AddKnownLang(string lang)
         {
-            LangsStr += "," + wLang + "," + tLang;
+            KnownLangs = new List<string>();
+
+            if (!KnownLangs.Contains(lang))
+            {
+                LangsStr += "," + lang;
+            }
 
             KnownLangs.AddRange(ListStringConverter.ToList(LangsStr));
         }

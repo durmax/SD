@@ -52,7 +52,7 @@ namespace SD.Client.Pages
             {
                 SFL = value;
                 LocalStorageService.SetItemAsync("FLang", SelectedFL.Key);
-                AddKnownLang(SelectedFL.Key);
+                KnownLangsService.AddKnownLang(SelectedFL.Key);
                 DefaultLangsService.DefaultWordLang = SelectedFL.Key;
             }
         }
@@ -65,7 +65,7 @@ namespace SD.Client.Pages
                 STL = value;
                 LocalStorageService.SetItemAsync("TLang", SelectedTL.Key);
                 SetUILang(SelectedTL.Key);
-                AddKnownLang(SelectedTL.Key);
+                KnownLangsService.AddKnownLang(SelectedTL.Key);
                 DefaultLangsService.DefaultToLang = SelectedTL.Key;
             }
         }
@@ -144,23 +144,7 @@ namespace SD.Client.Pages
             return await Task.FromResult(LangCodes.Where(x => x.Value.ToLower().Contains(searchText.ToLower())).ToList());
         }
 
-        protected void AddKnownLang(string lang)
-        {
-            if (KnownLangs != null)
-            {
-                if (!KnownLangs.Contains(lang))
-                {
-                    KnownLangs.Add(lang);
-                    KnownLangsService.LangsStr += "," + lang;
-                }
-            }
-            else
-            {
-                KnownLangs = new List<string>();
-                KnownLangs.Add(lang);
-                KnownLangsService.LangsStr += "," + lang;
-            }
-        }
+
 
         protected void RemoveKnownLang(string lang)
         {
@@ -173,8 +157,8 @@ namespace SD.Client.Pages
 
         protected void BuildKnownLangs()
         {
-            KnownLangsService.GetLangsFromLocalAsync(SelectedFL.Key,
-               SelectedTL.Key);
+            KnownLangsService.AddKnownLang(SelectedFL.Key);
+            KnownLangsService.AddKnownLang(SelectedTL.Key);
 
             KnownLangs = new List<string>();
             KnownLangs = KnownLangsService.KnownLangs;

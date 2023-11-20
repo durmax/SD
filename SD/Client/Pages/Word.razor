@@ -127,10 +127,7 @@
                 {
                     @foreach (var w in LanguageToolWords)
                     {
-                        <b>@w</b> 
-@*                        <a herf="" class="m-1" @onclick="async ()  => { await SetWord(w); }">
-                            <u class="text-primary"> @w </u>
-                        </a>*@
+                        <a @onclick="()=> wordDto.Title= w">@w</a> 
                     }
                 }
             </div>

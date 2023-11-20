@@ -15,7 +15,11 @@ else
 
         <div class="@(Collapsed? "collapse" : "")">
 
-            <div class="card-body p-0 d-flex flex-column" dropzone="move" ondragover="event.preventDefault();" @ondrop="Drop">
+            <div class="card-body p-0 d-flex flex-column" dropzone="move" ondragover="event.preventDefault();" @ondrop="Drop" 
+            @ontouchmove:preventDefault
+            @ontouchcancel:preventDefault
+            @ontouchcancel:stopPropagation
+            @ontouchmove:stopPropagation>
 
                 @if (opRes != null)
                 {

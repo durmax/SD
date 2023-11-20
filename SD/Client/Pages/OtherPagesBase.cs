@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Newtonsoft.Json;
 using SD.Client.Services;
 using SD.Shared;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -76,13 +77,18 @@ namespace SD.Client.Pages
 
         protected async Task Drop(DragEventArgs e)
         {
-            await OtherPagesSortByEval(dragedOtherPage, e.ScreenY);
+            await OtherPagesChangeEval(dragedOtherPage, e.ScreenY);
         }
-        protected async Task OtherPagesSortByEval(OtherPageResModel otherPage, double newScreenY)
+        protected async Task OtherPagesChangeEval(OtherPageResModel otherPage, double newScreenY)
         {
             var x = (int)(oldScreenY - newScreenY) / 25;
             otherPageModels.Find(p => p.Host == otherPage.Host).Eval = otherPage.Eval - x;
 
+            await OtherPagesSort();
+        }
+
+        protected async Task OtherPagesSort()
+        {
             otherPageModels.Sort((x, y) => x.Eval.CompareTo(y.Eval));
 
             int i = -1;
@@ -94,6 +100,36 @@ namespace SD.Client.Pages
             await LocalStorageService.SetItemAsync(FLangCode + "-" + TLangCode, otherPageModels);
             opRes = null;
             opRes = OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
+        }
+
+        protected async Task SetEvalAsync(ChangeEventArgs e, OtherPageResModel otherPage)
+        {
+            var oldEVal = otherPage.Eval;
+            var newEVal = Int32.Parse(e.Value.ToString());
+
+            if (oldEVal > newEVal)
+            {
+                foreach (var p in otherPageModels)
+                {
+                    if (p.Eval >= newEVal)
+                    {
+                        p.Eval++;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var p in otherPageModels)
+                {
+                    if (p.Eval >= oldEVal)
+                    {
+                        p.Eval--;
+                    }
+                }
+            }
+            otherPageModels.Find(p => p.Host == otherPage.Host).Eval = newEVal;
+
+            await OtherPagesSort();
         }
 
         protected async Task GetOpRes()

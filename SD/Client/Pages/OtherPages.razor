@@ -15,47 +15,23 @@ else
 
         <div class="@(Collapsed? "collapse" : "")">
 
-            <div class="card-body p-0 d-flex flex-column" dropzone="move" ondragover="event.preventDefault();" @ondrop="Drop" 
-            @ontouchmove:preventDefault
-            @ontouchcancel:preventDefault
-            @ontouchcancel:stopPropagation
-            @ontouchmove:stopPropagation>
+            <div class="card-body p-0 d-flex flex-column" dropzone="move" ondragover="event.preventDefault();" @ondrop="Drop">
 
                 @if (opRes != null)
                 {
-@*                     @foreach (var otherPage in opRes)
-                    {
-                        <div class="d-flex">
-                            <div class="flex-grow-1 pl-1 pt-1" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
-                                <a href="@otherPage.Link">
-                                    <u>@otherPage.Host</u>
-                                </a>
-                            </div>
-                            <div class="float-right m-0">
-                                @if (!string.IsNullOrWhiteSpace(FavSite) && FavSite.Contains(otherPage.Host))
-                                {
-                                    <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage); })"><img width="20" height="20" src="/icons/crown-solid.svg" asp-append-version="true" /></button>
-                                }
-                                else
-                                {
-                                    if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
-                                    {
-                                        <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage); })"><img width="20" height="20" src="/icons/crown-solid.svg" asp-append-version="true" style="opacity: 0.3;" /></button>
-                                    }
-                                }
-                                <button class="btn btn-light bg-transparent" @onclick="@(async ()=> { await OtherPagesSort(otherPage.Host); })">
-                                    <i class="float-right oi oi-arrow-top"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <hr class="m-0">
-                    } *@
-
                     @foreach (var otherPage in opRes)
                     {
-                        <OtherPage otherPage=@otherPage FavSite="@FavSite" CanSetFavSite="@CanSetFavSite" FLangCode="@FLangCode" TLangCode="@TLangCode" OnDragStart="HandleDragStart" />
+                        <div class="container">
+                            @if (CanSetFavSite)
+                            {
+                                <input class="float-left border-0" style="max-width:30px" value="@otherPage.Eval"
+                                @onchange="@((ChangeEventArgs e) => SetEvalAsync(e, otherPage))" />
+                            }
+
+                            <OtherPage otherPage=@otherPage FavSite="@FavSite" CanSetFavSite="@CanSetFavSite" FLangCode="@FLangCode" TLangCode="@TLangCode" OnDragStart="HandleDragStart" />
+                        </div>
                     }
-                    
+
                     @if (!string.IsNullOrWhiteSpace(Info))
                     {
                         <a class="btn-light float-right" href="@Info"> to set favorite site go to @languageContainer.Keys["LangConfig"] </a>

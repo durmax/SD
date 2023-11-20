@@ -161,7 +161,7 @@
 
                 @if (!(string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang)))
                 {
-                    <OtherPages FLangCode="@wordDto.WordLang" TLangCode="@wordDto.ToLang" Word="@wordDto.Title" Collapsed="@Collapsed" CanSetFavSite="false"></OtherPages>
+                    <OtherPages FLangCode="@wordDto.WordLang" TLangCode="@wordDto.ToLang" Word="@wordDto.Title" Collapsed="@Collapsed" CanSetFavSite="false" MaxHeight="200px"></OtherPages>
                 }
             </div>
         </div>

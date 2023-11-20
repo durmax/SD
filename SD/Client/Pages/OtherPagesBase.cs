@@ -30,6 +30,9 @@ namespace SD.Client.Pages
         [Parameter]
         public string Word { get; set; }
 
+        [Parameter]
+        public string MaxHeight { get; set; }
+
         private string fLang;
         private string tLang;
 

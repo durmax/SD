@@ -38,7 +38,7 @@ namespace SD.Client.Pages
         private string tLang;
 
         [Parameter]
-        public string FLangCode //{ get; set; }
+        public string FLangCode
         {
             get { return fLang; }
             set
@@ -51,7 +51,7 @@ namespace SD.Client.Pages
             }
         }
         [Parameter]
-        public string TLangCode // { get; set; }
+        public string TLangCode
         {
             get { return tLang; }
             set
@@ -91,7 +91,7 @@ namespace SD.Client.Pages
         {
             otherPageModels.Sort((x, y) => x.Eval.CompareTo(y.Eval));
 
-            int i = -1;
+            int i = 0;
             foreach (var oPage in otherPageModels)
             {
                 i++;

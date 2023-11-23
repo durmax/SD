@@ -73,7 +73,7 @@
                             @item
                         </label>
                         <button type="button" class="btn btn-link"
-                                @onclick="(() => RemoveKnownLang(item))">
+                        @onclick="(() => RemoveKnownLang(item))">
                             <i class="oi oi-delete"></i>
                         </button>
 
@@ -102,7 +102,7 @@
                 }
             </select>
             <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
-                <i class="fas fa-exchange-alt"></i>
+                <i class="oi oi-loop"></i>
             </button>
             <select class="bg-transparent rounded-0 border-0" @bind="tl">
                 @foreach (var item in KnownLangs)
@@ -117,8 +117,11 @@
                     }
                 }
             </select>
-        </div>
 
+            <button type="button" class="btn btn-light bg-transparent" @onclick="ResetOPAsync">
+                <i>Reset</i>
+            </button>
+        </div>
         <OtherPages FLangCode="@fl" TLangCode="@tl" Collapsed="false" CanSetFavSite="true"></OtherPages>
     </div>
 }

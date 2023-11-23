@@ -28,6 +28,9 @@ namespace SD.Client.Pages
         [Inject]
         public ILanguageContainerService languageContainer { get; set; }
 
+        [Inject]
+        NavigationManager NavigationManager { get; set; }
+
         protected List<string> KnownLangs { get; set; }
 
         private LangCode SFL;
@@ -37,6 +40,13 @@ namespace SD.Client.Pages
         protected string fl { get; set; }
         protected string tl { get; set; }
 
+
+        protected async Task ResetOPAsync()
+        {
+            await LocalStorageService.RemoveItemAsync(fl + "-" + tl);
+            SetLangsStr();
+            NavigationManager.NavigateTo("Languages", true);
+        }
 
         protected void Reverse()
         {

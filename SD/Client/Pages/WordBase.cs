@@ -231,20 +231,28 @@ namespace SD.Client.Pages
             if (title.Length > 2)
             {
                 loading = true;
-
-                SameWords = await WordService.GetWordsContainText(CurrentUser.id, title);
-
+                if (!string.IsNullOrEmpty(CurrentUser?.id))
+                {
+                    SameWords = await WordService.GetWordsContainText(CurrentUser.id, title);
+                }
                 LanguageToolWords = await WordService.GetLanguageToolWords(wordDto.WordLang, title);
 
                 loading = false;
             }
-            else SameWords = null;
+            else
+            {
+                SameWords = null;
+                LanguageToolWords = null;
+            }
         }
 
         protected async Task SetWord(string title)
         {
-            var wDto = await WordService.GetWordByText(CurrentUser.id, title);
-            await OnWordFound.InvokeAsync(wDto);
+            if (!string.IsNullOrEmpty(CurrentUser?.id))
+            {
+                var wDto = await WordService.GetWordByText(CurrentUser.id, title);
+                await OnWordFound.InvokeAsync(wDto);
+            }
         }
 
         protected void SetMyText()

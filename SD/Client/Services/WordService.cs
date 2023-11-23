@@ -114,6 +114,7 @@ namespace SD.Client.Services
                     return response.Matches
                         .SelectMany(match => match.Replacements)
                         .Select(replacement => replacement.Value) //.Where(value =>  value.ToLower() != str.ToLower())
+                        .Take(15)
                         .ToList();
 
                 }

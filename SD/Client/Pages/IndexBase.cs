@@ -92,7 +92,6 @@ namespace SD.Client.Pages
         {
             NewWords.Insert(0, false);
 
-            if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
 
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
@@ -103,12 +102,21 @@ namespace SD.Client.Pages
                 }
                 catch { }
             }
-            try
+
+            if (!CurrentUser.isAuthTested)
             {
-                FriendRequestsDictionary = await RelationshipService.GetFriendRequestsById(CurrentUser.id);
+                await CurrUsrService.GetAuth();
             }
-            catch
+
+            if(CurrentUser.isAuthenticated)
             {
+                try
+                {
+                    FriendRequestsDictionary = await RelationshipService.GetFriendRequestsById(CurrentUser.id);
+                }
+                catch
+                {
+                }
             }
         }
     }

@@ -11,7 +11,7 @@ namespace SD.Client.Services
         private readonly UserService _userService;
         private readonly CurrentUser _currentUser;
 
-        public CurrentUserService(AuthenticationStateProvider authenticationStateProvider, 
+        public CurrentUserService(AuthenticationStateProvider authenticationStateProvider,
             UserService userService, CurrentUser currentUser)
         {
             _authenticationStateProvider = authenticationStateProvider;
@@ -28,9 +28,9 @@ namespace SD.Client.Services
                 _currentUser.id = authState.User.FindFirst(c => c.Type == "oid")?.Value;
                 _currentUser.name = authState.User.Identity.Name;
                 _currentUser.email = authState.User.FindFirst(c => c.Type == "email")?.Value;
-            }
 
-            await AddUserAsync(_currentUser.id, _currentUser.email, _currentUser.name);
+                await AddUserAsync(_currentUser.id, _currentUser.email, _currentUser.name);
+            }
 
             _currentUser.isAuthTested = true;
         }

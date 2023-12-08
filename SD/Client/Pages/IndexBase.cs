@@ -92,6 +92,8 @@ namespace SD.Client.Pages
         {
             NewWords.Insert(0, false);
 
+            if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();
+       
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
 
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
@@ -101,11 +103,6 @@ namespace SD.Client.Pages
                     languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(uiLang));
                 }
                 catch { }
-            }
-
-            if (!CurrentUser.isAuthTested)
-            {
-                await CurrUsrService.GetAuth();
             }
 
             if(CurrentUser.isAuthenticated)

@@ -5,7 +5,9 @@
 @if (!RemoveNewWord)
 {
     @if (!string.IsNullOrWhiteSpace(@note))
-    {@note}
+    {
+        @note
+    }
 
     <div class="card mt-1 @(string.IsNullOrEmpty(wordDto.WordId)? "border-primary": "border-dark")">
         @if (!string.IsNullOrEmpty(wordDto.UserName))
@@ -15,28 +17,11 @@
             </div>
         }
         <div class="input-group">
-            @if (KnownLangs != null)
-            {
-                <select class="bg-transparent rounded-0 border-0" @bind="@wordDto.WordLang">
-                    @foreach (var item in KnownLangs)
-                    {
-                        if (item == wordDto.WordLang)
-                        {
-                            <option selected value="@item">@item</option>
-                        }
-                        else
-                        {
-                            <option value="@item">@item</option>
-                        }
-                    }
-                </select>
-            }
-
             <input type="search" class="form-control font-weight-bold" placeholder=@languageContainer.Keys["NewWord"]
                    id="wordId"
                    value="@wordDto.Title"
-                   @onkeyup="KeyupAsync"
-                   @oninput="@(async (ui) => {await WordChangedAsync(ui.Value.ToString()); })" />
+            @onkeyup="KeyupAsync"
+            @oninput="@(async (ui) => {await WordChangedAsync(ui.Value.ToString()); })" />
 
             <div class="input-group-append">
                 <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="OnCollapsed">
@@ -50,6 +35,20 @@
 
                 @if (KnownLangs != null)
                 {
+                    <select class="bg-transparent rounded-0 border-0" @bind="@wordDto.WordLang">
+                        @foreach (var item in KnownLangs)
+                        {
+                            if (item == wordDto.WordLang)
+                            {
+                                <option selected value="@item">@item</option>
+                            }
+                            else
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+
                     <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
                         <i class="oi oi-loop"></i>
                     </button>
@@ -69,7 +68,9 @@
                     </select>
                 }
 
-                @{ var list = new List<string> { languageContainer.Keys["OnlyMe"], languageContainer.Keys["Friends"], languageContainer.Keys["Public"] }; }
+                @{
+                    var list = new List<string> { languageContainer.Keys["OnlyMe"], languageContainer.Keys["Friends"], languageContainer.Keys["Public"] };
+                }
 
                 <Dropdown TItem="int" OnSelected="@OnSelectedAsync">
                     <InitialTip>
@@ -127,7 +128,7 @@
                 {
                     @foreach (var w in LanguageToolWords)
                     {
-                        <a @onclick="()=> wordDto.Title= w">@w</a> 
+                        <a @onclick="()=> wordDto.Title= w">@w</a>
                     }
                 }
             </div>
@@ -152,8 +153,8 @@
                 <div class="m-0">
                     <textarea class="form-control"
                               rows="@Rows"
-                              @bind-value="@MyText"
-                              @bind-value:event="oninput">@MyText</textarea>
+                    @bind-value="@MyText"
+                    @bind-value:event="oninput">@MyText</textarea>
                 </div>
 
                 @if (!(string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang)))
@@ -161,72 +162,74 @@
                     <OtherPages FLangCode="@wordDto.WordLang" TLangCode="@wordDto.ToLang" Word="@wordDto.Title" Collapsed="@Collapsed" CanSetFavSite="false" MaxHeight="200px"></OtherPages>
                 }
             </div>
-        </div>
 
-        @if (!string.IsNullOrWhiteSpace(wordDto.WordId))
-        {
-            <div class="card-footer p-0">
-                <div class="row  fs-6">
-                    <div class="col-5">
-                        <button type="button" style="float:left" class="btn btn-light bg-transparent" @onclick="async () => { await LikeAsync(); }">
-                            <img width="20" height="20" src=@(CULiked ? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg") asp-append-version="true" />
+            @if (!string.IsNullOrWhiteSpace(wordDto.WordId))
+            {
+                <div class="card-footer p-0">
+                    <div class="row  fs-6">
+                        <div class="col-5">
+                            <button type="button" style="float:left" class="btn btn-light bg-transparent" @onclick="async () => { await LikeAsync(); }">
+                                <img width="20" height="20" src=@(CULiked ? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg") asp-append-version="true" />
 
-                        </button>
-
-                        @if (LikesCount != null && (CULiked ? LikesCount > 1 : LikesCount > 0))
-                        {
-                            <button type="button" class="btn btn-light bg-transparent" @onclick="async () => { await GetLikedUsers(LikesCount); }">
-                                @LikesCount <i>likes</i>
                             </button>
-                        }
-                    </div>
 
-                    <div type="button" style="float:right" class="col-2 btn btn-light bg-transparent" @onclick="OnCollapsed">
-                        @if (!Collapsed)
-                        {
-                            <i class="oi oi-collapse-up"></i>
-                        }
-                    </div>
-
-                    <div class="col-5">
-                        <button type="button" style="float:right" class="btn btn-light bg-transparent" @onclick="GetWordCommentsAsync">
-                            @if (wordDto.CommentsCount > 0)
-                            {@wordDto.CommentsCount}
-
-                            <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class=@(CollapsedLike ? "collapse" : "")>
-                @if (likedUsers != null)
-                {
-                    @foreach (var foudUser in likedUsers)
-                    {
-                        <Friendship UserId="@CurrentUser.id" friendId="@foudUser.UserId" friendName="@foudUser.RelationalUserName" Relationship="foudUser.Relation"></Friendship>
-                    }
-                }
-            </div>
-
-            <div class="card m-0 border-left-0 border-right-0 @(CollapsedComm ? "collapse" : "")">
-                @if (!CollapsedComm)
-                {
-                    <CascadingValue Value="@CurrentUser.id">
-                        <div class="card-body p-0">
-
-                            @foreach (var comment in wordComments)
+                            @if (LikesCount != null && (CULiked ? LikesCount > 1 : LikesCount > 0))
                             {
-                                <Comment commentModel="@comment" WordId="@wordDto.WordId" CurrentUserName="@CurrentUser.name" WordUserId="@wordDto.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
+                                <button type="button" class="btn btn-light bg-transparent" @onclick="async () => { await GetLikedUsers(LikesCount); }">
+                                    @LikesCount <i>likes</i>
+                                </button>
                             }
+                        </div>
 
-                            <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
-                                <span>Add Comment </span> <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" />
+                        <div type="button" style="float:right" class="col-2 btn btn-light bg-transparent" @onclick="OnCollapsed">
+                            @if (!Collapsed)
+                            {
+                                <i class="oi oi-collapse-up"></i>
+                            }
+                        </div>
+
+                        <div class="col-5">
+                            <button type="button" style="float:right" class="btn btn-light bg-transparent" @onclick="GetWordCommentsAsync">
+                                @if (wordDto.CommentsCount > 0)
+                                {
+                                    @wordDto.CommentsCount
+                                }
+
+                                <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
                             </button>
                         </div>
-                    </CascadingValue>
-                }
-            </div>
-        }
+                    </div>
+                </div>
+
+                <div class=@(CollapsedLike ? "collapse" : "")>
+                    @if (likedUsers != null)
+                    {
+                        @foreach (var foudUser in likedUsers)
+                        {
+                            <Friendship UserId="@CurrentUser.id" friendId="@foudUser.UserId" friendName="@foudUser.RelationalUserName" Relationship="foudUser.Relation"></Friendship>
+                        }
+                    }
+                </div>
+
+                <div class="card m-0 border-left-0 border-right-0 @(CollapsedComm ? "collapse" : "")">
+                    @if (!CollapsedComm)
+                    {
+                        <CascadingValue Value="@CurrentUser.id">
+                            <div class="card-body p-0">
+
+                                @foreach (var comment in wordComments)
+                                {
+                                    <Comment commentModel="@comment" WordId="@wordDto.WordId" CurrentUserName="@CurrentUser.name" WordUserId="@wordDto.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
+                                }
+
+                                <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
+                                    <span>Add Comment </span> <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" />
+                                </button>
+                            </div>
+                        </CascadingValue>
+                    }
+                </div>
+            }
+        </div>
     </div>
 }

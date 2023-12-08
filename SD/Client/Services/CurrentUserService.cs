@@ -28,19 +28,23 @@ namespace SD.Client.Services
                 _currentUser.id = authState.User.FindFirst(c => c.Type == "oid")?.Value;
                 _currentUser.name = authState.User.Identity.Name;
                 _currentUser.email = authState.User.FindFirst(c => c.Type == "email")?.Value;
-
-                await AddUserAsync(_currentUser.id, _currentUser.email, _currentUser.name);
             }
+
+            await AddUserAsync(_currentUser.id, _currentUser.email, _currentUser.name);
 
             _currentUser.isAuthTested = true;
         }
         private async Task AddUserAsync(string currUserId, string email, string name)
         {
-            UserModel userModel = new UserModel();
-            userModel.UserId = currUserId;
-            userModel.Email = email;
-            userModel.Name = name;
-            await _userService.AddUser(userModel);
+            if (!string.IsNullOrWhiteSpace(currUserId) && !string.IsNullOrWhiteSpace(email))
+            {
+                UserModel userModel = new UserModel();
+                userModel.UserId = currUserId;
+                userModel.Email = email;
+                userModel.Name = name;
+
+                await _userService.AddUser(userModel);
+            }
         }
     }
 }

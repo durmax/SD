@@ -62,7 +62,7 @@ namespace SD.Client.Services
                 var w = await _httpClient.GetFromJsonAsync<List<string>>($"api/Word/GetWordsContainText/{userId}/{title}");
                 return w;
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
@@ -80,7 +80,7 @@ namespace SD.Client.Services
 
         public async Task<int> Like(string userId, string wordId)
         {
-            return await _httpClient.GetFromJsonAsync<int>($"api/Word/Like/{userId}/{wordId}", null);
+            return await _httpClient.GetFromJsonAsync<int>($"api/Word/Like/{userId}/{wordId}");
         }
 
         public async Task<IEnumerable<UserRelationshipsWithOneUserDto>> GetLikedUsers(string userId, string wordId)
@@ -91,19 +91,12 @@ namespace SD.Client.Services
 
         public async Task<List<string>> GetLanguageToolWords(string wordLang, string str)
         {
-            switch (wordLang)
+            wordLang = wordLang switch
             {
-                case "de":
-                    wordLang = "de-DE";
-                    break;
-                case "en":
-                    wordLang = "en-US";
-                    break;
-                default:
-                    wordLang = string.Empty;
-                    break;
-            }
-
+                "de" => "de-DE",
+                "en" => "en-US",
+                _ => string.Empty,
+            };
             if (!string.IsNullOrEmpty(wordLang))
             {
                 try

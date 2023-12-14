@@ -1,12 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="MongoDB.Bson" Version="2.11.0-beta1" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0-preview.4.20251.6" />
   </ItemGroup>
-
 </Project>

@@ -1,18 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <RazorLangVersion>3.0</RazorLangVersion>
     <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
   </PropertyGroup>
-
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.13" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.13" PrivateAssets="all" />
+	</ItemGroup>
   <ItemGroup>
     <Compile Remove="bin\**" />
     <Content Remove="bin\**" />
     <EmbeddedResource Remove="bin\**" />
     <None Remove="bin\**" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="Resources\ar-SY.yml" />
     <None Remove="Resources\de-DE.yml" />
@@ -25,7 +26,6 @@
     <None Remove="Resources\ru-RU.yml" />
     <None Remove="Resources\tr-TR.yml" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources\ar-SY.yml" />
     <EmbeddedResource Include="Resources\de-DE.yml" />
@@ -38,21 +38,17 @@
     <EmbeddedResource Include="Resources\ru-RU.yml" />
     <EmbeddedResource Include="Resources\tr-TR.yml" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="AKSoftware.Localization.MultiLanguages" Version="3.0.1" />
     <PackageReference Include="Blazored.LocalStorage" Version="2.1.6" />
     <PackageReference Include="Blazored.Typeahead" Version="4.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="3.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Build" Version="3.2.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="3.2.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="3.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0-preview.4.20251.6" />
-    <PackageReference Include="System.Net.Http.Json" Version="5.0.0-preview.4.20251.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.14" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.14" />
+    <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="7.0.14" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Shared\SD.Shared.csproj" />
   </ItemGroup>
-
 </Project>

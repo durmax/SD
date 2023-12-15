@@ -1,6 +1,5 @@
 using System;
 using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Blazored.LocalStorage;
@@ -9,14 +8,9 @@ using SD.Client.Models;
 using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
 using SD.Shared;
+using SD.Client;
 
-namespace SD.Client
-{
-    public class Program
-    {
-        public static async Task Main(string[] args)
-        {
-            var builder = WebAssemblyHostBuilder.CreateDefault(args);
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
 
             //builder.Services.AddScoped(sp => new HttpClient {}    it is recomenden from Microsoft
@@ -58,6 +52,3 @@ namespace SD.Client
             builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
 
             await builder.Build().RunAsync();
-        }
-    }
-}

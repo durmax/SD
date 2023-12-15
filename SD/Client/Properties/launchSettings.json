@@ -3,10 +3,12 @@
     "SD.Client": {
       "commandName": "Project",
       "launchBrowser": true,
+      "dotnetRunMessages": true,
+      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
+      "applicationUrl": "https://localhost:51473;http://localhost:51474",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "https://localhost:51473;http://localhost:51474"
+      }
     }
   }
 }

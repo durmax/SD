@@ -16,12 +16,13 @@
                 <a class="text-decoration-none pl-1" href="MyWords/@wordDto.UserId/@wordDto.UserName">@wordDto.UserName</a>
             </div>
         }
+
         <div class="input-group">
             <input type="search" class="form-control font-weight-bold" placeholder=@languageContainer.Keys["NewWord"]
                    id="wordId"
                    value="@wordDto.Title"
-            @onkeyup="KeyupAsync"
-            @oninput="@(async (ui) => {await WordChangedAsync(ui.Value.ToString()); })" />
+                   @onkeyup="KeyupAsync"
+                   @oninput="@(async (ui) => {await WordChangedAsync(ui.Value.ToString()); })" />
 
             <div class="input-group-append">
                 <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="OnCollapsed">
@@ -30,7 +31,8 @@
             </div>
         </div>
 
-        <div class=@(Collapsed ? "collapse" : "")>
+        @if (!Collapsed)
+        {
             <div class="btn-group" role="group">
 
                 @if (KnownLangs != null)
@@ -49,7 +51,7 @@
                         }
                     </select>
 
-                    <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
+                    <button type="button" class="bg-transparent border-0" @onclick="Reverse">
                         <i class="oi oi-loop"></i>
                     </button>
 
@@ -94,16 +96,15 @@
                         </div>
                     </ChildContent>
                 </Dropdown>
-                <button type="button" class="btn btn-light bg-transparent" @onclick="async () => { await AddWord(); }">
+                <button type="button" class="bg-transparent border-0" @onclick="async () => { await AddWord(); }">
+                    @languageContainer.Keys["Save"]
                     <img width="20" height="20" src="/icons/SaveSave.svg" asp-append-version="true" />
                 </button>
+                <button type="button" class="@cssClassDelete bg-transparent border-0" @onclick="async () => { await DeleteWord(); }">
+                    @languageContainer.Keys["Delete"]
+                    <img width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" />
+                </button>
             </div>
-
-
-            <button type="button" style="float:right" class="@cssClassDelete btn btn-light bg-transparent" @onclick="async () => { await DeleteWord(); }">
-                <img width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" />
-            </button>
-
             @if (loading)
             {
                 <button type="button" class="btn btn-light bg-transparent">
@@ -132,9 +133,7 @@
                     }
                 }
             </div>
-        </div>
 
-        <div class=@(Collapsed ? "collapse" : "")>
             <div class="card-body p-0">
 
                 <div class="card mb-1 @cssClassUpdate">
@@ -153,8 +152,8 @@
                 <div class="m-0">
                     <textarea class="form-control"
                               rows="@Rows"
-                    @bind-value="@MyText"
-                    @bind-value:event="oninput">@MyText</textarea>
+                              @bind-value="@MyText"
+                              @bind-value:event="oninput">@MyText</textarea>
                 </div>
 
                 @if (!(string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang)))
@@ -230,6 +229,6 @@
                     }
                 </div>
             }
-        </div>
+        }
     </div>
 }

@@ -51,4 +51,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Shared\SD.Shared.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
+  </ItemGroup>
 </Project>

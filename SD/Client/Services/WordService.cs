@@ -33,10 +33,10 @@ namespace SD.Client.Services
             return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordDto>>>($"api/Word/GetPageWordsFromUserID/{CurrentUserId}/{userId}/{pageSize}/{currentPage}");
         }
 
-        public async Task<Tuple<int, List<WordDto>>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)
+        public async Task<List<WordDto>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)
         {
             CurrentUserId ??= "0";
-            return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordDto>>>($"api/Word/GetPageWordsFromAllUseres/{CurrentUserId}/{pageSize}/{currentPage}");
+            return await _httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsFromAllUseres/{CurrentUserId}/{pageSize}/{currentPage}");
         }
 
         public async Task<WordDto> GetWordById(string id)

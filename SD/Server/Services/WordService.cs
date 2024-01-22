@@ -22,7 +22,7 @@ namespace sd.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<Tuple<int, List<WordDto>>> GetPageWords(string currentUserId, string userId, string lang, int pageSize, int currentPage)
+        public async Task<List<WordDto>> GetPageWords(string currentUserId, string userId, string lang, int pageSize, int currentPage)
         {
             List<WordDto> wordDtos = new List<WordDto>();
             WordModel word;
@@ -56,9 +56,7 @@ namespace sd.Api.Services
                 newCurrentPage++;
             }
 
-            Res = new Tuple<int, List<WordDto>>(newCurrentPage, wordDtos);
-
-            return Res;
+            return wordDtos;
         }
 
         private async Task<bool> IsWordShareWithUser(WordDto wordDto, string userId)

@@ -96,7 +96,7 @@ namespace sd.Api.Controllers
 
 
         [HttpGet("GetPageWordsFromAllUseres/{CurrentUserId}/{pageSize}/{currentPage}")]
-        public async Task<ActionResult<Tuple<int, List<WordDto>>>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)
+        public async Task<ActionResult<List<WordDto>>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)
         {
             try
             {

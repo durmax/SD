@@ -36,7 +36,7 @@ namespace SD.Client.Pages
 
 
         protected bool loading;
-        protected int currentPage = 0;
+        protected int currentPage = 1;
         protected string TLang;
 
         protected void OnSelectedAsync(int selection)
@@ -61,14 +61,12 @@ namespace SD.Client.Pages
         {
             loading = true;
             TLang = DefaultLangsService.DefaultToLang;
-            currentPage++;
-            var res = await WordService.GetPageWordsFromAllUseres(CurrentUser.id, 10, currentPage);
-            if (res != null)
-            {
-                currentPage = res.Item1;
-                Words.AddRange(res.Item2);
-                //Words = Words.Union(res.Item2).Distinct().ToList();
-            }
+            var wordsCount = Words.Count;
+
+            Words.AddRange(await WordService.GetPageWordsFromAllUseres(CurrentUser.id, 10, currentPage));
+
+            currentPage += Words.Count - wordsCount;
+
             loading = false;
         }
         protected void NewWordHandler(WordDto newWord)

@@ -333,14 +333,19 @@ namespace SD.Client.Pages
             {
                 if (wordDto.UserId == CurrentUser.id)
                 {
-                    var response = await WordService.RemoveWord(wordDto.WordId);
-                    if (response.IsSuccessStatusCode)
+                    bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "You try to delete '" + wordDto.Title + "', are you sure?");
+                    if (confirmed)
                     {
-                        await OnWordDelete.InvokeAsync(wordDto);
-                    }
-                    else
-                    {
-                        //note = $"You can NOT delete {wordModel.Title}";
+                        var response = await WordService.RemoveWord(wordDto.WordId);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            await OnWordDelete.InvokeAsync(wordDto);
+                        }
+                        else
+                        {
+                            //note = $"You can NOT delete {wordModel.Title}";
+                            await jsRuntime.InvokeVoidAsync("alert", $"You do NOT have a promising to delete '{wordDto.Title}'");
+                        }
                     }
                 }
             }

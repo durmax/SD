@@ -82,14 +82,11 @@ namespace SD.Client.Pages
         protected NavigationManager UriHelper { get; set; }
         protected async Task KeyupAsync(KeyboardEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(FavSite) && wordDto != null)
+            if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(FavSite) && wordDto != null)
             {
                 string url = OtherPageService.BuildLink(FavSite, wordDto.Title, wordDto.WordLang, wordDto.ToLang);
 
-                if (e.Key == "Enter")
-                {
-                    await jsRuntime.InvokeAsync<object>("window.open", url, "popup");
-                }
+                await jsRuntime.InvokeVoidAsync("window.open", url, "popup");
             }
         }
 
@@ -210,7 +207,7 @@ namespace SD.Client.Pages
                 WordLang = DefaultLangsService.DefaultWordLang,
                 ToLang = DefaultLangsService.DefaultToLang,
                 UserId = CurrentUser.id,
-                ShareWith = wordDto?.ShareWith ?? ShareWith.Public 
+                ShareWith = wordDto?.ShareWith ?? ShareWith.Public
             };
             wordDto.Explain = null;
             MyText = null;
@@ -455,7 +452,7 @@ namespace SD.Client.Pages
         }
 
         protected override async Task OnParametersSetAsync()
-        { 
+        {
             ShareWithImageSRC = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
             note = null;
             SetMyText();

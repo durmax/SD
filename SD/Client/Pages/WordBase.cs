@@ -25,8 +25,6 @@ namespace SD.Client.Pages
         NavigationManager NavigationManager { get; set; }
         [Inject]
         KnownLangsService KnownLangsService { get; set; }
-
-        public bool RemoveNewWord { set; get; }
         [Parameter]
         public bool Collapsed { set; get; } //= true;    // hide by default
         public bool CollapsedComm { set; get; } = true;
@@ -348,10 +346,6 @@ namespace SD.Client.Pages
                         }
                     }
                 }
-            }
-            else
-            {
-                RemoveNewWord = true;
             }
             loading = false;
         }

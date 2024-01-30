@@ -41,7 +41,7 @@ namespace SD.Client.Services
         }
         public async Task<HttpResponseMessage> AddUser(UserModel user)
         {
-            return await _httpClient.PostAsJsonAsync("api/User", user);
+            return await _httpClient.PostAsJsonAsync("api/User/Create", user);
         }
 
         public async Task<HttpResponseMessage> RemoveUser(string id)
@@ -51,7 +51,7 @@ namespace SD.Client.Services
 
         public async Task<HttpResponseMessage> UpdateUser(string id, UserModel newUser)
         {
-            return await _httpClient.PutAsJsonAsync($"api/User/{id}", newUser);
+            return await _httpClient.PutAsJsonAsync($"api/User/UpdateUser/{id}", newUser);
         }
 
         public async Task<HttpResponseMessage> AddFriendRequest(string userId, string friendId)

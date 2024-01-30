@@ -93,6 +93,7 @@ namespace sd.Api.Controllers
         }
 
         [HttpPost]
+        [Route("Create")]
         public async Task<ActionResult<TransObj>> Create(UserModel user)
         {
             try
@@ -113,7 +114,7 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("UpdateUser/{id}")]
         public async Task<ActionResult<TransObj>> UpdateUser(string id, UserModel updatedUser)
         {
             if (id != updatedUser.UserId)

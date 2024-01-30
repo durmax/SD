@@ -88,7 +88,7 @@ namespace sd.Api.Services
 
         public async Task<bool> RemoveUser(string id)
         {
-            return await _userRepository.Delete(id);
+           return await _userRepository.Delete(id);
         }
     }
 }

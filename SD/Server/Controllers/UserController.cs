@@ -93,7 +93,6 @@ namespace sd.Api.Controllers
         }
 
         [HttpPost]
-        [Route("Create")]
         public async Task<ActionResult<TransObj>> Create(UserModel user)
         {
             try
@@ -114,7 +113,7 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpPut("UpdateUser/{id}")]
+        [HttpPut("{id}")]
         public async Task<ActionResult<TransObj>> UpdateUser(string id, UserModel updatedUser)
         {
             if (id != updatedUser.UserId)
@@ -137,13 +136,6 @@ namespace sd.Api.Controllers
         {
             try
             {
-                UserModel userToDelete = await _userService.GetUserById(id);
-
-                if (userToDelete == null)
-                {
-                    return NotFound($"User with Id = {id} not found");
-                }
-
                 return Ok(await _userService.RemoveUser(id));
             }
             catch (Exception)

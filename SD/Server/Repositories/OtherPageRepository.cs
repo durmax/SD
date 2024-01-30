@@ -71,7 +71,7 @@ namespace sd.Api.Repositories
             DeleteResult DeleteRecored;
             DeleteRecored = await _context.OtherPages.DeleteOneAsync(
               Builders<OtherPageModel>.Filter.Eq("OtherPageId", id));
-            return DeleteRecored.IsAcknowledged;
+            return DeleteRecored.DeletedCount > 0;
         }
     }
 }

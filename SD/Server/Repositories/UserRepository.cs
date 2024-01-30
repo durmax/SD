@@ -64,7 +64,7 @@ namespace sd.Api.Repositories
         {
             MongoDB.Driver.DeleteResult DeleteRecored;
             DeleteRecored = await _context.Users.DeleteOneAsync(Builders<UserModel>.Filter.Eq("UserId", id));
-            return DeleteRecored.IsAcknowledged;
+            return DeleteRecored.DeletedCount > 0;
         }
     }
 }

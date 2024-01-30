@@ -2,12 +2,10 @@
 using SD.Shared;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using System.Xml.Schema;
 
 namespace SD.Client.Services
 {
@@ -22,7 +20,7 @@ namespace SD.Client.Services
 
         public async Task<HttpResponseMessage> AddWord(WordDto word)
         {
-            return await _httpClient.PostAsJsonAsync("api/Word/AddWord", word);
+            return await _httpClient.PostAsJsonAsync("api/Word", word);
         }
 
         public async Task<Tuple<int, List<WordDto>>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
@@ -41,7 +39,7 @@ namespace SD.Client.Services
 
         public async Task<WordDto> GetWordById(string id)
         {
-            return await _httpClient.GetFromJsonAsync<WordDto>($"api/Word/GetWord/{id}");
+            return await _httpClient.GetFromJsonAsync<WordDto>($"api/Word/{id}");
         }
 
         public async Task<WordDto> GetWordByText(string userId, string title)
@@ -70,12 +68,12 @@ namespace SD.Client.Services
 
         public async Task<HttpResponseMessage> RemoveWord(string id)
         {
-            return await _httpClient.DeleteAsync($"api/Word/DeleteWord/{id}");
+            return await _httpClient.DeleteAsync($"api/Word/{id}");
         }
 
         public async Task<HttpResponseMessage> UpdateWord(WordDto newWord)
         {
-            return await _httpClient.PutAsJsonAsync($"api/Word/UpdateWord", newWord);
+            return await _httpClient.PutAsJsonAsync($"api/Word", newWord);
         }
 
         public async Task<int> Like(string userId, string wordId)

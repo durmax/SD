@@ -29,7 +29,7 @@ namespace sd.Api.Controllers
         }
 
         // GET: api/Word/GetWord/5
-        [HttpGet("GetWord/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<WordDto>> GetWord(string id)
         {
             try
@@ -110,7 +110,6 @@ namespace sd.Api.Controllers
         }
 
         [HttpPost]
-        [Route("AddWord")]
         public async Task<ActionResult<string>> Create(WordDto word)
         {
             try
@@ -119,14 +118,11 @@ namespace sd.Api.Controllers
                     return BadRequest();
                 if (string.IsNullOrWhiteSpace(word.UserId) || string.IsNullOrWhiteSpace(word.Title))
                     return BadRequest();
-                if (!string.IsNullOrWhiteSpace(word.WordId))
+                if (!string.IsNullOrWhiteSpace(word.WordId) && await _wordService.GetWordDtoById(word.WordId) != null)
                 {
-                    if (await _wordService.GetWordDtoById(word.WordId) != null)
-                    {
-                        await _wordService.UpdateWord(word);
-                        return StatusCode(StatusCodes.Status202Accepted,
-                           "Updated");
-                    }
+                    await _wordService.UpdateWord(word);
+                    return StatusCode(StatusCodes.Status202Accepted,
+                       "Updated");
                 }
 
                 var wordToInsert = await _wordService.GetWordByText(word.UserId, word.Title);
@@ -144,22 +140,17 @@ namespace sd.Api.Controllers
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    $"Error to save new {word.Title}");
+                    $"Error in save {word.Title}");
             }
         }
 
         [HttpPut]
-        [Route("UpdateWord")]
         public async Task<ActionResult> UpdateWord(WordDto updatedWord)
         {
             try
             {
-                var wordToUpdate = await _wordService.GetWordDtoById(updatedWord.WordId);
-
-                int statusCode = await _wordService.UpdateWord(updatedWord) ? StatusCodes.Status200OK : StatusCodes.Status500InternalServerError;
-
+                int statusCode = await _wordService.UpdateWord(updatedWord) ? StatusCodes.Status204NoContent : StatusCodes.Status500InternalServerError;
                 return StatusCode(statusCode);
-
             }
             catch (Exception)
             {
@@ -168,7 +159,7 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpDelete("DeleteWord/{id}")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteWord(string id)
         {
             try

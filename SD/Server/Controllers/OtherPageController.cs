@@ -34,7 +34,7 @@ namespace sd.Api.Controllers
         }
 
         [HttpGet]
-        [Route("GetById/{id}")]
+        [Route("{id}")]
         public async Task<ActionResult<OtherPageModel>> GetById(string id)
         {
             try
@@ -51,7 +51,6 @@ namespace sd.Api.Controllers
         }
 
         [HttpPost]
-        [Route("Create")]
         public async Task<IActionResult> Create(OtherPageModel page)
         {
             try
@@ -77,8 +76,7 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("Update")]
+        [HttpPut]
         public async Task<IActionResult> UpdateOtherPage(OtherPageModel updatedPage)
         {
             try

@@ -70,12 +70,12 @@ namespace SD.Client.Services
 
         public async Task<OtherPageModel> GetOtherPageById(string id)
         {
-            return await _httpClient.GetFromJsonAsync<OtherPageModel>($"api/OtherPage/GetById/{id}");
+            return await _httpClient.GetFromJsonAsync<OtherPageModel>($"api/OtherPage/{id}");
         }
 
         public async Task<HttpResponseMessage> RegisterOtherPage(OtherPageModel otherPage)
         {
-            return await _httpClient.PostAsJsonAsync("api/OtherPage/Create", otherPage);
+            return await _httpClient.PostAsJsonAsync("api/OtherPage", otherPage);
         }
 
         public async Task<HttpResponseMessage> RemoveOtherPage(string id)
@@ -85,7 +85,7 @@ namespace SD.Client.Services
 
         public async Task<HttpResponseMessage> UpdateOtherPage(OtherPageModel newOtherPage)
         {
-            return await _httpClient.PostAsJsonAsync("api/OtherPage/Update", newOtherPage);
+            return await _httpClient.PutAsJsonAsync("api/OtherPage", newOtherPage);
         }
     }
 }

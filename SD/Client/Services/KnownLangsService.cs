@@ -7,7 +7,7 @@ namespace SD.Client.Services
     {
         public string LangsStr { get; set; }
 
-        public List<string> KnownLangs = new List<string>();
+        public List<string> KnownLangs = new();
 
         public void AddKnownLang(string lang)
         {

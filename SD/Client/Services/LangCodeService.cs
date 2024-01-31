@@ -4,7 +4,7 @@ namespace SD.Client.Services
 {
     public class LangCodeService
     {
-        public Dictionary<string, string> Langs = new Dictionary<string, string>();
+        public Dictionary<string, string> Langs = new();
         
         public LangCodeService()
         {

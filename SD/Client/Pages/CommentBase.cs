@@ -3,6 +3,7 @@ using SD.Client.Services;
 using SD.Shared;
 using System;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -10,9 +11,10 @@ namespace SD.Client.Pages
     public class CommentBase : ComponentBase
     {
         [Inject]
-        public CommentService CommentService { set; get; }
-        [Inject]
         NavigationManager NavigationManager { get; set; }
+        [Inject]
+        HttpClient HttpClient { get; set; }
+
         [Parameter]
         public string WordId { get; set; }
         [Parameter]
@@ -78,7 +80,7 @@ namespace SD.Client.Pages
                 {
                     CommentModel.CommentText = MyText;
                     CommentModel.CommentOwnerName = CurrentUserName;
-                    HttpResponseMessage respons = await CommentService.SaveComment(CommentModel, WordId);
+                    HttpResponseMessage respons = await HttpClient.PostAsJsonAsync($"api/Comment/SaveComment/{WordId}", CommentModel);
                     if (!respons.IsSuccessStatusCode)
                     {
                         IsChanged = false;
@@ -101,13 +103,10 @@ namespace SD.Client.Pages
             }
             else
             {
-                if (!string.IsNullOrWhiteSpace(CurrentUserId))
+                if (!string.IsNullOrWhiteSpace(CurrentUserId) && !string.IsNullOrWhiteSpace(WordId) && !string.IsNullOrWhiteSpace(CommentModel.CommentId) && !string.IsNullOrWhiteSpace(CommentModel.UserId) && (CurrentUserId == CommentModel.UserId || CurrentUserId == WordUserId))
                 {
-                    if (!string.IsNullOrWhiteSpace(CommentModel.UserId) && (CurrentUserId == CommentModel.UserId || CurrentUserId == WordUserId))
-                    {
-                        await CommentService.RemoveComment(CurrentUserId, WordId, CommentModel.CommentId);
-                        await OnCommentDelete.InvokeAsync(CommentModel);
-                    }
+                    await HttpClient.DeleteAsync($"api/Comment/DeleteComment/{CurrentUserId}/{WordId}/{CommentModel.CommentId}");
+                    await OnCommentDelete.InvokeAsync(CommentModel);
                 }
             }
         }

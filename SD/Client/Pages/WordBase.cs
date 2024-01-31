@@ -7,6 +7,7 @@ using SD.Shared;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -14,7 +15,7 @@ namespace SD.Client.Pages
     public class WordBase : ComponentBase
     {
         [Inject]
-        IJSRuntime jsRuntime { set; get; }
+        IJSRuntime JsRuntime { set; get; }
         [Inject]
         OtherPageService OtherPageService { set; get; }
         [Inject]
@@ -38,11 +39,12 @@ namespace SD.Client.Pages
 
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
+
         [Inject]
-        public CommentService CommentService { get; set; }
+        HttpClient HttpClient { set; get; }
 
         [Parameter]
-        public WordDto wordDto { get; set; }
+        public WordDto WordDto { get; set; }
 
         protected List<string> KnownLangs { get; set; }
 
@@ -59,7 +61,7 @@ namespace SD.Client.Pages
 
         private string FavSite { get; set; }
 
-        protected List<CommentModel> wordComments { get; set; }
+        protected List<CommentModel> WordComments { get; set; }
 
         protected string foundWordIdToUpdate;
 
@@ -80,11 +82,11 @@ namespace SD.Client.Pages
         protected NavigationManager UriHelper { get; set; }
         protected async Task KeyupAsync(KeyboardEventArgs e)
         {
-            if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(FavSite) && wordDto != null)
+            if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(FavSite) && WordDto != null)
             {
-                string url = OtherPageService.BuildLink(FavSite, wordDto.Title, wordDto.WordLang, wordDto.ToLang);
+                string url = OtherPageService.BuildLink(FavSite, WordDto.Title, WordDto.WordLang, WordDto.ToLang);
 
-                await jsRuntime.InvokeVoidAsync("window.open", url, "popup");
+                await JsRuntime.InvokeVoidAsync("window.open", url, "popup");
             }
         }
 
@@ -104,9 +106,7 @@ namespace SD.Client.Pages
 
         protected void Reverse()
         {
-            string l = wordDto.WordLang;
-            wordDto.WordLang = wordDto.ToLang;
-            wordDto.ToLang = l;
+            (WordDto.ToLang, WordDto.WordLang) = (WordDto.WordLang, WordDto.ToLang);
         }
 
         [Parameter]
@@ -119,8 +119,8 @@ namespace SD.Client.Pages
 
         protected async Task OnSelectedAsync(int selection)
         {
-            wordDto.ShareWith = (ShareWith)selection;
-            ShareWithImageSRC = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
+            WordDto.ShareWith = (ShareWith)selection;
+            ShareWithImageSRC = "/icons/Save" + WordDto.ShareWith.ToString() + ".svg";
             await AddWord();
         }
 
@@ -129,9 +129,9 @@ namespace SD.Client.Pages
             loading = true;
             if (!string.IsNullOrWhiteSpace(CurrentUser.id))
             {
-                wordDto.Explain = MyText;
+                WordDto.Explain = MyText;
 
-                HttpResponseMessage respons = await WordService.AddWord(wordDto);
+                HttpResponseMessage respons = await WordService.AddWord(WordDto);
 
                 if (!respons.IsSuccessStatusCode)
                 {
@@ -146,9 +146,9 @@ namespace SD.Client.Pages
                 {
                     if ((int)respons.StatusCode == 200)
                     {
-                        note = $"{wordDto.Title} is Saved";
-                        wordDto.WordId = await respons.Content.ReadAsStringAsync();
-                        await OnWordSave.InvokeAsync(wordDto);
+                        note = $"{WordDto.Title} is Saved";
+                        WordDto.WordId = await respons.Content.ReadAsStringAsync();
+                        await OnWordSave.InvokeAsync(WordDto);
                         await NewWordAsync();
                     }
                 }
@@ -165,7 +165,7 @@ namespace SD.Client.Pages
         {
             if (!string.IsNullOrWhiteSpace(CurrentUser.id))
             {
-                if (string.IsNullOrWhiteSpace(wordDto.UserId) || CurrentUser.id != wordDto.UserId)
+                if (string.IsNullOrWhiteSpace(WordDto.UserId) || CurrentUser.id != WordDto.UserId)
                 {
                     await AddWord();
                 }
@@ -174,10 +174,10 @@ namespace SD.Client.Pages
                     loading = true;
                     if (!string.IsNullOrWhiteSpace(foundWordIdToUpdate))
                     {
-                        wordDto.WordId = foundWordIdToUpdate;
+                        WordDto.WordId = foundWordIdToUpdate;
                         cssClassUpdate = "d-none";
 
-                        HttpResponseMessage respons = await WordService.UpdateWord(wordDto);
+                        HttpResponseMessage respons = await WordService.UpdateWord(WordDto);
                         if (!respons.IsSuccessStatusCode)
                         {
                             //note = $"Sorry, {wordModel.Title} did not updated!";
@@ -185,7 +185,7 @@ namespace SD.Client.Pages
                         }
                         else
                         {
-                            note = $"{wordDto.Title} is Updated";
+                            note = $"{WordDto.Title} is Updated";
                         }
                         foundWordIdToUpdate = null;
                     }
@@ -200,19 +200,19 @@ namespace SD.Client.Pages
 
         protected async Task NewWordAsync()
         {
-            wordDto = new WordDto
+            WordDto = new()
             {
                 WordLang = DefaultLangsService.DefaultWordLang,
                 ToLang = DefaultLangsService.DefaultToLang,
                 UserId = CurrentUser.id,
-                ShareWith = wordDto?.ShareWith ?? ShareWith.Public
+                ShareWith = WordDto?.ShareWith ?? ShareWith.Public,
+                Explain = null
             };
-            wordDto.Explain = null;
             MyText = null;
             SetMyText();
-            ShareWithImageSRC = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
+            ShareWithImageSRC = "/icons/Save" + WordDto.ShareWith.ToString() + ".svg";
 
-            if (string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang))
+            if (string.IsNullOrWhiteSpace(WordDto.WordLang) || string.IsNullOrWhiteSpace(WordDto.ToLang))
             {
                 await SetLangsAsync();
             }
@@ -222,7 +222,7 @@ namespace SD.Client.Pages
         {
             cssClassUpdate = "d-none";
             note = null;
-            wordDto.Title = title.Trim();
+            WordDto.Title = title.Trim();
             if (title.Length > 2)
             {
                 loading = true;
@@ -230,7 +230,7 @@ namespace SD.Client.Pages
                 {
                     SameWords = await WordService.GetWordsContainText(CurrentUser.id, title);
                 }
-                LanguageToolWords = await WordService.GetLanguageToolWords(wordDto.WordLang, title);
+                LanguageToolWords = await WordService.GetLanguageToolWords(WordDto.WordLang, title);
 
                 loading = false;
             }
@@ -254,7 +254,7 @@ namespace SD.Client.Pages
         {
             try
             {
-                MyText = wordDto?.Explain;
+                MyText = WordDto?.Explain;
                 CalculateSize(MyText);
                 Rows = Rows < 3 ? Rows : Rows++;
             }
@@ -268,10 +268,10 @@ namespace SD.Client.Pages
             DefaultLangsService.DefaultWordLang = await LocalStorageService.GetItemAsync<string>("FLang");
             DefaultLangsService.DefaultToLang = await LocalStorageService.GetItemAsync<string>("TLang");
 
-            wordDto.WordLang = DefaultLangsService.DefaultWordLang;
-            wordDto.ToLang = DefaultLangsService.DefaultToLang;
+            WordDto.WordLang = DefaultLangsService.DefaultWordLang;
+            WordDto.ToLang = DefaultLangsService.DefaultToLang;
 
-            if (string.IsNullOrWhiteSpace(wordDto.WordLang) || wordDto.WordLang == "null" || string.IsNullOrWhiteSpace(wordDto.ToLang) || wordDto.ToLang == "null")
+            if (string.IsNullOrWhiteSpace(WordDto.WordLang) || WordDto.WordLang == "null" || string.IsNullOrWhiteSpace(WordDto.ToLang) || WordDto.ToLang == "null")
             {
                 NavigationManager.NavigateTo("Languages");
             }
@@ -285,8 +285,8 @@ namespace SD.Client.Pages
                 KnownLangsService.LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
             }
 
-            KnownLangsService.AddKnownLang(wordDto.WordLang);
-            KnownLangsService.AddKnownLang(wordDto.ToLang);
+            KnownLangsService.AddKnownLang(WordDto.WordLang);
+            KnownLangsService.AddKnownLang(WordDto.ToLang);
 
             KnownLangs ??= new List<string>();
             KnownLangs = KnownLangsService.KnownLangs;
@@ -300,10 +300,12 @@ namespace SD.Client.Pages
             }
             else
             {
-                CommentModel commentModel = new CommentModel();
-                commentModel.UserId = CurrentUser.id;
-                wordComments.Add(commentModel);
-                wordDto.CommentsCount++;
+                CommentModel commentModel = new()
+                {
+                    UserId = CurrentUser.id
+                };
+                WordComments.Add(commentModel);
+                WordDto.CommentsCount++;
                 CollapsedComm = false;
             }
         }
@@ -311,11 +313,11 @@ namespace SD.Client.Pages
         protected async Task RemoveCommentHandlerAsync(CommentModel comment)
         {
             loading = true;
-            wordComments.Remove(comment);
-            var response = await CommentService.RemoveComment(CurrentUser.id, wordDto.WordId, comment.CommentId);
+            WordComments.Remove(comment);
+            var response = await HttpClient.DeleteAsync($"api/Comment/DeleteComment/{CurrentUser.id}/{WordDto.WordId}/{comment.CommentId}");
             if (response.IsSuccessStatusCode)
             {
-                wordDto.CommentsCount--;
+                WordDto.CommentsCount--;
                 note = $"Comment of {comment.CommentOwnerName} is deleted";
             }
             else note = $"Comment of {comment.CommentOwnerName} is NOT deleted";
@@ -327,22 +329,22 @@ namespace SD.Client.Pages
         {
             loading = true;
 
-            if (!string.IsNullOrWhiteSpace(wordDto.WordId) && !string.IsNullOrWhiteSpace(wordDto.UserId))// is not a new word
+            if (!string.IsNullOrWhiteSpace(WordDto.WordId) && !string.IsNullOrWhiteSpace(WordDto.UserId))// is not a new word
             {
-                if (wordDto.UserId == CurrentUser.id)
+                if (WordDto.UserId == CurrentUser.id)
                 {
-                    bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", "You try to delete '" + wordDto.Title + "', are you sure?");
+                    bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete '" + WordDto.Title + "', are you sure?");
                     if (confirmed)
                     {
-                        var response = await WordService.RemoveWord(wordDto.WordId);
+                        var response = await WordService.RemoveWord(WordDto.WordId);
                         if (response.IsSuccessStatusCode)
                         {
-                            await OnWordDelete.InvokeAsync(wordDto);
+                            await OnWordDelete.InvokeAsync(WordDto);
                         }
                         else
                         {
                             //note = $"You can NOT delete {wordModel.Title}";
-                            await jsRuntime.InvokeVoidAsync("alert", $"You do NOT have a promising to delete '{wordDto.Title}'");
+                            await JsRuntime.InvokeVoidAsync("alert", $"You do NOT have a promising to delete '{WordDto.Title}'");
                         }
                     }
                 }
@@ -364,7 +366,7 @@ namespace SD.Client.Pages
             CollapsedLike = !CollapsedLike;
             if (!CollapsedLike && likesCount != null)
             {
-                likedUsers = await WordService.GetLikedUsers(CurrentUser.id, wordDto.WordId);
+                likedUsers = await WordService.GetLikedUsers(CurrentUser.id, WordDto.WordId);
             }
         }
         protected async Task LikeAsync()
@@ -373,7 +375,7 @@ namespace SD.Client.Pages
             {
                 CULiked = !CULiked;
                 LikesCount += CULiked ? 1 : -1;
-                await WordService.Like(CurrentUser.id, wordDto.WordId);
+                await WordService.Like(CurrentUser.id, WordDto.WordId);
             }
             else
             {
@@ -399,15 +401,15 @@ namespace SD.Client.Pages
         protected async Task GetWordCommentsAsync()
         {
             CollapsedComm = !CollapsedComm;
-            if (wordComments == null)
+            if (WordComments == null)
             {
-                wordComments = new List<CommentModel>();
-                if (wordDto?.WordId != null)
+                WordComments = new List<CommentModel>();
+                if (WordDto?.WordId != null)
                 {
                     try
                     {
-                        wordComments = (List<CommentModel>)await CommentService.GetWordComments(wordDto?.WordId);
-                        wordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
+                        WordComments =  string.IsNullOrEmpty(WordDto?.WordId) ? null : (List<CommentModel>) await HttpClient.GetFromJsonAsync<IEnumerable<CommentModel>>($"api/Comment/GetWordComments/{WordDto?.WordId}");
+                        WordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
                     }
                     catch { }
                 }
@@ -418,10 +420,10 @@ namespace SD.Client.Pages
             string fl;
             string tl;
 
-            if (wordDto != null)
+            if (WordDto != null)
             {
-                fl = wordDto.WordLang;
-                tl = wordDto.ToLang;
+                fl = WordDto.WordLang;
+                tl = WordDto.ToLang;
             }
             else
             {
@@ -437,14 +439,14 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            if (wordDto == null || string.IsNullOrWhiteSpace(wordDto.WordId))
+            if (WordDto == null || string.IsNullOrWhiteSpace(WordDto.WordId))
             {
                 await NewWordAsync();
             }
             else
             {
-                CULiked = wordDto.IsILiked;
-                LikesCount = wordDto.LikesCount;
+                CULiked = WordDto.IsILiked;
+                LikesCount = WordDto.LikesCount;
             }
 
             await BuildKnownLangsAsync();
@@ -452,7 +454,7 @@ namespace SD.Client.Pages
 
         protected override async Task OnParametersSetAsync()
         {
-            ShareWithImageSRC = "/icons/Save" + wordDto.ShareWith.ToString() + ".svg";
+            ShareWithImageSRC = "/icons/Save" + WordDto.ShareWith.ToString() + ".svg";
             note = null;
             SetMyText();
             await GetFavLinkAsync();

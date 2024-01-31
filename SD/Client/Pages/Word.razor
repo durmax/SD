@@ -7,18 +7,18 @@
     @note
 }
 
-<div class="card mt-1 @(string.IsNullOrEmpty(wordDto.WordId)? "border-primary": "border-dark")">
-    @if (!string.IsNullOrEmpty(wordDto.UserName))
+<div class="card mt-1 @(string.IsNullOrEmpty(WordDto.WordId)? "border-primary": "border-dark")">
+    @if (!string.IsNullOrEmpty(WordDto.UserName))
     {
         <div class="card-header p-0">
-            <a class="text-decoration-none pl-1" href="MyWords/@wordDto.UserId/@wordDto.UserName">@wordDto.UserName</a>
+            <a class="text-decoration-none pl-1" href="MyWords/@WordDto.UserId/@WordDto.UserName">@WordDto.UserName</a>
         </div>
     }
 
     <div class="input-group">
         <input type="search" class="form-control font-weight-bold" placeholder=@languageContainer.Keys["NewWord"]
                id="wordId"
-               value="@wordDto.Title"
+               value="@WordDto.Title"
                @onkeyup="KeyupAsync"
                @oninput="@(async (ui) => {await WordChangedAsync(ui.Value.ToString()); })" />
 
@@ -36,10 +36,10 @@
             {
                 bool IsEqual(string str1, string str2) => str1 == str2;
 
-                <select class="bg-transparent rounded-0 border-0" @bind="@wordDto.WordLang">
+                <select class="bg-transparent rounded-0 border-0" @bind="@WordDto.WordLang">
                     @foreach (var item in KnownLangs)
                     {
-                        <option value="@item" selected="@IsEqual(item,wordDto.WordLang)">@item</option>
+                        <option value="@item" selected="@IsEqual(item,WordDto.WordLang)">@item</option>
                     }
                 </select>
 
@@ -47,10 +47,10 @@
                     <i class="oi oi-loop"></i>
                 </button>
 
-                <select class="bg-transparent rounded-0 border-0" @bind="@wordDto.ToLang">
+                <select class="bg-transparent rounded-0 border-0" @bind="@WordDto.ToLang">
                     @foreach (var item in KnownLangs)
                     {
-                        <option value="@item" selected="@IsEqual(item, wordDto.ToLang)">@item</option>
+                        <option value="@item" selected="@IsEqual(item, WordDto.ToLang)">@item</option>
                     }
                 </select>
             }
@@ -100,7 +100,7 @@
         }
 
         <div style="max-width:500px">
-            @if (SameWords != null && !string.IsNullOrWhiteSpace(wordDto.Title))
+            @if (SameWords != null && !string.IsNullOrWhiteSpace(WordDto.Title))
             {
                 @foreach (var w in SameWords)
                 {
@@ -110,11 +110,11 @@
                 }
             }
 
-            @if (LanguageToolWords != null && !string.IsNullOrWhiteSpace(wordDto.Title))
+            @if (LanguageToolWords != null && !string.IsNullOrWhiteSpace(WordDto.Title))
             {
                 @foreach (var w in LanguageToolWords)
                 {
-                    <a @onclick="()=> wordDto.Title= w">@w</a>
+                    <a @onclick="()=> WordDto.Title= w">@w</a>
                 }
             }
         </div>
@@ -123,7 +123,7 @@
 
             <div class="card mb-1 @cssClassUpdate">
                 <div class="card-body">
-                    <div class="text-muted">@wordDto.Title is already exist</div>
+                    <div class="text-muted">@WordDto.Title is already exist</div>
                 </div>
                 <div class="card-footer">
                     <button type="button" class="btn btn-outline-secondary" @onclick="UpdateWord">
@@ -141,13 +141,13 @@
                           @bind-value:event="oninput">@MyText</textarea>
             </div>
 
-            @if (!(string.IsNullOrWhiteSpace(wordDto.WordLang) || string.IsNullOrWhiteSpace(wordDto.ToLang)))
+            @if (!(string.IsNullOrWhiteSpace(WordDto.WordLang) || string.IsNullOrWhiteSpace(WordDto.ToLang)))
             {
-                <OtherPages FLangCode="@wordDto.WordLang" TLangCode="@wordDto.ToLang" Word="@wordDto.Title" Collapsed="@Collapsed" CanSetFavSite="false" MaxHeight="200px"></OtherPages>
+                <OtherPages FLangCode="@WordDto.WordLang" TLangCode="@WordDto.ToLang" Word="@WordDto.Title" Collapsed="@Collapsed" CanSetFavSite="false" MaxHeight="200px"></OtherPages>
             }
         </div>
 
-        @if (!string.IsNullOrWhiteSpace(wordDto.WordId))
+        @if (!string.IsNullOrWhiteSpace(WordDto.WordId))
         {
             <div class="card-footer p-0">
                 <div class="row  fs-6">
@@ -174,9 +174,9 @@
 
                     <div class="col-5">
                         <button type="button" style="float:right" class="btn btn-light bg-transparent" @onclick="GetWordCommentsAsync">
-                            @if (wordDto.CommentsCount > 0)
+                            @if (WordDto.CommentsCount > 0)
                             {
-                                @wordDto.CommentsCount
+                                @WordDto.CommentsCount
                             }
 
                             <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
@@ -201,9 +201,9 @@
                     <CascadingValue Value="@CurrentUser.id">
                         <div class="card-body p-0">
 
-                            @foreach (var comment in wordComments)
+                            @foreach (var comment in WordComments)
                             {
-                                <Comment CommentModel="@comment" WordId="@wordDto.WordId" CurrentUserName="@CurrentUser.name" WordUserId="@wordDto.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
+                                <Comment CommentModel="@comment" WordId="@WordDto.WordId" CurrentUserName="@CurrentUser.name" WordUserId="@WordDto.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
                             }
 
                             <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">

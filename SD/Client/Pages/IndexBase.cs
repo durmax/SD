@@ -6,6 +6,8 @@ using SD.Shared;
 using System.Collections.Generic;
 using AKSoftware.Localization.MultiLanguages;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 
 namespace SD.Client.Pages
 {
@@ -13,10 +15,9 @@ namespace SD.Client.Pages
     {
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
+
         [Inject]
-        public RelationshipService RelationshipService { set; get; }
-        [Inject]
-        public ILanguageContainerService languageContainer { set; get; }
+        public ILanguageContainerService LanguageContainer { set; get; }
         [Inject]
         public CurrentUserService CurrUsrService { set; get; }
         [Inject]
@@ -24,9 +25,12 @@ namespace SD.Client.Pages
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
 
+        [Inject]
+        HttpClient HttpClient { set; get; }
+
         protected bool CollapsedFriend { get; set; } = true;    // hide by default
 
-        protected Dictionary<string, string> FriendRequestsDictionary = new Dictionary<string, string>();
+        protected Dictionary<string, string> FriendRequestsDictionary = new();
 
         protected List<WordDto> Words { get; set; } = new List<WordDto>();
         protected List<bool> NewWords { get; set; } = new List<bool>();
@@ -98,7 +102,7 @@ namespace SD.Client.Pages
             {
                 try
                 {
-                    languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(uiLang));
+                    LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(uiLang));
                 }
                 catch { }
             }
@@ -107,7 +111,7 @@ namespace SD.Client.Pages
             {
                 try
                 {
-                    FriendRequestsDictionary = await RelationshipService.GetFriendRequestsById(CurrentUser.id);
+                    FriendRequestsDictionary = await HttpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequestsById/{CurrentUser.id}");
                 }
                 catch
                 {

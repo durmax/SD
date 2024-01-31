@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SD.Client.Services;
-using System.Linq;
 using SD.Shared;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -16,9 +15,6 @@ namespace SD.Client.Pages
         protected int? FriendsCount { set; get; }
 
         protected Dictionary<string, string> FriendsDictionary;
-
-        [Inject]
-        public RelationshipService RelationshipService { set; get; }
 
         [Inject]
         CurrentUser CurrentUser { set; get; }
@@ -51,15 +47,13 @@ namespace SD.Client.Pages
 
         protected async override Task OnInitializedAsync()
         {
-                if (CurrentUser.isAuthenticated)
-                {
-                    CurrUserId = CurrentUser.id;
+            if (CurrentUser.isAuthenticated)
+            {
+                FriendsDictionary = new Dictionary<string, string>();
+                FriendsDictionary = await HttpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetAllFriends/{CurrentUser.id}");
 
-                    FriendsDictionary = new Dictionary<string, string>();
-                    FriendsDictionary = await RelationshipService.GetAllFriends(CurrUserId);
-
-                    FriendsCount = FriendsDictionary.Count;
-                }
+                FriendsCount = FriendsDictionary.Count;
+            }
         }
     }
 }

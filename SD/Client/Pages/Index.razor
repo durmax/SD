@@ -16,7 +16,7 @@
                     <div class="container">
                         @foreach (var item in FriendRequestsDictionary)
                         {
-                            <Friendship UserId="@CurrentUser.id" friendId="@item.Key" friendName="@item.Value"></Friendship>
+                            <Friendship UserId="@CurrentUser.id" FriendId="@item.Key" FriendName="@item.Value"></Friendship>
                         }
 
                     </div>

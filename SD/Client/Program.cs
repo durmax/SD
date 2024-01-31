@@ -46,9 +46,6 @@ builder.Services.AddScoped<LinkParam>();
 builder.Services.AddScoped<OtherPageService>();
 builder.Services.AddScoped<WordService>();
 builder.Services.AddScoped<CommentService>();
-builder.Services.AddScoped<RelationshipService>();
-
-
 
 builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
 

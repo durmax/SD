@@ -2,6 +2,8 @@
 using SD.Client.Services;
 using SD.Shared;
 using System;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -12,16 +14,18 @@ namespace SD.Client.Pages
         [Parameter]
         public string UserId { get; set; }
         [Parameter]
-        public string friendId { get; set; }
+        public string FriendId { get; set; }
         [Parameter]
-        public string friendName { get; set; }
+        public string FriendName { get; set; }
 
         [Parameter]
         public Relation Relationship { get; set; }
-        [Inject]
-        public RelationshipService RelationshipService { set; get; }
+
         [Inject]
         NavigationManager NavigationManager { set; get; }
+
+        [Inject]
+        HttpClient HttpClient { set; get; }
 
         public async Task SendFriendRequest(string ToUserId)
         {
@@ -29,17 +33,17 @@ namespace SD.Client.Pages
 
             if (UserId != "0" && !string.IsNullOrWhiteSpace(ToUserId))
             {
-                RelationshipModel relationship = new RelationshipModel()
+                RelationshipModel relationship = new()
                 {
                     RelationshipId = Guid.NewGuid().ToString(),
                     Reletion = Relation.FriendRequestTo,
                     UserId1 = UserId,
                     UserId2 = ToUserId
                 };
-                var res = await RelationshipService.AddRelationship(relationship);
+                var res = await HttpClient.PostAsJsonAsync($"api/Relationship/AddRelationship", relationship);
                 if (res.IsSuccessStatusCode)
                 {
-                   Relationship = Relation.FriendRequestTo;
+                    Relationship = Relation.FriendRequestTo;
                 }
             }
             else
@@ -54,7 +58,7 @@ namespace SD.Client.Pages
             waitBool = true;
             if (!string.IsNullOrWhiteSpace(friendId))
             {
-                var res = await RelationshipService.RemoveFriendship(UserId,Relation.Friend, friendId);
+                var res = await HttpClient.DeleteAsync($"api/Relationship/RemoveFriendship/{UserId}/{Relation.Friend}/{friendId}");
                 if (res.IsSuccessStatusCode)
                 {
                     Relationship = Relation.None;
@@ -67,16 +71,16 @@ namespace SD.Client.Pages
         {
             waitBool = true;
 
-            if (!string.IsNullOrWhiteSpace(friendId))
+            if (!string.IsNullOrWhiteSpace(FriendId))
             {
-                RelationshipModel relationship = new RelationshipModel()
+                RelationshipModel relationship = new()
                 {
                     RelationshipId = Guid.NewGuid().ToString(),
                     Reletion = Relation.Friend,
                     UserId1 = UserId,
-                    UserId2 = friendId
+                    UserId2 = FriendId
                 };
-                var res = await RelationshipService.AddRelationship(relationship);
+                var res = await HttpClient.PostAsJsonAsync($"api/Relationship/AddRelationship", relationship);
 
                 if (res.IsSuccessStatusCode)
                 {
@@ -90,9 +94,9 @@ namespace SD.Client.Pages
         {
             waitBool = true;
 
-            if (!string.IsNullOrWhiteSpace(friendId))
+            if (!string.IsNullOrWhiteSpace(FriendId))
             {
-                var res = await RelationshipService.RemoveFriendship(UserId,Relation.FriendRequestTo, friendId);
+                var res = await HttpClient.DeleteAsync($"api/Relationship/RemoveFriendship/{UserId}/{Relation.FriendRequestTo}/{FriendId}");
                 if (res.IsSuccessStatusCode)
                 {
                     Relationship = Relation.None;

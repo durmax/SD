@@ -3,7 +3,7 @@
 <div class="row">
     <div class="col-8">
         <a type="button" class="btn btn-link"
-           href="MyWords/@friendId/@friendName">@friendName</a>
+           href="MyWords/@FriendId/@FriendName">@FriendName</a>
     </div>
     <div class="col-4">
 
@@ -17,7 +17,7 @@
                 case SD.Shared.Relation.Friend:
 
                     <button type="button" class="btn btn-link"
-                            @onclick="@(async () => { await RemoveFriend(friendId); })">
+                            @onclick="@(async () => { await RemoveFriend(FriendId); })">
                         <img width="20" height="20" src="/icons/user-minus-solid.svg" asp-append-version="true" />
                     </button>
                     break;
@@ -49,7 +49,7 @@
                 default:
 
                     <button type="button" class="btn btn-link"
-                            @onclick="@(async () => { await SendFriendRequest(friendId); })">
+                            @onclick="@(async () => { await SendFriendRequest(FriendId); })">
                         <img width="20" height="20" src="/icons/user-plus-solid.svg" asp-append-version="true" />
                     </button>
                     break;

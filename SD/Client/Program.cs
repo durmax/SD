@@ -11,14 +11,16 @@ using SD.Shared;
 using SD.Client;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.RootComponents.Add<App>("app");
+builder.RootComponents.Add<App>("app");
 
-            //builder.Services.AddScoped(sp => new HttpClient {}    it is recomenden from Microsoft
-            builder.Services.AddSingleton(new HttpClient {
-                BaseAddress = new Uri("https://sdapi20200529140234.azurewebsites.net/") }); 
-                              //new Uri("https://localhost:44394/") });
-           
-            builder.Services.AddMsalAuthentication(options =>
+
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri("https://sdapi20200529140234.azurewebsites.net/")
+    //BaseAddress = new Uri("https://localhost:44394/")
+});
+
+builder.Services.AddMsalAuthentication(options =>
             {
                 var config = options.ProviderOptions;
                 config.Authentication.Authority = "https://login.microsoftonline.com/common";
@@ -26,29 +28,29 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
                 config.Authentication.ValidateAuthority = true;
                 config.Cache.CacheLocation = "localStorage";
                 config.Authentication.PostLogoutRedirectUri = "/";
- 
+
                 //https://docs.microsoft.com/en-us/aspnet/core/security/blazor/webassembly/standalone-with-microsoft-accounts?view=aspnetcore-3.1
             });
 
-            builder.Services.AddBlazoredLocalStorage();
-            builder.Services.AddSingleton<LangCodeService>();
-            builder.Services.AddSingleton<KnownLangsService>();
-            builder.Services.AddSingleton<DefaultLangsService>();
-            builder.Services.AddSingleton<CurrentUser>();
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<LangCodeService>();
+builder.Services.AddScoped<KnownLangsService>();
+builder.Services.AddScoped<DefaultLangsService>();
+builder.Services.AddScoped<CurrentUser>();
 
-            builder.Services.AddScoped<CurrentUserService>();
+builder.Services.AddScoped<CurrentUserService>();
 
-            builder.Services.AddSingleton<UriService>();
-            builder.Services.AddSingleton<LinkModel>();
-            builder.Services.AddSingleton<LinkParam>();
-            builder.Services.AddSingleton<OtherPageService>();
-            builder.Services.AddSingleton<UserService>();
-            builder.Services.AddSingleton<WordService>();
-            builder.Services.AddSingleton<CommentService>();
-            builder.Services.AddSingleton<RelationshipService>();
+builder.Services.AddScoped<UriService>();
+builder.Services.AddScoped<LinkModel>();
+builder.Services.AddScoped<LinkParam>();
+builder.Services.AddScoped<OtherPageService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<WordService>();
+builder.Services.AddScoped<CommentService>();
+builder.Services.AddScoped<RelationshipService>();
 
-            
 
-            builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
 
-            await builder.Build().RunAsync();
+builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
+
+await builder.Build().RunAsync();

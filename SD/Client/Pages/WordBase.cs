@@ -19,8 +19,6 @@ namespace SD.Client.Pages
         [Inject]
         OtherPageService OtherPageService { set; get; }
         [Inject]
-        public CurrentUserService CurrUsrService { set; get; }
-        [Inject]
         public CurrentUser CurrentUser { set; get; }
         [Inject]
         NavigationManager NavigationManager { get; set; }
@@ -77,9 +75,6 @@ namespace SD.Client.Pages
                 CalculateSize(value);
             }
         }
-
-        [Inject]
-        protected NavigationManager UriHelper { get; set; }
         protected async Task KeyupAsync(KeyboardEventArgs e)
         {
             if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(FavSite) && WordDto != null)

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using SD.Client.Services;
 using SD.Shared;
 using System;
@@ -10,6 +11,8 @@ namespace SD.Client.Pages
 {
     public class CommentBase : ComponentBase
     {
+        [Inject]
+        IJSRuntime JsRuntime { set; get; }
         [Inject]
         NavigationManager NavigationManager { get; set; }
         [Inject]
@@ -97,16 +100,20 @@ namespace SD.Client.Pages
 
         protected async Task RemoveComment()
         {
-            if (string.IsNullOrWhiteSpace(CommentModel.CommentId))
+            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete comment, are you sure?");
+            if (confirmed)
             {
-                await OnCommentDelete.InvokeAsync(CommentModel);
-            }
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(CurrentUserId) && !string.IsNullOrWhiteSpace(WordId) && !string.IsNullOrWhiteSpace(CommentModel.CommentId) && !string.IsNullOrWhiteSpace(CommentModel.UserId) && (CurrentUserId == CommentModel.UserId || CurrentUserId == WordUserId))
+                if (string.IsNullOrWhiteSpace(CommentModel.CommentId))
                 {
-                    await HttpClient.DeleteAsync($"api/Comment/DeleteComment/{CurrentUserId}/{WordId}/{CommentModel.CommentId}");
                     await OnCommentDelete.InvokeAsync(CommentModel);
+                }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(CurrentUserId) && !string.IsNullOrWhiteSpace(WordId) && !string.IsNullOrWhiteSpace(CommentModel.CommentId) && !string.IsNullOrWhiteSpace(CommentModel.UserId) && (CurrentUserId == CommentModel.UserId || CurrentUserId == WordUserId))
+                    {
+                        await HttpClient.DeleteAsync($"api/Comment/DeleteComment/{CurrentUserId}/{WordId}/{CommentModel.CommentId}");
+                        await OnCommentDelete.InvokeAsync(CommentModel);
+                    }
                 }
             }
         }

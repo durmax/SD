@@ -4,12 +4,12 @@
 
 
 <div class="card">
-    <div class="card-header"><b>@languageContainer.Keys["LangConfig"]</b></div>
+    <div class="card-header"><b>@LanguageContainer.Keys["LangConfig"]</b></div>
 
     <div class="card-body">
 
         <div class="row pb-1">
-            <div class="col-6"><lable>@languageContainer.Keys["Motherlanguage"]</lable></div>
+            <div class="col-6"><lable>@LanguageContainer.Keys["Motherlanguage"]</lable></div>
             <div class="col-6">
                 <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedTL">
                     <SelectedTemplate>
@@ -23,7 +23,7 @@
         </div>
 
         <div class="row pb-1">
-            <div class="col-6"><lable>@languageContainer.Keys["Secondlanguage"]</lable></div>
+            <div class="col-6"><lable>@LanguageContainer.Keys["Secondlanguage"]</lable></div>
             <div class="col-6">
                 <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedFL">
                     <SelectedTemplate>
@@ -38,13 +38,13 @@
     </div>
 </div>
 <div class="card mt-2">
-    <div class="card-header"><b>@languageContainer.Keys["LList"]</b></div>
+    <div class="card-header"><b>@LanguageContainer.Keys["LList"]</b></div>
 
     <div class="card-body">
         <div class="row pb-1">
             <div class="col-6">
                 <label>
-                    @languageContainer.Keys["AddLang"]
+                    @LanguageContainer.Keys["AddLang"]
                 </label>
             </div>
             <div class="col-6">
@@ -88,7 +88,7 @@
 {
     <div class="card mt-2 mb-2">
         <div class="input-group">
-            <select class="bg-transparent rounded-0 border-0" @bind="fl">
+            <select class="bg-transparent rounded-0 border-0" @bind="Fl">
                 @foreach (var item in KnownLangs)
                 {
                     if (item == SelectedFL.Key)
@@ -104,7 +104,7 @@
             <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
                 <i class="oi oi-loop"></i>
             </button>
-            <select class="bg-transparent rounded-0 border-0" @bind="tl">
+            <select class="bg-transparent rounded-0 border-0" @bind="Tl">
                 @foreach (var item in KnownLangs)
                 {
                     if (item == SelectedTL.Key)
@@ -122,6 +122,6 @@
                 <i>Reset</i>
             </button>
         </div>
-        <OtherPages FLangCode="@fl" TLangCode="@tl" Collapsed="false" CanSetFavSite="true"></OtherPages>
+        <OtherPages FLangCode="@Fl" TLangCode="@Tl" Collapsed="false" CanSetFavSite="true"></OtherPages>
     </div>
 }

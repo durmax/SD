@@ -11,7 +11,7 @@ namespace SD.Client.Services
     {
         private readonly HttpClient _httpClient;
         private readonly UriService _uriService;
-        private LinkParam _reqLinkP;
+        private readonly LinkParam _reqLinkP;
 
         public OtherPageService(HttpClient http,
                                    UriService uriService,
@@ -40,7 +40,7 @@ namespace SD.Client.Services
 
         public IEnumerable<OtherPageResModel> MakeLinks(IEnumerable<OtherPageResModel> OtherPageModels, string word, string fromLang, string toLang)
         {
-            List<OtherPageResModel> res = new List<OtherPageResModel>();
+            List<OtherPageResModel> res = new();
             if (OtherPageModels != null)
             {
 

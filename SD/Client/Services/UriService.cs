@@ -5,8 +5,8 @@ namespace SD.Client.Services
 {
     public class UriService
     {
-        private LinkModel _linkModel;
-        private LangCodeService _langCodeService;
+        private readonly LinkModel _linkModel;
+        private readonly LangCodeService _langCodeService;
 
         public UriService(LinkModel linkModel, LangCodeService langCodeService)
         {
@@ -21,7 +21,7 @@ namespace SD.Client.Services
             string pattern = linkParam.Pattern;
             string[] patternParts = pattern.Split(':');
 
-            List<string> properties = new List<string> { "FLangCode", "TLangCode", "FLangName", "TLangName", "Word" };
+            List<string> properties = new() { "FLangCode", "TLangCode", "FLangName", "TLangName", "Word" };
 
             _linkModel.FLangCode = linkParam.FLangCode;
             _linkModel.TLangCode = linkParam.TLangCode;

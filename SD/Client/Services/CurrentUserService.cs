@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
+using SD.Client.Pages;
 using SD.Shared;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace SD.Client.Services
@@ -8,15 +11,15 @@ namespace SD.Client.Services
     public class CurrentUserService
     {
         private readonly AuthenticationStateProvider _authenticationStateProvider;
-        private readonly UserService _userService;
         private readonly CurrentUser _currentUser;
+        private readonly HttpClient _httpClient;
 
         public CurrentUserService(AuthenticationStateProvider authenticationStateProvider,
-            UserService userService, CurrentUser currentUser)
+               CurrentUser currentUser, HttpClient httpClient)
         {
             _authenticationStateProvider = authenticationStateProvider;
-            _userService = userService;
             _currentUser = currentUser;
+            _httpClient = httpClient;
         }
 
         public async Task GetAuth()
@@ -38,12 +41,14 @@ namespace SD.Client.Services
         {
             if (!string.IsNullOrWhiteSpace(currUserId) && !string.IsNullOrWhiteSpace(email))
             {
-                UserModel userModel = new UserModel();
-                userModel.UserId = currUserId;
-                userModel.Email = email;
-                userModel.Name = name;
+                UserModel userModel = new()
+                {
+                    UserId = currUserId,
+                    Email = email,
+                    Name = name
+                };
 
-                await _userService.AddUser(userModel);
+                await _httpClient.PostAsJsonAsync("api/User/Create", userModel);
             }
         }
     }

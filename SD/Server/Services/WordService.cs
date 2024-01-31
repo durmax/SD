@@ -24,7 +24,7 @@ namespace sd.Api.Services
 
         public async Task<List<WordDto>> GetPageWords(string currentUserId, string userId, string lang, int pageSize, int currentPage)
         {
-            List<WordDto> wordDtos = new List<WordDto>();
+            List<WordDto> wordDtos = new();
             WordModel word;
             WordDto wordDto;
             int newCurrentPage = currentPage;
@@ -62,7 +62,7 @@ namespace sd.Api.Services
         private async Task<bool> IsWordShareWithUser(WordDto wordDto, string userId)
         {
             var word = _mapper.Map<WordModel>(wordDto);
-            bool areSame = userId == word.UserId ? true : false;
+            bool areSame = userId == word.UserId;
 
             if (areSame)
             {
@@ -113,7 +113,7 @@ namespace sd.Api.Services
 
         public async Task<IEnumerable<string>> GetWordsContainText(string userId, string text)
         {
-            List<string> res = new List<string>();
+            List<string> res = new();
             var words = await _wordRepository.GetWordsContainText(userId, text);
             foreach (var w in words)
             {

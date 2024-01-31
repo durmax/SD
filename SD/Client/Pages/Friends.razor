@@ -18,7 +18,7 @@
 </div>
 
 <div class="@SearchDisplayClass">
-    @if (foundUsers == null)
+    @if (FoundUsers == null)
     {
         <div class="d-flex justify-content-center p-1">
             <div class="spinner-border" role="status">
@@ -31,11 +31,11 @@
         <div class="card">
             <div class="card-body">
                 <div class="container">
-                    @foreach (var user in foundUsers)
+                    @foreach (var user in FoundUsers)
                     {
-                        <Friendship UserId="@currUserId" friendId="@user.UserId" friendName="@user.RelationalUserName" Relationship=user.Relation></Friendship>
+                        <Friendship UserId="@CurrUserId" friendId="@user.UserId" friendName="@user.RelationalUserName" Relationship=user.Relation></Friendship>
                     }
-                    @if (sendFriendReqWait)
+                    @if (SendFriendReqWait)
                     {
                         <div class="d-flex justify-content-center p-1">
                             <div class="spinner-border" role="status">
@@ -70,7 +70,7 @@
                         <div class="container">
                             @foreach (var foudUser in FriendsDictionary)
                             {
-                                <Friendship UserId="@currUserId" friendId="@foudUser.Key" friendName="@foudUser.Value" Relationship=SD.Shared.Relation.Friend></Friendship>
+                                <Friendship UserId="@CurrUserId" friendId="@foudUser.Key" friendName="@foudUser.Value" Relationship=SD.Shared.Relation.Friend></Friendship>
                             }
 
                         </div>

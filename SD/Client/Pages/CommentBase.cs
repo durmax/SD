@@ -12,8 +12,6 @@ namespace SD.Client.Pages
         [Inject]
         public CommentService CommentService { set; get; }
         [Inject]
-        public UserService UserService { set; get; }
-        [Inject]
         NavigationManager NavigationManager { get; set; }
         [Parameter]
         public string WordId { get; set; }
@@ -24,11 +22,11 @@ namespace SD.Client.Pages
         [Parameter]
         public string CurrentUserName { get; set; }
 
-        protected string cssDelCom { get; set; } = "d-none";
+        protected string CssDelCom { get; set; } = "d-none";
         protected bool IsChanged { get; set; } = false;
 
         [Parameter]
-        public CommentModel commentModel { get; set; }
+        public CommentModel CommentModel { get; set; }
 
         [Parameter]
         public EventCallback<CommentModel> OnCommentDelete { get; set; }
@@ -46,7 +44,7 @@ namespace SD.Client.Pages
             set
             {
                 _myText = value;
-                commentModel.CommentText = value;
+                CommentModel.CommentText = value;
                 CalculateSize(value);
             }
         }
@@ -70,17 +68,17 @@ namespace SD.Client.Pages
             }
             else
             {
-                if (commentModel.CommentId == null)
+                if (CommentModel.CommentId == null)
                 {
-                    commentModel.CommentId = Guid.NewGuid().ToString();
-                    commentModel.CreatedAt = DateTime.Now;
+                    CommentModel.CommentId = Guid.NewGuid().ToString();
+                    CommentModel.CreatedAt = DateTime.Now;
                 }
 
-                if (commentModel.UserId == CurrentUserId)
+                if (CommentModel.UserId == CurrentUserId)
                 {
-                    commentModel.CommentText = MyText;
-                    commentModel.CommentOwnerName = CurrentUserName;
-                    HttpResponseMessage respons = await CommentService.SaveComment(commentModel, WordId);
+                    CommentModel.CommentText = MyText;
+                    CommentModel.CommentOwnerName = CurrentUserName;
+                    HttpResponseMessage respons = await CommentService.SaveComment(CommentModel, WordId);
                     if (!respons.IsSuccessStatusCode)
                     {
                         IsChanged = false;
@@ -97,18 +95,18 @@ namespace SD.Client.Pages
 
         protected async Task RemoveComment()
         {
-            if (string.IsNullOrWhiteSpace(commentModel.CommentId))
+            if (string.IsNullOrWhiteSpace(CommentModel.CommentId))
             {
-                await OnCommentDelete.InvokeAsync(commentModel);
+                await OnCommentDelete.InvokeAsync(CommentModel);
             }
             else
             {
                 if (!string.IsNullOrWhiteSpace(CurrentUserId))
                 {
-                    if (!string.IsNullOrWhiteSpace(commentModel.UserId) && (CurrentUserId == commentModel.UserId || CurrentUserId == WordUserId))
+                    if (!string.IsNullOrWhiteSpace(CommentModel.UserId) && (CurrentUserId == CommentModel.UserId || CurrentUserId == WordUserId))
                     {
-                        await CommentService.RemoveComment(CurrentUserId, WordId, commentModel.CommentId);
-                        await OnCommentDelete.InvokeAsync(commentModel);
+                        await CommentService.RemoveComment(CurrentUserId, WordId, CommentModel.CommentId);
+                        await OnCommentDelete.InvokeAsync(CommentModel);
                     }
                 }
             }
@@ -116,14 +114,14 @@ namespace SD.Client.Pages
 
         protected override void OnParametersSet()
         {
-            MyText = commentModel.CommentText;
+            MyText = CommentModel.CommentText;
         }
 
         protected override void OnInitialized()
         {
-            if (commentModel.UserId == CurrentUserId || WordUserId == CurrentUserId)
+            if (CommentModel.UserId == CurrentUserId || WordUserId == CurrentUserId)
             {
-                cssDelCom = null;
+                CssDelCom = null;
             }
         }
     }

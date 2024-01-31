@@ -4,19 +4,18 @@ using System.Threading.Tasks;
 using SD.Client.Services;
 using System.Linq;
 using SD.Shared;
+using System.Net.Http;
+using System.Net.Http.Json;
 
 namespace SD.Client.Pages
 {
     public class FriendsBase : ComponentBase
     {
-        public IEnumerable<UserRelationshipsWithOneUserDto> foundUsers { set; get; }
+        public IEnumerable<UserRelationshipsWithOneUserDto> FoundUsers { set; get; }
 
         protected int? FriendsCount { set; get; }
 
         protected Dictionary<string, string> FriendsDictionary;
-
-        [Inject]
-        public UserService UserService { set; get; }
 
         [Inject]
         public RelationshipService RelationshipService { set; get; }
@@ -24,9 +23,12 @@ namespace SD.Client.Pages
         [Inject]
         CurrentUser CurrentUser { set; get; }
 
-        protected string currUserId { get; set; }
+        [Inject]
+        HttpClient HttpClient { set; get; }
 
-        protected bool sendFriendReqWait = false;
+        protected string CurrUserId { get; set; }
+
+        protected bool SendFriendReqWait = false;
 
         protected string Info { get; set; }
         protected string InfoDisplayClass { get; set; } = "d-none";
@@ -37,11 +39,12 @@ namespace SD.Client.Pages
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 SearchDisplayClass = null;
-                foundUsers = await UserService.SearchUser(currUserId, SearchText);
+                CurrUserId ??= "0";
+                FoundUsers = await HttpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/User/GetUsersByTextNew/{CurrUserId}/{SearchText}");
             }
             else
             {
-                foundUsers = null;
+                FoundUsers = null;
                 SearchDisplayClass = "d-none";
             }
         }
@@ -50,12 +53,12 @@ namespace SD.Client.Pages
         {
                 if (CurrentUser.isAuthenticated)
                 {
-                    currUserId = CurrentUser.id;
+                    CurrUserId = CurrentUser.id;
 
                     FriendsDictionary = new Dictionary<string, string>();
-                    FriendsDictionary = await RelationshipService.GetAllFriends(currUserId);
+                    FriendsDictionary = await RelationshipService.GetAllFriends(CurrUserId);
 
-                    FriendsCount = FriendsDictionary.Count();
+                    FriendsCount = FriendsDictionary.Count;
                 }
         }
     }

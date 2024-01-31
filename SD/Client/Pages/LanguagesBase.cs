@@ -12,9 +12,6 @@ namespace SD.Client.Pages
     public class LanguagesBase : ComponentBase
     {
         [Inject]
-        public UserService UserService { set; get; }
-
-        [Inject]
         protected LangCodeService LangCodeService { get; set; }
 
         [Inject]
@@ -26,7 +23,7 @@ namespace SD.Client.Pages
         [Inject]
         public ILocalStorageService LocalStorageService { get; set; }
         [Inject]
-        public ILanguageContainerService languageContainer { get; set; }
+        public ILanguageContainerService LanguageContainer { get; set; }
 
         [Inject]
         NavigationManager NavigationManager { get; set; }
@@ -37,22 +34,20 @@ namespace SD.Client.Pages
         private LangCode STL;
         private LangCode LToAdd;
 
-        protected string fl { get; set; }
-        protected string tl { get; set; }
+        protected string Fl { get; set; }
+        protected string Tl { get; set; }
 
 
         protected async Task ResetOPAsync()
         {
-            await LocalStorageService.RemoveItemAsync(fl + "-" + tl);
+            await LocalStorageService.RemoveItemAsync(Fl + "-" + Tl);
             SetLangsStr();
             NavigationManager.NavigateTo("Languages", true);
         }
 
         protected void Reverse()
         {
-            string l = fl;
-            fl = tl;
-            tl = l;
+            (Tl, Fl) = (Fl, Tl);
         }
 
         protected LangCode SelectedFL
@@ -98,50 +93,50 @@ namespace SD.Client.Pages
                 switch (langCode)
                 {
                     case "ar":
-                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("ar-SY"));
+                        LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("ar-SY"));
                         LocalStorageService.SetItemAsync("UILang", "ar-SY");
                         break;
                     case "de":
-                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("de-DE"));
+                        LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("de-DE"));
                         LocalStorageService.SetItemAsync("UILang", "de-DE");
                         break;
                     case "fr":
-                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("fr-FR"));
+                        LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("fr-FR"));
                         LocalStorageService.SetItemAsync("UILang", "fr-FR");
                         break;
                     case "es":
-                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("es-ES"));
+                        LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("es-ES"));
                         LocalStorageService.SetItemAsync("UILang", "es-ES");
                         break;
                     case "fa":
-                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("fa-IR"));
+                        LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("fa-IR"));
                         LocalStorageService.SetItemAsync("UILang", "fa-IR");
                         break;
                     case "it":
-                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("it-IT"));
+                        LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("it-IT"));
                         LocalStorageService.SetItemAsync("UILang", "it-IT");
                         break;
                     case "pt":
-                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("pt-PT"));
+                        LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("pt-PT"));
                         LocalStorageService.SetItemAsync("UILang", "pt-PT");
                         break;
                     case "ru":
-                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("ru-RU"));
+                        LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("ru-RU"));
                         LocalStorageService.SetItemAsync("UILang", "ru-RU");
                         break;
                     case "tr":
-                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("tr-TR"));
+                        LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("tr-TR"));
                         LocalStorageService.SetItemAsync("UILang", "tr-TR");
                         break;
                     default:
-                        languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+                        LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
                         LocalStorageService.SetItemAsync("UILang", "en-US");
                         break;
                 }
             }
             catch
             {
-                languageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+                LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
                 LocalStorageService.SetItemAsync("UILang", "en-US");
             }
         }
@@ -188,29 +183,29 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-             tl = "en";
-             fl = "de";
+             Tl = "en";
+             Fl = "de";
             try
             {
-                fl = await LocalStorageService.GetItemAsync<string>("FLang");
-                tl = await LocalStorageService.GetItemAsync<string>("TLang");
+                Fl = await LocalStorageService.GetItemAsync<string>("FLang");
+                Tl = await LocalStorageService.GetItemAsync<string>("TLang");
             }
             catch
             {
             }
-            fl = (string.IsNullOrWhiteSpace(fl) || fl == "null") ? "en" : fl;
-            tl = (string.IsNullOrWhiteSpace(tl) || tl == "null") ? "de" : tl;
+            Fl = (string.IsNullOrWhiteSpace(Fl) || Fl == "null") ? "en" : Fl;
+            Tl = (string.IsNullOrWhiteSpace(Tl) || Tl == "null") ? "de" : Tl;
 
             SelectedFL = new LangCode
             {
-                Key = fl,
-                Value = LangCodeService.Langs[fl]
+                Key = Fl,
+                Value = LangCodeService.Langs[Fl]
             };
 
             SelectedTL = new LangCode
             {
-                Key = tl,
-                Value = LangCodeService.Langs[tl]
+                Key = Tl,
+                Value = LangCodeService.Langs[Tl]
             };
 
             KnownLangsService.LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
@@ -219,7 +214,7 @@ namespace SD.Client.Pages
             LangCodes = new List<LangCode>();
             foreach (var item in LangCodeService.Langs)
             {
-                LangCode langCode = new LangCode
+                LangCode langCode = new()
                 {
                     Key = item.Key,
                     Value = item.Value

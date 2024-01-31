@@ -203,7 +203,7 @@
 
                             @foreach (var comment in wordComments)
                             {
-                                <Comment commentModel="@comment" WordId="@wordDto.WordId" CurrentUserName="@CurrentUser.name" WordUserId="@wordDto.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
+                                <Comment CommentModel="@comment" WordId="@wordDto.WordId" CurrentUserName="@CurrentUser.name" WordUserId="@wordDto.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
                             }
 
                             <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">

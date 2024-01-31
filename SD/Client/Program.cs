@@ -44,7 +44,6 @@ builder.Services.AddScoped<UriService>();
 builder.Services.AddScoped<LinkModel>();
 builder.Services.AddScoped<LinkParam>();
 builder.Services.AddScoped<OtherPageService>();
-builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<WordService>();
 builder.Services.AddScoped<CommentService>();
 builder.Services.AddScoped<RelationshipService>();

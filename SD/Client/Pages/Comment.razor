@@ -1,7 +1,7 @@
 ﻿@inject ILanguageContainerService languageContainer
 @inherits CommentBase
 
-@if (commentModel != null)
+@if (CommentModel != null)
 {
     <div class="ml-2 mr-2">
         <div class="card mb-2">
@@ -17,13 +17,13 @@
                         </div>
                     </button>
                 }
-                @if (commentModel.CommentId != null)
+                @if (CommentModel.CommentId != null)
                 {
                     <a type="button" class="btn btn-link"
-                       href="MyWords/@commentModel.UserId/@commentModel.CommentOwnerName">@commentModel.CommentOwnerName</a>
-                    <lable> form @DateTime.Now.Subtract(commentModel.CreatedAt).Days day </lable>
+                       href="MyWords/@CommentModel.UserId/@CommentModel.CommentOwnerName">@CommentModel.CommentOwnerName</a>
+                    <lable> form @DateTime.Now.Subtract(CommentModel.CreatedAt).Days day </lable>
                 }
-                <button type="button" style="float:right" class="btn btn-link bg-transparent @cssDelCom" @onclick="@(async () => await RemoveComment())">
+                <button type="button" style="float:right" class="btn btn-link bg-transparent @CssDelCom" @onclick="@(async () => await RemoveComment())">
                     <img width="20" height="20" src="/icons/bxs-message-x.svg" asp-append-version="true" />
                 </button>
             </div>

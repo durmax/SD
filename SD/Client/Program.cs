@@ -9,16 +9,20 @@ using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
 using SD.Shared;
 using SD.Client;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("app");
 
+builder.Services.AddHttpClient("LingoClubClient", client => 
+        //client.BaseAddress = new Uri("https://sdapi20200529140234.azurewebsites.net/"))
+        client.BaseAddress = new Uri("https://localhost:44394/"))
 
-builder.Services.AddScoped(sp => new HttpClient
-{
-    BaseAddress = new Uri("https://sdapi20200529140234.azurewebsites.net/")
-    //BaseAddress = new Uri("https://localhost:44394/")
-});
+    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+
+// Supply HttpClient instances that include access tokens when making requests to the server project
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("LingoClubClient"));
+
 
 builder.Services.AddMsalAuthentication(options =>
             {

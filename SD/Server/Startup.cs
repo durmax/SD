@@ -8,7 +8,8 @@ using sd.Api.Interfaces;
 using sd.Api.Models;
 using sd.Api.Repositories;
 using sd.Api.Services;
-using AutoMapper;
+using Microsoft.Identity.Web;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace sd.Api
 {
@@ -24,6 +25,16 @@ namespace sd.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.Configure<JwtBearerOptions>(
+    JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.TokenValidationParameters.NameClaimType = "name";
+    });
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
+
             services.Configure<MongodbSettings>(Configuration.GetSection(nameof(MongodbSettings)));
 
             services.AddSingleton<IMongodbSettings>(sp =>
@@ -59,8 +70,6 @@ namespace sd.Api
 
             app.UseHttpsRedirection();
 
-            app.UseRouting();
-
             app.UseCors(builder =>
             {
                 builder.WithOrigins(
@@ -71,6 +80,8 @@ namespace sd.Api
                        .AllowAnyHeader();
             });
 
+            app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

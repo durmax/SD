@@ -30,15 +30,15 @@
             <img width="20" height="20" src="/icons/form-new-24-regular.svg" />
         </InitialTip>
         <ChildContent>
-                <DropdownListItem Item=0>
-                    <img width="30" height="30" src="/icons/form-new-24-regular.svg" />
-                </DropdownListItem>
-                <DropdownListItem Item=1>
-                    <img width="30" height="30" src="/icons/form-new-28-filled.svg" />
-                </DropdownListItem>
-                <DropdownListItem Item=2>
-                    <img width="30" height="30" src="/icons/document-header-remove-24-regular.svg" />
-                </DropdownListItem>
+            <DropdownListItem Item=0>
+                <img width="30" height="30" src="/icons/form-new-24-regular.svg" />
+            </DropdownListItem>
+            <DropdownListItem Item=1>
+                <img width="30" height="30" src="/icons/form-new-28-filled.svg" />
+            </DropdownListItem>
+            <DropdownListItem Item=2>
+                <img width="30" height="30" src="/icons/document-header-remove-24-regular.svg" />
+            </DropdownListItem>
         </ChildContent>
     </Dropdown>
 
@@ -65,11 +65,9 @@
     }
     else
     {
-        @if (CurrentUser.isAuthTested)
-        {
-            <button class="btn btn-outline-secondary bg-white text-dark m-2" type="button" @onclick="GetNextPage">
-                Load more Words
-            </button>
-        }
+        <button class="btn btn-outline-secondary bg-white text-dark m-2" type="button" @onclick="GetNextPage">
+            Load more Words
+        </button>
+
     }
 </div>

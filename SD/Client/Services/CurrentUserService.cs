@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
-using SD.Client.Pages;
 using SD.Shared;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SD.Client.Services
@@ -30,14 +30,26 @@ namespace SD.Client.Services
             {
                 _currentUser.id = authState.User.FindFirst(c => c.Type == "oid")?.Value;
                 _currentUser.name = authState.User.Identity.Name;
-                _currentUser.email = authState.User.FindFirst(c => c.Type == "email")?.Value;
+                _currentUser.email = authState.User.FindFirst(c => c.Type == "preferred_username")?.Value;
+
+                if (_currentUser.email != null)
+                {
+                    var response = await AddUserAsync(_currentUser.id, _currentUser.email, _currentUser.name);
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    var respondedUser = JsonSerializer.Deserialize<UserModel>(responseBody);
+
+                    if (respondedUser != null)
+                    {
+                        _currentUser.id = respondedUser.UserId;
+                        _currentUser.email = respondedUser.Email;
+                        _currentUser.name = respondedUser.Name;
+                    }
+                }
+                _currentUser.isAuthTested = true;
             }
-
-            await AddUserAsync(_currentUser.id, _currentUser.email, _currentUser.name);
-
-            _currentUser.isAuthTested = true;
         }
-        private async Task AddUserAsync(string currUserId, string email, string name)
+        private async Task<HttpResponseMessage> AddUserAsync(string currUserId, string email, string name)
         {
             if (!string.IsNullOrWhiteSpace(currUserId) && !string.IsNullOrWhiteSpace(email))
             {
@@ -48,8 +60,9 @@ namespace SD.Client.Services
                     Name = name
                 };
 
-                await _httpClient.PostAsJsonAsync("api/User/Create", userModel);
+                return await _httpClient.PostAsJsonAsync<UserModel>("api/User/Create", userModel);
             }
+            return new HttpResponseMessage();
         }
     }
 }

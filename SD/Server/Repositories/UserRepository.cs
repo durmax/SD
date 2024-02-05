@@ -45,9 +45,9 @@ namespace sd.Api.Repositories
             }
         }
 
-        public async Task<bool> CheckEmail(string email)
+        public async Task<UserModel> GetUserByEmail(string email)
         {
-            return await _context.Users.Find<UserModel>(u => u.Email == email).AnyAsync();
+            return await _context.Users.Find<UserModel>(u => u.Email == email).FirstOrDefaultAsync();
         }
 
         public async Task Create(UserModel user)

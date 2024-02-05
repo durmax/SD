@@ -94,17 +94,17 @@ namespace sd.Api.Controllers
 
         [HttpPost]
         [Route("Create")]
-        public async Task<ActionResult<TransObj>> Create(UserModel user)
+        public async Task<ActionResult<UserModel>> Create(UserModel user)
         {
             try
             {
                 if (user == null)
                     return BadRequest();
-                if (string.IsNullOrWhiteSpace(user.UserId) || string.IsNullOrWhiteSpace(user.Email))
+                if (string.IsNullOrWhiteSpace(user.Email))
                     return BadRequest();
 
-                TransObj status = await _userService.RegisterUserAsync(user);
-                return Ok(status);
+                var foundUser = await _userService.RegisterUserAsync(user);
+                return Ok(foundUser);
 
             }
             catch (Exception)

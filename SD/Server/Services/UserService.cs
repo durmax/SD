@@ -34,28 +34,24 @@ namespace sd.Api.Services
             return await _userRepository.GetUserById(id);
         }
 
-        public async Task<bool> CheckEmail(string email)
+        public async Task<UserModel> GetUserByEmail(string email)
         {
-            return await _userRepository.CheckEmail(email);
+            return await _userRepository.GetUserByEmail(email);
         }
 
-        public async Task<TransObj> RegisterUserAsync(UserModel user)
+        public async Task<UserModel> RegisterUserAsync(UserModel user)
         {
             var transObj = new TransObj();
-            bool IsEmailExist = await CheckEmail(user.Email);
+            var foundUser = await GetUserByEmail(user.Email);
 
-            if (!IsEmailExist)
+            if (foundUser == null)
             {
                 user.CreatedAt = DateTime.Now;
 
                 await _userRepository.Create(user);
                 transObj.BoolVar = true; transObj.SetringVar = "User Details Inserted Successfully";
             }
-            else
-            {
-                transObj.BoolVar = false; transObj.SetringVar = $"Sorry, {user.Email}  is already in use.";
-            }
-            return transObj;
+            return foundUser;
         }
 
 
@@ -69,7 +65,7 @@ namespace sd.Api.Services
 
             if (oldVer.Email != newVer.Email)
             {
-                if (await CheckEmail(newVer.Email))
+                if (await GetUserByEmail(newVer.Email) != null)
                     return new TransObj { BoolVar = false, SetringVar = $"Sorry, {newVer.Email}  is already in use." };
                 else newVer.IsEmailReg = false;
             }
@@ -88,7 +84,7 @@ namespace sd.Api.Services
 
         public async Task<bool> RemoveUser(string id)
         {
-           return await _userRepository.Delete(id);
+            return await _userRepository.Delete(id);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace SD.Client.Services
             {
                 _currentUser.id = authState.User.FindFirst(c => c.Type == "oid")?.Value;
                 _currentUser.name = authState.User.Identity.Name;
-                _currentUser.email = authState.User.FindFirst(c => c.Type == "preferred_username")?.Value;
+                _currentUser.email = authState.User.FindFirst(c => c.Type == "email")?.Value;
 
                 if (_currentUser.email != null)
                 {

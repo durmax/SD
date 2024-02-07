@@ -104,8 +104,8 @@
             {
                 @foreach (var w in SameWords)
                 {
-                    <a herf="" class="m-1" @onclick="async ()  => { await SetWord(w); }">
-                        <u class="text-primary"> @w </u>
+                    <a herf="" class="m-1" @onclick="async ()  => { await SetWord(w.Split(':')[1]); }">
+                        <u class="text-primary"> @w.Split(':')[0] </u>
                     </a>
                 }
             }

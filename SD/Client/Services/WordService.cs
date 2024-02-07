@@ -42,17 +42,6 @@ namespace SD.Client.Services
             return await _httpClient.GetFromJsonAsync<WordDto>($"api/Word/{id}");
         }
 
-        public async Task<WordDto> GetWordByText(string userId, string title)
-        {
-            try
-            {
-                return await _httpClient.GetFromJsonAsync<WordDto>($"api/Word/GetWordByText/{userId}/{title}");
-            }
-            catch
-            {
-                return new WordDto();
-            }
-        }
         public async Task<List<string>> GetWordsContainText(string userId, string title)
         {
             try

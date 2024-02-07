@@ -117,7 +117,7 @@ namespace sd.Api.Services
             var words = await _wordRepository.GetWordsContainText(userId, text);
             foreach (var w in words)
             {
-                res.Add(w.Title);
+                res.Add($"{w.Title}:{w.WordId}");
             }
             return res;
         }

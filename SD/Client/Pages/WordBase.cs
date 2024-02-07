@@ -124,6 +124,7 @@ namespace SD.Client.Pages
             loading = true;
             if (!string.IsNullOrWhiteSpace(CurrentUser.id))
             {
+                WordDto.UserId = CurrentUser.id;
                 WordDto.Explain = MyText;
 
                 HttpResponseMessage respons = await WordService.AddWord(WordDto);
@@ -240,7 +241,7 @@ namespace SD.Client.Pages
         {
             if (!string.IsNullOrEmpty(CurrentUser?.id))
             {
-                var wDto = await WordService.GetWordByText(CurrentUser.id, title);
+                var wDto = await WordService.GetWordById(title);
                 await OnWordFound.InvokeAsync(wDto);
             }
         }

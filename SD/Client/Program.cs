@@ -20,8 +20,7 @@ builder.Services.AddHttpClient("SD.Client.ServerAPI", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiUrl:Prod"]); // "ApiUrl:Prod" or "ApiUrl:Dev"
 }).AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizationMessageHandler>()
-                                     .ConfigureHandler(new[] { builder.Configuration["ApiUrl:Dev"] },
-                                                       new[] { builder.Configuration["AzureAd:Scope"] } ));
+                                     .ConfigureHandler(new[] { builder.Configuration["AzureAd:Scope"] }));
 
 // Create HttpClient with name: SD.Client.ServerAPI. (see its Configuration)
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("SD.Client.ServerAPI"));

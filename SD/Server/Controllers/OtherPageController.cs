@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using sd.Api.Interfaces;
 using sd.Api.Services;
 using SD.Shared;
 

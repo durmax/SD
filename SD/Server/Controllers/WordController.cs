@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using sd.Api.Interfaces;
 using SD.Shared;
 using sd.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace sd.Api.Controllers
 {
@@ -109,6 +110,7 @@ namespace sd.Api.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<string>> Create(WordDto word)
         {
@@ -144,6 +146,7 @@ namespace sd.Api.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut]
         public async Task<ActionResult> UpdateWord(WordDto updatedWord)
         {
@@ -159,6 +162,7 @@ namespace sd.Api.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteWord(string id)
         {
@@ -174,6 +178,7 @@ namespace sd.Api.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("Like/{userId}/{wordId}")]
         public async Task<ActionResult<int>> Like(string userId, string wordId)
         {

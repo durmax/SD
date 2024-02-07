@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using sd.Api.Services;
 using SD.Shared;
+using Microsoft.AspNetCore.Authorization;
 
 namespace sd.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class RelationshipController : ControllerBase

@@ -237,11 +237,11 @@ namespace SD.Client.Pages
             }
         }
 
-        protected async Task SetWord(string title)
+        protected async Task SetWord(string id)
         {
             if (!string.IsNullOrEmpty(CurrentUser?.id))
             {
-                var wDto = await WordService.GetWordById(title);
+                var wDto = await WordService.GetWordById(id);
                 await OnWordFound.InvokeAsync(wDto);
             }
         }

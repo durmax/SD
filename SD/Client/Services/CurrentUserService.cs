@@ -28,34 +28,39 @@ namespace SD.Client.Services
             _currentUser.isAuthenticated = authState.User.Identity.IsAuthenticated;
             if (_currentUser.isAuthenticated)
             {
-                _currentUser.id = authState.User.FindFirst(c => c.Type == "oid")?.Value;
+                //var id = authState.User.FindFirst(c => c.Type == "oid")?.Value;
                 _currentUser.name = authState.User.Identity.Name;
                 _currentUser.email = authState.User.FindFirst(c => c.Type == "email")?.Value;
 
                 if (_currentUser.email != null)
                 {
-                    var response = await AddUserAsync(_currentUser.id, _currentUser.email, _currentUser.name);
-
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    var respondedUser = JsonSerializer.Deserialize<UserModel>(responseBody);
-
-                    if (respondedUser != null)
+                    var response = await AddUserAsync(_currentUser.email, _currentUser.name);
+                    if (response.IsSuccessStatusCode)
                     {
-                        _currentUser.id = respondedUser.UserId;
-                        _currentUser.email = respondedUser.Email;
-                        _currentUser.name = respondedUser.Name;
+                        string responseBody = await response.Content.ReadAsStringAsync();
+
+                        if (!string.IsNullOrEmpty(responseBody))
+                        {
+                            var respondedUser = JsonSerializer.Deserialize<UserModel>(responseBody);
+
+                            if (respondedUser != null)
+                            {
+                                _currentUser.id = respondedUser.UserId;
+                                _currentUser.email = respondedUser.Email;
+                                _currentUser.name = respondedUser.Name;
+                            }
+                        }
                     }
                 }
                 _currentUser.isAuthTested = true;
             }
         }
-        private async Task<HttpResponseMessage> AddUserAsync(string currUserId, string email, string name)
+        private async Task<HttpResponseMessage> AddUserAsync(string email, string name)
         {
-            if (!string.IsNullOrWhiteSpace(currUserId) && !string.IsNullOrWhiteSpace(email))
+            if (!string.IsNullOrWhiteSpace(email))
             {
                 UserModel userModel = new()
                 {
-                    UserId = currUserId,
                     Email = email,
                     Name = name
                 };

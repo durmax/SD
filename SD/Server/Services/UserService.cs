@@ -39,19 +39,25 @@ namespace sd.Api.Services
             return await _userRepository.GetUserByEmail(email);
         }
 
-        public async Task<UserModel> RegisterUserAsync(UserModel user)
+        public async Task<UserModel?> RegisterUserAsync(UserModel user)
         {
-            var transObj = new TransObj();
-            var foundUser = await GetUserByEmail(user.Email);
+            var existingUser = await GetUserByEmail(user.Email) ;
 
-            if (foundUser == null)
+            if (existingUser == null)
             {
+                if (string.IsNullOrEmpty(user.UserId))
+                {
+                    user.UserId = Guid.NewGuid().ToString();
+                }
                 user.CreatedAt = DateTime.Now;
 
                 await _userRepository.Create(user);
-                transObj.BoolVar = true; transObj.SetringVar = "User Details Inserted Successfully";
             }
-            return foundUser;
+            else
+            {
+                user = existingUser;
+            }
+            return user;
         }
 
 

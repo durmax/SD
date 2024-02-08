@@ -92,6 +92,8 @@ namespace SD.Client.Pages
         }
         protected override async Task OnInitializedAsync()
         {
+            await DefaultLangsService.SetDefLangsAsync();
+
             NewWords.Insert(0, false);
 
             if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();

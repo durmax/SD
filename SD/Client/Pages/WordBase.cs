@@ -261,9 +261,6 @@ namespace SD.Client.Pages
 
         private async Task SetLangsAsync()
         {
-            DefaultLangsService.DefaultWordLang = await LocalStorageService.GetItemAsync<string>("FLang");
-            DefaultLangsService.DefaultToLang = await LocalStorageService.GetItemAsync<string>("TLang");
-
             WordDto.WordLang = DefaultLangsService.DefaultWordLang;
             WordDto.ToLang = DefaultLangsService.DefaultToLang;
 

@@ -187,8 +187,8 @@ namespace SD.Client.Pages
              Fl = "de";
             try
             {
-                Fl = await LocalStorageService.GetItemAsync<string>("FLang");
-                Tl = await LocalStorageService.GetItemAsync<string>("TLang");
+                Fl = DefaultLangsService.DefaultWordLang;
+                Tl = DefaultLangsService.DefaultToLang;
             }
             catch
             {

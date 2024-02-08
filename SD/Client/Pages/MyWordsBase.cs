@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 using SD.Client.Services;
 using SD.Shared;
 using System.Collections.Generic;
@@ -12,8 +13,6 @@ namespace SD.Client.Pages
         public WordService WordService { set; get; }
 
         [Inject]
-        DefaultLangsService DefaultLangsService { get; set; }
-        [Inject]
         public CurrentUser CurrentUser { get; set; }
 
         [Parameter]
@@ -24,9 +23,7 @@ namespace SD.Client.Pages
         protected bool Collapsed { set; get; } = true;    // hide by default
         protected bool loading = true;
         protected int currentPage = 0;
-        protected string TLang;
-
-        protected List<WordDto> Words { get; set; } = new List<WordDto>();
+        protected List<WordDto> Words { get; set; }
 
         protected void NewWordHandler(WordDto wordDto)
         {
@@ -41,7 +38,7 @@ namespace SD.Client.Pages
 
         protected async Task InitAsync()
         {
-            TLang = DefaultLangsService.DefaultToLang;
+            Words = new List<WordDto>();
             await GetNextPage();
         }
 

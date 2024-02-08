@@ -41,7 +41,6 @@ namespace SD.Client.Pages
 
         protected bool loading;
         protected int currentPage = 1;
-        protected string TLang;
 
         protected void OnSelectedAsync(int selection)
         {
@@ -64,13 +63,9 @@ namespace SD.Client.Pages
         protected async Task GetNextPage()
         {
             loading = true;
-            TLang = DefaultLangsService.DefaultToLang;
-            var wordsCount = Words.Count;
-
+            var wordsCountBefor = Words.Count;
             Words.AddRange(await WordService.GetPageWordsFromAllUseres(CurrentUser.id, 10, currentPage));
-
-            currentPage += Words.Count - wordsCount;
-
+            currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }
         protected void NewWordHandler(WordDto newWord)
@@ -97,7 +92,7 @@ namespace SD.Client.Pages
             NewWords.Insert(0, false);
 
             if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();
-       
+
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
 
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
@@ -109,7 +104,7 @@ namespace SD.Client.Pages
                 catch { }
             }
 
-            if(CurrentUser.isAuthenticated)
+            if (CurrentUser.isAuthenticated)
             {
                 try
                 {

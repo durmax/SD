@@ -26,7 +26,7 @@ namespace SD.Client.Pages
         protected int currentPage = 0;
         protected string TLang;
 
-        protected List<WordDto> Words { get; set; }
+        protected List<WordDto> Words { get; set; } = new List<WordDto>();
 
         protected void NewWordHandler(WordDto wordDto)
         {
@@ -48,21 +48,9 @@ namespace SD.Client.Pages
         protected async Task GetNextPage()
         {
             loading = true;
-            currentPage++;
-
-            if (Words == null)
-            {
-                Words = new List<WordDto>();
-            }
-            var res = await WordService.GetPageWordsFromUserID(CurrentUser.id, UserId, 10, currentPage);
-            if (res != null)
-            {
-                currentPage = res.Item1;
-                foreach (var w in res.Item2)
-                {
-                    Words.Add(w);
-                }
-            }
+            var wordsCountBefor = Words.Count;
+            Words.AddRange(await WordService.GetPageWordsFromAllUseres(CurrentUser.id, 10, currentPage));
+            currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }
 

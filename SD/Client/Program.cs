@@ -18,9 +18,12 @@ builder.RootComponents.Add<App>("app");
 // Add configured HttpClient with name: SD.Client.ServerAPI. It configured it has access tokens.
 builder.Services.AddHttpClient("SD.Client.ServerAPI", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ApiUrl:Prod"]); // "ApiUrl:Prod" or "ApiUrl:Dev"
+    client.BaseAddress = new Uri(builder.Configuration["ApiUrl"]); // "ApiUrl:Prod" or "ApiUrl:Dev"
 }).AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizationMessageHandler>()
-                                     .ConfigureHandler(new[] { builder.Configuration["AzureAd:Scope"] }));
+                                     .ConfigureHandler(
+                                                        authorizedUrls: new[] { builder.Configuration["ApiUrl"] },
+                                                        scopes: new[] { builder.Configuration["AzureAd:Scope"] }
+                                                        ));
 
 // Create HttpClient with name: SD.Client.ServerAPI. (see its Configuration)
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("SD.Client.ServerAPI"));

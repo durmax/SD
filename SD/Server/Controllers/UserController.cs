@@ -9,6 +9,7 @@ using SD.Shared;
 
 namespace sd.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -22,7 +23,6 @@ namespace sd.Api.Controllers
             _relationshipService = relationshipService;
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserModel>>> Get()
         {
@@ -93,6 +93,24 @@ namespace sd.Api.Controllers
             }
         }
 
+        // GET: api/User/GetUserById/5
+        [HttpGet("GetUserByEmail/{email}")]
+        public async Task<ActionResult<UserModel>> GetUserByEmail(string email)
+        {
+            try
+            {
+                var result = await _userService.GetUserByEmail(email);
+                if (result == null) return NotFound();
+                return result;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database");
+            }
+        }
+
+        [AllowAnonymous]
         [HttpPost]
         [Route("Create")]
         public async Task<ActionResult<UserModel>> Create(UserModel user)
@@ -106,7 +124,6 @@ namespace sd.Api.Controllers
 
                 var foundUser = await _userService.RegisterUserAsync(user);
                 return Ok(foundUser);
-
             }
             catch (Exception)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sd.Api.Services;
@@ -49,6 +50,7 @@ namespace sd.Api.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(OtherPageModel page)
         {
@@ -75,6 +77,7 @@ namespace sd.Api.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut]
         public async Task<IActionResult> UpdateOtherPage(OtherPageModel updatedPage)
         {
@@ -98,6 +101,7 @@ namespace sd.Api.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete]
         public async Task<ActionResult<bool>> DeleteOtherPage(string id)
         {

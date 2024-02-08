@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace sd.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class WordController : ControllerBase
@@ -20,8 +21,7 @@ namespace sd.Api.Controllers
         private readonly RelationshipService _relationshipService;
 
         public WordController(UserService userService, ILikeWordService likeWord,
-            WordService wordService, RelationshipService relationshipService
-            )
+        WordService wordService, RelationshipService relationshipService)
         {
             _userService = userService;
             _likeWord = likeWord;
@@ -82,11 +82,12 @@ namespace sd.Api.Controllers
         }
 
         [HttpGet("GetPageWordsFromUserID/{CurrentUserId}/{userId}/{pageSize}/{currentPage}")]
-        public async Task<ActionResult<Tuple<int, List<WordDto>>>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
+        public async Task<ActionResult<List<WordDto>>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
         {
             try
             {
-                return Ok(await _wordService.GetPageWords(CurrentUserId, userId, null, pageSize, currentPage));
+                var res= await _wordService.GetPageWords(CurrentUserId, userId, null, pageSize, currentPage);
+                return Ok(res);
             }
             catch (Exception ex)
             {
@@ -95,13 +96,28 @@ namespace sd.Api.Controllers
             }
         }
 
-
+        [AllowAnonymous]
         [HttpGet("GetPageWordsFromAllUseres/{CurrentUserId}/{pageSize}/{currentPage}")]
         public async Task<ActionResult<List<WordDto>>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)
         {
             try
             {
                 return Ok(await _wordService.GetPageWords(CurrentUserId, null, null, pageSize, currentPage));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("GetPageWordsFromOneUser/{CurrentUserId}/{userId}/{pageSize}/{currentPage}")]
+        public async Task<ActionResult<List<WordDto>>> GetPageWordsFromOneUser(string CurrentUserId, string userId, int pageSize, int currentPage)
+        {
+            try
+            {
+                return Ok(await _wordService.GetPageWords(CurrentUserId, userId, null, pageSize, currentPage));
             }
             catch (Exception ex)
             {

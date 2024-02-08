@@ -48,7 +48,7 @@ namespace sd.Api.Services
                         if (currentUserId != wordDto.UserId)
                         {
                             var user = await _userRepository.GetUserById(wordDto.UserId);
-                            wordDto.UserName = user.Name;
+                            wordDto.UserName = user?.Name;
                         }
                         wordDtos.Add(wordDto);
                     }

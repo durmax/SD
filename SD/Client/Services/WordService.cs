@@ -1,6 +1,5 @@
 ﻿using SD.Client.Models;
 using SD.Shared;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -23,12 +22,12 @@ namespace SD.Client.Services
             return await _httpClient.PostAsJsonAsync("api/Word", word);
         }
 
-        public async Task<Tuple<int, List<WordDto>>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
+        public async Task<List<WordDto>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
         {
             CurrentUserId ??= "0";
             userId ??= CurrentUserId;
 
-            return await _httpClient.GetFromJsonAsync<Tuple<int, List<WordDto>>>($"api/Word/GetPageWordsFromUserID/{CurrentUserId}/{userId}/{pageSize}/{currentPage}");
+            return await _httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsFromUserID/{CurrentUserId}/{userId}/{pageSize}/{currentPage}");
         }
 
         public async Task<List<WordDto>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)

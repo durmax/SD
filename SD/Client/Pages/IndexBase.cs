@@ -6,7 +6,6 @@ using SD.Shared;
 using System.Collections.Generic;
 using AKSoftware.Localization.MultiLanguages;
 using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace SD.Client.Pages
@@ -24,9 +23,6 @@ namespace SD.Client.Pages
         public CurrentUser CurrentUser { set; get; }
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
-
-        [Inject]
-        HttpClient HttpClient { set; get; }
 
         protected bool CollapsedFriend { get; set; } = true;    // hide by default
 
@@ -64,7 +60,7 @@ namespace SD.Client.Pages
         {
             loading = true;
             var wordsCountBefor = Words.Count;
-            Words.AddRange(await WordService.GetPageWordsFromAllUseres(CurrentUser.id, 10, currentPage));
+            Words.AddRange(await WordService.GetPageWordsFromAllUseres(CurrentUser?.id, 10, currentPage));
             currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }
@@ -91,7 +87,7 @@ namespace SD.Client.Pages
 
             NewWords.Insert(0, false);
 
-            if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();
+           // if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();
 
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
 
@@ -108,7 +104,7 @@ namespace SD.Client.Pages
             {
                 try
                 {
-                    FriendRequestsDictionary = await HttpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequestsById/{CurrentUser.id}");
+                    FriendRequestsDictionary = await CurrentUser.httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequestsById/{CurrentUser.id}");
                 }
                 catch
                 {

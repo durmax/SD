@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SD.Client.Services;
 using SD.Shared;
-using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace SD.Client.Pages
@@ -17,12 +15,7 @@ namespace SD.Client.Pages
         protected Dictionary<string, string> FriendsDictionary;
 
         [Inject]
-        CurrentUser CurrentUser { set; get; }
-
-        [Inject]
-        HttpClient HttpClient { set; get; }
-
-        protected string CurrUserId { get; set; }
+        public CurrentUser CurrentUser { set; get; }
 
         protected bool SendFriendReqWait = false;
 
@@ -35,8 +28,8 @@ namespace SD.Client.Pages
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 SearchDisplayClass = null;
-                CurrUserId ??= "0";
-                FoundUsers = await HttpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/User/GetUsersByTextNew/{CurrUserId}/{SearchText}");
+                CurrentUser.id ??= "0";
+                FoundUsers = await CurrentUser.httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/User/GetUsersByTextNew/{CurrentUser.id}/{SearchText}");
             }
             else
             {
@@ -50,7 +43,7 @@ namespace SD.Client.Pages
             if (CurrentUser.isAuthenticated)
             {
                 FriendsDictionary = new Dictionary<string, string>();
-                FriendsDictionary = await HttpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetAllFriends/{CurrentUser.id}");
+                FriendsDictionary = await CurrentUser.httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetAllFriends/{CurrentUser.id}");
 
                 FriendsCount = FriendsDictionary.Count;
             }

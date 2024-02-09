@@ -10,16 +10,16 @@ namespace SD.Client.Services
 {
     public class WordService
     {
-        private readonly HttpClient _httpClient;
+        private readonly CurrentUser _currentUser;
 
-        public WordService(HttpClient httpClient)
+        public WordService(CurrentUser currentUser)
         {
-            _httpClient = httpClient;
+            _currentUser = currentUser;
         }
 
         public async Task<HttpResponseMessage> AddWord(WordDto word)
         {
-            return await _httpClient.PostAsJsonAsync("api/Word", word);
+            return await _currentUser.httpClient.PostAsJsonAsync("api/Word", word);
         }
 
         public async Task<List<WordDto>> GetPageWordsFromUserID(string currentUserId, string userId, int pageSize, int currentPage)
@@ -27,29 +27,29 @@ namespace SD.Client.Services
             currentUserId ??= "0";
             userId ??= currentUserId;
 
-            return await _httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsFromUserID/{currentUserId}/{userId}/{pageSize}/{currentPage}");
+            return await _currentUser.httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsFromUserID/{currentUserId}/{userId}/{pageSize}/{currentPage}");
         }
 
         public async Task<List<WordDto>> GetPageWordsFromAllUseres(string currentUserId, int pageSize, int currentPage)
         {
-            return await _httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsFromAllUseres/{currentUserId ?? "0"}/{pageSize}/{currentPage}");
+            return await _currentUser.httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsFromAllUseres/{currentUserId ?? "0"}/{pageSize}/{currentPage}");
         }
         
         public async Task<List<WordDto>> GetPageWordsFromOneUser(string currentUserId, string userId, int pageSize, int currentPage)
         {
-            return await _httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsOneUser/{currentUserId ?? "0"}/{userId ?? "0"}/{pageSize}/{currentPage}");
+            return await _currentUser.httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsOneUser/{currentUserId ?? "0"}/{userId ?? "0"}/{pageSize}/{currentPage}");
         }
 
         public async Task<WordDto> GetWordById(string id)
         {
-            return await _httpClient.GetFromJsonAsync<WordDto>($"api/Word/{id}");
+            return await _currentUser.httpClient.GetFromJsonAsync<WordDto>($"api/Word/{id}");
         }
 
         public async Task<List<string>> GetWordsContainText(string userId, string title)
         {
             try
             {
-                var w = await _httpClient.GetFromJsonAsync<List<string>>($"api/Word/GetWordsContainText/{userId}/{title}");
+                var w = await _currentUser.httpClient.GetFromJsonAsync<List<string>>($"api/Word/GetWordsContainText/{userId}/{title}");
                 return w;
             }
             catch
@@ -60,23 +60,23 @@ namespace SD.Client.Services
 
         public async Task<HttpResponseMessage> RemoveWord(string id)
         {
-            return await _httpClient.DeleteAsync($"api/Word/{id}");
+            return await _currentUser.httpClient.DeleteAsync($"api/Word/{id}");
         }
 
         public async Task<HttpResponseMessage> UpdateWord(WordDto newWord)
         {
-            return await _httpClient.PutAsJsonAsync($"api/Word", newWord);
+            return await _currentUser.httpClient.PutAsJsonAsync($"api/Word", newWord);
         }
 
         public async Task<int> Like(string userId, string wordId)
         {
-            return await _httpClient.GetFromJsonAsync<int>($"api/Word/Like/{userId}/{wordId}");
+            return await _currentUser.httpClient.GetFromJsonAsync<int>($"api/Word/Like/{userId}/{wordId}");
         }
 
         public async Task<IEnumerable<UserRelationshipsWithOneUserDto>> GetLikedUsers(string userId, string wordId)
         {
             userId ??= "0";
-            return await _httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{userId}/{wordId}");
+            return await _currentUser.httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{userId}/{wordId}");
         }
 
         public async Task<List<string>> GetLanguageToolWords(string wordLang, string str)
@@ -91,7 +91,7 @@ namespace SD.Client.Services
             {
                 try
                 {
-                    var response = await _httpClient.GetFromJsonAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text={str}");
+                    var response = await _currentUser.httpClient.GetFromJsonAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text={str}");
 
                     // Extract the list of string values from Matches.Replacements.Value
                     return response.Matches
@@ -99,7 +99,6 @@ namespace SD.Client.Services
                         .Select(replacement => replacement.Value) //.Where(value =>  value.ToLower() != str.ToLower())
                         .Take(15)
                         .ToList();
-
                 }
                 catch
                 {

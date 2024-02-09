@@ -33,7 +33,7 @@
                 <div class="container">
                     @foreach (var user in FoundUsers)
                     {
-                        <Friendship UserId="@CurrUserId" FriendId="@user.UserId" FriendName="@user.RelationalUserName" Relationship=user.Relation></Friendship>
+                        <Friendship UserId="@CurrentUser.id" FriendId="@user.UserId" FriendName="@user.RelationalUserName" Relationship=user.Relation></Friendship>
                     }
                     @if (SendFriendReqWait)
                     {
@@ -70,7 +70,7 @@
                         <div class="container">
                             @foreach (var foudUser in FriendsDictionary)
                             {
-                                <Friendship UserId="@CurrUserId" FriendId="@foudUser.Key" FriendName="@foudUser.Value" Relationship=SD.Shared.Relation.Friend></Friendship>
+                                <Friendship UserId="@CurrentUser.id" FriendId="@foudUser.Key" FriendName="@foudUser.Value" Relationship=SD.Shared.Relation.Friend></Friendship>
                             }
 
                         </div>

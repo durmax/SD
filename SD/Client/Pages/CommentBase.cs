@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using SD.Client.Services;
 using SD.Shared;
 using System;
 using System.Net.Http;
@@ -16,14 +15,12 @@ namespace SD.Client.Pages
         [Inject]
         NavigationManager NavigationManager { get; set; }
         [Inject]
-        HttpClient HttpClient { get; set; }
-
+        protected CurrentUser CurrentUser { get; set; }
         [Parameter]
         public string WordId { get; set; }
         [Parameter]
         public string WordUserId { get; set; }
-        [CascadingParameter]
-        protected string CurrentUserId { get; set; }
+
         [Parameter]
         public string CurrentUserName { get; set; }
 
@@ -67,7 +64,7 @@ namespace SD.Client.Pages
         {
             IsChanged = false;
             loading = true;
-            if (string.IsNullOrEmpty(CurrentUserId))
+            if (string.IsNullOrEmpty(CurrentUser.id))
             {
                 NavigationManager.NavigateTo("/authentication/login");
             }
@@ -79,11 +76,11 @@ namespace SD.Client.Pages
                     CommentModel.CreatedAt = DateTime.Now;
                 }
 
-                if (CommentModel.UserId == CurrentUserId)
+                if (CommentModel.UserId == CurrentUser.id)
                 {
                     CommentModel.CommentText = MyText;
                     CommentModel.CommentOwnerName = CurrentUserName;
-                    HttpResponseMessage respons = await HttpClient.PostAsJsonAsync($"api/Comment/SaveComment/{WordId}", CommentModel);
+                    HttpResponseMessage respons = await CurrentUser.httpClient.PostAsJsonAsync($"api/Comment/SaveComment/{WordId}", CommentModel);
                     if (!respons.IsSuccessStatusCode)
                     {
                         IsChanged = false;
@@ -109,9 +106,9 @@ namespace SD.Client.Pages
                 }
                 else
                 {
-                    if (!string.IsNullOrWhiteSpace(CurrentUserId) && !string.IsNullOrWhiteSpace(WordId) && !string.IsNullOrWhiteSpace(CommentModel.CommentId) && !string.IsNullOrWhiteSpace(CommentModel.UserId) && (CurrentUserId == CommentModel.UserId || CurrentUserId == WordUserId))
+                    if (!string.IsNullOrWhiteSpace(CurrentUser.id) && !string.IsNullOrWhiteSpace(WordId) && !string.IsNullOrWhiteSpace(CommentModel.CommentId) && !string.IsNullOrWhiteSpace(CommentModel.UserId) && (CurrentUser.id == CommentModel.UserId || CurrentUser.id == WordUserId))
                     {
-                        await HttpClient.DeleteAsync($"api/Comment/DeleteComment/{CurrentUserId}/{WordId}/{CommentModel.CommentId}");
+                        await CurrentUser.httpClient.DeleteAsync($"api/Comment/DeleteComment/{CurrentUser.id}/{WordId}/{CommentModel.CommentId}");
                         await OnCommentDelete.InvokeAsync(CommentModel);
                     }
                 }
@@ -125,7 +122,7 @@ namespace SD.Client.Pages
 
         protected override void OnInitialized()
         {
-            if (CommentModel.UserId == CurrentUserId || WordUserId == CurrentUserId)
+            if (CommentModel.UserId == CurrentUser.id || WordUserId == CurrentUser.id)
             {
                 CssDelCom = null;
             }

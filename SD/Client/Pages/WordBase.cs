@@ -19,7 +19,7 @@ namespace SD.Client.Pages
         [Inject]
         OtherPageService OtherPageService { set; get; }
         [Inject]
-        public CurrentUser CurrentUser { set; get; }
+        protected CurrentUser CurrentUser { set; get; }
         [Inject]
         NavigationManager NavigationManager { get; set; }
         [Inject]
@@ -307,7 +307,7 @@ namespace SD.Client.Pages
         {
             loading = true;
             WordComments.Remove(comment);
-            var response = await HttpClient.DeleteAsync($"api/Comment/DeleteComment/{CurrentUser.id}/{WordDto.WordId}/{comment.CommentId}");
+            var response = await CurrentUser.httpClient.DeleteAsync($"api/Comment/DeleteComment/{CurrentUser.id}/{WordDto.WordId}/{comment.CommentId}");
             if (response.IsSuccessStatusCode)
             {
                 WordDto.CommentsCount--;
@@ -401,7 +401,7 @@ namespace SD.Client.Pages
                 {
                     try
                     {
-                        WordComments =  string.IsNullOrEmpty(WordDto?.WordId) ? null : (List<CommentModel>) await HttpClient.GetFromJsonAsync<IEnumerable<CommentModel>>($"api/Comment/GetWordComments/{WordDto?.WordId}");
+                        WordComments =  string.IsNullOrEmpty(WordDto?.WordId) ? null : (List<CommentModel>) await CurrentUser.httpClient.GetFromJsonAsync<IEnumerable<CommentModel>>($"api/Comment/GetWordComments/{WordDto?.WordId}");
                         WordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
                     }
                     catch { }

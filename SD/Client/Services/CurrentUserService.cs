@@ -12,20 +12,51 @@ namespace SD.Client.Services
     {
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly CurrentUser _currentUser;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         public CurrentUserService(AuthenticationStateProvider authenticationStateProvider,
-               CurrentUser currentUser, HttpClient httpClient)
+               CurrentUser currentUser, IHttpClientFactory httpClientFactory)
         {
             _authenticationStateProvider = authenticationStateProvider;
             _currentUser = currentUser;
-            _httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
+
+            CreateHttpClient(_currentUser.isAuthenticated);
+
+            // Subscribe to authentication state changes
+            _authenticationStateProvider.AuthenticationStateChanged += HandleAuthenticationStateChanged;
         }
 
-        public async Task GetAuth()
+        private async Task<HttpResponseMessage> AddUserAsync(string email, string name)
         {
-            var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                UserModel userModel = new()
+                {
+                    Email = email,
+                    Name = name
+                };
+
+                return await _currentUser.httpClient.PostAsJsonAsync<UserModel>("api/User/Create", userModel);
+            }
+            return new HttpResponseMessage();
+        }
+
+        private void CreateHttpClient(bool isAuthenticated)
+        {
+            string httpClientName = isAuthenticated ? "forAuthenticatedUser" : "forNotAuthenticatedUser";
+            _currentUser.httpClient = _httpClientFactory.CreateClient(httpClientName);
+        }
+
+        private async void HandleAuthenticationStateChanged(Task<AuthenticationState> task)
+        {
+            AuthenticationState authState = await task;
+
+            //var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
             _currentUser.isAuthenticated = authState.User.Identity.IsAuthenticated;
+
+            CreateHttpClient(_currentUser.isAuthenticated);
+            
             if (_currentUser.isAuthenticated)
             {
                 //var id = authState.User.FindFirst(c => c.Type == "oid")?.Value;
@@ -52,22 +83,7 @@ namespace SD.Client.Services
                         }
                     }
                 }
-                _currentUser.isAuthTested = true;
             }
-        }
-        private async Task<HttpResponseMessage> AddUserAsync(string email, string name)
-        {
-            if (!string.IsNullOrWhiteSpace(email))
-            {
-                UserModel userModel = new()
-                {
-                    Email = email,
-                    Name = name
-                };
-
-                return await _httpClient.PostAsJsonAsync<UserModel>("api/User/Create", userModel);
-            }
-            return new HttpResponseMessage();
         }
     }
 }

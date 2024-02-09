@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
-using SD.Client.Services;
 using SD.Shared;
 using System;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -25,7 +23,7 @@ namespace SD.Client.Pages
         NavigationManager NavigationManager { set; get; }
 
         [Inject]
-        HttpClient HttpClient { set; get; }
+        protected CurrentUser CurrentUser { set; get; }
 
         public async Task SendFriendRequest(string ToUserId)
         {
@@ -40,7 +38,7 @@ namespace SD.Client.Pages
                     UserId1 = UserId,
                     UserId2 = ToUserId
                 };
-                var res = await HttpClient.PostAsJsonAsync($"api/Relationship/AddRelationship", relationship);
+                var res = await  CurrentUser.httpClient.PostAsJsonAsync($"api/Relationship/AddRelationship", relationship);
                 if (res.IsSuccessStatusCode)
                 {
                     Relationship = Relation.FriendRequestTo;
@@ -58,7 +56,7 @@ namespace SD.Client.Pages
             waitBool = true;
             if (!string.IsNullOrWhiteSpace(friendId))
             {
-                var res = await HttpClient.DeleteAsync($"api/Relationship/RemoveFriendship/{UserId}/{Relation.Friend}/{friendId}");
+                var res = await CurrentUser.httpClient.DeleteAsync($"api/Relationship/RemoveFriendship/{UserId}/{Relation.Friend}/{friendId}");
                 if (res.IsSuccessStatusCode)
                 {
                     Relationship = Relation.None;
@@ -80,7 +78,7 @@ namespace SD.Client.Pages
                     UserId1 = UserId,
                     UserId2 = FriendId
                 };
-                var res = await HttpClient.PostAsJsonAsync($"api/Relationship/AddRelationship", relationship);
+                var res = await CurrentUser.httpClient.PostAsJsonAsync($"api/Relationship/AddRelationship", relationship);
 
                 if (res.IsSuccessStatusCode)
                 {
@@ -96,7 +94,7 @@ namespace SD.Client.Pages
 
             if (!string.IsNullOrWhiteSpace(FriendId))
             {
-                var res = await HttpClient.DeleteAsync($"api/Relationship/RemoveFriendship/{UserId}/{Relation.FriendRequestTo}/{FriendId}");
+                var res = await CurrentUser.httpClient.DeleteAsync($"api/Relationship/RemoveFriendship/{UserId}/{Relation.FriendRequestTo}/{FriendId}");
                 if (res.IsSuccessStatusCode)
                 {
                     Relationship = Relation.None;

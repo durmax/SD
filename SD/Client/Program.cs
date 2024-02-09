@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Blazored.LocalStorage;
@@ -11,27 +10,9 @@ using SD.Shared;
 using SD.Client;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("app");
-
-builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddScoped<LangCodeService>();
-builder.Services.AddScoped<KnownLangsService>();
-builder.Services.AddScoped<DefaultLangsService>();
-builder.Services.AddScoped<CurrentUser>();
-
-builder.Services.AddScoped<CurrentUserService>();
-
-builder.Services.AddScoped<UriService>();
-builder.Services.AddScoped<LinkModel>();
-builder.Services.AddScoped<LinkParam>();
-builder.Services.AddScoped<OtherPageService>();
-builder.Services.AddScoped<WordService>();
-
-builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
-
 
 // Add configured HttpClient with AuthorizationMessageHandler
 builder.Services.AddHttpClient("forAuthenticatedUser", client =>
@@ -57,16 +38,20 @@ builder.Services.AddMsalAuthentication(options =>
     options.ProviderOptions.LoginMode = "redirect";
 }) ;
 
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<LangCodeService>();
+builder.Services.AddScoped<KnownLangsService>();
+builder.Services.AddScoped<DefaultLangsService>();
+builder.Services.AddScoped<CurrentUser>();
 
-var host = builder.Build();
+builder.Services.AddScoped<CurrentUserService>();
 
-var authenticationStateProvider = host.Services.GetRequiredService<AuthenticationStateProvider>();
-var authenticationState = await authenticationStateProvider.GetAuthenticationStateAsync();
-bool isAuthenticated = authenticationState.User.Identity.IsAuthenticated;
+builder.Services.AddScoped<UriService>();
+builder.Services.AddScoped<LinkModel>();
+builder.Services.AddScoped<LinkParam>();
+builder.Services.AddScoped<OtherPageService>();
+builder.Services.AddScoped<WordService>();
 
-string httpClientName = isAuthenticated ? "forAuthenticatedUser" : "forNotAuthenticatedUser";
-
-// Create HttpClient with name: httpClientName
-builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient(httpClientName));
+builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
 
 await builder.Build().RunAsync();

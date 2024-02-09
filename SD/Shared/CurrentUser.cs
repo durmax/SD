@@ -1,4 +1,6 @@
-﻿namespace SD.Shared
+﻿using System.Net.Http;
+
+namespace SD.Shared
 {
     public class CurrentUser
     {
@@ -7,5 +9,6 @@
         public string email { get; set; }
         public bool isAuthenticated { get; set; }
         public bool isAuthTested { get; set; }
+        public HttpClient httpClient { get; set; }
     }
 }

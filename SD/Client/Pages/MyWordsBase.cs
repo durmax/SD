@@ -1,5 +1,4 @@
-﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using SD.Client.Services;
 using SD.Shared;
 using System.Collections.Generic;
@@ -46,16 +45,23 @@ namespace SD.Client.Pages
         {
             loading = true;
             var wordsCountBefor = Words.Count;
-            Words.AddRange(await WordService.GetPageWordsFromAllUseres(CurrentUser.id, 10, currentPage));
+            if (CurrentUser.isAuthenticated)
+            {
+                Words.AddRange(await WordService.GetPageWordsFromOneUser(CurrentUser.id, CurrentUser.id, 10, currentPage));
+            }
+            else
+            {
+                Words.AddRange(await WordService.GetPageWordsFromAllUseres(CurrentUser.id, 10, currentPage));
+            }
             currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }
 
-        protected override async Task OnParametersSetAsync()
-        {
-            Words = null;
-            currentPage = 0;
-            await InitAsync();
-        }
+        //protected override async Task OnParametersSetAsync()
+        //{
+        //    Words = null;
+        //    currentPage = 0;
+        //    await InitAsync();
+        //}
     }
 }

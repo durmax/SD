@@ -22,18 +22,22 @@ namespace SD.Client.Services
             return await _httpClient.PostAsJsonAsync("api/Word", word);
         }
 
-        public async Task<List<WordDto>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
+        public async Task<List<WordDto>> GetPageWordsFromUserID(string currentUserId, string userId, int pageSize, int currentPage)
         {
-            CurrentUserId ??= "0";
-            userId ??= CurrentUserId;
+            currentUserId ??= "0";
+            userId ??= currentUserId;
 
-            return await _httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsFromUserID/{CurrentUserId}/{userId}/{pageSize}/{currentPage}");
+            return await _httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsFromUserID/{currentUserId}/{userId}/{pageSize}/{currentPage}");
         }
 
-        public async Task<List<WordDto>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)
+        public async Task<List<WordDto>> GetPageWordsFromAllUseres(string currentUserId, int pageSize, int currentPage)
         {
-            CurrentUserId ??= "0";
-            return await _httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsFromAllUseres/{CurrentUserId}/{pageSize}/{currentPage}");
+            return await _httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsFromAllUseres/{currentUserId ?? "0"}/{pageSize}/{currentPage}");
+        }
+        
+        public async Task<List<WordDto>> GetPageWordsFromOneUser(string currentUserId, string userId, int pageSize, int currentPage)
+        {
+            return await _httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWordsOneUser/{currentUserId ?? "0"}/{userId ?? "0"}/{pageSize}/{currentPage}");
         }
 
         public async Task<WordDto> GetWordById(string id)

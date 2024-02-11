@@ -9,7 +9,7 @@ namespace sd.Api.Helpers
         {
             FilterDefinition<WordModel> filter = Builders<WordModel>.Filter.Empty;
             if (wordId != null) filter &= Builders<WordModel>.Filter.Eq(x => x.WordId, wordId);
-            if (userId != null) filter &= Builders<WordModel>.Filter.Eq(x => x.UserId, userId);
+            if (userId != null && userId != "0") filter &= Builders<WordModel>.Filter.Eq(x => x.UserId, userId);
             if (lang != null) filter &= Builders<WordModel>.Filter.Eq(x => x.ToLang, lang);
 
             return filter;

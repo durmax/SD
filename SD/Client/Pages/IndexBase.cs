@@ -60,7 +60,7 @@ namespace SD.Client.Pages
         {
             loading = true;
             var wordsCountBefor = Words.Count;
-            Words.AddRange(await WordService.GetPageWordsFromAllUseres(CurrentUser?.id, 10, currentPage));
+            Words.AddRange(await WordService.GetPageWords(CurrentUser?.id ?? "0", "0", 10, currentPage));
             currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }

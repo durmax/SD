@@ -81,43 +81,14 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpGet("GetPageWordsFromUserID/{CurrentUserId}/{userId}/{pageSize}/{currentPage}")]
-        public async Task<ActionResult<List<WordDto>>> GetPageWordsFromUserID(string CurrentUserId, string userId, int pageSize, int currentPage)
+        [AllowAnonymous]
+        [HttpGet("GetPageWords/{CurrentUserId}/{userId}/{pageSize}/{currentPage}")]
+        public async Task<ActionResult<List<WordDto>>> GetPageWords(string CurrentUserId, string userId, int pageSize, int currentPage)
         {
             try
             {
                 var res= await _wordService.GetPageWords(CurrentUserId, userId, null, pageSize, currentPage);
                 return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
-        }
-
-        [AllowAnonymous]
-        [HttpGet("GetPageWordsFromAllUseres/{CurrentUserId}/{pageSize}/{currentPage}")]
-        public async Task<ActionResult<List<WordDto>>> GetPageWordsFromAllUseres(string CurrentUserId, int pageSize, int currentPage)
-        {
-            try
-            {
-                return Ok(await _wordService.GetPageWords(CurrentUserId, null, null, pageSize, currentPage));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
-        }
-
-        [AllowAnonymous]
-        [HttpGet("GetPageWordsFromOneUser/{CurrentUserId}/{userId}/{pageSize}/{currentPage}")]
-        public async Task<ActionResult<List<WordDto>>> GetPageWordsFromOneUser(string CurrentUserId, string userId, int pageSize, int currentPage)
-        {
-            try
-            {
-                return Ok(await _wordService.GetPageWords(CurrentUserId, userId, null, pageSize, currentPage));
             }
             catch (Exception ex)
             {

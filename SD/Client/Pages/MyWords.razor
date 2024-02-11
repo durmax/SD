@@ -12,6 +12,7 @@
 {
     @foreach (var word in Words)
     {
+        word.UserName = null;
         <Word WordDto="word" Collapsed="true" OnWordDelete="DeleteWordHandler"></Word>
     }
 }

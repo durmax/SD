@@ -21,7 +21,7 @@ namespace SD.Client.Pages
         public string UserName { get; set; }
         protected bool Collapsed { set; get; } = true;    // hide by default
         protected bool loading = true;
-        protected int currentPage = 0;
+        protected int currentPage = 1;
         protected List<WordDto> Words { get; set; }
 
         protected void NewWordHandler(WordDto wordDto)
@@ -35,33 +35,19 @@ namespace SD.Client.Pages
             currentPage--;
         }
 
-        protected async Task InitAsync()
-        {
-            Words = new List<WordDto>();
-            await GetNextPage();
-        }
-
         protected async Task GetNextPage()
         {
             loading = true;
             var wordsCountBefor = Words.Count;
-            if (CurrentUser.isAuthenticated)
-            {
-                Words.AddRange(await WordService.GetPageWordsFromOneUser(CurrentUser.id, CurrentUser.id, 10, currentPage));
-            }
-            else
-            {
-                Words.AddRange(await WordService.GetPageWordsFromAllUseres(CurrentUser.id, 10, currentPage));
-            }
+            Words.AddRange(await WordService.GetPageWords(CurrentUser.id, UserId, 10, currentPage));
             currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }
 
-        //protected override async Task OnParametersSetAsync()
-        //{
-        //    Words = null;
-        //    currentPage = 0;
-        //    await InitAsync();
-        //}
+        protected override async Task OnInitializedAsync()
+        {
+            Words = new List<WordDto>();
+            await GetNextPage();
+        }
     }
 }

@@ -104,7 +104,7 @@ namespace SD.Client.Pages
             {
                 try
                 {
-                    FriendRequestsDictionary = await CurrentUser.httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequestsById/{CurrentUser.id}");
+                    FriendRequestsDictionary = await CurrentUser.httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequestsById/{CurrentUser?.id ?? "0"}");
                 }
                 catch
                 {

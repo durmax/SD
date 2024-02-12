@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SD.Shared;
 using SD.Client.Services;
-using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace SD.Client.Pages
@@ -20,9 +19,6 @@ namespace SD.Client.Pages
         public CurrentUserService CurrUsrService { set; get; }
         [Inject]
         public CurrentUser CurrentUser { set; get; }
-
-        [Inject]
-        HttpClient HttpClient { set; get; }
 
         [Parameter]
         public string UserId { get; set; }
@@ -46,7 +42,7 @@ namespace SD.Client.Pages
                         if (!Registered)
                         {
                             // userModel.UserId = UserId;
-                            var status = await HttpClient.PostAsJsonAsync("api/User/Create", userModel);
+                            var status = await CurrentUser.httpClient.PostAsJsonAsync("api/User/Create", userModel);
                             if (status.IsSuccessStatusCode)
                             {
                                 Info = $"Willcome {userModel.Email}!, your data saved successfully";
@@ -60,7 +56,7 @@ namespace SD.Client.Pages
                         else
                         {
                             // userModel.Email = Email;
-                            var status = await HttpClient.PutAsJsonAsync($"api/User/UpdateUser/{userModel.UserId}", userModel);
+                            var status = await CurrentUser.httpClient.PutAsJsonAsync($"api/User/UpdateUser/{userModel.UserId}", userModel);
                             Info = status.ReasonPhrase;
                         }
                     }
@@ -74,25 +70,11 @@ namespace SD.Client.Pages
                 }
             }
         }
-        private async Task AddUserAsync(string currUserId, string email, string name)
-        {
-            UserModel userModel = new()
-            {
-                UserId = currUserId,
-                Email = email,
-                Name = name
-            };
-            await HttpClient.PostAsJsonAsync("api/User/Create", userModel);
-        }
 
         protected async override Task OnInitializedAsync()
         {
             //if (!CurrUsrService.isAuthTested) await CurrUsrService.GetAuth();
             CurrUserId = CurrentUser.id;
-            if (CurrUserId != "0")
-            {
-                await AddUserAsync(CurrUserId, CurrentUser.email, CurrentUser.name);
-            }
 
             if (string.IsNullOrWhiteSpace(UserId))
             {
@@ -104,7 +86,7 @@ namespace SD.Client.Pages
             {
                 try
                 {
-                    userModel = await HttpClient.GetFromJsonAsync<UserModel>($"api/User/GetUserById/{UserId}");
+                    userModel = await CurrentUser.httpClient.GetFromJsonAsync<UserModel>($"api/User/GetUserById/{UserId}");
                 }
                 catch
                 {

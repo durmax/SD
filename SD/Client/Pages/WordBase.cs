@@ -38,9 +38,6 @@ namespace SD.Client.Pages
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
 
-        [Inject]
-        HttpClient HttpClient { set; get; }
-
         [Parameter]
         public WordDto WordDto { get; set; }
 

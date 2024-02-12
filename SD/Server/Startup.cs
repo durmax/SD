@@ -55,7 +55,6 @@ namespace sd.Api
             services.AddScoped<RelationshipService>();
             services.AddScoped<UserService>();
             services.AddScoped<OtherPageService>();
-            services.AddScoped<CurrentUser>();
 
             services.AddDataProtection();
 

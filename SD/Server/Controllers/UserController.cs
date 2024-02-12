@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,8 +18,8 @@ namespace sd.Api.Controllers
         private readonly UserService _userService;
         private readonly RelationshipService _relationshipService;
 
-        public UserController(UserService userService, RelationshipService relationshipService) 
-        { 
+        public UserController(UserService userService, RelationshipService relationshipService)
+        {
             _userService = userService;
             _relationshipService = relationshipService;
         }
@@ -36,34 +37,15 @@ namespace sd.Api.Controllers
                     "Error retrieving data from the database");
             }
         }
+
         // GET: api/User/GetUsersByText/Dured
         [HttpGet("GetUsersByText/{CurrentUserId}/{searchText}")]
-        public async Task<ActionResult<Dictionary<string, Tuple<string, string>>>> GetUsersByText(string CurrentUserId, string searchText)
-        {
-            List<UserModel> foundUsers;  
-            try
-            {
-                foundUsers = await _userService.SearchUser(CurrentUserId, searchText);
-
-                 var result = await _relationshipService.GetRelationships(CurrentUserId, foundUsers);
-                if (result == null) return NotFound();
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database");
-            }
-        }
-
-        // GET: api/User/GetUsersByText/Dured
-        [HttpGet("GetUsersByTextNew/{CurrentUserId}/{searchText}")]
-        public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetUsersByTextNew(string CurrentUserId, string searchText)
+        public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetUsersByText(string CurrentUserId, string searchText)
         {
             List<UserModel> foundUsers;
             try
             {
-                foundUsers = await _userService.SearchUser(CurrentUserId, searchText);
+                foundUsers = await _userService.SearchUser(searchText);
 
                 IEnumerable<UserRelationshipsWithOneUserDto> result = await _relationshipService.GetRelationships(CurrentUserId, foundUsers);
                 if (result == null) return NotFound();
@@ -111,16 +93,18 @@ namespace sd.Api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpGet]
         [Route("Create")]
-        public async Task<ActionResult<UserModel>> Create(UserModel user)
+        public async Task<ActionResult<UserModel>> Create()
         {
+            UserModel user = new();
             try
             {
-                if (user == null)
-                    return BadRequest();
-                if (string.IsNullOrWhiteSpace(user.Email))
-                    return BadRequest();
+                if (User !=null && User.Identity.IsAuthenticated)
+                {
+                    user.Name = User.Identity.Name;
+                    user.Email = User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+                }
 
                 var foundUser = await _userService.RegisterUserAsync(user);
                 return Ok(foundUser);

@@ -12,6 +12,7 @@ using Microsoft.Identity.Web;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
+using SD.Shared;
 
 namespace sd.Api
 {
@@ -54,6 +55,7 @@ namespace sd.Api
             services.AddScoped<RelationshipService>();
             services.AddScoped<UserService>();
             services.AddScoped<OtherPageService>();
+            services.AddScoped<CurrentUser>();
 
             services.AddDataProtection();
 

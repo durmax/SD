@@ -21,7 +21,7 @@ namespace sd.Api.Repositories
             return await _context.Users
                     .Find(user => true).ToListAsync();
         }
-        public async Task<List<UserModel>> SearchUser(string CurrentUserId, string searchText)
+        public async Task<List<UserModel>> SearchUser(string searchText)
         {
             return await _context.Users
                 .Find(u => u.Name.ToLower().Contains(searchText.ToLower())).ToListAsync();

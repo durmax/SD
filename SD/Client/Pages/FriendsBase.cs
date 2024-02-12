@@ -29,7 +29,7 @@ namespace SD.Client.Pages
             {
                 SearchDisplayClass = null;
                 CurrentUser.id ??= "0";
-                FoundUsers = await CurrentUser.httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/User/GetUsersByTextNew/{CurrentUser.id}/{SearchText}");
+                FoundUsers = await CurrentUser.httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/User/GetUsersByText/{CurrentUser.id}/{SearchText}");
             }
             else
             {

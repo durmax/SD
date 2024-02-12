@@ -11,7 +11,7 @@ namespace sd.Api.Interfaces
         Task<IEnumerable<UserModel>> GetAllUsers();
         Task<UserModel> GetUserById(string id);
         Task<UserModel> GetUserByEmail(string email);
-        Task<List<UserModel>> SearchUser(string searcherId, string searchText);
+        Task<List<UserModel>> SearchUser(string searchText);
         Task<List<UserModel>> GetUsers(List<string> userIds);
 
         Task Create(UserModel user);

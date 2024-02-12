@@ -19,9 +19,9 @@ namespace sd.Api.Services
             return await _userRepository.GetAllUsers();
         }
 
-        public async Task<List<UserModel>> SearchUser(string CurrentUserId, string searchText)
+        public async Task<List<UserModel>> SearchUser(string searchText)
         {
-            return await _userRepository.SearchUser(CurrentUserId, searchText);
+            return await _userRepository.SearchUser(searchText);
         }
 
         public async Task<List<UserModel>> GetUsers(List<string> userIds)

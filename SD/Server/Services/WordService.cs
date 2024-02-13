@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using sd.Api.Interfaces;
+using sd.Api.Repositories;
 using SD.Shared;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,7 @@ namespace sd.Api.Services
                 if (word != null)
                 {
                     wordDto = _mapper.Map<WordDto>(word);
-                    if (await IsWordShareWithUser(wordDto, currentUserId))
+                    if (await IsWordSharedWithUser(wordDto, currentUserId))
                     {
                         if (word.Likes != null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
                         if (currentUserId != wordDto.UserId)
@@ -59,33 +60,23 @@ namespace sd.Api.Services
             return wordDtos;
         }
 
-        private async Task<bool> IsWordShareWithUser(WordDto wordDto, string userId)
+        private async Task<bool> IsWordSharedWithUser(WordDto wordDto, string userId)
         {
-            var word = _mapper.Map<WordModel>(wordDto);
-            bool areSame = userId == word.UserId;
-
-            if (areSame)
+            if (userId == wordDto.UserId)
             {
                 return true;
             }
+
+            var relationshipId = await _relationshipService.GetRelationshipId(userId, Relation.Friend, wordDto.UserId);
+
+            if (!string.IsNullOrEmpty(relationshipId))
+            {
+                return wordDto.ShareWith == ShareWith.Friends || wordDto.ShareWith == ShareWith.Public;
+            }
             else
             {
-                if (await _relationshipService.AreFrinds(userId, word.UserId) != "0")
-                {
-                    if (word.ShareWith > 0)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if (word.ShareWith > 1)
-                    {
-                        return true;
-                    }
-                }
+                return wordDto.ShareWith == ShareWith.Public;
             }
-            return false;
         }
 
         public async Task<WordDto> GetWordDtoById(string id)

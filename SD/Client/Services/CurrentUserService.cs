@@ -20,7 +20,6 @@ namespace SD.Client.Services
             _currentUser = currentUser;
             _httpClientFactory = httpClientFactory;
 
-            //CreateHttpClient(_currentUser.isAuthenticated);
             HandleAuthenticationStateChanged(_authenticationStateProvider.GetAuthenticationStateAsync());
 
             // Subscribe to authentication state changes

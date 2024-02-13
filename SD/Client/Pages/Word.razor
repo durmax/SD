@@ -7,7 +7,7 @@
     @note
 }
 
-<div class="card mt-1 @(string.IsNullOrEmpty(WordDto.WordId)? "border-primary": "border-dark")">
+<div class="card mt-1 position-relative @(string.IsNullOrEmpty(WordDto.WordId)? "border-primary": "border-dark")">
     @if (!string.IsNullOrEmpty(WordDto.UserName))
     {
         <div class="card-header p-0">
@@ -31,29 +31,7 @@
 
     @if (!Collapsed)
     {
-        <div class="btn-group" role="group">
-            @if (KnownLangs != null)
-            {
-                bool IsEqual(string str1, string str2) => str1 == str2;
-
-                <select class="bg-transparent rounded-0 border-0" @bind="@WordDto.WordLang">
-                    @foreach (var item in KnownLangs)
-                    {
-                        <option value="@item" selected="@IsEqual(item,WordDto.WordLang)">@item</option>
-                    }
-                </select>
-
-                <button type="button" class="bg-transparent border-0" @onclick="Reverse">
-                    <i class="oi oi-loop"></i>
-                </button>
-
-                <select class="bg-transparent rounded-0 border-0" @bind="@WordDto.ToLang">
-                    @foreach (var item in KnownLangs)
-                    {
-                        <option value="@item" selected="@IsEqual(item, WordDto.ToLang)">@item</option>
-                    }
-                </select>
-            }
+        <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 
             @{
                 var list = new List<string> { languageContainer.Keys["OnlyMe"], languageContainer.Keys["Friends"], languageContainer.Keys["Public"] };
@@ -85,10 +63,12 @@
                 @languageContainer.Keys["Save"]
                 <img width="20" height="20" src="/icons/SaveSave.svg" asp-append-version="true" />
             </button>
-            <button type="button" class="@cssClassDelete bg-transparent border-0" @onclick="async () => { await DeleteWord(); }">
+            <button type="button" class="@cssClassDelete bg-transparent border-0 pl-3 pr-3" @onclick="async () => { await DeleteWord(); }">
                 @languageContainer.Keys["Delete"]
                 <img width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" />
             </button>
+
+            <input class="position-absolute text-center border-0 mt-1 w-25" style="right:20px" value="@WordDto.Score" />
         </div>
         @if (loading)
         {
@@ -140,7 +120,32 @@
                           @bind-value="@MyText"
                           @bind-value:event="oninput">@MyText</textarea>
             </div>
+            
+            @if (KnownLangs != null)
+            {
+                bool IsEqual(string str1, string str2) => str1 == str2;
 
+                <select class="bg-transparent rounded-0 border-0" @bind="@WordDto.WordLang">
+                    @foreach (var item in KnownLangs)
+                    {
+                        <option value="@item" selected="@IsEqual(item,WordDto.WordLang)">@item</option>
+                    }
+                </select>
+
+                <button type="button" class="bg-transparent border-0" @onclick="Reverse">
+                    <i class="oi oi-loop"></i>
+                </button>
+
+                <select class="bg-transparent rounded-0 border-0" @bind="@WordDto.ToLang">
+                    @foreach (var item in KnownLangs)
+                    {
+                        <option value="@item" selected="@IsEqual(item, WordDto.ToLang)">@item</option>
+                    }
+                </select>
+            }
+
+                
+      
             @if (!(string.IsNullOrWhiteSpace(WordDto.WordLang) || string.IsNullOrWhiteSpace(WordDto.ToLang)))
             {
                 <OtherPages FLangCode="@WordDto.WordLang" TLangCode="@WordDto.ToLang" Word="@WordDto.Title" Collapsed="@Collapsed" CanSetFavSite="false" MaxHeight="200px"></OtherPages>

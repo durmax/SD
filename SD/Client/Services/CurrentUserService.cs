@@ -20,7 +20,8 @@ namespace SD.Client.Services
             _currentUser = currentUser;
             _httpClientFactory = httpClientFactory;
 
-            CreateHttpClient(_currentUser.isAuthenticated);
+            //CreateHttpClient(_currentUser.isAuthenticated);
+            HandleAuthenticationStateChanged(_authenticationStateProvider.GetAuthenticationStateAsync());
 
             // Subscribe to authentication state changes
             _authenticationStateProvider.AuthenticationStateChanged += HandleAuthenticationStateChanged;
@@ -36,7 +37,6 @@ namespace SD.Client.Services
         {
             AuthenticationState authState = await task;
 
-            //var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
             _currentUser.isAuthenticated = authState.User.Identity.IsAuthenticated;
 
             CreateHttpClient(_currentUser.isAuthenticated);

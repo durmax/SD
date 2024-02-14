@@ -27,15 +27,11 @@ namespace sd.Api.Services
             return await _relationshipRepository.GetRelationshipId(userId1, reletion, userId2);
         }
 
-        public async Task<string> AreFrinds(string userId1, string userId2)
-        {
-            return await _relationshipRepository.GetRelationshipId(userId1, Relation.Friend, userId2);
-        }
-
         public async Task<bool> AddRelationship(RelationshipModel relationship)
         {
             bool res = false;
-            if (await AreFrinds(relationship.UserId1, relationship.UserId2) != null)
+            Relation relation = await _relationshipRepository.GetRelationshipsBetweenTwoUsers(relationship.UserId1, relationship.UserId2);
+            if (relation == Relation.None)
             {
                 res = await _relationshipRepository.Create(relationship);
             }
@@ -54,7 +50,7 @@ namespace sd.Api.Services
 
         public async Task<bool> RemoveFriendship(string UserId, string friendId)
         {
-            string relationshipId = await _relationshipRepository.GetRelationshipId(UserId, Relation.Friend, friendId);
+            string relationshipId = await _relationshipRepository.GetRelationshipId(UserId, Relation.None, friendId);
             return await _relationshipRepository.Delete(relationshipId);
         }
 
@@ -88,19 +84,19 @@ namespace sd.Api.Services
             if (CurrentUserId == null || users == null) throw new ArgumentNullException();
 
             List<UserRelationshipsWithOneUserDto> relationships = new List<UserRelationshipsWithOneUserDto>();
-            
+
             if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")
             {
-                users.RemoveAll(u => u.UserId == CurrentUserId); //remove Sercher from list
+                users.RemoveAll(u => u.UserId == CurrentUserId); //remove Searcher from list
             }
 
             foreach (var user in users)
             {
                 Relation relation = await _relationshipRepository.GetRelationshipsBetweenTwoUsers(CurrentUserId, user.UserId);
                 var s = new UserRelationshipsWithOneUserDto(user.UserId, user.Name, relation);
-                if (s!=null)
+                if (s != null)
                 {
-                          relationships.Add(s );
+                    relationships.Add(s);
                 }
 
                 relation = Relation.None;

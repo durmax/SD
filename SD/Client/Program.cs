@@ -42,7 +42,6 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<LangCodeService>();
 builder.Services.AddScoped<KnownLangsService>();
 builder.Services.AddScoped<DefaultLangsService>();
-builder.Services.AddScoped<CurrentUser>();
 
 builder.Services.AddScoped<CurrentUserService>();
 

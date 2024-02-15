@@ -1,6 +1,3 @@
-@inject SD.Client.Services.CurrentUserService CurrUsrService
-
-
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
@@ -24,13 +21,3 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
-
-
-@code {
-
-    protected override async Task OnInitializedAsync()
-    {
-        // if (!CurrentUser.isAuthTested)
-        //await CurrUsrService.GetAuth();
-    }
-}

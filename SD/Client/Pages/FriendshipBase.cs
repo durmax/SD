@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using SD.Client.Services;
 using SD.Shared;
 using System;
 using System.Net.Http.Json;
@@ -9,8 +11,7 @@ namespace SD.Client.Pages
     public class FriendshipBase : ComponentBase
     {
         protected bool waitBool = false;
-        [Parameter]
-        public string UserId { get; set; }
+
         [Parameter]
         public string FriendId { get; set; }
         [Parameter]
@@ -18,27 +19,28 @@ namespace SD.Client.Pages
 
         [Parameter]
         public Relation Relationship { get; set; }
-
+        [Inject]
+        protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
         [Inject]
         NavigationManager NavigationManager { set; get; }
 
         [Inject]
-        protected CurrentUser CurrentUser { set; get; }
+        protected CurrentUserService CurrentUser { set; get; }
 
         public async Task SendFriendRequest(string ToUserId)
         {
             waitBool = true;
 
-            if (UserId != "0" && !string.IsNullOrWhiteSpace(ToUserId))
+            if (CurrentUser.IsAuthenticated && !string.IsNullOrWhiteSpace(ToUserId))
             {
                 RelationshipModel relationship = new()
                 {
                     RelationshipId = Guid.NewGuid().ToString(),
                     Reletion = Relation.FriendRequestTo,
-                    UserId1 = UserId,
+                    UserId1 = null, // Set in Server
                     UserId2 = ToUserId
                 };
-                var res = await  CurrentUser.httpClient.PostAsJsonAsync($"api/Relationship/AddRelationship", relationship);
+                var res = await  CurrentUser.HttpClient.PostAsJsonAsync($"api/Relationship/AddRelationship", relationship);
                 if (res.IsSuccessStatusCode)
                 {
                     Relationship = Relation.FriendRequestTo;
@@ -56,7 +58,7 @@ namespace SD.Client.Pages
             waitBool = true;
             if (!string.IsNullOrWhiteSpace(friendId))
             {
-                var res = await CurrentUser.httpClient.DeleteAsync($"api/Relationship/RemoveFriendship/{UserId}/{Relation.Friend}/{friendId}");
+                var res = await CurrentUser.HttpClient.DeleteAsync($"api/Relationship/RemoveFriendship/{Relation.Friend}/{friendId}");
                 if (res.IsSuccessStatusCode)
                 {
                     Relationship = Relation.None;
@@ -75,10 +77,10 @@ namespace SD.Client.Pages
                 {
                     RelationshipId = Guid.NewGuid().ToString(),
                     Reletion = Relation.Friend,
-                    UserId1 = UserId,
+                    UserId1 = null,  // Set in Server
                     UserId2 = FriendId
                 };
-                var res = await CurrentUser.httpClient.PostAsJsonAsync($"api/Relationship/AddRelationship", relationship);
+                var res = await CurrentUser.HttpClient.PostAsJsonAsync($"api/Relationship/AddRelationship", relationship);
 
                 if (res.IsSuccessStatusCode)
                 {
@@ -94,7 +96,7 @@ namespace SD.Client.Pages
 
             if (!string.IsNullOrWhiteSpace(FriendId))
             {
-                var res = await CurrentUser.httpClient.DeleteAsync($"api/Relationship/RemoveFriendship/{UserId}/{Relation.FriendRequestTo}/{FriendId}");
+                var res = await CurrentUser.HttpClient.DeleteAsync($"api/Relationship/RemoveFriendship/{Relation.FriendRequestTo}/{FriendId}");
                 if (res.IsSuccessStatusCode)
                 {
                     Relationship = Relation.None;

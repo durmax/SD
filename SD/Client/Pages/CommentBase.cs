@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
+using SD.Client.Services;
 using SD.Shared;
 using System;
 using System.Net.Http;
@@ -15,7 +17,10 @@ namespace SD.Client.Pages
         [Inject]
         NavigationManager NavigationManager { get; set; }
         [Inject]
-        protected CurrentUser CurrentUser { get; set; }
+        protected CurrentUserService CurrentUser { get; set; }
+        [Inject]
+        protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
+
         [Parameter]
         public string WordId { get; set; }
         [Parameter]
@@ -24,7 +29,6 @@ namespace SD.Client.Pages
         [Parameter]
         public string CurrentUserName { get; set; }
 
-        protected string CssDelCom { get; set; } = "d-none";
         protected bool IsChanged { get; set; } = false;
 
         [Parameter]
@@ -64,7 +68,7 @@ namespace SD.Client.Pages
         {
             IsChanged = false;
             loading = true;
-            if (string.IsNullOrEmpty(CurrentUser.id))
+            if (!CurrentUser.IsAuthenticated)
             {
                 NavigationManager.NavigateTo("/authentication/login");
             }
@@ -76,11 +80,10 @@ namespace SD.Client.Pages
                     CommentModel.CreatedAt = DateTime.Now;
                 }
 
-                if (CommentModel.UserId == CurrentUser.id)
+                if (CurrentUser.IsAuthenticated)
                 {
                     CommentModel.CommentText = MyText;
-                    CommentModel.CommentOwnerName = CurrentUserName;
-                    HttpResponseMessage respons = await CurrentUser.httpClient.PostAsJsonAsync($"api/Comment/SaveComment/{WordId}", CommentModel);
+                    HttpResponseMessage respons = await CurrentUser.HttpClient.PostAsJsonAsync($"api/Comment/SaveComment/{WordId}", CommentModel);
                     if (!respons.IsSuccessStatusCode)
                     {
                         IsChanged = false;
@@ -98,7 +101,7 @@ namespace SD.Client.Pages
         protected async Task RemoveComment()
         {
             bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete comment, are you sure?");
-            if (confirmed)
+            if (confirmed && CurrentUser.IsAuthenticated)
             {
                 if (string.IsNullOrWhiteSpace(CommentModel.CommentId))
                 {
@@ -106,9 +109,9 @@ namespace SD.Client.Pages
                 }
                 else
                 {
-                    if (!string.IsNullOrWhiteSpace(CurrentUser.id) && !string.IsNullOrWhiteSpace(WordId) && !string.IsNullOrWhiteSpace(CommentModel.CommentId) && !string.IsNullOrWhiteSpace(CommentModel.UserId) && (CurrentUser.id == CommentModel.UserId || CurrentUser.id == WordUserId))
+                    if (!string.IsNullOrWhiteSpace(WordId) && !string.IsNullOrWhiteSpace(CommentModel.CommentId) && !string.IsNullOrWhiteSpace(CommentModel.UserId))
                     {
-                        await CurrentUser.httpClient.DeleteAsync($"api/Comment/DeleteComment/{CurrentUser.id}/{WordId}/{CommentModel.CommentId}");
+                        await CurrentUser.HttpClient.DeleteAsync($"api/Comment/DeleteComment/{WordId}/{CommentModel.CommentId}");
                         await OnCommentDelete.InvokeAsync(CommentModel);
                     }
                 }
@@ -118,14 +121,6 @@ namespace SD.Client.Pages
         protected override void OnParametersSet()
         {
             MyText = CommentModel.CommentText;
-        }
-
-        protected override void OnInitialized()
-        {
-            if (CommentModel.UserId == CurrentUser.id || WordUserId == CurrentUser.id)
-            {
-                CssDelCom = null;
-            }
         }
     }
 }

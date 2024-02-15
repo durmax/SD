@@ -39,15 +39,15 @@ namespace sd.Api.Controllers
         }
 
         // GET: api/User/GetUsersByText/Dured
-        [HttpGet("GetUsersByText/{CurrentUserId}/{searchText}")]
-        public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetUsersByText(string CurrentUserId, string searchText)
+        [HttpGet("GetUsersByText/{searchText}")]
+        public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetUsersByText(string searchText)
         {
             List<UserModel> foundUsers;
             try
             {
                 foundUsers = await _userService.SearchUser(searchText);
 
-                IEnumerable<UserRelationshipsWithOneUserDto> result = await _relationshipService.GetRelationships(CurrentUserId, foundUsers);
+                IEnumerable<UserRelationshipsWithOneUserDto> result = await _relationshipService.GetRelationships((await _userService.GetCurrentUser(User))?.UserId, foundUsers);
                 if (result == null) return NotFound();
                 return Ok(result);
             }
@@ -58,13 +58,13 @@ namespace sd.Api.Controllers
             }
         }
 
-        // GET: api/User/GetUserById/5
-        [HttpGet("GetUserById/{id}")]
-        public async Task<ActionResult<UserModel>> GetUserById(string id)
+        [Authorize]
+        [HttpGet("GetCurrentUser")]
+        public async Task<ActionResult<UserModel>> GetCurrentUser()
         {
             try
             {
-                var result = await _userService.GetUserById(id);
+                var result = await _userService.GetUserById((await _userService.GetCurrentUser(User))?.UserId);
                 if (result == null) return NotFound();
                 return result;
             }

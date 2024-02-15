@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using SD.Client.Services;
@@ -19,7 +20,9 @@ namespace SD.Client.Pages
         [Inject]
         OtherPageService OtherPageService { set; get; }
         [Inject]
-        protected CurrentUser CurrentUser { set; get; }
+        protected CurrentUserService CurrentUser { set; get; }
+        [Inject]
+        protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
         [Inject]
         NavigationManager NavigationManager { get; set; }
         [Inject]
@@ -53,8 +56,13 @@ namespace SD.Client.Pages
 
         protected bool loading;
         protected string note;
+        public int? LikesCount { get; set; }
+        protected bool CULiked { get; set; } = false;
+        protected IEnumerable<UserRelationshipsWithOneUserDto> likedUsers;
 
-        private string FavSite { get; set; }
+        protected IEnumerable<string> SameWords { get; set; }
+        protected IEnumerable<string> LanguageToolWords { get; set; }
+        private string? FavSite { get; set; }
 
         protected List<CommentModel> WordComments { get; set; }
 
@@ -119,9 +127,8 @@ namespace SD.Client.Pages
         protected async Task AddWord()
         {
             loading = true;
-            if (!string.IsNullOrWhiteSpace(CurrentUser.id))
+            if (CurrentUser.IsAuthenticated)
             {
-                WordDto.UserId = CurrentUser.id;
                 WordDto.Explain = MyText;
 
                 HttpResponseMessage respons = await WordService.AddWord(WordDto);
@@ -156,9 +163,9 @@ namespace SD.Client.Pages
 
         protected async Task UpdateWord()
         {
-            if (!string.IsNullOrWhiteSpace(CurrentUser.id))
+            if (CurrentUser.IsAuthenticated)
             {
-                if (string.IsNullOrWhiteSpace(WordDto.UserId) || CurrentUser.id != WordDto.UserId)
+                if (string.IsNullOrWhiteSpace(WordDto.UserId))
                 {
                     await AddWord();
                 }
@@ -197,7 +204,6 @@ namespace SD.Client.Pages
             {
                 WordLang = DefaultLangsService.DefaultWordLang,
                 ToLang = DefaultLangsService.DefaultToLang,
-                UserId = CurrentUser.id,
                 ShareWith = WordDto?.ShareWith ?? ShareWith.Public,
                 Explain = null
             };
@@ -219,9 +225,9 @@ namespace SD.Client.Pages
             if (title.Length > 2)
             {
                 loading = true;
-                if (!string.IsNullOrEmpty(CurrentUser?.id))
+                if (CurrentUser.IsAuthenticated)
                 {
-                    SameWords = await WordService.GetWordsContainText(CurrentUser.id, title);
+                    SameWords = await WordService.GetWordsContainText(title);
                 }
                 LanguageToolWords = await WordService.GetLanguageToolWords(WordDto.WordLang, title);
 
@@ -236,7 +242,7 @@ namespace SD.Client.Pages
 
         protected async Task SetWord(string id)
         {
-            if (!string.IsNullOrEmpty(CurrentUser?.id))
+            if (CurrentUser.IsAuthenticated)
             {
                 var wDto = await WordService.GetWordById(id);
                 await OnWordFound.InvokeAsync(wDto);
@@ -260,11 +266,6 @@ namespace SD.Client.Pages
         {
             WordDto.WordLang = DefaultLangsService.DefaultWordLang;
             WordDto.ToLang = DefaultLangsService.DefaultToLang;
-
-            if (string.IsNullOrWhiteSpace(WordDto.WordLang) || WordDto.WordLang == "null" || string.IsNullOrWhiteSpace(WordDto.ToLang) || WordDto.ToLang == "null")
-            {
-                NavigationManager.NavigateTo("Languages");
-            }
         }
 
         private async Task BuildKnownLangsAsync()
@@ -284,16 +285,13 @@ namespace SD.Client.Pages
 
         protected void CreateComment()
         {
-            if (string.IsNullOrEmpty(CurrentUser.id))
+            if (!CurrentUser.IsAuthenticated)
             {
                 NavigationManager.NavigateTo("/authentication/login");
             }
             else
             {
-                CommentModel commentModel = new()
-                {
-                    UserId = CurrentUser.id
-                };
+                CommentModel commentModel = new();
                 WordComments.Add(commentModel);
                 WordDto.CommentsCount++;
                 CollapsedComm = false;
@@ -303,15 +301,21 @@ namespace SD.Client.Pages
         protected async Task RemoveCommentHandlerAsync(CommentModel comment)
         {
             loading = true;
-            WordComments.Remove(comment);
-            var response = await CurrentUser.httpClient.DeleteAsync($"api/Comment/DeleteComment/{CurrentUser.id}/{WordDto.WordId}/{comment.CommentId}");
-            if (response.IsSuccessStatusCode)
+            if (!CurrentUser.IsAuthenticated)
             {
-                WordDto.CommentsCount--;
-                note = $"Comment of {comment.CommentOwnerName} is deleted";
+                NavigationManager.NavigateTo("/authentication/login");
             }
-            else note = $"Comment of {comment.CommentOwnerName} is NOT deleted";
-
+            else
+            {
+                WordComments.Remove(comment);
+                var response = await CurrentUser.HttpClient.DeleteAsync($"api/Comment/DeleteComment/{WordDto.WordId}/{comment.CommentId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    WordDto.CommentsCount--;
+                    note = $"Comment of {comment.CommentOwnerName} is deleted";
+                }
+                else note = $"Comment of {comment.CommentOwnerName} is NOT deleted";
+            }
             loading = false;
         }
 
@@ -319,9 +323,9 @@ namespace SD.Client.Pages
         {
             loading = true;
 
-            if (!string.IsNullOrWhiteSpace(WordDto.WordId) && !string.IsNullOrWhiteSpace(WordDto.UserId))// is not a new word
+            if (CurrentUser.IsAuthenticated && !string.IsNullOrWhiteSpace(WordDto.WordId))// is not a new word
             {
-                if (WordDto.UserId == CurrentUser.id)
+                if (CurrentUser.IsAuthenticated)
                 {
                     bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete '" + WordDto.Title + "', are you sure?");
                     if (confirmed)
@@ -342,30 +346,21 @@ namespace SD.Client.Pages
             loading = false;
         }
 
-        /// <summary>
-        /// Like start
-        /// </summary>
-        public int? LikesCount { get; set; }
-        protected bool CULiked { get; set; } = false;
-        protected IEnumerable<UserRelationshipsWithOneUserDto> likedUsers;
-        protected IEnumerable<string> SameWords { get; set; }
-        protected IEnumerable<string> LanguageToolWords { get; set; }
-
         protected async Task GetLikedUsers(int? likesCount)
         {
             CollapsedLike = !CollapsedLike;
             if (!CollapsedLike && likesCount != null)
             {
-                likedUsers = await WordService.GetLikedUsers(CurrentUser.id, WordDto.WordId);
+                likedUsers = await WordService.GetLikedUsers(WordDto.WordId);
             }
         }
         protected async Task LikeAsync()
         {
-            if (!string.IsNullOrWhiteSpace(CurrentUser.id) && CurrentUser.id != "0")
+            if (CurrentUser.IsAuthenticated)
             {
                 CULiked = !CULiked;
                 LikesCount += CULiked ? 1 : -1;
-                await WordService.Like(CurrentUser.id, WordDto.WordId);
+                await WordService.Like(WordDto.WordId);
             }
             else
             {
@@ -398,7 +393,7 @@ namespace SD.Client.Pages
                 {
                     try
                     {
-                        WordComments =  string.IsNullOrEmpty(WordDto?.WordId) ? null : (List<CommentModel>) await CurrentUser.httpClient.GetFromJsonAsync<IEnumerable<CommentModel>>($"api/Comment/GetWordComments/{WordDto?.WordId}");
+                        WordComments =  string.IsNullOrEmpty(WordDto?.WordId) ? null : (List<CommentModel>) await CurrentUser.HttpClient.GetFromJsonAsync<IEnumerable<CommentModel>>($"api/Comment/GetWordComments/{WordDto?.WordId}");
                         WordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
                     }
                     catch { }
@@ -422,7 +417,7 @@ namespace SD.Client.Pages
             }
             try
             {
-                FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + fl + "-" + tl);
+                FavSite = await LocalStorageService.GetItemAsStringAsync("fav" + "-" + fl + "-" + tl);
             }
             catch { }
         }
@@ -438,7 +433,6 @@ namespace SD.Client.Pages
                 CULiked = WordDto.IsILiked;
                 LikesCount = WordDto.LikesCount;
             }
-
             await BuildKnownLangsAsync();
         }
 

@@ -7,7 +7,6 @@ namespace SD.Shared
     {
         //[Required]
         public string WordId { get; set; }
-        [Required]
         public string UserId { get; set; }
         public string UserName { get; set; }
         public string Title { get; set; }

@@ -15,11 +15,14 @@ namespace sd.Api.Controllers
     public class RelationshipController : ControllerBase
     {
         private readonly RelationshipService _relationshipService;
+        private readonly UserService _userService;
+
         //private readonly UserService _userService;
 
-        public RelationshipController(RelationshipService relationshipService)
+        public RelationshipController(RelationshipService relationshipService, UserService userService)
         {
             _relationshipService = relationshipService;
+            _userService = userService;
             //_userService = userService;
         }
 
@@ -40,12 +43,13 @@ namespace sd.Api.Controllers
                     ex.Message);
             }
         }
-
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<bool>> AddRelationship(RelationshipModel relationship)
         {
             try
             {
+                relationship.UserId1 = (await _userService.GetCurrentUser(User))?.UserId;
                 return await _relationshipService.AddRelationship(relationship);
             }
             catch (Exception ex)
@@ -84,12 +88,13 @@ namespace sd.Api.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("{UserId}/{reletion}/{friendId}")]
-        public async Task<ActionResult> RemoveFriendship(string userId, Relation reletion, string friendId)
+        public async Task<ActionResult> RemoveFriendship(Relation reletion, string friendId)
         {
             try
             {
-                var rId = await _relationshipService.GetRelationshipId(userId, reletion, friendId);
+                var rId = await _relationshipService.GetRelationshipId((await _userService.GetCurrentUser(User))?.UserId, reletion, friendId);
                 await _relationshipService.RemoveRelationship(rId);
                 return StatusCode(StatusCodes.Status200OK);
             }
@@ -100,13 +105,13 @@ namespace sd.Api.Controllers
             }
         }
 
-
-        [HttpGet("{userId}")]
-        public async Task<ActionResult<Dictionary<string, string>>> GetAllFriends(string userId)
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<Dictionary<string, string>>> GetAllFriends()
         {
             try
             {
-                var result = await _relationshipService.GetAllFriends(userId);
+                var result = await _relationshipService.GetAllFriends((await _userService.GetCurrentUser(User))?.UserId);
 
                 if (result == null) return NotFound();
 
@@ -119,12 +124,13 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Dictionary<string, string>>> GetFriendRequestsById(string id)
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<Dictionary<string, string>>> GetFriendRequests()
         {
             try
             {
-                var result = await _relationshipService.FriendRequestsToUser(id);
+                var result = await _relationshipService.FriendRequestsToUser((await _userService.GetCurrentUser(User))?.UserId);
 
                 if (result == null) return NotFound();
 

@@ -18,9 +18,7 @@ namespace SD.Client.Pages
         [Inject]
         public ILanguageContainerService LanguageContainer { set; get; }
         [Inject]
-        public CurrentUserService CurrUsrService { set; get; }
-        [Inject]
-        public CurrentUser CurrentUser { set; get; }
+        public CurrentUserService CurrentUser { set; get; }
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
 
@@ -60,7 +58,7 @@ namespace SD.Client.Pages
         {
             loading = true;
             var wordsCountBefor = Words.Count;
-            Words.AddRange(await WordService.GetPageWords(CurrentUser?.id ?? "0", "0", 10, currentPage));
+            Words.AddRange(await WordService.GetPageWords("0", 10, currentPage));
             currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }
@@ -100,11 +98,11 @@ namespace SD.Client.Pages
                 catch { }
             }
 
-            if (CurrentUser.isAuthenticated)
+            if (CurrentUser.IsAuthenticated)
             {
                 try
                 {
-                    FriendRequestsDictionary = await CurrentUser.httpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequestsById/{CurrentUser?.id ?? "0"}");
+                    FriendRequestsDictionary = await CurrentUser.HttpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequests");
                 }
                 catch
                 {

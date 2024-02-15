@@ -11,7 +11,6 @@ namespace SD.Shared
         [BsonId]
         [BsonRepresentation(BsonType.String)]
         public string CommentId { get; set; }
-        [Required]
         public string UserId { get; set; }
         public string CommentOwnerName { get; set; }
         [Required]

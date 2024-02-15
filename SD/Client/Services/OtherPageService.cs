@@ -9,11 +9,11 @@ namespace SD.Client.Services
 {
     public class OtherPageService
     {
-        private readonly CurrentUser _currentUser;
+        private readonly CurrentUserService _currentUser;
         private readonly UriService _uriService;
         private readonly LinkParam _reqLinkP;
 
-        public OtherPageService(CurrentUser currentUser,
+        public OtherPageService(CurrentUserService currentUser,
                                    UriService uriService,
                                    LinkParam reqLinkP)
         {
@@ -29,7 +29,7 @@ namespace SD.Client.Services
             
             try
             {
-                OPResModels = await _currentUser.httpClient.GetFromJsonAsync<List<OtherPageResModel>>($"api/OtherPage/{fromLang}/{toLang}");
+                OPResModels = await _currentUser.HttpClient.GetFromJsonAsync<List<OtherPageResModel>>($"api/OtherPage/{fromLang}/{toLang}");
             }
             catch
             {
@@ -70,22 +70,22 @@ namespace SD.Client.Services
 
         public async Task<OtherPageModel> GetOtherPageById(string id)
         {
-            return await _currentUser.httpClient.GetFromJsonAsync<OtherPageModel>($"api/OtherPage/{id}");
+            return await _currentUser.HttpClient.GetFromJsonAsync<OtherPageModel>($"api/OtherPage/{id}");
         }
 
         public async Task<HttpResponseMessage> RegisterOtherPage(OtherPageModel otherPage)
         {
-            return await _currentUser.httpClient.PostAsJsonAsync("api/OtherPage", otherPage);
+            return await _currentUser.HttpClient.PostAsJsonAsync("api/OtherPage", otherPage);
         }
 
         public async Task<HttpResponseMessage> RemoveOtherPage(string id)
         {
-            return await _currentUser.httpClient.DeleteAsync($"api/OtherPage/?id={id}");
+            return await _currentUser.HttpClient.DeleteAsync($"api/OtherPage/?id={id}");
         }
 
         public async Task<HttpResponseMessage> UpdateOtherPage(OtherPageModel newOtherPage)
         {
-            return await _currentUser.httpClient.PutAsJsonAsync("api/OtherPage", newOtherPage);
+            return await _currentUser.HttpClient.PutAsJsonAsync("api/OtherPage", newOtherPage);
         }
     }
 }

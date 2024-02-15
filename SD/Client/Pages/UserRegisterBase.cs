@@ -13,12 +13,8 @@ namespace SD.Client.Pages
         public UserModel userModel = new();
         public Dictionary<string, string> foundUsers;
 
-        //protected int? FriendsCount { set; get; }
-
         [Inject]
-        public CurrentUserService CurrUsrService { set; get; }
-        [Inject]
-        public CurrentUser CurrentUser { set; get; }
+        public CurrentUserService CurrentUser { set; get; }
 
         [Parameter]
         public string UserId { get; set; }
@@ -42,7 +38,7 @@ namespace SD.Client.Pages
                         if (!Registered)
                         {
                             // userModel.UserId = UserId;
-                            var status = await CurrentUser.httpClient.PostAsJsonAsync("api/User/Create", userModel);
+                            var status = await CurrentUser.HttpClient.PostAsJsonAsync("api/User/Create", userModel);
                             if (status.IsSuccessStatusCode)
                             {
                                 Info = $"Willcome {userModel.Email}!, your data saved successfully";
@@ -56,7 +52,7 @@ namespace SD.Client.Pages
                         else
                         {
                             // userModel.Email = Email;
-                            var status = await CurrentUser.httpClient.PutAsJsonAsync($"api/User/UpdateUser/{userModel.UserId}", userModel);
+                            var status = await CurrentUser.HttpClient.PutAsJsonAsync($"api/User/UpdateUser/{userModel.UserId}", userModel);
                             Info = status.ReasonPhrase;
                         }
                     }
@@ -73,20 +69,16 @@ namespace SD.Client.Pages
 
         protected async override Task OnInitializedAsync()
         {
-            //if (!CurrUsrService.isAuthTested) await CurrUsrService.GetAuth();
-            CurrUserId = CurrentUser.id;
 
-            if (string.IsNullOrWhiteSpace(UserId))
+            if (!CurrentUser.IsAuthenticated)
             {
-                UserId = CurrUserId;
                 CssDisplayNotCurrentUser = null;
             }
-
-            if (!string.IsNullOrEmpty(UserId) && UserId != "0")
+            else
             {
                 try
                 {
-                    userModel = await CurrentUser.httpClient.GetFromJsonAsync<UserModel>($"api/User/GetUserById/{UserId}");
+                    userModel = await CurrentUser.HttpClient.GetFromJsonAsync<UserModel>($"api/User/GetCurrentUser");
                 }
                 catch
                 {

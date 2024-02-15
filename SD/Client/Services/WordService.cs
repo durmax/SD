@@ -10,34 +10,33 @@ namespace SD.Client.Services
 {
     public class WordService
     {
-        private readonly CurrentUser _currentUser;
+        private readonly CurrentUserService _currentUser;
 
-        public WordService(CurrentUser currentUser)
+        public WordService(CurrentUserService currentUser)
         {
             _currentUser = currentUser;
         }
 
         public async Task<HttpResponseMessage> AddWord(WordDto word)
         {
-            return await _currentUser.httpClient.PostAsJsonAsync("api/Word", word);
+            return await _currentUser.HttpClient.PostAsJsonAsync("api/Word", word);
         }
 
-        public async Task<List<WordDto>> GetPageWords(string currentUserId, string userId, int pageSize, int currentPage)
+        public async Task<List<WordDto>> GetPageWords(string userId, int pageSize, int currentPage)
         {
-            return await _currentUser.httpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWords/{currentUserId ?? "0"}/{userId ?? "0"}/{pageSize}/{currentPage}");
+            return await _currentUser.HttpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWords/{userId ?? "0"}/{pageSize}/{currentPage}");
         }
         
         public async Task<WordDto> GetWordById(string id)
         {
-            return await _currentUser.httpClient.GetFromJsonAsync<WordDto>($"api/Word/{id}");
+            return await _currentUser.HttpClient.GetFromJsonAsync<WordDto>($"api/Word/{id}");
         }
 
-        public async Task<List<string>> GetWordsContainText(string userId, string title)
+        public async Task<List<string>> GetWordsContainText(string title)
         {
             try
             {
-                var w = await _currentUser.httpClient.GetFromJsonAsync<List<string>>($"api/Word/GetWordsContainText/{userId}/{title}");
-                return w;
+                return await _currentUser.HttpClient.GetFromJsonAsync<List<string>>($"api/Word/GetWordsContainText/{title}");
             }
             catch
             {
@@ -47,23 +46,22 @@ namespace SD.Client.Services
 
         public async Task<HttpResponseMessage> RemoveWord(string id)
         {
-            return await _currentUser.httpClient.DeleteAsync($"api/Word/{id}");
+            return await _currentUser.HttpClient.DeleteAsync($"api/Word/{id}");
         }
 
         public async Task<HttpResponseMessage> UpdateWord(WordDto newWord)
         {
-            return await _currentUser.httpClient.PutAsJsonAsync($"api/Word", newWord);
+            return await _currentUser.HttpClient.PutAsJsonAsync($"api/Word", newWord);
         }
 
-        public async Task<int> Like(string userId, string wordId)
+        public async Task<int> Like(string wordId)
         {
-            return await _currentUser.httpClient.GetFromJsonAsync<int>($"api/Word/Like/{userId}/{wordId}");
+            return await _currentUser.HttpClient.GetFromJsonAsync<int>($"api/Word/Like/{wordId}");
         }
 
-        public async Task<IEnumerable<UserRelationshipsWithOneUserDto>> GetLikedUsers(string userId, string wordId)
+        public async Task<IEnumerable<UserRelationshipsWithOneUserDto>> GetLikedUsers(string wordId)
         {
-            userId ??= "0";
-            return await _currentUser.httpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{userId}/{wordId}");
+            return await _currentUser.HttpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{wordId}");
         }
 
         public async Task<List<string>> GetLanguageToolWords(string wordLang, string str)
@@ -78,7 +76,7 @@ namespace SD.Client.Services
             {
                 try
                 {
-                    var response = await _currentUser.httpClient.GetFromJsonAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text={str}");
+                    var response = await _currentUser.HttpClient.GetFromJsonAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text={str}");
 
                     // Extract the list of string values from Matches.Replacements.Value
                     return response.Matches

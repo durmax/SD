@@ -1,8 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inject ILanguageContainerService languageContainer
-@inject SD.Client.Services.CurrentUserService CurrUsrService
-@inject SD.Shared.CurrentUser CurrentUser
 
 
 @inject NavigationManager Navigation
@@ -24,11 +22,5 @@
     {
         await SignOutManager.SetSignOutState();
         Navigation.NavigateTo("authentication/logout");
-    }
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        //if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();
     }
 }

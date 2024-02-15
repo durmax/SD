@@ -23,7 +23,7 @@
                        href="MyWords/@CommentModel.UserId/@CommentModel.CommentOwnerName">@CommentModel.CommentOwnerName</a>
                     <lable> form @DateTime.Now.Subtract(CommentModel.CreatedAt).Days day </lable>
                 }
-                <button type="button" style="float:right" class="btn btn-link bg-transparent @CssDelCom" @onclick="@(async () => await RemoveComment())">
+                <button type="button" style="float:right" class="btn btn-link bg-transparent" @onclick="@(async () => await RemoveComment())">
                     <img width="20" height="20" src="/icons/bxs-message-x.svg" asp-append-version="true" />
                 </button>
             </div>

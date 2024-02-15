@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sd.Api.Interfaces;
+using sd.Api.Services;
 using SD.Shared;
 
 namespace sd.Api.Controllers
@@ -14,10 +15,12 @@ namespace sd.Api.Controllers
     public class CommentController : ControllerBase
     {
         private readonly ICommentService _commentService;
+        private readonly UserService _userService;
 
-        public CommentController(ICommentService commentService)
+        public CommentController(ICommentService commentService, UserService userService)
         {
             _commentService = commentService;
+            _userService = userService;
         }
 
         [HttpGet("{wordId}")]
@@ -34,10 +37,14 @@ namespace sd.Api.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         [Route("{wordId}")]
         public async Task<ActionResult> SaveComment(string wordId, CommentModel comment)
         {
+            if (string.IsNullOrEmpty(comment?.UserId)) comment.UserId = (await _userService.GetCurrentUser(User))?.UserId;
+            if (string.IsNullOrEmpty(comment?.CommentOwnerName)) comment.CommentOwnerName = (await _userService.GetCurrentUser(User))?.Name;
+
             if (await _commentService.SaveComment(wordId, comment))
                 return StatusCode(StatusCodes.Status200OK);
 
@@ -45,12 +52,13 @@ namespace sd.Api.Controllers
                 $"Error to save comment");
         }
 
-        [HttpGet("{userId}/{WordId}/{commentId}")]
-        public async Task<ActionResult<int>> LikeComment(string userId, string wordId, string commentId)
+        [Authorize]
+        [HttpGet("{WordId}/{commentId}")]
+        public async Task<ActionResult<int>> LikeComment(string wordId, string commentId)
         {
             try
             {
-                return Ok(await _commentService.Like(userId, wordId, commentId));
+                return Ok(await _commentService.Like((await _userService.GetCurrentUser(User))?.UserId, wordId, commentId));
             }
             catch (Exception ex)
             {
@@ -58,12 +66,15 @@ namespace sd.Api.Controllers
                     ex.Message);
             }
         }
-        [HttpDelete("{currUsr}/{wordId}/{commentId}")]
-        public async Task<ActionResult<bool>> DeleteComment(string currUsr, string wordId, string commentId)
+
+        [Authorize]
+        [HttpDelete("{wordId}/{commentId}")]
+        public async Task<ActionResult<bool>> DeleteComment(string wordId, string commentId)
         {
             try
             {
-                return Ok(await _commentService.Delete( currUsr,  wordId,  commentId));
+                return Ok(await _commentService.Delete((await _userService.GetCurrentUser(User))?.UserId, wordId, commentId));
+
             }
             catch (Exception)
             {

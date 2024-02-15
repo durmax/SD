@@ -195,7 +195,7 @@
                 {
                     @foreach (var foudUser in likedUsers)
                     {
-                        <Friendship UserId="@CurrentUser.id" FriendId="@foudUser.UserId" FriendName="@foudUser.RelationalUserName" Relationship="foudUser.Relation"></Friendship>
+                        <Friendship FriendId="@foudUser.UserId" FriendName="@foudUser.RelationalUserName" Relationship="foudUser.Relation"></Friendship>
                     }
                 }
             </div>
@@ -203,19 +203,19 @@
             <div class="card m-0 border-left-0 border-right-0 @(CollapsedComm ? "collapse" : "")">
                 @if (!CollapsedComm)
                 {
-                    <CascadingValue Value="@CurrentUser.id">
+                    @* <CascadingValue Value="@CurrentUser.id"> *@
                         <div class="card-body p-0">
 
                             @foreach (var comment in WordComments)
                             {
-                                <Comment CommentModel="@comment" WordId="@WordDto.WordId" CurrentUserName="@CurrentUser.name" WordUserId="@WordDto.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
+                                <Comment CommentModel="@comment" WordId="@WordDto.WordId" WordUserId="@WordDto.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
                             }
 
                             <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
                                 <span>Add Comment </span> <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" />
                             </button>
                         </div>
-                    </CascadingValue>
+                    @* </CascadingValue> *@
                 }
             </div>
         }

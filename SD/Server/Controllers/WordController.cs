@@ -7,6 +7,8 @@ using sd.Api.Interfaces;
 using SD.Shared;
 using sd.Api.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+
 
 namespace sd.Api.Controllers
 {
@@ -66,12 +68,12 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpGet("GetWordsContainText/{userId}/{title}")]
-        public async Task<ActionResult<IEnumerable<string>>> GetWordsContainText(string userId, string title)
+        [HttpGet("GetWordsContainText/{title}")]
+        public async Task<ActionResult<IEnumerable<string>>> GetWordsContainText(string title)
         {
             try
             {
-                var ws = await _wordService.GetWordsContainText(userId, title);
+                var ws = await _wordService.GetWordsContainText((await _userService.GetCurrentUser(User))?.UserId, title);
                 return Ok(ws);
             }
             catch (Exception ex)
@@ -82,12 +84,12 @@ namespace sd.Api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("GetPageWords/{CurrentUserId}/{userId}/{pageSize}/{currentPage}")]
-        public async Task<ActionResult<List<WordDto>>> GetPageWords(string CurrentUserId, string userId, int pageSize, int currentPage)
+        [HttpGet("GetPageWords/{userId}/{pageSize}/{currentPage}")]
+        public async Task<ActionResult<List<WordDto>>> GetPageWords(string userId, int pageSize, int currentPage)
         {
             try
             {
-                var res= await _wordService.GetPageWords(CurrentUserId, userId, null, pageSize, currentPage);
+                var res = await _wordService.GetPageWords((await _userService.GetCurrentUser(User))?.UserId, userId, null, pageSize, currentPage);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -103,11 +105,14 @@ namespace sd.Api.Controllers
         {
             try
             {
-                if (word == null)
+                if (string.IsNullOrWhiteSpace(word?.Title))
                     return BadRequest();
-                if (string.IsNullOrWhiteSpace(word.UserId) || string.IsNullOrWhiteSpace(word.Title))
-                    return BadRequest();
-                if (!string.IsNullOrWhiteSpace(word.WordId) && await _wordService.GetWordDtoById(word.WordId) != null)
+
+                if (string.IsNullOrWhiteSpace(word.UserId))
+                {
+                    word.UserId = (await _userService.GetCurrentUser(User))?.UserId;
+                }
+                else if (await _wordService.GetWordDtoById(word.WordId) != null)
                 {
                     await _wordService.UpdateWord(word);
                     return StatusCode(StatusCodes.Status202Accepted,
@@ -166,12 +171,12 @@ namespace sd.Api.Controllers
         }
 
         [Authorize]
-        [HttpGet("Like/{userId}/{wordId}")]
-        public async Task<ActionResult<int>> Like(string userId, string wordId)
+        [HttpGet("Like/{wordId}")]
+        public async Task<ActionResult<int>> Like(string wordId)
         {
             try
             {
-                return await _likeWord.Like(userId, wordId);
+                return await _likeWord.Like((await _userService.GetCurrentUser(User))?.UserId, wordId);
             }
             catch (Exception ex)
             {
@@ -180,15 +185,15 @@ namespace sd.Api.Controllers
             }
         }
 
-        [HttpGet("GetLikedUsers/{CurrentUserId}/{wordId}")]
-        public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetLikes(string CurrentUserId, string wordId)
+        [HttpGet("GetLikedUsers/{wordId}")]
+        public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetLikes(string wordId)
         {
             try
             {
                 var word = await _wordService.GetWordById(wordId);
 
                 var foundUsers = await _userService.GetUsers(word.Likes);
-                var result = await _relationshipService.GetRelationships(CurrentUserId, foundUsers);
+                var result = await _relationshipService.GetRelationships((await _userService.GetCurrentUser(User))?.UserId, foundUsers);
 
                 if (result == null) return NotFound();
                 return Ok(result);

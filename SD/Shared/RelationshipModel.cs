@@ -9,7 +9,6 @@ namespace SD.Shared
         [BsonId]
         [BsonRepresentation(BsonType.String)]
         public string RelationshipId { get; set; }
-        [Required]
         public string UserId1 { get; set; }
 
         [Required]

@@ -11,8 +11,6 @@ namespace SD.Client.Pages
         [Inject]
         public WordService WordService { set; get; }
 
-        [Inject]
-        public CurrentUser CurrentUser { get; set; }
 
         [Parameter]
         public string UserId { get; set; }
@@ -39,7 +37,7 @@ namespace SD.Client.Pages
         {
             loading = true;
             var wordsCountBefor = Words.Count;
-            Words.AddRange(await WordService.GetPageWords(CurrentUser.id, UserId, 10, currentPage));
+            Words.AddRange(await WordService.GetPageWords(UserId, 10, currentPage));
             currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }

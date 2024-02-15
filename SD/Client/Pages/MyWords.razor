@@ -1,15 +1,16 @@
 ﻿@page "/MyWords"
-@page "/MyWords/{UserId}/{UserName}"
+@page "/MyWords/{UserId}"
 @inject ILanguageContainerService languageContainer
 @inherits MyWordsBase
 
-<h3>@UserName</h3>
 
 <div class="sticky-top pb-1">
     <Word OnWordSave="NewWordHandler" Collapsed="Collapsed"></Word>
 </div>
-@if (Words != null)
+@if (Words != null && Words.Count > 0)
 {
+    <h4>@Words.FirstOrDefault(x => !string.IsNullOrEmpty(x?.UserName)).UserName Words</h4>
+
     @foreach (var word in Words)
     {
         word.UserName = null;

@@ -15,8 +15,6 @@ namespace SD.Client.Pages
         [Parameter]
         public string UserId { get; set; }
 
-        [Parameter]
-        public string UserName { get; set; }
         protected bool Collapsed { set; get; } = true;    // hide by default
         protected bool loading = true;
         protected int currentPage = 1;

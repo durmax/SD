@@ -81,8 +81,6 @@ namespace sd.Api.Services
 
         public async Task<List<UserRelationshipsWithOneUserDto>> GetRelationships(string CurrentUserId, List<UserModel> users)
         {
-            if (CurrentUserId == null || users == null) throw new ArgumentNullException();
-
             List<UserRelationshipsWithOneUserDto> relationships = new List<UserRelationshipsWithOneUserDto>();
 
             if (!string.IsNullOrWhiteSpace(CurrentUserId) && CurrentUserId != "0")

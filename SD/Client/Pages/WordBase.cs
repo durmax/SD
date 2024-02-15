@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Newtonsoft.Json;
 using SD.Client.Services;
 using SD.Shared;
 using System;
@@ -31,6 +32,9 @@ namespace SD.Client.Pages
         public bool Collapsed { set; get; } //= true;    // hide by default
         public bool CollapsedComm { set; get; } = true;
         public bool CollapsedLike { set; get; } = true;
+
+        [Parameter]
+        public string WordId { get; set; }
 
         [Inject]
         public WordService WordService { set; get; }
@@ -393,7 +397,7 @@ namespace SD.Client.Pages
                 {
                     try
                     {
-                        WordComments =  string.IsNullOrEmpty(WordDto?.WordId) ? null : (List<CommentModel>) await CurrentUser.HttpClient.GetFromJsonAsync<IEnumerable<CommentModel>>($"api/Comment/GetWordComments/{WordDto?.WordId}");
+                        WordComments = string.IsNullOrEmpty(WordDto?.WordId) ? null : (List<CommentModel>)await CurrentUser.HttpClient.GetFromJsonAsync<IEnumerable<CommentModel>>($"api/Comment/GetWordComments/{WordDto?.WordId}");
                         WordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
                     }
                     catch { }
@@ -424,6 +428,18 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            if (!string.IsNullOrEmpty(WordId))
+            {
+                try
+                {
+                    WordDto = await WordService.GetWordById(WordId);
+                }
+                catch (Exception x)
+                {
+                    note = x.Message;
+                }
+            }
+
             if (WordDto == null || string.IsNullOrWhiteSpace(WordDto.WordId))
             {
                 await NewWordAsync();

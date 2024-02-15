@@ -11,7 +11,6 @@ namespace SD.Client.Pages
         [Inject]
         public WordService WordService { set; get; }
 
-
         [Parameter]
         public string UserId { get; set; }
 

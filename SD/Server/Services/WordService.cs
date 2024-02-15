@@ -60,7 +60,7 @@ namespace sd.Api.Services
             return wordDtos;
         }
 
-        private async Task<bool> IsWordSharedWithUser(WordDto wordDto, string? userId)
+        public async Task<bool> IsWordSharedWithUser(WordDto wordDto, string? userId)
         {
             if (userId == wordDto.UserId)
             {
@@ -79,10 +79,22 @@ namespace sd.Api.Services
             }
         }
 
-        public async Task<WordDto> GetWordDtoById(string id)
+        public async Task<WordDto> GetWordDtoById(string id, string? currentUserId)
         {
             var word = await _wordRepository.GetWordById(id);
-            return _mapper.Map<WordDto>(word);
+            var wordDto = _mapper.Map<WordDto>(word);
+
+            if (await IsWordSharedWithUser(wordDto, currentUserId))
+            {
+                if (word.Likes != null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
+                if (currentUserId != wordDto.UserId)
+                {
+                    var user = await _userRepository.GetUserById(wordDto.UserId);
+                    wordDto.UserName = user?.Name;
+                }
+                return wordDto;
+            }
+            else return null; 
         }
         public async Task<WordModel> GetWordById(string id)
         {

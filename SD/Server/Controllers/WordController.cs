@@ -31,17 +31,18 @@ namespace sd.Api.Controllers
             _relationshipService = relationshipService;
         }
 
-        // GET: api/Word/GetWord/5
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<WordDto>> GetWord(string id)
         {
             try
             {
-                var result = await _wordService.GetWordDtoById(id);
+                var currentUserId = (await _userService.GetCurrentUser(User))?.UserId;
+                var wordDto = await _wordService.GetWordDtoById(id, currentUserId);
+                
+                if (wordDto == null) return NotFound();
 
-                if (result == null) return NotFound();
-
-                return result;
+                return Ok(wordDto);
             }
             catch (Exception ex)
             {
@@ -112,7 +113,7 @@ namespace sd.Api.Controllers
                 {
                     word.UserId = (await _userService.GetCurrentUser(User))?.UserId;
                 }
-                else if (await _wordService.GetWordDtoById(word.WordId) != null)
+                else if (await _wordService.GetWordDtoById(word.WordId, word.UserId) != null)
                 {
                     await _wordService.UpdateWord(word);
                     return StatusCode(StatusCodes.Status202Accepted,
@@ -185,6 +186,7 @@ namespace sd.Api.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("GetLikedUsers/{wordId}")]
         public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetLikes(string wordId)
         {

@@ -93,11 +93,10 @@ namespace sd.Api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
+        [HttpPost]
         [Route("Create")]
-        public async Task<ActionResult<UserModel>> Create()
+        public async Task<ActionResult<UserModel>> Create(UserModel user)
         {
-            UserModel user = new();
             try
             {
                 if (User !=null && User.Identity.IsAuthenticated)
@@ -106,8 +105,8 @@ namespace sd.Api.Controllers
                     user.Email = User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
                 }
 
-                var foundUser = await _userService.RegisterUserAsync(user);
-                return Ok(foundUser);
+                var registeredUser = await _userService.RegisterUserAsync(user.Email);
+                return Ok(registeredUser);
             }
             catch (Exception)
             {

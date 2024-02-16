@@ -20,7 +20,8 @@ namespace sd.Api.Services
             if (user?.Identity != null && user.Identity.IsAuthenticated)
             {
                 var email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
-                return await GetUserByEmail(email);
+
+                return await GetUserByEmail(email) ?? await RegisterUserAsync(email);
             }
             else return null;
         }
@@ -50,25 +51,22 @@ namespace sd.Api.Services
             return email != null ? await _userRepository.GetUserByEmail(email) : null;
         }
 
-        public async Task<UserModel?> RegisterUserAsync(UserModel user)
+        public async Task<UserModel?> RegisterUserAsync(string userEmail)
         {
-            var existingUser = await GetUserByEmail(user.Email);
+            var existingUser = await GetUserByEmail(userEmail);
 
-            if (existingUser == null)
-            {
-                if (string.IsNullOrEmpty(user.UserId))
-                {
-                    user.UserId = Guid.NewGuid().ToString();
-                }
-                user.CreatedAt = DateTime.Now;
-
-                await _userRepository.Create(user);
-            }
+            if (existingUser != null)
+                return existingUser;
             else
             {
-                user = existingUser;
+                UserModel userModel = new UserModel();
+                userModel.UserId = Guid.NewGuid().ToString();
+                userModel.CreatedAt = DateTime.Now;
+
+                await _userRepository.Create(userModel);
+
+                return await GetUserByEmail(userModel.Email);
             }
-            return user;
         }
 
 

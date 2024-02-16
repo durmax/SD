@@ -37,11 +37,6 @@ namespace SD.Client.Services
             IsAuthenticated = authState.User.Identity.IsAuthenticated;
 
             CreateHttpClient(IsAuthenticated);
-
-            if (IsAuthenticated)
-            {
-              await HttpClient.GetAsync("api/User/Create");
-            }
         }
     }
 }

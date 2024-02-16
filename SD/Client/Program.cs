@@ -6,7 +6,6 @@ using SD.Client.Services;
 using SD.Client.Models;
 using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
-using SD.Shared;
 using SD.Client;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
@@ -36,6 +35,7 @@ builder.Services.AddMsalAuthentication(options =>
     builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
     options.ProviderOptions.DefaultAccessTokenScopes.Add(builder.Configuration["AzureAd:Scope"]);
     options.ProviderOptions.LoginMode = "redirect";
+    options.ProviderOptions.Cache.CacheLocation = "localStorage"; // remove this option to use Session storage.
 }) ;
 
 builder.Services.AddBlazoredLocalStorage();

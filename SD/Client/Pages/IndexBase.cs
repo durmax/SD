@@ -98,16 +98,16 @@ namespace SD.Client.Pages
                 catch { }
             }
 
-            if (CurrentUser.IsAuthenticated)
-            {
-                try
-                {
-                    FriendRequestsDictionary = await CurrentUser.HttpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequests");
-                }
-                catch
-                {
-                }
-            }
+            //if (CurrentUser.IsAuthenticated)
+            //{
+            //    try
+            //    {
+            //        FriendRequestsDictionary = await CurrentUser.HttpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequests");
+            //    }
+            //    catch
+            //    {
+            //    }
+            //}
         }
     }
 }

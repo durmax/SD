@@ -39,7 +39,7 @@ namespace sd.Api.Controllers
             {
                 var currentUserId = (await _userService.GetCurrentUser(User))?.UserId;
                 var wordDto = await _wordService.GetWordDtoById(id, currentUserId);
-                
+
                 if (wordDto == null) return NotFound();
 
                 return Ok(wordDto);
@@ -109,11 +109,9 @@ namespace sd.Api.Controllers
                 if (string.IsNullOrWhiteSpace(word?.Title))
                     return BadRequest();
 
-                if (string.IsNullOrWhiteSpace(word.UserId))
-                {
-                    word.UserId = (await _userService.GetCurrentUser(User))?.UserId;
-                }
-                else if (await _wordService.GetWordDtoById(word.WordId, word.UserId) != null)
+                word.UserId = (await _userService.GetCurrentUser(User))?.UserId;
+
+                if (!string.IsNullOrEmpty(word?.WordId) && await _wordService.GetWordById(word.WordId) != null)
                 {
                     await _wordService.UpdateWord(word);
                     return StatusCode(StatusCodes.Status202Accepted,
@@ -127,7 +125,9 @@ namespace sd.Api.Controllers
                     return StatusCode(StatusCodes.Status302Found,
                        $"{wordToInsert?.WordId}");    // returen word id that found
                 }
+
                 word.WordId = await _wordService.AddWord(word);
+
                 int statusCode = !string.IsNullOrWhiteSpace(word.WordId) ? StatusCodes.Status200OK : StatusCodes.Status500InternalServerError;
 
                 return StatusCode(statusCode, word.WordId);
@@ -145,6 +145,9 @@ namespace sd.Api.Controllers
         {
             try
             {
+                var currentUser = (await _userService.GetCurrentUser(User))?.UserId;
+                if (updatedWord.UserId != currentUser) return StatusCode(StatusCodes.Status401Unauthorized);
+
                 int statusCode = await _wordService.UpdateWord(updatedWord) ? StatusCodes.Status204NoContent : StatusCodes.Status500InternalServerError;
                 return StatusCode(statusCode);
             }
@@ -161,6 +164,10 @@ namespace sd.Api.Controllers
         {
             try
             {
+                var currentUser = (await _userService.GetCurrentUser(User))?.UserId;
+                var w = await _wordService.GetWordById(id);
+                if (w?.UserId != currentUser) return StatusCode(StatusCodes.Status401Unauthorized);
+
                 await _wordService.RemoveWord(id);
                 return StatusCode(StatusCodes.Status200OK);
             }

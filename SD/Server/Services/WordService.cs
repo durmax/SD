@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using sd.Api.Interfaces;
-using sd.Api.Repositories;
 using SD.Shared;
 using System;
 using System.Collections.Generic;

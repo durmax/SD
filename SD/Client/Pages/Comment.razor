@@ -20,7 +20,7 @@
                 @if (CommentModel.CommentId != null)
                 {
                     <a type="button" class="btn btn-link"
-                       href="MyWords/@CommentModel.UserId/@CommentModel.CommentOwnerName">@CommentModel.CommentOwnerName</a>
+                       href="Words/@CommentModel.UserId/@CommentModel.CommentOwnerName">@CommentModel.CommentOwnerName</a>
                     <lable> form @DateTime.Now.Subtract(CommentModel.CreatedAt).Days day </lable>
                 }
                 <button type="button" style="float:right" class="btn btn-link bg-transparent" @onclick="@(async () => await RemoveComment())">

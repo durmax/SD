@@ -2,17 +2,19 @@
 using SD.Client.Services;
 using SD.Shared;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
 {
-    public class MyWordsBase : ComponentBase
+    public class WordsBase : ComponentBase
     {
         [Inject]
         public WordService WordService { set; get; }
 
         [Parameter]
         public string UserId { get; set; }
+        public string PageHeader { get; set; }
 
         protected bool Collapsed { set; get; } = true;    // hide by default
         protected bool loading = true;
@@ -43,6 +45,14 @@ namespace SD.Client.Pages
         {
             Words = new List<WordDto>();
             await GetNextPage();
+            if (Words.Count > 0)
+            {
+                PageHeader = string.IsNullOrEmpty(UserId) ? "My words" : Words.FirstOrDefault(x => !string.IsNullOrEmpty(x?.UserName))?.UserName + " words";
+            }
+            else
+            {
+                PageHeader = "No words to share!";
+            }
         }
     }
 }

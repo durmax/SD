@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using AKSoftware.Localization.MultiLanguages;
 using System.Linq;
 using System.Net.Http.Json;
+using System;
 
 namespace SD.Client.Pages
 {
@@ -85,8 +86,6 @@ namespace SD.Client.Pages
 
             NewWords.Insert(0, false);
 
-           // if (!CurrentUser.isAuthTested) await CurrUsrService.GetAuth();
-
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
 
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
@@ -97,17 +96,20 @@ namespace SD.Client.Pages
                 }
                 catch { }
             }
+        }
 
-            //if (CurrentUser.IsAuthenticated)
-            //{
-            //    try
-            //    {
-            //        FriendRequestsDictionary = await CurrentUser.HttpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequests");
-            //    }
-            //    catch
-            //    {
-            //    }
-            //}
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender && CurrentUser.IsAuthenticated)
+            {
+                try
+                {
+                    FriendRequestsDictionary = await CurrentUser.HttpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequests");
+                }
+                catch
+                {
+                }
+            }
         }
     }
 }

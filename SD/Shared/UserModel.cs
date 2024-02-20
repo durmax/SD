@@ -25,5 +25,13 @@ namespace SD.Shared
         public string EmailRegCode { get; set; }
         [BsonIgnoreIfNull]
         public int AccountLavel { get; set; }
+        public Role Role { get; set; }
+    }
+
+    public enum Role
+    {
+        Owner = 0,
+        Admin = 1,
+        User = 3,
     }
 }

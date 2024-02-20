@@ -37,7 +37,8 @@ namespace SD.Client.Pages
                     {
                         if (!Registered)
                         {
-                            // userModel.UserId = UserId;
+                            userModel.Role = Role.User;
+
                             var status = await CurrentUser.HttpClient.PostAsJsonAsync("api/User/Create", userModel);
                             if (status.IsSuccessStatusCode)
                             {

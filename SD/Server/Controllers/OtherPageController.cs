@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,9 +13,11 @@ namespace sd.Api.Controllers
     [ApiController]
     public class OtherPageController : ControllerBase
     {
+        private readonly UserService _userService;
         private readonly OtherPageService _otherPageService;
-        public OtherPageController(OtherPageService otherPageService)
+        public OtherPageController(UserService userService, OtherPageService otherPageService)
         {
+            _userService = userService;
             _otherPageService = otherPageService;
         }
 
@@ -59,8 +60,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var email = User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
-                if (email != "dured.maksoud@gmail.com") return StatusCode(StatusCodes.Status401Unauthorized);
+                if ((await _userService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
                 if (page == null)
                     return BadRequest();
@@ -88,8 +88,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var email = User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
-                if (email != "dured.maksoud@gmail.com") return StatusCode(StatusCodes.Status401Unauthorized);
+                if ((await _userService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
                 TransObj status = await _otherPageService.UpdateOtherPage(updatedPage.OtherPageId, updatedPage);
                 if (status.BoolVar)
@@ -114,8 +113,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var email = User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
-                if (email != "dured.maksoud@gmail.com") return StatusCode(StatusCodes.Status401Unauthorized);
+                if ((await _userService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
                 OtherPageModel pageToDelete = await _otherPageService.GetOtherPageById(id);
 

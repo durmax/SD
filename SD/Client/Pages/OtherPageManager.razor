@@ -1,12 +1,11 @@
 ﻿@page "/OtherPageManager/{id}"
+@using System.Security.Claims
 @inherits OtherPageManagerBase
 
 <h3>OtherPage</h3>
 
 <AuthorizeView>
     <Authorized>
-        @if (@context.User.FindFirst(c => c.Type == "email")?.Value == "dured.maksoud@gmail.com")
-        {
             <EditForm Model="@otherPageModel" OnValidSubmit="SaveData" Context="op">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
@@ -132,6 +131,5 @@
             <div class="col-sm-10">
                 <button class="btn btn-outline-danger" @onclick="RemoveOtherPage"><i class="fa fa-trash-o fa-lg"></i> Remove</button>
             </div>
-        }
     </Authorized>
 </AuthorizeView>

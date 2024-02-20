@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +9,7 @@ using SD.Shared;
 
 namespace sd.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OtherPageController : ControllerBase
@@ -18,6 +20,7 @@ namespace sd.Api.Controllers
             _otherPageService = otherPageService;
         }
 
+        [AllowAnonymous]
         // GET: api/OtherPage/ar/de
         [HttpGet("{fromLangCode}/{toLangCode}")]
         public async Task<ActionResult<OtherPageResModel>> GetLinks(string fromLangCode, string toLangCode)
@@ -33,6 +36,7 @@ namespace sd.Api.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult<OtherPageModel>> GetById(string id)
@@ -50,12 +54,14 @@ namespace sd.Api.Controllers
             }
         }
 
-        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(OtherPageModel page)
         {
             try
             {
+                var email = User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+                if (email != "dured.maksoud@gmail.com") return StatusCode(StatusCodes.Status401Unauthorized);
+
                 if (page == null)
                     return BadRequest();
 
@@ -77,12 +83,14 @@ namespace sd.Api.Controllers
             }
         }
 
-        [Authorize]
         [HttpPut]
         public async Task<IActionResult> UpdateOtherPage(OtherPageModel updatedPage)
         {
             try
             {
+                var email = User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+                if (email != "dured.maksoud@gmail.com") return StatusCode(StatusCodes.Status401Unauthorized);
+
                 TransObj status = await _otherPageService.UpdateOtherPage(updatedPage.OtherPageId, updatedPage);
                 if (status.BoolVar)
                 {
@@ -101,12 +109,14 @@ namespace sd.Api.Controllers
             }
         }
 
-        [Authorize]
         [HttpDelete]
         public async Task<ActionResult<bool>> DeleteOtherPage(string id)
         {
             try
             {
+                var email = User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+                if (email != "dured.maksoud@gmail.com") return StatusCode(StatusCodes.Status401Unauthorized);
+
                 OtherPageModel pageToDelete = await _otherPageService.GetOtherPageById(id);
 
                 if (pageToDelete == null)

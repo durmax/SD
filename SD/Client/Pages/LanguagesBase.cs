@@ -183,18 +183,10 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            // Tl = "en";
-            // Fl = "de";
-            //try
-            //{
-                Fl = DefaultLangsService.DefaultWordLang;
+            await DefaultLangsService.SetDefLangsAsync();
+
+            Fl = DefaultLangsService.DefaultWordLang;
                 Tl = DefaultLangsService.DefaultToLang;
-            //}
-            //catch
-            //{
-            //}
-            //Fl = (string.IsNullOrEmpty(Fl) || Fl == "null") ? "en" : Fl;
-            //Tl = (string.IsNullOrEmpty(Tl) || Tl == "null") ? "de" : Tl;
 
             SelectedFL = new LangCode
             {

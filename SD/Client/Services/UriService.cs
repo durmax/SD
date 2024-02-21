@@ -27,7 +27,7 @@ namespace SD.Client.Services
             _linkModel.TLangCode = linkParam.TLangCode;
 
             _linkModel.FLangName = _langCodeService.Langs[linkParam.FLangCode]; // Get LangName from dictionery names
-            _linkModel.TLangName = _langCodeService.Langs[linkParam.TLangCode];     // GetLangName
+            _linkModel.TLangName = _langCodeService.Langs[linkParam.TLangCode]; // GetLangName
 
 
             _linkModel.Word = linkParam.Word;

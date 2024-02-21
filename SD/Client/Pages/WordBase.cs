@@ -66,7 +66,7 @@ namespace SD.Client.Pages
 
         protected IEnumerable<string> SameWords { get; set; }
         protected IEnumerable<string> LanguageToolWords { get; set; }
-        private string? FavSite { get; set; }
+        private string FavSite { get; set; }
 
         protected List<CommentModel> WordComments { get; set; }
 
@@ -421,7 +421,7 @@ namespace SD.Client.Pages
             }
             try
             {
-                FavSite = await LocalStorageService.GetItemAsStringAsync("fav" + "-" + fl + "-" + tl);
+                FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + fl + "-" + tl);
             }
             catch { }
         }

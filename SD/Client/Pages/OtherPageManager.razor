@@ -6,130 +6,159 @@
 
 <AuthorizeView>
     <Authorized>
-            <EditForm Model="@otherPageModel" OnValidSubmit="SaveData" Context="op">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <div class="form-group row">
-                    <div class="col-sm-10">
-                        <InputText id="Name" class="form-control" placeholder="Host"
-                                   @bind-Value="otherPageModel.Host" />
-                    </div>
+        <EditForm Model="@otherPageModel" OnValidSubmit="SaveData" Context="op">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <InputText id="Name" class="form-control" placeholder="Host"
+                               @bind-Value="otherPageModel.Host" />
                 </div>
-
-                <div class="form-group row">
-                    <div class="col-sm-10">
-                        <InputText id="email" class="form-control" placeholder="PageType"
-                                   @bind-Value="otherPageModel.PageType" />
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-sm-10">
-                        <InputNumber id="email" class="form-control" placeholder="Eval"
-                                     @bind-Value="otherPageModel.Eval" />
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-sm-10">
-                        <InputText id="Name" class="form-control" placeholder="Pattern"
-                                   @bind-Value="otherPageModel.Pattern" />
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-sm-10">
-                        <div class="input-group mb-3">
-                            <select class="custom-select" id="PrimLangs" @bind="TempPrimLang">
-                                <option selected value="All">All</option>
-                                @foreach (var lang in LangCodeService.Langs)
-                                {
-                                    <option value="@lang.Key">@lang.Value</option>
-                                }
-                            </select>
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button" @onclick="(() => AddPrimLang(TempPrimLang))">Add PrimLang</button>
-                            </div>
-                        </div>
-
-                        @if (PrimLangs != null)
-                        {
-                            <div class="input-group mb-3" style="width:auto;">
-                                <ul class="form-check form-check-inline">
-                                    @foreach (var item in PrimLangs)
-                                    {
-                                        <li @key="item"
-                                            class="btn btn-outline-secondary form-check-inline">
-                                            <label class="form-check-label">
-                                                @item
-                                            </label>
-                                            <button type="button" class="btn btn-link"
-                                                    @onclick="(() => RemovePrimLang(item))">
-                                                (&#9747;)
-                                            </button>
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
-                        }
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-sm-10">
-                        <div class="input-group mb-3">
-                            <select class="custom-select" id="PrimLangs" @bind="TempSecLang">
-                                <option selected  value="All">All</option>
-                                @foreach (var lang in LangCodeService.Langs)
-                                {
-                                    <option value="@lang.Key">@lang.Value</option>
-                                }
-                            </select>
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button" @onclick="(() => AddSecLang(TempSecLang))">Add SecLang</button>
-                            </div>
-                        </div>
-
-                        @if (SecLangs != null)
-                        {
-                            <div class="input-group mb-3" style="width:auto;">
-                                <ul class="form-check form-check-inline">
-                                    @foreach (var item in SecLangs)
-                                    {
-                                        <li @key="item"
-                                            class="btn btn-outline-secondary form-check-inline">
-                                            <label class="form-check-label">
-                                                @item
-                                            </label>
-                                            <button type="button" class="btn btn-link"
-                                                    @onclick="(() => RemoveSecLang(item))">
-                                                (&#9747;)
-                                            </button>
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
-                        }
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-sm-10">
-                        <div class="alert alert-primary @InfoShowClass" role="alert">
-                            @Info
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-sm-10">
-                        <button type="submit" class="btn btn-outline-primary"><i class="fa fa-save"></i> Save</button>
-                    </div>
-
-                </div>
-            </EditForm>
-            <div class="col-sm-10">
-                <button class="btn btn-outline-danger" @onclick="RemoveOtherPage"><i class="fa fa-trash-o fa-lg"></i> Remove</button>
             </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <InputText id="email" class="form-control" placeholder="PageType"
+                               @bind-Value="otherPageModel.PageType" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <InputNumber id="email" class="form-control" placeholder="Eval"
+                                 @bind-Value="otherPageModel.Eval" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <InputText id="Name" class="form-control" placeholder="Pattern"
+                               @bind-Value="otherPageModel.Pattern" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <div class="input-group mb-3">
+                        <select class="custom-select" id="PrimLangs" @bind="TempPrimLang">
+                            <option selected value="All">All</option>
+                            @foreach (var lang in LangCodeService.Langs)
+                            {
+                                <option value="@lang.Key">@lang.Value</option>
+                            }
+                        </select>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" @onclick="(() => AddPrimLang(TempPrimLang))">Add PrimLang</button>
+                        </div>
+                    </div>
+
+                    @if (PrimLangs != null)
+                    {
+                        <div class="input-group mb-3" style="width:auto;">
+                            <ul class="form-check form-check-inline">
+                                @foreach (var item in PrimLangs)
+                                {
+                                    <li @key="item"
+                                        class="btn btn-outline-secondary form-check-inline">
+                                        <label class="form-check-label">
+                                            @item
+                                        </label>
+                                        <button type="button" class="btn btn-link"
+                                                @onclick="(() => RemovePrimLang(item))">
+                                            (&#9747;)
+                                        </button>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <div class="input-group mb-3">
+                        <select class="custom-select" id="PrimLangs" @bind="TempSecLang">
+                            <option selected value="All">All</option>
+                            @foreach (var lang in LangCodeService.Langs)
+                            {
+                                <option value="@lang.Key">@lang.Value</option>
+                            }
+                        </select>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" @onclick="(() => AddSecLang(TempSecLang))">Add SecLang</button>
+                        </div>
+                    </div>
+
+                    @if (SecLangs != null)
+                    {
+                        <div class="input-group mb-3" style="width:auto;">
+                            <ul class="form-check form-check-inline">
+                                @foreach (var item in SecLangs)
+                                {
+                                    <li @key="item"
+                                        class="btn btn-outline-secondary form-check-inline">
+                                        <label class="form-check-label">
+                                            @item
+                                        </label>
+                                        <button type="button" class="btn btn-link"
+                                                @onclick="(() => RemoveSecLang(item))">
+                                            (&#9747;)
+                                        </button>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <div class="alert alert-primary @InfoShowClass" role="alert">
+                        @Info
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-outline-primary"><i class="fa fa-save"></i> Save</button>
+                </div>
+
+            </div>
+        </EditForm>
+        <div class="col-sm-10">
+            <button class="btn btn-outline-danger" @onclick="RemoveOtherPage"><i class="fa fa-trash-o fa-lg"></i> Remove</button>
+        </div>
     </Authorized>
 </AuthorizeView>
+
+
+<br />
+<br />
+
+<a href="https://chat.openai.com/c/e4806437-ad9f-49ca-8a5e-a552ef1a22d2">https://chat.openai.com</a>
+<pre>
+
+Break down the URL and give me the pattern as the following example:
+
+URL: https://context.reverso.net/translation/german-arabic/Test
+Source Language: german
+Target Language: arabic
+Word: Test
+
+The result pattern is:
+context.reverso.net/translation/:FLangName:-:TLangName:/:Word:
+
+I'm using this coding
+:Word: => the word to translate
+:FLangName: => from Language name (german)
+:TLangName: => to Language name (arabic)
+:FLangCode: => from Language code (de)
+:TLangCode: => to Language code (ar)
+
+Provide me the pattern of the 
+URL: https://www.deepl.com/translator#de/en/Test
+
+</pre>

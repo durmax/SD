@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 using SD.Shared;
 using System.Collections.Generic;
 using AKSoftware.Localization.MultiLanguages;
-using System.Linq;
 using System.Net.Http.Json;
-using System;
 
 namespace SD.Client.Pages
 {
@@ -28,7 +26,7 @@ namespace SD.Client.Pages
         protected Dictionary<string, string> FriendRequestsDictionary = new();
 
         protected List<WordDto> Words { get; set; } = new List<WordDto>();
-        protected List<bool> NewWords { get; set; } = new List<bool>();
+        protected int NewWords { get; set; }
 
         [Inject]
         public WordService WordService { set; get; }
@@ -37,22 +35,10 @@ namespace SD.Client.Pages
         protected bool loading;
         protected int currentPage = 1;
 
-        protected void OnSelectedAsync(int selection)
+        protected void AddNewWord()
         {
-            switch (selection)
-            {
-                case 0:
-                    NewWords.Insert(0, false);
-                    break;
-                case 1:
-                    NewWords.Insert(0, true);
-                    break;
-                case 2:
-                    if (NewWords.Count > 1) NewWords.Remove(NewWords.Last());
-                    break;
-                default:
-                    break;
-            }
+            NewWords++;
+            Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang });
         }
 
         protected async Task GetNextPage()
@@ -65,14 +51,14 @@ namespace SD.Client.Pages
         }
         protected void NewWordHandler(WordDto newWord)
         {
-            Words.Insert(0, newWord);
+            Words.Insert(Words.Count, newWord);
             currentPage++;
         }
         protected void OldWordHandler(WordDto oldWord)
         {
             if (!Words.Exists(w => w.WordId == oldWord.WordId))
             {
-                Words.Insert(0, oldWord);
+                Words.Insert(Words.Count, oldWord);
             }
         }
         protected void DeleteWordHandler(WordDto word)
@@ -84,7 +70,8 @@ namespace SD.Client.Pages
         {
             await DefaultLangsService.SetDefLangsAsync();
 
-            NewWords.Insert(0, false);
+            Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang });
+
 
             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
 

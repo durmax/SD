@@ -10,7 +10,7 @@
 
 @if (WordDto != null)
 {
-    <div class="card mt-1 position-relative @(string.IsNullOrEmpty(WordDto.WordId)? "border-primary": "border-dark")">
+    <div class="card mt-1 position-relative @(!Guid.TryParse(WordDto?.WordId, out Guid result)? "border-primary": "border-dark")">
         @if (!string.IsNullOrEmpty(WordDto.UserName))
         {
             <div class="card-header p-0">

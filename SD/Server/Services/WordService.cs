@@ -61,12 +61,12 @@ namespace sd.Api.Services
 
         public async Task<bool> IsWordSharedWithUser(WordDto wordDto, string? userId)
         {
-            if (userId == wordDto.UserId)
+            if (userId == wordDto?.UserId)
             {
                 return true;
             }
 
-            var relationshipId = await _relationshipService.GetRelationshipId(userId, Relation.Friend, wordDto.UserId);
+            var relationshipId = await _relationshipService.GetRelationshipId(userId, Relation.Friend, wordDto?.UserId);
 
             if (!string.IsNullOrEmpty(relationshipId))
             {
@@ -74,7 +74,7 @@ namespace sd.Api.Services
             }
             else
             {
-                return wordDto.ShareWith == ShareWith.Public;
+                return wordDto?.ShareWith == ShareWith.Public;
             }
         }
 
@@ -98,7 +98,6 @@ namespace sd.Api.Services
         public async Task<WordModel> GetWordById(string id)
         {
             return await _wordRepository.GetWordById(id);
-
         }
 
         public async Task<WordDto> GetWordByText(string userId, string text)

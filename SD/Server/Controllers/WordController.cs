@@ -111,7 +111,7 @@ namespace sd.Api.Controllers
 
                 word.UserId = (await _userService.GetCurrentUser(User))?.UserId;
 
-                if (!string.IsNullOrEmpty(word?.WordId) && await _wordService.GetWordById(word.WordId) != null)
+                if (Guid.TryParse(word?.WordId, out Guid result) && await _wordService.GetWordById(word.WordId) != null)
                 {
                     await _wordService.UpdateWord(word);
                     return StatusCode(StatusCodes.Status202Accepted,

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using Newtonsoft.Json;
 using SD.Client.Services;
 using SD.Shared;
 using System;
@@ -151,9 +150,11 @@ namespace SD.Client.Pages
                     if ((int)respons.StatusCode == 200)
                     {
                         note = $"{WordDto.Title} is Saved";
+                        string oId = WordDto.WordId;
                         WordDto.WordId = await respons.Content.ReadAsStringAsync();
                         await OnWordSave.InvokeAsync(WordDto);
-                        await NewWordAsync();
+
+                        await NewWordAsync(oId);
                     }
                 }
             }
@@ -202,10 +203,11 @@ namespace SD.Client.Pages
             }
         }
 
-        protected async Task NewWordAsync()
+        protected async Task NewWordAsync(string wordId)
         {
             WordDto = new()
             {
+                WordId = wordId,
                 WordLang = DefaultLangsService.DefaultWordLang,
                 ToLang = DefaultLangsService.DefaultToLang,
                 ShareWith = WordDto?.ShareWith ?? ShareWith.Public,
@@ -246,10 +248,10 @@ namespace SD.Client.Pages
 
         protected async Task SetWord(string id)
         {
-            if (CurrentUser.IsAuthenticated)
+            if (CurrentUser.IsAuthenticated && !string.IsNullOrEmpty(id))
             {
                 var wDto = await WordService.GetWordById(id);
-                await OnWordFound.InvokeAsync(wDto);
+                if (wDto != null) await OnWordFound.InvokeAsync(wDto);
             }
         }
 
@@ -326,26 +328,32 @@ namespace SD.Client.Pages
         protected async Task DeleteWord()
         {
             loading = true;
-
-            if (CurrentUser.IsAuthenticated && !string.IsNullOrWhiteSpace(WordDto.WordId))// is not a new word
+            if (Guid.TryParse(WordDto?.WordId, out Guid result))// is not a new word
             {
                 if (CurrentUser.IsAuthenticated)
                 {
-                    bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete '" + WordDto.Title + "', are you sure?");
-                    if (confirmed)
+                    if (CurrentUser.IsAuthenticated)
                     {
-                        var response = await WordService.RemoveWord(WordDto.WordId);
-                        if (response.IsSuccessStatusCode)
+                        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete '" + WordDto.Title + "', are you sure?");
+                        if (confirmed)
                         {
-                            await OnWordDelete.InvokeAsync(WordDto);
-                        }
-                        else
-                        {
-                            //note = $"You can NOT delete {wordModel.Title}";
-                            await JsRuntime.InvokeVoidAsync("alert", $"You do NOT have a promising to delete '{WordDto.Title}'");
+                            var response = await WordService.RemoveWord(WordDto.WordId);
+                            if (response.IsSuccessStatusCode)
+                            {
+                                await OnWordDelete.InvokeAsync(WordDto);
+                            }
+                            else
+                            {
+                                //note = $"You can NOT delete {wordModel.Title}";
+                                await JsRuntime.InvokeVoidAsync("alert", $"You do NOT have a promising to delete '{WordDto.Title}'");
+                            }
                         }
                     }
                 }
+            }
+            else
+            {
+                await OnWordDelete.InvokeAsync(WordDto);
             }
             loading = false;
         }
@@ -406,19 +414,9 @@ namespace SD.Client.Pages
         }
         private async Task GetFavLinkAsync()
         {
-            string fl;
-            string tl;
+            string fl = WordDto?.WordLang ?? DefaultLangsService.DefaultWordLang;
+            string tl = WordDto?.ToLang ?? DefaultLangsService.DefaultToLang;
 
-            if (WordDto != null)
-            {
-                fl = WordDto.WordLang;
-                tl = WordDto.ToLang;
-            }
-            else
-            {
-                fl = DefaultLangsService.DefaultWordLang;
-                tl = DefaultLangsService.DefaultToLang;
-            }
             try
             {
                 FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + fl + "-" + tl);
@@ -428,7 +426,7 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            if (!string.IsNullOrEmpty(WordId))
+            if (Guid.TryParse(WordId, out Guid result))
             {
                 try
                 {
@@ -440,9 +438,9 @@ namespace SD.Client.Pages
                 }
             }
 
-            if (WordDto == null || string.IsNullOrWhiteSpace(WordDto.WordId))
+            if (WordDto == null || !Guid.TryParse(WordDto.WordId, out Guid res))
             {
-                await NewWordAsync();
+                await NewWordAsync(WordDto.WordId);
             }
             else
             {

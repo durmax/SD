@@ -16,7 +16,7 @@ namespace SD.Client.Pages
         public string UserId { get; set; }
         public string PageHeader { get; set; }
 
-        protected bool Collapsed { set; get; } = true;    // hide by default
+        //protected bool Collapsed { set; get; } = true;    // hide by default
         protected bool loading = true;
         protected int currentPage = 1;
         protected List<WordDto> Words { get; set; }

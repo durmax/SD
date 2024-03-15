@@ -13,11 +13,11 @@ namespace sd.Api.Controllers
     [ApiController]
     public class OtherPageController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly CurrUsrService _currUsrService;
         private readonly OtherPageService _otherPageService;
-        public OtherPageController(UserService userService, OtherPageService otherPageService)
+        public OtherPageController(OtherPageService otherPageService, CurrUsrService currUsrService)
         {
-            _userService = userService;
+            _currUsrService = currUsrService;
             _otherPageService = otherPageService;
         }
 
@@ -60,7 +60,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                if ((await _userService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
+                if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
                 if (page == null)
                     return BadRequest();
@@ -88,7 +88,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                if ((await _userService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
+                if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
                 TransObj status = await _otherPageService.UpdateOtherPage(updatedPage.OtherPageId, updatedPage);
                 if (status.BoolVar)
@@ -113,7 +113,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                if ((await _userService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
+                if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
                 OtherPageModel pageToDelete = await _otherPageService.GetOtherPageById(id);
 

@@ -12,7 +12,6 @@ using Microsoft.Identity.Web;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
-using SD.Shared;
 
 namespace sd.Api
 {
@@ -45,16 +44,18 @@ namespace sd.Api
             //services.AddSingleton<MongodbContext>(x => new MongodbContext(x.GetRequiredService<IMongodbSettings>()));
             services.AddSingleton<MongodbContext>();
 
-            services.AddScoped<IOtherPageRepository, OtherPageRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IWordRepository, WordRepository>();
-            services.AddScoped<ICommentService, CommentService>();
-            services.AddScoped<ILikeWordService, LikeWordService>();
-            services.AddScoped<IRelationshipRepository, RelationshipRepository>();
-            services.AddScoped<WordService>();
-            services.AddScoped<RelationshipService>();
-            services.AddScoped<UserService>();
-            services.AddScoped<OtherPageService>();
+            services.AddScoped<CurrUsrService>();
+            
+            services.AddSingleton<IOtherPageRepository, OtherPageRepository>();
+            services.AddSingleton<IUserRepository, UserRepository>();
+            services.AddSingleton<IWordRepository, WordRepository>();
+            services.AddSingleton<ICommentService, CommentService>();
+            services.AddSingleton<ILikeWordService, LikeWordService>();
+            services.AddSingleton<IRelationshipRepository, RelationshipRepository>();
+            services.AddSingleton<WordService>();
+            services.AddSingleton<RelationshipService>();
+            services.AddSingleton<UserService>();
+            services.AddSingleton<OtherPageService>();
 
             services.AddDataProtection();
 

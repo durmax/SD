@@ -15,11 +15,13 @@ namespace sd.Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly CurrUsrService _currUsrService;
         private readonly UserService _userService;
         private readonly RelationshipService _relationshipService;
 
-        public UserController(UserService userService, RelationshipService relationshipService)
+        public UserController(UserService userService, RelationshipService relationshipService, CurrUsrService currUsrService)
         {
+            _currUsrService = currUsrService;
             _userService = userService;
             _relationshipService = relationshipService;
         }
@@ -47,7 +49,7 @@ namespace sd.Api.Controllers
             {
                 foundUsers = await _userService.SearchUser(searchText);
 
-                IEnumerable<UserRelationshipsWithOneUserDto> result = await _relationshipService.GetRelationships((await _userService.GetCurrentUser(User))?.UserId, foundUsers);
+                IEnumerable<UserRelationshipsWithOneUserDto> result = await _relationshipService.GetRelationships((await _currUsrService.GetCurrentUser(User))?.UserId, foundUsers);
                 if (result == null) return NotFound();
                 return Ok(result);
             }
@@ -64,7 +66,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var result = await _userService.GetUserById((await _userService.GetCurrentUser(User))?.UserId);
+                var result = await _userService.GetUserById((await _currUsrService.GetCurrentUser(User))?.UserId);
                 if (result == null) return NotFound();
                 return result;
             }

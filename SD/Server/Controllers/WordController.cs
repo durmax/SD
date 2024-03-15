@@ -7,7 +7,6 @@ using sd.Api.Interfaces;
 using SD.Shared;
 using sd.Api.Services;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 
 
 namespace sd.Api.Controllers
@@ -17,14 +16,16 @@ namespace sd.Api.Controllers
     [ApiController]
     public class WordController : ControllerBase
     {
+        private readonly CurrUsrService _currUsrService;
         private readonly UserService _userService;
         private readonly ILikeWordService _likeWord;
         private readonly WordService _wordService;
         private readonly RelationshipService _relationshipService;
 
         public WordController(UserService userService, ILikeWordService likeWord,
-        WordService wordService, RelationshipService relationshipService)
+        WordService wordService, RelationshipService relationshipService, CurrUsrService currUsrService)
         {
+            _currUsrService = currUsrService;
             _userService = userService;
             _likeWord = likeWord;
             _wordService = wordService;
@@ -37,7 +38,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var currentUserId = (await _userService.GetCurrentUser(User))?.UserId;
+                var currentUserId = (await _currUsrService.GetCurrentUser(User))?.UserId;
                 var wordDto = await _wordService.GetWordDtoById(id, currentUserId);
 
                 if (wordDto == null) return NotFound();
@@ -74,7 +75,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var ws = await _wordService.GetWordsContainText((await _userService.GetCurrentUser(User))?.UserId, title);
+                var ws = await _wordService.GetWordsContainText((await _currUsrService.GetCurrentUser(User))?.UserId, title);
                 return Ok(ws);
             }
             catch (Exception ex)
@@ -90,7 +91,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var res = await _wordService.GetPageWords((await _userService.GetCurrentUser(User))?.UserId, userId, null, pageSize, currentPage);
+                var res = await _wordService.GetPageWords((await _currUsrService.GetCurrentUser(User))?.UserId, userId, null, pageSize, currentPage);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -109,7 +110,7 @@ namespace sd.Api.Controllers
                 if (string.IsNullOrWhiteSpace(word?.Title))
                     return BadRequest();
 
-                word.UserId = (await _userService.GetCurrentUser(User))?.UserId;
+                word.UserId = (await _currUsrService.GetCurrentUser(User))?.UserId;
 
                 if (Guid.TryParse(word?.WordId, out Guid result) && await _wordService.GetWordById(word.WordId) != null)
                 {
@@ -145,7 +146,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var currentUser = (await _userService.GetCurrentUser(User))?.UserId;
+                var currentUser = (await _currUsrService.GetCurrentUser(User))?.UserId;
                 if (updatedWord.UserId != currentUser) return StatusCode(StatusCodes.Status401Unauthorized);
 
                 int statusCode = await _wordService.UpdateWord(updatedWord) ? StatusCodes.Status204NoContent : StatusCodes.Status500InternalServerError;
@@ -164,7 +165,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var currentUser = (await _userService.GetCurrentUser(User))?.UserId;
+                var currentUser = (await _currUsrService.GetCurrentUser(User))?.UserId;
                 var w = await _wordService.GetWordById(id);
                 if (w?.UserId != currentUser) return StatusCode(StatusCodes.Status401Unauthorized);
 
@@ -184,7 +185,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                return await _likeWord.Like((await _userService.GetCurrentUser(User))?.UserId, wordId);
+                return await _likeWord.Like((await _currUsrService.GetCurrentUser(User))?.UserId, wordId);
             }
             catch (Exception ex)
             {
@@ -202,7 +203,7 @@ namespace sd.Api.Controllers
                 var word = await _wordService.GetWordById(wordId);
 
                 var foundUsers = await _userService.GetUsers(word.Likes);
-                var result = await _relationshipService.GetRelationships((await _userService.GetCurrentUser(User))?.UserId, foundUsers);
+                var result = await _relationshipService.GetRelationships((await _currUsrService.GetCurrentUser(User))?.UserId, foundUsers);
 
                 if (result == null) return NotFound();
                 return Ok(result);

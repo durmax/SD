@@ -2,7 +2,6 @@
 using SD.Shared;
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace sd.Api.Services
@@ -13,17 +12,6 @@ namespace sd.Api.Services
         public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-        }
-
-        public async Task<UserModel?> GetCurrentUser(ClaimsPrincipal user)
-        {
-            if (user?.Identity != null && user.Identity.IsAuthenticated)
-            {
-                var email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
-
-                return await GetUserByEmail(email) ?? await RegisterUserAsync(email);
-            }
-            else return null;
         }
 
         public async Task<IEnumerable<UserModel>> GetAllUsers()
@@ -48,7 +36,7 @@ namespace sd.Api.Services
 
         public async Task<UserModel?> GetUserByEmail(string? email)
         {
-            return email != null ? await _userRepository.GetUserByEmail(email) : null;
+            return !string.IsNullOrEmpty(email) ? await _userRepository.GetUserByEmail(email) : null;
         }
 
         public async Task<UserModel?> RegisterUserAsync(string userEmail)

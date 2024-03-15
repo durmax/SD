@@ -14,16 +14,13 @@ namespace sd.Api.Controllers
     [ApiController]
     public class RelationshipController : ControllerBase
     {
+        private readonly CurrUsrService _currUsrService;
         private readonly RelationshipService _relationshipService;
-        private readonly UserService _userService;
 
-        //private readonly UserService _userService;
-
-        public RelationshipController(RelationshipService relationshipService, UserService userService)
+        public RelationshipController(RelationshipService relationshipService, CurrUsrService currUsrService)
         {
+            _currUsrService = currUsrService;
             _relationshipService = relationshipService;
-            _userService = userService;
-            //_userService = userService;
         }
 
         [HttpGet("{id}")]
@@ -49,7 +46,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                relationship.UserId1 = (await _userService.GetCurrentUser(User))?.UserId;
+                relationship.UserId1 = (await _currUsrService.GetCurrentUser(User))?.UserId;
                 return await _relationshipService.AddRelationship(relationship);
             }
             catch (Exception ex)
@@ -94,7 +91,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var rId = await _relationshipService.GetRelationshipId((await _userService.GetCurrentUser(User))?.UserId, reletion, friendId);
+                var rId = await _relationshipService.GetRelationshipId((await _currUsrService.GetCurrentUser(User))?.UserId, reletion, friendId);
                 await _relationshipService.RemoveRelationship(rId);
                 return StatusCode(StatusCodes.Status200OK);
             }
@@ -111,7 +108,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var result = await _relationshipService.GetAllFriends((await _userService.GetCurrentUser(User))?.UserId);
+                var result = await _relationshipService.GetAllFriends((await _currUsrService.GetCurrentUser(User))?.UserId);
 
                 if (result == null) return NotFound();
 
@@ -130,7 +127,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                var result = await _relationshipService.FriendRequestsToUser((await _userService.GetCurrentUser(User))?.UserId);
+                var result = await _relationshipService.FriendRequestsToUser((await _currUsrService.GetCurrentUser(User))?.UserId);
 
                 if (result == null) return NotFound();
 

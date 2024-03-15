@@ -15,12 +15,13 @@ namespace sd.Api.Controllers
     public class CommentController : ControllerBase
     {
         private readonly ICommentService _commentService;
-        private readonly UserService _userService;
 
-        public CommentController(ICommentService commentService, UserService userService)
+        private readonly CurrUsrService _currUsrService;
+
+        public CommentController(ICommentService commentService, CurrUsrService currUsrService)
         {
+            _currUsrService = currUsrService;
             _commentService = commentService;
-            _userService = userService;
         }
 
         [HttpGet("{wordId}")]
@@ -42,8 +43,8 @@ namespace sd.Api.Controllers
         [Route("{wordId}")]
         public async Task<ActionResult> SaveComment(string wordId, CommentModel comment)
         {
-            if (string.IsNullOrEmpty(comment?.UserId)) comment.UserId = (await _userService.GetCurrentUser(User))?.UserId;
-            if (string.IsNullOrEmpty(comment?.CommentOwnerName)) comment.CommentOwnerName = (await _userService.GetCurrentUser(User))?.Name;
+            if (string.IsNullOrEmpty(comment?.UserId)) comment.UserId = (await _currUsrService.GetCurrentUser(User))?.UserId;
+            if (string.IsNullOrEmpty(comment?.CommentOwnerName)) comment.CommentOwnerName = (await _currUsrService.GetCurrentUser(User))?.Name;
 
             if (await _commentService.SaveComment(wordId, comment))
                 return StatusCode(StatusCodes.Status200OK);
@@ -58,7 +59,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                return Ok(await _commentService.Like((await _userService.GetCurrentUser(User))?.UserId, wordId, commentId));
+                return Ok(await _commentService.Like((await _currUsrService.GetCurrentUser(User))?.UserId, wordId, commentId));
             }
             catch (Exception ex)
             {
@@ -73,7 +74,7 @@ namespace sd.Api.Controllers
         {
             try
             {
-                return Ok(await _commentService.Delete((await _userService.GetCurrentUser(User))?.UserId, wordId, commentId));
+                return Ok(await _commentService.Delete((await _currUsrService.GetCurrentUser(User))?.UserId, wordId, commentId));
 
             }
             catch (Exception)

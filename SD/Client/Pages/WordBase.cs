@@ -142,7 +142,7 @@ namespace SD.Client.Pages
                     if ((int)respons.StatusCode == 302)
                     {
                         cssClassUpdate = null;
-                        foundWordDtoToUpdate = JsonConvert.DeserializeObject <WordDto>(await respons.Content.ReadAsStringAsync());
+                        foundWordDtoToUpdate = JsonConvert.DeserializeObject<WordDto>(await respons.Content.ReadAsStringAsync());
                     }
                     //note = await respons.Content.ReadAsStringAsync();
                 }
@@ -152,8 +152,8 @@ namespace SD.Client.Pages
                     {
                         note = $"{WordDto.Title} is Saved";
 
-                        WordDto.WordId = foundWordDtoToUpdate.WordId;
-                        await OnWordSave.InvokeAsync();
+                        WordDto.WordId = foundWordDtoToUpdate?.WordId;
+                        await OnWordSave.InvokeAsync(WordDto);
                     }
                 }
             }
@@ -185,7 +185,7 @@ namespace SD.Client.Pages
                     else
                     {
                         note = $"{WordDto.Title} is Updated";
-                        await OnWordSave.InvokeAsync();
+                        await OnWordSave.InvokeAsync(WordDto);
                     }
                     foundWordDtoToUpdate = null;
                 }
@@ -195,24 +195,6 @@ namespace SD.Client.Pages
             {
                 NavigationManager.NavigateTo("/authentication/login");
             }
-        }
-
-        protected async Task NewWordAsync(string wordId)
-        {
-            WordDto = new()
-            {
-                WordId = wordId,
-                WordLang = DefaultLangsService.DefaultWordLang,
-                ToLang = DefaultLangsService.DefaultToLang,
-                ShareWith = WordDto?.ShareWith ?? ShareWith.Public,
-                Explain = null
-            };
-            MyText = null;
-            SetMyText();
-            ShareWithImageSRC = "/icons/Save" + WordDto.ShareWith.ToString() + ".svg";
-
-            if (string.IsNullOrWhiteSpace(WordDto.WordLang)) WordDto.WordLang = DefaultLangsService.DefaultWordLang;
-            if (string.IsNullOrWhiteSpace(WordDto.ToLang)) WordDto.ToLang = DefaultLangsService.DefaultToLang;
         }
 
         protected async Task WordChangedAsync(string title)
@@ -243,7 +225,14 @@ namespace SD.Client.Pages
             if (CurrentUser.IsAuthenticated && !string.IsNullOrEmpty(id))
             {
                 var wDto = await WordService.GetWordById(id);
-                if (wDto != null) await OnWordFound.InvokeAsync(wDto);
+                if (wDto != null)
+                {
+                    await OnWordFound.InvokeAsync(wDto); 
+                }
+                else
+                {
+                    note = "The Word is not found!";
+                }
             }
         }
 

@@ -6,6 +6,8 @@ using SD.Shared;
 using System.Collections.Generic;
 using AKSoftware.Localization.MultiLanguages;
 using System.Net.Http.Json;
+using System.Linq;
+using System;
 
 namespace SD.Client.Pages
 {
@@ -49,9 +51,25 @@ namespace SD.Client.Pages
             currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }
-        protected void NewWordHandler()
+        protected void NewWordHandler(WordDto word)
         {
-             AddNewWord();
+            var ws = Words.FindAll(w => w.WordId == word.WordId);
+            if (ws.Count > 1) // by update, it will be 2
+            {
+                int maxIndex = -1; // Initialize with an invalid index
+
+                foreach (var item in ws)
+                {
+                    int index = Words.FindLastIndex(w => w.WordId == item.WordId); // Find the last index of matching item
+                    if (index > maxIndex)
+                    {
+                        maxIndex = index; // Update maxIndex if a higher index is found
+                    }
+                }
+
+                Words.RemoveAt(maxIndex); // Remove the old word by update
+            }
+            AddNewWord();
             currentPage++;
         }
         protected void OldWordHandler(WordDto oldWord)

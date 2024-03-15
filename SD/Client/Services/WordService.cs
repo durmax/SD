@@ -26,10 +26,18 @@ namespace SD.Client.Services
         {
             return await _currentUser.HttpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWords/{userId ?? "0"}/{pageSize}/{currentPage}");
         }
-        
+
         public async Task<WordDto> GetWordById(string id)
         {
-            return await _currentUser.HttpClient.GetFromJsonAsync<WordDto>($"api/Word/{id}");
+            try
+            {
+                var res = await _currentUser.HttpClient.GetFromJsonAsync<WordDto>($"api/Word/{id}");
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public async Task<List<string>> GetWordsContainText(string title)

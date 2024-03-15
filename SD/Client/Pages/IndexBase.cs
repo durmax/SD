@@ -49,9 +49,9 @@ namespace SD.Client.Pages
             currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }
-        protected void NewWordHandler(WordDto newWord)
+        protected void NewWordHandler()
         {
-            Words.Insert(Words.Count, newWord);
+             AddNewWord();
             currentPage++;
         }
         protected void OldWordHandler(WordDto oldWord)
@@ -63,7 +63,11 @@ namespace SD.Client.Pages
         }
         protected void DeleteWordHandler(WordDto word)
         {
-            Words.Remove(word);
+            int index = Words.FindIndex(w => w.Equals(word));
+            if (index != -1)
+            {
+                Words.RemoveAt(index);
+            }
             currentPage--;
         }
         protected override async Task OnInitializedAsync()

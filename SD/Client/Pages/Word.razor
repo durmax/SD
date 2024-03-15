@@ -112,7 +112,7 @@
                         <button type="button" class="btn btn-outline-secondary" @onclick="UpdateWord">
                             Update <i class="fas fa-question-circle"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-secondary" @onclick="@(()=> {foundWordIdToUpdate=""; cssClassUpdate = "d-none";})">
+                        <button type="button" class="btn btn-outline-secondary" @onclick="@(()=> {foundWordDtoToUpdate=null; cssClassUpdate = "d-none";})">
                             Cancel <i class="fas fa-window-close"></i>
                         </button>
                     </div>

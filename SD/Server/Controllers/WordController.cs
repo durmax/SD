@@ -103,7 +103,7 @@ namespace sd.Api.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<string>> Create(WordDto word)
+        public async Task<ActionResult<WordDto>> Create(WordDto word)
         {
             try
             {
@@ -123,15 +123,14 @@ namespace sd.Api.Controllers
 
                 if (wordToInsert != null)
                 {
-                    return StatusCode(StatusCodes.Status302Found,
-                       $"{wordToInsert?.WordId}");    // returen word id that found
+                    return StatusCode(StatusCodes.Status302Found, wordToInsert);
                 }
 
                 word.WordId = await _wordService.AddWord(word);
 
                 int statusCode = !string.IsNullOrWhiteSpace(word.WordId) ? StatusCodes.Status200OK : StatusCodes.Status500InternalServerError;
 
-                return StatusCode(statusCode, word.WordId);
+                return StatusCode(statusCode, word);
             }
             catch (Exception)
             {

@@ -100,7 +100,7 @@ namespace SD.Client.Pages
                 i++;
                 oPage.Eval = i;
             }
-            await LocalStorageService.SetItemAsync(FLangCode + "-" + TLangCode, otherPageModels);
+            await LocalStorageService.SetItemAsync($"{FLangCode}-{TLangCode}", otherPageModels);
             opRes = null;
             opRes = OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
         }
@@ -144,7 +144,7 @@ namespace SD.Client.Pages
                     otherPageModels = null;
                     opRes = null;
 
-                    var OPStr = await LocalStorageService.GetItemAsync<string>(FLangCode + "-" + TLangCode);
+                    var OPStr = await LocalStorageService.GetItemAsync<string>($"{FLangCode}-{TLangCode}");
                     if (!string.IsNullOrEmpty(OPStr) && OPStr != "null")
                     {
                         otherPageModels = JsonConvert.DeserializeObject<List<OtherPageResModel>>(OPStr);
@@ -156,7 +156,7 @@ namespace SD.Client.Pages
                         {
                             try
                             {
-                                await LocalStorageService.SetItemAsync(FLangCode + "-" + TLangCode, otherPageModels);
+                                await LocalStorageService.SetItemAsync($"{FLangCode}-{TLangCode}", otherPageModels);
                             }
                             catch (Exception ex)
                             {
@@ -186,13 +186,13 @@ namespace SD.Client.Pages
             {
                 opRes = null;
                 await GetOpRes();
-                FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + FLangCode + "-" + TLangCode);
+                FavSite = await LocalStorageService.GetItemAsync<string>($"fav-{FLangCode}-{TLangCode}");
             }
         }
         protected override async Task OnInitializedAsync()
         {
             if (string.IsNullOrWhiteSpace(FavSite))
-                FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + FLangCode + "-" + TLangCode);
+                FavSite = await LocalStorageService.GetItemAsync<string>($"fav-{FLangCode}-{TLangCode}");
         }
     }
 }

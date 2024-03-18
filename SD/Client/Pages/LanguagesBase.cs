@@ -40,7 +40,7 @@ namespace SD.Client.Pages
 
         protected async Task ResetOPAsync()
         {
-            await LocalStorageService.RemoveItemAsync(Fl + "-" + Tl);
+            await LocalStorageService.RemoveItemAsync($"{Fl}-{Tl}");
             SetLangsStr();
             NavigationManager.NavigateTo("Languages", true);
         }

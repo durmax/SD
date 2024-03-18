@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
+using SD.Client.Models;
 using SD.Client.Services;
 using SD.Shared;
 using System;
@@ -124,7 +125,7 @@ namespace SD.Client.Pages
         protected async Task OnSelectedAsync(int selection)
         {
             WordDto.ShareWith = (ShareWith)selection;
-            ShareWithImageSRC = "/icons/Save" + WordDto.ShareWith.ToString() + ".svg";
+            ShareWithImageSRC = $"/icons/Save{WordDto.ShareWith.ToString()}.svg";
             await AddWord();
         }
 
@@ -391,10 +392,9 @@ namespace SD.Client.Pages
         {
             string fl = WordDto?.WordLang ?? DefaultLangsService.DefaultWordLang;
             string tl = WordDto?.ToLang ?? DefaultLangsService.DefaultToLang;
-
             try
             {
-                FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + fl + "-" + tl);
+                FavSite = await LocalStorageService.GetItemAsync<string>($"fav-{fl}-{tl}");
             }
             catch { }
         }
@@ -423,7 +423,7 @@ namespace SD.Client.Pages
 
         protected override async Task OnParametersSetAsync()
         {
-            ShareWithImageSRC = "/icons/Save" + WordDto.ShareWith.ToString() + ".svg";
+            ShareWithImageSRC = $"/icons/Save{WordDto.ShareWith.ToString()}.svg";
             note = null;
             SetMyText();
             await GetFavLinkAsync();

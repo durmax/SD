@@ -35,8 +35,8 @@ namespace SD.Client.Pages
         {
             if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
             {
-                await LocalStorageService.SetItemAsync("fav" + "-" + FLangCode + "-" + TLangCode, otherPage.Pattern);
-                FavSite = await LocalStorageService.GetItemAsync<string>("fav" + "-" + FLangCode + "-" + TLangCode);
+                await LocalStorageService.SetItemAsync($"fav-{FLangCode}-{TLangCode}", otherPage.Pattern);
+                FavSite = await LocalStorageService.GetItemAsync<string>($"fav-{FLangCode}-{TLangCode}");
             }
             else
             {

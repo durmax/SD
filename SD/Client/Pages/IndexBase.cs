@@ -95,7 +95,7 @@ namespace SD.Client.Pages
             Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang });
 
 
-            string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
+             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
 
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
             {

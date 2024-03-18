@@ -9,9 +9,12 @@ using System.Reflection;
 using SD.Client;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("app");
+
+builder.Services.AddSingleton<LoggingService>();
 
 // Add configured HttpClient with AuthorizationMessageHandler
 builder.Services.AddHttpClient("forAuthenticatedUser", client =>

@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using SD.Client.Services;
@@ -8,11 +9,14 @@ using SD.Shared;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SD.Client.Pages
 {
     public class OtherPagesBase : ComponentBase
     {
+        [Inject]
+        LoggingService logger { get; set; }
         [Inject]
         IJSRuntime JsRuntime { get; set; }
         [Inject]
@@ -144,7 +148,11 @@ namespace SD.Client.Pages
                     otherPageModels = null;
                     opRes = null;
 
+                    logger.Log(this.ToString(), LogLevel.Information, "Before GetItemAsync");
                     var OPStr = await LocalStorageService.GetItemAsync<string>($"{FLangCode}-{TLangCode}");
+                    logger.Log(this.ToString(), LogLevel.Information, "After GetItemAsync " + $"{FLangCode}-{TLangCode}");
+                    logger.Log(this.ToString(), LogLevel.Information, OPStr);
+
                     if (!string.IsNullOrEmpty(OPStr) && OPStr != "null")
                     {
                         otherPageModels = JsonConvert.DeserializeObject<List<OtherPageResModel>>(OPStr);

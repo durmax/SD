@@ -1,0 +1,36 @@
+﻿@page "/Logger"
+@using SD.Client.Services
+<h3>Logger</h3>
+
+
+<table class="table table-sm" style="font-size: 11px;">
+    <thead>
+        <tr>
+            <th scope="col">Timestamp</th>
+            <th scope="col">Name</th>
+            <th scope="col">Level</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var logEntry in logger.logEntries)
+        {
+            <tr>
+                <th scope="row">@logEntry.Timestamp</th>
+                <td>@logEntry.Provider</td>
+                <td>@logEntry.Level</td>
+            </tr> 
+            @logEntry.Message
+        }
+    </tbody>
+</table>
+
+
+@code {
+@inject LoggingService logger
+
+    protected override void OnInitialized()
+    {
+        logger.logEntries.Reverse();
+    }
+}

@@ -6,8 +6,6 @@ using SD.Shared;
 using System.Collections.Generic;
 using AKSoftware.Localization.MultiLanguages;
 using System.Net.Http.Json;
-using System.Linq;
-using System;
 
 namespace SD.Client.Pages
 {
@@ -95,7 +93,7 @@ namespace SD.Client.Pages
             Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang });
 
 
-             string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
+            string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
 
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
             {

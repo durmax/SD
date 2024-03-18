@@ -118,11 +118,6 @@
                 }
             </select>
         </div>
-        <AuthorizeView>
-            <Authorized>
-
-            </Authorized>
-        </AuthorizeView>
 
         <OtherPages FLangCode="@Fl" TLangCode="@Tl" Collapsed="false" CanSetFavSite="true"></OtherPages>
     </div>
@@ -130,7 +125,7 @@
     <AuthorizeView>
         <Authorized>
             <div class="mb-2">
-                <button type="reset" class="btn btn-light" @onclick="ResetOPAsync"> Reset data for @Fl-@Tl </button>
+                <button type="reset" class="btn btn-light" @onclick="ResetOPAsync"> Reset for @Fl-@Tl </button>
                 <button type="reset" class="btn btn-danger float-right" @onclick="async ()=> await LocalStorageService.ClearAsync()">Remove all stored data</button>
             </div>
         </Authorized>

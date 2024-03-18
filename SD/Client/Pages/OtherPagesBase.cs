@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using SD.Client.Services;
 using SD.Shared;
@@ -12,6 +13,8 @@ namespace SD.Client.Pages
 {
     public class OtherPagesBase : ComponentBase
     {
+        [Inject]
+        IJSRuntime JsRuntime { get; set; }
         [Inject]
         protected OtherPageService OtherPageService { get; set; }
 
@@ -151,7 +154,16 @@ namespace SD.Client.Pages
                         otherPageModels = await OtherPageService.GetOPResModels(FLangCode, TLangCode);
                         if (FLangCode != TLangCode)
                         {
-                            await LocalStorageService.SetItemAsync(FLangCode + "-" + TLangCode, otherPageModels);
+                            try
+                            {
+                                await LocalStorageService.SetItemAsync(FLangCode + "-" + TLangCode, otherPageModels);
+                            }
+                            catch (Exception ex)
+                            {
+                                await JsRuntime.InvokeVoidAsync("alert", $"LocalStorageService SetItemAsync " + ex.Message);
+                                throw;
+                            }
+
                         }
                     }
 

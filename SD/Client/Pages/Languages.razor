@@ -73,7 +73,7 @@
                             @item
                         </label>
                         <button type="button" class="btn btn-link"
-                        @onclick="(() => RemoveKnownLang(item))">
+                                @onclick="(() => RemoveKnownLang(item))">
                             <i class="oi oi-delete"></i>
                         </button>
 
@@ -117,11 +117,22 @@
                     }
                 }
             </select>
-
-            <button type="button" class="btn btn-light bg-transparent" @onclick="ResetOPAsync">
-                <i>Reset</i>
-            </button>
         </div>
+        <AuthorizeView>
+            <Authorized>
+
+            </Authorized>
+        </AuthorizeView>
+
         <OtherPages FLangCode="@Fl" TLangCode="@Tl" Collapsed="false" CanSetFavSite="true"></OtherPages>
     </div>
+
+    <AuthorizeView>
+        <Authorized>
+            <div class="mb-2">
+                <button type="reset" class="btn btn-light" @onclick="ResetOPAsync"> Reset data for @Fl-@Tl </button>
+                <button type="reset" class="btn btn-danger float-right" @onclick="async ()=> await LocalStorageService.ClearAsync()">Remove all stored data</button>
+            </div>
+        </Authorized>
+    </AuthorizeView>
 }

@@ -8,11 +8,14 @@ using SD.Shared;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using YamlDotNet.Core.Tokens;
 
 namespace SD.Client.Pages
 {
     public class OtherPagesBase : ComponentBase
     {
+        [Inject]
+        LocalStorageAccessor LocalStorageAccessor { get; set; }
         [Inject]
         LoggingService logger { get; set; }
         [Inject]
@@ -145,7 +148,8 @@ namespace SD.Client.Pages
                     opRes = null;
 
                     logger.Log(this.ToString(), LogLevel.Information, "Before GetItemAsync");
-                    var OPStr = await LocalStorageService.GetItemAsync<string>($"{FLangCode}{TLangCode}");
+                    //var OPStr = await LocalStorageService.GetItemAsync<string>($"{FLangCode}{TLangCode}");
+                    var OPStr = await LocalStorageAccessor.GetValueAsync<string>($"{FLangCode}{TLangCode}");
                     logger.Log(this.ToString(), LogLevel.Information, "After GetItemAsync " + $"{FLangCode}{TLangCode}");
                     logger.Log(this.ToString(), LogLevel.Information, OPStr);
 

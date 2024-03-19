@@ -1,11 +1,11 @@
-﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SD.Client.Services;
 using SD.Shared;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using YamlDotNet.Core.Tokens;
@@ -20,10 +20,6 @@ namespace SD.Client.Pages
         LoggingService logger { get; set; }
         [Inject]
         protected OtherPageService OtherPageService { get; set; }
-
-        [Inject]
-        public ILocalStorageService LocalStorageService { get; set; }
-
         protected List<OtherPageResModel> otherPageModels { get; set; }
         protected IEnumerable<OtherPageResModel> opRes { get; set; }
 
@@ -103,7 +99,7 @@ namespace SD.Client.Pages
                 i++;
                 oPage.Eval = i;
             }
-            await LocalStorageService.SetItemAsync($"{FLangCode}{TLangCode}", otherPageModels);
+            await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", otherPageModels);
             opRes = null;
             opRes = OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
         }
@@ -148,7 +144,6 @@ namespace SD.Client.Pages
                     opRes = null;
 
                     logger.Log(this.ToString(), LogLevel.Information, "Before GetItemAsync");
-                    //var OPStr = await LocalStorageService.GetItemAsync<string>($"{FLangCode}{TLangCode}");
                     var OPStr = await LocalStorageAccessor.GetValueAsync<string>($"{FLangCode}{TLangCode}");
                     logger.Log(this.ToString(), LogLevel.Information, "After GetItemAsync " + $"{FLangCode}{TLangCode}");
                     logger.Log(this.ToString(), LogLevel.Information, OPStr);
@@ -164,11 +159,12 @@ namespace SD.Client.Pages
                         {
                             try
                             {
-                                await LocalStorageService.SetItemAsync($"{FLangCode}{TLangCode}", otherPageModels);
+                                var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
+                                await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", serializedOtherPageModels);
                             }
                             catch (Exception ex)
                             {
-                                logger.Log(this.ToString(), LogLevel.Error, "LocalStorageService.SetItemAsync " + $"{FLangCode}{TLangCode} " + ex.Message);
+                                logger.Log(this.ToString(), LogLevel.Error, "LocalStorageAccessor.SetValueAsync " + $"{FLangCode}{TLangCode} " + ex.Message);
                                 throw;
                             }
 
@@ -196,7 +192,7 @@ namespace SD.Client.Pages
                 try
                 {
                     await GetOpRes();
-                    FavSite = await LocalStorageService.GetItemAsync<string>($"fav-{FLangCode}{TLangCode}");
+                    FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{FLangCode}{TLangCode}");
                 }
                 catch (Exception ex)
                 {
@@ -208,7 +204,7 @@ namespace SD.Client.Pages
         protected override async Task OnInitializedAsync()
         {
             if (string.IsNullOrWhiteSpace(FavSite))
-                FavSite = await LocalStorageService.GetItemAsync<string>($"fav-{FLangCode}{TLangCode}");
+                FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{FLangCode}{TLangCode}");
         }
     }
 }

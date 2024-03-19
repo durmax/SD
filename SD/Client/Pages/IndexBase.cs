@@ -1,5 +1,4 @@
-﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using SD.Client.Services;
 using System.Threading.Tasks;
 using SD.Shared;
@@ -12,7 +11,7 @@ namespace SD.Client.Pages
     public class IndexBase : ComponentBase
     {
         [Inject]
-        public ILocalStorageService LocalStorageService { get; set; }
+        LocalStorageAccessor LocalStorageAccessor { get; set; }
 
         [Inject]
         public ILanguageContainerService LanguageContainer { set; get; }
@@ -93,7 +92,7 @@ namespace SD.Client.Pages
             Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang });
 
 
-            string uiLang = await LocalStorageService.GetItemAsync<string>("UILang");
+            string uiLang = await LocalStorageAccessor.GetValueAsync<string>("UILang");
 
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
             {

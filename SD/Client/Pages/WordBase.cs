@@ -1,10 +1,8 @@
-﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
-using SD.Client.Models;
 using SD.Client.Services;
 using SD.Shared;
 using System;
@@ -17,6 +15,8 @@ namespace SD.Client.Pages
 {
     public class WordBase : ComponentBase
     {
+        [Inject]
+        LocalStorageAccessor LocalStorageAccessor { get; set; }
         [Inject]
         IJSRuntime JsRuntime { set; get; }
         [Inject]
@@ -36,13 +36,8 @@ namespace SD.Client.Pages
 
         [Parameter]
         public string WordId { get; set; }
-
         [Inject]
         public WordService WordService { set; get; }
-
-        [Inject]
-        public ILocalStorageService LocalStorageService { get; set; }
-
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
 
@@ -255,7 +250,7 @@ namespace SD.Client.Pages
 
             if (string.IsNullOrWhiteSpace(KnownLangsService.LangsStr))
             {
-                KnownLangsService.LangsStr = await LocalStorageService.GetItemAsync<string>("Langs");
+                KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>("Langs");
             }
 
             KnownLangsService.AddKnownLang(WordDto.WordLang);
@@ -394,7 +389,7 @@ namespace SD.Client.Pages
             string tl = WordDto?.ToLang ?? DefaultLangsService.DefaultToLang;
             try
             {
-                FavSite = await LocalStorageService.GetItemAsync<string>($"fav-{fl}{tl}");
+                FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{fl}{tl}");
             }
             catch { }
         }

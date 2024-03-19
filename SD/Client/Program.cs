@@ -1,7 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Blazored.LocalStorage;
 using SD.Client.Services;
 using SD.Client.Models;
 using AKSoftware.Localization.MultiLanguages;
@@ -41,7 +40,6 @@ builder.Services.AddMsalAuthentication(options =>
     options.ProviderOptions.Cache.CacheLocation = "localStorage"; // remove this option to use Session storage.
 }) ;
 
-builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<LangCodeService>();
 builder.Services.AddScoped<KnownLangsService>();
 builder.Services.AddScoped<DefaultLangsService>();

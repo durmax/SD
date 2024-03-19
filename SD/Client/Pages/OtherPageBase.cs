@@ -1,6 +1,6 @@
-﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using SD.Client.Services;
 using SD.Shared;
 using System.Threading.Tasks;
 
@@ -9,8 +9,7 @@ namespace SD.Client.Pages
     public class OtherPageBase : ComponentBase
     {
         [Inject]
-        public ILocalStorageService LocalStorageService { get; set; }
-
+        LocalStorageAccessor LocalStorageAccessor { get; set; }
         [Parameter]
         public OtherPageResModel otherPage { get; set; }
         
@@ -35,8 +34,8 @@ namespace SD.Client.Pages
         {
             if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
             {
-                await LocalStorageService.SetItemAsync($"fav-{FLangCode}{TLangCode}", otherPage.Pattern);
-                FavSite = await LocalStorageService.GetItemAsync<string>($"fav-{FLangCode}{TLangCode}");
+                await LocalStorageAccessor.SetValueAsync($"fav-{FLangCode}{TLangCode}", otherPage.Pattern);
+                FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{FLangCode}{TLangCode}");
             }
             else
             {

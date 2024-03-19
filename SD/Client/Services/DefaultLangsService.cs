@@ -1,25 +1,23 @@
-﻿
-using Blazored.LocalStorage;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace SD.Client.Services
 {
     public class DefaultLangsService
     {
-        private readonly ILocalStorageService localStorageService;
         public string DefaultWordLang { get; set; }
         public string DefaultToLang { get; set; }
+        public LocalStorageAccessor LocalStorageAccessor { get; }
 
-        public DefaultLangsService(ILocalStorageService localStorageService)
+        public DefaultLangsService(LocalStorageAccessor localStorageAccessor)
         {
-            this.localStorageService = localStorageService;
+            LocalStorageAccessor = localStorageAccessor;
         }
         public async Task SetDefLangsAsync()
         {
-            string fl = await localStorageService.GetItemAsync<string>("FLang");
+            string fl = await LocalStorageAccessor.GetValueAsync<string>("FLang");
             DefaultWordLang = (string.IsNullOrEmpty(fl) || fl == "null") ? "en" : fl;
 
-            string tl = await localStorageService.GetItemAsync<string>("TLang");
+            string tl = await LocalStorageAccessor.GetValueAsync<string>("TLang");
             DefaultToLang = (string.IsNullOrEmpty(tl) || tl == "null") ? "de" : tl;
         }
     }

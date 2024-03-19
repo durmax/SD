@@ -2,14 +2,12 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
-using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using SD.Client.Services;
 using SD.Shared;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SD.Client.Pages
 {
@@ -17,8 +15,6 @@ namespace SD.Client.Pages
     {
         [Inject]
         LoggingService logger { get; set; }
-        [Inject]
-        IJSRuntime JsRuntime { get; set; }
         [Inject]
         protected OtherPageService OtherPageService { get; set; }
 
@@ -168,7 +164,7 @@ namespace SD.Client.Pages
                             }
                             catch (Exception ex)
                             {
-                                await JsRuntime.InvokeVoidAsync("alert", $"LocalStorageService SetItemAsync " + ex.Message);
+                                logger.Log(this.ToString(), LogLevel.Error, "LocalStorageService.SetItemAsync " + $"{FLangCode}{TLangCode} " + ex.Message);
                                 throw;
                             }
 
@@ -193,8 +189,16 @@ namespace SD.Client.Pages
             if (!Collapsed)
             {
                 opRes = null;
-                await GetOpRes();
-                FavSite = await LocalStorageService.GetItemAsync<string>($"fav-{FLangCode}{TLangCode}");
+                try
+                {
+                    await GetOpRes();
+                    FavSite = await LocalStorageService.GetItemAsync<string>($"fav-{FLangCode}{TLangCode}");
+                }
+                catch (Exception ex)
+                {
+                    logger.Log(this.ToString(), LogLevel.Error, "GetOpRes " + ex.Message);
+                    throw;
+                }
             }
         }
         protected override async Task OnInitializedAsync()

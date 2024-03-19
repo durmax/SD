@@ -55,10 +55,15 @@ namespace SD.Client.Pages
             get { return SFL; }
             set
             {
-                SFL = value;
-                LocalStorageService.SetItemAsync("FLang", SelectedFL.Key);
-                KnownLangsService.AddKnownLang(SelectedFL.Key);
-                DefaultLangsService.DefaultWordLang = SelectedFL.Key;
+                if (value != null)
+                {
+                    SFL = value;
+                    LocalStorageService.SetItemAsync("FLang", SelectedFL.Key);
+                    KnownLangsService.AddKnownLang(SelectedFL.Key);
+                    DefaultLangsService.DefaultWordLang = SelectedFL.Key;
+                    LangToAdd = value;
+                    Fl = value.Key;
+                }
             }
         }
 
@@ -67,11 +72,16 @@ namespace SD.Client.Pages
             get { return STL; }
             set
             {
-                STL = value;
-                LocalStorageService.SetItemAsync("TLang", SelectedTL.Key);
-                SetUILang(SelectedTL.Key);
-                KnownLangsService.AddKnownLang(SelectedTL.Key);
-                DefaultLangsService.DefaultToLang = SelectedTL.Key;
+                if (value != null)
+                {
+                    STL = value;
+                    LocalStorageService.SetItemAsync("TLang", SelectedTL.Key);
+                    SetUILang(SelectedTL.Key);
+                    KnownLangsService.AddKnownLang(SelectedTL.Key);
+                    DefaultLangsService.DefaultToLang = SelectedTL.Key;
+                    LangToAdd = value;
+                    Tl = value.Key;
+                }
             }
         }
 
@@ -80,9 +90,12 @@ namespace SD.Client.Pages
             get { return LToAdd; }
             set
             {
-                LToAdd = value;
-                KnownLangsService.LangsStr += "," + LToAdd.Key;
-                BuildKnownLangs();
+                if (value != null)
+                {
+                    LToAdd = value;
+                    KnownLangsService.LangsStr += "," + LToAdd.Key;
+                    BuildKnownLangs();
+                }
             }
         }
 
@@ -162,8 +175,8 @@ namespace SD.Client.Pages
 
         protected void BuildKnownLangs()
         {
-            KnownLangsService.AddKnownLang(SelectedFL.Key);
-            KnownLangsService.AddKnownLang(SelectedTL.Key);
+            KnownLangsService.AddKnownLang(SelectedFL?.Key);
+            KnownLangsService.AddKnownLang(SelectedTL?.Key);
 
             KnownLangs = new List<string>();
             KnownLangs = KnownLangsService.KnownLangs;
@@ -186,7 +199,7 @@ namespace SD.Client.Pages
             await DefaultLangsService.SetDefLangsAsync();
 
             Fl = DefaultLangsService.DefaultWordLang;
-                Tl = DefaultLangsService.DefaultToLang;
+            Tl = DefaultLangsService.DefaultToLang;
 
             SelectedFL = new LangCode
             {

@@ -13,7 +13,7 @@ namespace SD.Client.Services
         {
             KnownLangs = new List<string>();
 
-            if (!KnownLangs.Contains(lang))
+            if (!string.IsNullOrEmpty(lang) && !KnownLangs.Contains(lang))
             {
                 LangsStr += "," + lang;
             }

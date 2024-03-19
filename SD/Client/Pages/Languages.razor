@@ -91,9 +91,9 @@
             <select class="bg-transparent rounded-0 border-0" @bind="Fl">
                 @foreach (var item in KnownLangs)
                 {
-                    if (item == SelectedFL.Key)
+                    if (item == SelectedFL?.Key)
                     {
-                        <option selected value="@SelectedFL.Key">@item</option>
+                        <option selected value="@SelectedFL?.Key">@item</option>
                     }
                     else
                     {
@@ -107,9 +107,9 @@
             <select class="bg-transparent rounded-0 border-0" @bind="Tl">
                 @foreach (var item in KnownLangs)
                 {
-                    if (item == SelectedTL.Key)
+                    if (item == SelectedTL?.Key)
                     {
-                        <option selected value="@SelectedTL.Key">@item</option>
+                        <option selected value="@SelectedTL?.Key">@item</option>
                     }
                     else
                     {

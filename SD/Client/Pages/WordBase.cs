@@ -394,7 +394,7 @@ namespace SD.Client.Pages
             string tl = WordDto?.ToLang ?? DefaultLangsService.DefaultToLang;
             try
             {
-                FavSite = await LocalStorageService.GetItemAsync<string>($"fav-{fl}-{tl}");
+                FavSite = await LocalStorageService.GetItemAsync<string>($"fav-{fl}{tl}");
             }
             catch { }
         }

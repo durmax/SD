@@ -1,5 +1,6 @@
 ﻿using AKSoftware.Localization.MultiLanguages;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using SD.Client.Models;
 using SD.Client.Services;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace SD.Client.Pages
     {
         [Inject]
         LocalStorageAccessor LocalStorageAccessor { get; set; }
+        [Inject]
+        IJSRuntime JsRuntime { set; get; }
         [Inject]
         protected LangCodeService LangCodeService { get; set; }
 
@@ -35,14 +38,6 @@ namespace SD.Client.Pages
 
         protected string Fl { get; set; }
         protected string Tl { get; set; }
-
-
-        protected async Task ResetOPAsync()
-        {
-            await LocalStorageAccessor.RemoveAsync($"{Fl}{Tl}");
-            SetLangsStr();
-            NavigationManager.NavigateTo("Languages", true);
-        }
 
         protected void Reverse()
         {
@@ -161,14 +156,36 @@ namespace SD.Client.Pages
             return await Task.FromResult(LangCodes.Where(x => x.Value.ToLower().Contains(searchText.ToLower())).ToList());
         }
 
-
-
         protected void RemoveKnownLang(string lang)
         {
             if (lang != SelectedFL.Key && lang != SelectedTL.Key)
             {
                 KnownLangs.Remove(lang);
                 SetLangsStr();
+            }
+        }
+
+
+        protected async Task ResetOPAsync()
+        {
+            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"You try to reset {Fl}-{Tl}, are you sure?");
+            if (confirmed)
+            {
+                await LocalStorageAccessor.RemoveAsync($"{Fl}{Tl}");
+                SetLangsStr();
+                NavigationManager.NavigateTo(NavigationManager.Uri, true);
+            }
+        }
+
+        protected async Task RemoveAllDataAsync()
+        {
+            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete all data, are you sure?");
+            if (confirmed)
+            {
+                await LocalStorageAccessor.Clear();
+                await JsRuntime.InvokeVoidAsync("alert", $"Your data are deleted");
+
+                NavigationManager.NavigateTo(NavigationManager.Uri, true);
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿@page "/Languages"
 @inherits LanguagesBase
-@using Blazored.Typeahead 
+@using Blazored.Typeahead
 
 @inject SD.Client.Services.LocalStorageAccessor LocalStorageAccessor;
 
@@ -124,12 +124,12 @@
         <OtherPages FLangCode="@Fl" TLangCode="@Tl" Collapsed="false" CanSetFavSite="true"></OtherPages>
     </div>
 
-    <AuthorizeView>
-        <Authorized>
-            <div class="mb-2">
-                <button type="reset" class="btn btn-light" @onclick="ResetOPAsync"> Reset for @Fl-@Tl </button>
-                <button type="reset" class="btn btn-danger float-right" @onclick="async ()=> await LocalStorageAccessor.Clear()">Remove all stored data</button>
-            </div>
-        </Authorized>
-    </AuthorizeView>
+    @*     <AuthorizeView>
+        <Authorized> *@
+    <div class="mb-2">
+        <button type="reset" class="btn btn-light" @onclick="ResetOPAsync"> Reset for @Fl-@Tl </button>
+        <button type="reset" class="btn btn-danger float-right" @onclick="RemoveAllDataAsync">Remove all stored data</button>
+    </div>
+    @*         </Authorized>
+    </AuthorizeView> *@
 }

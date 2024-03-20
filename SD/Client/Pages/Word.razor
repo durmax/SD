@@ -87,7 +87,7 @@
                 {
                     @foreach (var w in SameWords)
                     {
-                        <a herf="" class="m-1" @onclick="async ()  => { await SetWord(w.Split(':')[1]); }">
+                        <a href="" class="m-1" @onclick="async ()  => { await SetWord(w.Split(':')[1]); }">
                             <u class="text-primary"> @w.Split(':')[0] </u>
                         </a>
                     }
@@ -112,7 +112,7 @@
                         <button type="button" class="btn btn-outline-secondary" @onclick="UpdateWord">
                             Update <i class="fas fa-question-circle"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-secondary" @onclick="@(()=> {foundWordDtoToUpdate=null; cssClassUpdate = "d-none";})">
+                        <button type="button" class="btn btn-outline-secondary" @onclick="@(()=> {foundWordDtoToUpdate=null; cssClassUpdate = 'd-none';})">
                             Cancel <i class="fas fa-window-close"></i>
                         </button>
                     </div>

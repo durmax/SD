@@ -248,11 +248,7 @@ namespace SD.Client.Pages
         private async Task BuildKnownLangsAsync()
         {
 
-            if (string.IsNullOrWhiteSpace(KnownLangsService.LangsStr))
-            {
-                KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>("Langs");
-            }
-
+            KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>("Langs");
             KnownLangsService.AddKnownLang(WordDto.WordLang);
             KnownLangsService.AddKnownLang(WordDto.ToLang);
 

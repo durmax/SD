@@ -16,6 +16,8 @@ public class LocalStorageAccessor : IAsyncDisposable
 
     public async Task<T> GetValueAsync<T>(string key)
     {
+        if (string.IsNullOrWhiteSpace(key)) return default(T);
+
         await WaitForReference();
         var result = await _accessorJsRef.Value.InvokeAsync<T>("get", key);
 
@@ -24,8 +26,11 @@ public class LocalStorageAccessor : IAsyncDisposable
 
     public async Task SetValueAsync<T>(string key, T value)
     {
-        await WaitForReference();
-        await _accessorJsRef.Value.InvokeVoidAsync("set", key, value);
+        if (!string.IsNullOrWhiteSpace(key) && value != null)
+        {
+            await WaitForReference();
+            await _accessorJsRef.Value.InvokeVoidAsync("set", key, value);
+        }
     }
 
     public async Task Clear()
@@ -36,8 +41,11 @@ public class LocalStorageAccessor : IAsyncDisposable
 
     public async Task RemoveAsync(string key)
     {
-        await WaitForReference();
-        await _accessorJsRef.Value.InvokeVoidAsync("remove", key);
+        if (!string.IsNullOrWhiteSpace(key))
+        {
+            await WaitForReference();
+            await _accessorJsRef.Value.InvokeVoidAsync("remove", key);
+        }
     }
 
     private async Task WaitForReference()

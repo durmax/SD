@@ -5,10 +5,8 @@ using Newtonsoft.Json;
 using SD.Client.Services;
 using SD.Shared;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using YamlDotNet.Core.Tokens;
 
 namespace SD.Client.Pages
 {
@@ -99,7 +97,10 @@ namespace SD.Client.Pages
                 i++;
                 oPage.Eval = i;
             }
-            await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", otherPageModels);
+
+            var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
+            await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", serializedOtherPageModels);
+
             opRes = null;
             opRes = OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
         }

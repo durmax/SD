@@ -159,8 +159,8 @@ namespace SD.Client.Pages
                     else
                     {
                         logger.Log(this.ToString(), LogLevel.Information, "after else ------ ");
-                        var res = await OtherPageService.GetOPResModels(FLangCode, TLangCode);
-                        otherPageModels = res.ToList();
+                        otherPageModels = await OtherPageService.GetOPResModels(FLangCode, TLangCode);
+
                         if (FLangCode != TLangCode)
                         {
                             try
@@ -205,7 +205,7 @@ namespace SD.Client.Pages
                 catch (Exception ex)
                 {
                     logger.Log(this.ToString(), LogLevel.Error, "GetOpRes " + ex.Message);
-                    throw;
+                    //throw;
                 }
             }
         }

@@ -16,7 +16,7 @@ namespace sd.Api.Services
             _otherPageRepository = otherPageRepository;
         }
 
-        public async Task<IEnumerable<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
+        public async Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
         {
             List<OtherPageResModel> res = new List<OtherPageResModel>();
             var otherPages = await _otherPageRepository.FilterByLangs(fromLang, toLang);
@@ -38,7 +38,7 @@ namespace sd.Api.Services
                 }
                 // return res;
             }
-            return res.OrderBy(o => o.Eval);
+            return res.OrderBy(o => o.Eval).ToList();
         }
 
         public async Task<OtherPageModel> GetOtherPageById(string id)

@@ -25,15 +25,15 @@ namespace SD.Client.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
+        public async Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
         {
 
-            IEnumerable<OtherPageResModel> OPResModels = null;
+            List<OtherPageResModel> OPResModels = null;
             
             try
             {
                 _logger.Log(this.ToString(), LogLevel.Information, "before GetOPResModels call url:" + $"api/OtherPage/{fromLang}/{toLang}");
-                OPResModels = await _currentUser.HttpClient.GetFromJsonAsync<IEnumerable<OtherPageResModel>>($"api/OtherPage/{fromLang}/{toLang}");
+                OPResModels = await _currentUser.HttpClient.GetFromJsonAsync<List<OtherPageResModel>>($"api/OtherPage/{fromLang}/{toLang}");
 
                 var serializedOtherPageModels = JsonConvert.SerializeObject(OPResModels);
                 _logger.Log(this.ToString(), LogLevel.Information, "after GetOPResModels " + serializedOtherPageModels);

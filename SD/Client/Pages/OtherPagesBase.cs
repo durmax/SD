@@ -98,7 +98,9 @@ namespace SD.Client.Pages
                 oPage.Eval = i;
             }
 
-            var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
+            //var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
+            var serializedOtherPageModels = await LocalStorageAccessor.ToString(otherPageModels);
+
             await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", serializedOtherPageModels);
 
             opRes = null;
@@ -145,7 +147,7 @@ namespace SD.Client.Pages
                     opRes = null;
 
                     logger.Log(this.ToString(), LogLevel.Information, "Before GetItemAsync");
-                    var OPStr = await LocalStorageAccessor.GetValueAsync<string>($"{FLangCode}{TLangCode}");
+                    string OPStr = await LocalStorageAccessor.GetValueAsync<string>($"{FLangCode}{TLangCode}");
                     logger.Log(this.ToString(), LogLevel.Information, "After GetItemAsync " + $"{FLangCode}{TLangCode}");
                     logger.Log(this.ToString(), LogLevel.Information, OPStr);
 
@@ -160,7 +162,9 @@ namespace SD.Client.Pages
                         {
                             try
                             {
-                                var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
+                                //var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
+
+                                 var serializedOtherPageModels = await LocalStorageAccessor.ToString(otherPageModels);
                                 await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", serializedOtherPageModels);
                             }
                             catch (Exception ex)

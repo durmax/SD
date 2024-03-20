@@ -14,6 +14,17 @@ public class LocalStorageAccessor : IAsyncDisposable
         _jsRuntime = jsRuntime;
     }
 
+
+    public async Task<string> ToString<T>(T obj)
+    {
+        if (obj == null) return string.Empty;
+
+        await WaitForReference();
+        var result = await _accessorJsRef.Value.InvokeAsync<string>("toString", obj);
+
+        return result;
+    }
+
     public async Task<T> GetValueAsync<T>(string key)
     {
         if (string.IsNullOrWhiteSpace(key)) return default(T);

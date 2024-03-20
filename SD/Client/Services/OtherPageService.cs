@@ -1,4 +1,6 @@
-﻿using SD.Client.Models;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using SD.Client.Models;
 using SD.Shared;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -12,14 +14,14 @@ namespace SD.Client.Services
         private readonly CurrentUserService _currentUser;
         private readonly UriService _uriService;
         private readonly LinkParam _reqLinkP;
+        private readonly LoggingService _logger;
 
-        public OtherPageService(CurrentUserService currentUser,
-                                   UriService uriService,
-                                   LinkParam reqLinkP)
+        public OtherPageService(CurrentUserService currentUser, UriService uriService, LinkParam reqLinkP, LoggingService logger)
         {
             _currentUser = currentUser;
             _uriService = uriService;
             _reqLinkP = reqLinkP;
+            _logger = logger;
         }
 
         public async Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
@@ -30,6 +32,9 @@ namespace SD.Client.Services
             try
             {
                 OPResModels = await _currentUser.HttpClient.GetFromJsonAsync<List<OtherPageResModel>>($"api/OtherPage/{fromLang}/{toLang}");
+
+                var serializedOtherPageModels = JsonConvert.SerializeObject(OPResModels);
+                _logger.Log(this.ToString(), LogLevel.Information, "GetOPResModels " + serializedOtherPageModels);
             }
             catch
             {

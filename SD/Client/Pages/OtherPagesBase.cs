@@ -6,6 +6,7 @@ using SD.Client.Services;
 using SD.Shared;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -158,14 +159,15 @@ namespace SD.Client.Pages
                     else
                     {
                         logger.Log(this.ToString(), LogLevel.Information, "after else ------ ");
-                        otherPageModels = await OtherPageService.GetOPResModels(FLangCode, TLangCode);
+                        var res = await OtherPageService.GetOPResModels(FLangCode, TLangCode);
+                        otherPageModels = res.ToList();
                         if (FLangCode != TLangCode)
                         {
                             try
                             {
                                 //var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
 
-                                 var serializedOtherPageModels = await LocalStorageAccessor.ToString(otherPageModels);
+                                var serializedOtherPageModels = await LocalStorageAccessor.ToString(otherPageModels);
                                 await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", serializedOtherPageModels);
                             }
                             catch (Exception ex)

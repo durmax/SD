@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -24,7 +25,7 @@ namespace sd.Api.Controllers
         [AllowAnonymous]
         // GET: api/OtherPage/ar/de
         [HttpGet("{fromLangCode}/{toLangCode}")]
-        public async Task<ActionResult<OtherPageResModel>> GetLinks(string fromLangCode, string toLangCode)
+        public async Task<ActionResult<IEnumerable<OtherPageResModel>>> GetLinks(string fromLangCode, string toLangCode)
         {
             try
             {

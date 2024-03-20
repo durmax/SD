@@ -39,12 +39,11 @@ builder.Services.AddMsalAuthentication(options =>
     options.ProviderOptions.LoginMode = "redirect";
     options.ProviderOptions.Cache.CacheLocation = "localStorage"; // remove this option to use Session storage.
 }) ;
+builder.Services.AddScoped<CurrentUserService>();
 
 builder.Services.AddScoped<LangCodeService>();
 builder.Services.AddScoped<KnownLangsService>();
 builder.Services.AddScoped<DefaultLangsService>();
-
-builder.Services.AddScoped<CurrentUserService>();
 
 builder.Services.AddScoped<UriService>();
 builder.Services.AddScoped<LinkModel>();

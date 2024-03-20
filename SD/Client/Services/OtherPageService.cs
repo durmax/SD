@@ -40,7 +40,11 @@ namespace SD.Client.Services
             }
             catch(Exception  ex)    
             {
-                _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels " + ex.Message);
+                _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels 1 " + ex.Message);
+                _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels 2 " + ex.ToString());
+                _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels 3 " + _currentUser.ToString());
+                _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels 3 " + _currentUser?.HttpClient?.ToString());
+                _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels 3 " + _currentUser?.HttpClient?.BaseAddress);
             }
             return OPResModels;
         }

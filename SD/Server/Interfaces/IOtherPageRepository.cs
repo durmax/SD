@@ -7,7 +7,7 @@ namespace sd.Api.Interfaces
     public interface IOtherPageRepository
     {
         //Task<IEnumerable<OtherPageResModel>> GetOPResModels(string fromLang, string toLang);
-        Task<IEnumerable<OtherPageModel>> FilterByLangs(string fromLang, string toLang);
+        Task<List<OtherPageModel>> FilterByLangs(string fromLang, string toLang);
         Task<OtherPageModel> GetOtherPageById(string id);
         Task<TransObj> Create(OtherPageModel otherPage);
         Task<TransObj> Update(string id, OtherPageModel newOtherPage);

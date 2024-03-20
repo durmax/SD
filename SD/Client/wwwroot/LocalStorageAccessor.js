@@ -1,7 +1,4 @@
-﻿export function toString(obj) {
-    return JSON.stringify(obj);
-}
-export function get(key) {
+﻿export function get(key) {
     return window.localStorage.getItem(key);
 }
 

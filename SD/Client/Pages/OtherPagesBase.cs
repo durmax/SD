@@ -6,7 +6,6 @@ using SD.Client.Services;
 using SD.Shared;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -99,8 +98,7 @@ namespace SD.Client.Pages
                 oPage.Eval = i;
             }
 
-            //var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
-            var serializedOtherPageModels = await LocalStorageAccessor.ToString(otherPageModels);
+            var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
 
             await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", serializedOtherPageModels);
 
@@ -147,10 +145,7 @@ namespace SD.Client.Pages
                     otherPageModels = null;
                     opRes = null;
 
-                    logger.Log(this.ToString(), LogLevel.Information, "Before GetItemAsync");
                     string OPStr = await LocalStorageAccessor.GetValueAsync<string>($"{FLangCode}{TLangCode}");
-                    logger.Log(this.ToString(), LogLevel.Information, "After GetItemAsync " + $"{FLangCode}{TLangCode}");
-                    logger.Log(this.ToString(), LogLevel.Information, OPStr);
 
                     if (!string.IsNullOrEmpty(OPStr) && OPStr != "null")
                     {
@@ -158,16 +153,13 @@ namespace SD.Client.Pages
                     }
                     else
                     {
-                        logger.Log(this.ToString(), LogLevel.Information, "after else ------ ");
                         otherPageModels = await OtherPageService.GetOPResModels(FLangCode, TLangCode);
 
                         if (FLangCode != TLangCode)
                         {
                             try
                             {
-                                //var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
-
-                                var serializedOtherPageModels = await LocalStorageAccessor.ToString(otherPageModels);
+                                var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
                                 await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", serializedOtherPageModels);
                             }
                             catch (Exception ex)
@@ -175,7 +167,6 @@ namespace SD.Client.Pages
                                 logger.Log(this.ToString(), LogLevel.Error, "LocalStorageAccessor.SetValueAsync " + $"{FLangCode}{TLangCode} " + ex.Message);
                                 throw;
                             }
-
                         }
                     }
 

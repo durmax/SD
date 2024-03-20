@@ -22,7 +22,8 @@ namespace sd.Api.Repositories
         {
             return await _context.OtherPages.Find<OtherPageModel>(u => u.OtherPageId == id).FirstOrDefaultAsync();
         }
-        public async Task<IEnumerable<OtherPageModel>> FilterByLangs(string fromLang, string toLang)
+
+        public async Task<List<OtherPageModel>> FilterByLangs(string fromLang, string toLang)
         {
 
             return await _context.OtherPages.AsQueryable<OtherPageModel>()

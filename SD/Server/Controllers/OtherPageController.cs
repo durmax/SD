@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sd.Api.Services;
@@ -9,7 +8,7 @@ using SD.Shared;
 
 namespace sd.Api.Controllers
 {
-    [Authorize]
+
     [Route("api/[controller]")]
     [ApiController]
     public class OtherPageController : ControllerBase
@@ -22,7 +21,6 @@ namespace sd.Api.Controllers
             _otherPageService = otherPageService;
         }
 
-        [AllowAnonymous]
         // GET: api/OtherPage/ar/de
         [HttpGet("{fromLangCode}/{toLangCode}")]
         public async Task<ActionResult<List<OtherPageResModel>>> GetLinks(string fromLangCode, string toLangCode)
@@ -38,7 +36,6 @@ namespace sd.Api.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult<OtherPageModel>> GetById(string id)

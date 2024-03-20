@@ -31,10 +31,11 @@ namespace SD.Client.Services
             
             try
             {
+                _logger.Log(this.ToString(), LogLevel.Information, "before GetOPResModels ");
                 OPResModels = await _currentUser.HttpClient.GetFromJsonAsync<List<OtherPageResModel>>($"api/OtherPage/{fromLang}/{toLang}");
 
                 var serializedOtherPageModels = JsonConvert.SerializeObject(OPResModels);
-                _logger.Log(this.ToString(), LogLevel.Information, "GetOPResModels " + serializedOtherPageModels);
+                _logger.Log(this.ToString(), LogLevel.Information, "after GetOPResModels " + serializedOtherPageModels);
             }
             catch
             {

@@ -157,6 +157,7 @@ namespace SD.Client.Pages
                     }
                     else
                     {
+                        logger.Log(this.ToString(), LogLevel.Information, "after else ------ ");
                         otherPageModels = await OtherPageService.GetOPResModels(FLangCode, TLangCode);
                         if (FLangCode != TLangCode)
                         {

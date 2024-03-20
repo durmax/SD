@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using SD.Client.Models;
 using SD.Shared;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -31,15 +32,15 @@ namespace SD.Client.Services
             
             try
             {
-                _logger.Log(this.ToString(), LogLevel.Information, "before GetOPResModels ");
+                _logger.Log(this.ToString(), LogLevel.Information, "before GetOPResModels call url:" + $"api/OtherPage/{fromLang}/{toLang}");
                 OPResModels = await _currentUser.HttpClient.GetFromJsonAsync<List<OtherPageResModel>>($"api/OtherPage/{fromLang}/{toLang}");
 
                 var serializedOtherPageModels = JsonConvert.SerializeObject(OPResModels);
                 _logger.Log(this.ToString(), LogLevel.Information, "after GetOPResModels " + serializedOtherPageModels);
             }
-            catch
+            catch(Exception  ex)    
             {
-                //exception.RedirectToLogin();
+                _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels " + ex.Message);
             }
             return OPResModels;
         }

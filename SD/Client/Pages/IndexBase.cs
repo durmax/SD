@@ -11,8 +11,9 @@ namespace SD.Client.Pages
     public class IndexBase : ComponentBase
     {
         [Inject]
+        NavigationManager NavigationManager { get; set; }
+        [Inject]
         LocalStorageAccessor LocalStorageAccessor { get; set; }
-
         [Inject]
         public ILanguageContainerService LanguageContainer { set; get; }
         [Inject]
@@ -85,8 +86,16 @@ namespace SD.Client.Pages
             }
             currentPage--;
         }
+
         protected override async Task OnInitializedAsync()
         {
+            if (!NavigationManager.Uri.Contains("localhost"))
+            {
+                if (!NavigationManager.Uri.Contains("https://www.lingoclub.net"))
+                {
+                    NavigationManager.NavigateTo("https://www.lingoclub.net/");
+                }
+            }
             await DefaultLangsService.SetDefLangsAsync();
 
             Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang });

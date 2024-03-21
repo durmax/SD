@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace SD.Client.Services
 {
-
     public class CurrentUserService
     {
         private readonly AuthenticationStateProvider _authenticationStateProvider;

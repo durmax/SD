@@ -1,5 +1,7 @@
-﻿using SD.Client.Models;
+﻿using Microsoft.Extensions.Logging;
+using SD.Client.Models;
 using SD.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -11,20 +13,38 @@ namespace SD.Client.Services
     public class WordService
     {
         private readonly CurrentUserService _currentUser;
+        private readonly LoggingService _logger;
 
-        public WordService(CurrentUserService currentUser)
+        public WordService(CurrentUserService currentUser, LoggingService logger)
         {
             _currentUser = currentUser;
+            _logger = logger;
         }
 
         public async Task<HttpResponseMessage> AddWord(WordDto word)
         {
-            return await _currentUser.HttpClient.PostAsJsonAsync("api/Word", word);
+            try
+            {
+                return await _currentUser.HttpClient.PostAsJsonAsync("api/Word", word);
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
+                throw;
+            }
         }
 
         public async Task<List<WordDto>> GetPageWords(string userId, int pageSize, int currentPage)
         {
-            return await _currentUser.HttpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWords/{userId ?? "0"}/{pageSize}/{currentPage}");
+            try
+            {
+                return await _currentUser.HttpClient.GetFromJsonAsync<List<WordDto>>($"api/Word/GetPageWords/{userId ?? "0"}/{pageSize}/{currentPage}");
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
+                throw;
+            }
         }
 
         public async Task<WordDto> GetWordById(string id)
@@ -34,8 +54,9 @@ namespace SD.Client.Services
                 var res = await _currentUser.HttpClient.GetFromJsonAsync<WordDto>($"api/Word/{id}");
                 return res;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
                 return null;
             }
         }
@@ -46,30 +67,63 @@ namespace SD.Client.Services
             {
                 return await _currentUser.HttpClient.GetFromJsonAsync<List<string>>($"api/Word/GetWordsContainText/{title}");
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
                 return null;
             }
         }
 
         public async Task<HttpResponseMessage> RemoveWord(string id)
         {
-            return await _currentUser.HttpClient.DeleteAsync($"api/Word/{id}");
+            try
+            {
+                return await _currentUser.HttpClient.DeleteAsync($"api/Word/{id}");
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
+                throw;
+            }
         }
 
         public async Task<HttpResponseMessage> UpdateWord(WordDto newWord)
         {
-            return await _currentUser.HttpClient.PutAsJsonAsync($"api/Word", newWord);
+            try
+            {
+                return await _currentUser.HttpClient.PutAsJsonAsync($"api/Word", newWord);
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
+                throw;
+            }
         }
 
         public async Task<int> Like(string wordId)
         {
-            return await _currentUser.HttpClient.GetFromJsonAsync<int>($"api/Word/Like/{wordId}");
+            try
+            {
+                return await _currentUser.HttpClient.GetFromJsonAsync<int>($"api/Word/Like/{wordId}");
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
+                throw;
+            }
         }
 
         public async Task<IEnumerable<UserRelationshipsWithOneUserDto>> GetLikedUsers(string wordId)
         {
-            return await _currentUser.HttpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{wordId}");
+            try
+            {
+                return await _currentUser.HttpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{wordId}");
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
+                throw;
+            }
         }
 
         public async Task<List<string>> GetLanguageToolWords(string wordLang, string str)
@@ -93,8 +147,9 @@ namespace SD.Client.Services
                         .Take(15)
                         .ToList();
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
                     return null;
                 }
 

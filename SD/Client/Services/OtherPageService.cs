@@ -29,7 +29,7 @@ namespace SD.Client.Services
         {
 
             List<OtherPageResModel> OPResModels = null;
-            
+
             try
             {
                 _logger.Log(this.ToString(), LogLevel.Information, "before GetOPResModels call url:" + $"api/OtherPage/{fromLang}/{toLang}");
@@ -38,7 +38,7 @@ namespace SD.Client.Services
                 var serializedOtherPageModels = JsonConvert.SerializeObject(OPResModels);
                 _logger.Log(this.ToString(), LogLevel.Information, "after GetOPResModels " + serializedOtherPageModels);
             }
-            catch(Exception  ex)    
+            catch (Exception ex)
             {
                 _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels 1 " + ex.Message);
                 _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels 2 " + ex.ToString());
@@ -60,9 +60,9 @@ namespace SD.Client.Services
                     if (!string.IsNullOrEmpty(otherPage.Pattern))
                     {
                         string newLink = BuildLink(otherPage.Pattern, word, fromLang, toLang);
-                            OtherPageResModel otherPageResModel = otherPage;
-                            otherPageResModel.Link = newLink;
-                            res.Add(otherPageResModel);
+                        OtherPageResModel otherPageResModel = otherPage;
+                        otherPageResModel.Link = newLink;
+                        res.Add(otherPageResModel);
                     }
                 }
             }
@@ -81,22 +81,54 @@ namespace SD.Client.Services
 
         public async Task<OtherPageModel> GetOtherPageById(string id)
         {
-            return await _currentUser.HttpClient.GetFromJsonAsync<OtherPageModel>($"api/OtherPage/{id}");
+            try
+            {
+                return await _currentUser.HttpClient.GetFromJsonAsync<OtherPageModel>($"api/OtherPage/{id}");
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
+                throw;
+            }
         }
 
         public async Task<HttpResponseMessage> RegisterOtherPage(OtherPageModel otherPage)
         {
-            return await _currentUser.HttpClient.PostAsJsonAsync("api/OtherPage", otherPage);
+            try
+            {
+                return await _currentUser.HttpClient.PostAsJsonAsync("api/OtherPage", otherPage);
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
+                throw;
+            }
         }
 
         public async Task<HttpResponseMessage> RemoveOtherPage(string id)
         {
-            return await _currentUser.HttpClient.DeleteAsync($"api/OtherPage/?id={id}");
+            try
+            {
+                return await _currentUser.HttpClient.DeleteAsync($"api/OtherPage/?id={id}");
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
+                throw;
+            }
         }
 
         public async Task<HttpResponseMessage> UpdateOtherPage(OtherPageModel newOtherPage)
         {
-            return await _currentUser.HttpClient.PutAsJsonAsync("api/OtherPage", newOtherPage);
+            try
+            {
+                return await _currentUser.HttpClient.PutAsJsonAsync("api/OtherPage", newOtherPage);
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
+                throw;
+            }
         }
     }
 }

@@ -164,7 +164,7 @@ namespace SD.Client.Pages
                             }
                             catch (Exception ex)
                             {
-                                logger.Log(this.ToString(), LogLevel.Error, "LocalStorageAccessor.SetValueAsync " + $"{FLangCode}{TLangCode} " + ex.Message);
+                                logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
                                 throw;
                             }
                         }
@@ -188,14 +188,14 @@ namespace SD.Client.Pages
             if (!Collapsed)
             {
                 opRes = null;
+                await GetOpRes();
                 try
                 {
-                    await GetOpRes();
                     FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{FLangCode}{TLangCode}");
                 }
                 catch (Exception ex)
                 {
-                    logger.Log(this.ToString(), LogLevel.Error, "GetOpRes " + ex.Message);
+                    logger.Log(this.ToString(), LogLevel.Error, $"LocalStorageAccessor.GetValueAsync<string>(fav-{FLangCode}{TLangCode}) " + ex.Message);
                     //throw;
                 }
             }

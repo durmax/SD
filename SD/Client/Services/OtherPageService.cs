@@ -32,19 +32,13 @@ namespace SD.Client.Services
 
             try
             {
-                _logger.Log(this.ToString(), LogLevel.Information, "before GetOPResModels call url:" + $"api/OtherPage/{fromLang}/{toLang}");
                 OPResModels = await _currentUser.HttpClient.GetFromJsonAsync<List<OtherPageResModel>>($"api/OtherPage/{fromLang}/{toLang}");
 
                 var serializedOtherPageModels = JsonConvert.SerializeObject(OPResModels);
-                _logger.Log(this.ToString(), LogLevel.Information, "after GetOPResModels " + serializedOtherPageModels);
             }
             catch (Exception ex)
             {
-                _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels 1 " + ex.Message);
-                _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels 2 " + ex.ToString());
-                _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels 3 " + _currentUser.ToString());
-                _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels 3 " + _currentUser?.HttpClient?.ToString());
-                _logger.Log(this.ToString(), LogLevel.Error, "after GetOPResModels 3 " + _currentUser?.HttpClient?.BaseAddress);
+                _logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
             }
             return OPResModels;
         }

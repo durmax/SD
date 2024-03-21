@@ -16,20 +16,20 @@ builder.Services.AddSingleton<LoggingService>();
 builder.Services.AddScoped<LocalStorageAccessor>();
 
 // Add configured HttpClient with AuthorizationMessageHandler
-builder.Services.AddHttpClient("forAuthenticatedUser", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["ApiUrl"]); // "ApiUrl:Prod" or "ApiUrl:Dev"
-}).AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizationMessageHandler>()
-                                     .ConfigureHandler(
-                                                        authorizedUrls: new[] { builder.Configuration["ApiUrl"] },
-                                                        scopes: new[] { builder.Configuration["AzureAd:Scope"] }
-                                                        ));
+//builder.Services.AddHttpClient("forAuthenticatedUser", client =>
+//{
+//    client.BaseAddress = new Uri(builder.Configuration["ApiUrl"]); // "ApiUrl:Prod" or "ApiUrl:Dev"
+//}).AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizationMessageHandler>()
+//                                     .ConfigureHandler(
+//                                                        authorizedUrls: new[] { builder.Configuration["ApiUrl"] },
+//                                                        scopes: new[] { builder.Configuration["AzureAd:Scope"] }
+//                                                        ));
 
 // Add configured HttpClient without AuthorizationMessageHandler
-builder.Services.AddHttpClient("forNotAuthenticatedUser", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["ApiUrl"]); // "ApiUrl:Prod" or "ApiUrl:Dev"
-});
+//builder.Services.AddHttpClient("forNotAuthenticatedUser", client =>
+//{
+//    client.BaseAddress = new Uri(builder.Configuration["ApiUrl"]); // "ApiUrl:Prod" or "ApiUrl:Dev"
+//});
 
 
 builder.Services.AddMsalAuthentication(options =>

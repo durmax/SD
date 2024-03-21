@@ -12,17 +12,29 @@ namespace SD.Client.Services
         public bool IsAuthenticated { get; set; }
         public HttpClient HttpClient { get; set; }
 
-        public CurrentUserService(AuthenticationStateProvider authenticationStateProvider, IHttpClientFactory httpClientFactory)
+        //public CurrentUserService(AuthenticationStateProvider authenticationStateProvider, IHttpClientFactory httpClientFactory)
+        //{
+        //    _authenticationStateProvider = authenticationStateProvider;
+        //    _httpClientFactory = httpClientFactory;
+
+        //    HandleAuthenticationStateChanged(_authenticationStateProvider.GetAuthenticationStateAsync());
+
+        //    // Subscribe to authentication state changes
+        //    _authenticationStateProvider.AuthenticationStateChanged += HandleAuthenticationStateChanged;
+        //}
+
+        public CurrentUserService()
         {
-            _authenticationStateProvider = authenticationStateProvider;
-            _httpClientFactory = httpClientFactory;
-
-            HandleAuthenticationStateChanged(_authenticationStateProvider.GetAuthenticationStateAsync());
-
-            // Subscribe to authentication state changes
-            _authenticationStateProvider.AuthenticationStateChanged += HandleAuthenticationStateChanged;
+            CreateHttpClient();
         }
 
+        private void CreateHttpClient()
+        {
+            HttpClient = new HttpClient()
+            {
+                BaseAddress = new("https://sdapi20200529140234.azurewebsites.net/")
+            };
+        }
         private void CreateHttpClient(bool isAuthenticated)
         {
             string httpClientName = isAuthenticated ? "forAuthenticatedUser" : "forNotAuthenticatedUser";

@@ -89,12 +89,9 @@ namespace SD.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            if (!NavigationManager.Uri.Contains("localhost"))
+            if (!NavigationManager.Uri.Contains("https://www.") && !NavigationManager.Uri.Contains("localhost"))
             {
-                if (!NavigationManager.Uri.Contains("https://www.lingoclub.net"))
-                {
-                    NavigationManager.NavigateTo("https://www.lingoclub.net/");
-                }
+                NavigationManager.NavigateTo("https://www.lingoclub.net/", true);
             }
             await DefaultLangsService.SetDefLangsAsync();
 

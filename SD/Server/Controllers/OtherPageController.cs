@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sd.Api.Services;
@@ -7,7 +8,7 @@ using SD.Shared;
 
 namespace sd.Api.Controllers
 {
-
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OtherPageController : ControllerBase
@@ -21,6 +22,7 @@ namespace sd.Api.Controllers
         }
 
         // GET: api/OtherPage/ar/de
+        [AllowAnonymous]
         [HttpGet("{fromLangCode}/{toLangCode}")]
         public async Task<ActionResult<List<OtherPageResModel>>> GetLinks(string fromLangCode, string toLangCode)
         {
@@ -31,6 +33,8 @@ namespace sd.Api.Controllers
         [Route("{id}")]
         public async Task<ActionResult<OtherPageModel>> GetById(string id)
         {
+            if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
+
             var result = await _otherPageService.GetOtherPageById(id);
             if (result == null) return NotFound();
             return result;

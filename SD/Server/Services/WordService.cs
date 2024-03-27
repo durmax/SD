@@ -32,7 +32,7 @@ namespace sd.Api.Services
 
             long wordsCount = await _wordRepository.GetDocCount(userId, lang);
 
-            while (wordDtos.Count < pageSize)
+            while (wordDtos?.Count < pageSize)
             {
                 if (wordsCount < newCurrentPage)
                 {
@@ -45,7 +45,7 @@ namespace sd.Api.Services
                     if (await IsWordSharedWithUser(wordDto, currentUserId))
                     {
                         if (word.Likes != null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
-                        if (currentUserId != wordDto.UserId)
+                        if (currentUserId != wordDto?.UserId)
                         {
                             var user = await _userRepository.GetUserById(wordDto.UserId);
                             wordDto.UserName = user?.Name;
@@ -85,8 +85,8 @@ namespace sd.Api.Services
 
             if (await IsWordSharedWithUser(wordDto, currentUserId))
             {
-                if (word.Likes != null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
-                if (currentUserId != wordDto.UserId)
+                if (word?.Likes != null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
+                if (currentUserId != wordDto?.UserId)
                 {
                     var user = await _userRepository.GetUserById(wordDto.UserId);
                     wordDto.UserName = user?.Name;

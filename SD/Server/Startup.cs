@@ -12,6 +12,7 @@ using Microsoft.Identity.Web;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
+using sd.Api.Helpers;
 
 namespace sd.Api
 {
@@ -45,7 +46,7 @@ namespace sd.Api
             services.AddSingleton<MongodbContext>();
 
             services.AddScoped<CurrUsrService>();
-            
+
             services.AddSingleton<IOtherPageRepository, OtherPageRepository>();
             services.AddSingleton<IUserRepository, UserRepository>();
             services.AddSingleton<IWordRepository, WordRepository>();
@@ -59,7 +60,11 @@ namespace sd.Api
 
             services.AddDataProtection();
 
-            services.AddControllers();
+            services.AddControllers(options =>
+            {
+                options.Filters.Add<GlobalExceptionFilter>();
+            });
+
             services.AddAutoMapper(typeof(Startup));
 
             // Swagger

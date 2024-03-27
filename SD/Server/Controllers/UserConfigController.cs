@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sd.Api.Services;
 using SD.Shared;
@@ -30,41 +28,24 @@ namespace sd.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<TransObj>> Create(UserConfigModel userConfigModel)
         {
-            try
-            {
-                if (userConfigModel == null)
-                    return BadRequest();
+            if (userConfigModel == null)
+                return BadRequest();
 
-                var status = await _userConfigService.SetUserConfigs(userConfigModel);
+            var status = await _userConfigService.SetUserConfigs(userConfigModel);
 
-                return Ok(status);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error creating new user record");
-            }
+            return Ok(status);
         }
 
         [HttpGet]
         [Route("{userId}/{label}")]
         public async Task<ActionResult<TransObj>> SetUserLabels(string userId, string label)
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(label) || string.IsNullOrWhiteSpace(userId))
-                    return BadRequest();
+            if (string.IsNullOrWhiteSpace(label) || string.IsNullOrWhiteSpace(userId))
+                return BadRequest();
 
-                var status = await _userConfigService.AddUserLabel(userId, label);
-                return Ok(status);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error creating new user record");
-            }
+            var status = await _userConfigService.AddUserLabel(userId, label);
+            return Ok(status);
         }
     }
-
 }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,15 +26,7 @@ namespace sd.Api.Controllers
         [HttpGet("{wordId}")]
         public async Task<ActionResult<OtherPageResModel>> GetWordComments(string wordId)
         {
-            try
-            {
-                return Ok(await _commentService.GetWordComments(wordId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
+            return Ok(await _commentService.GetWordComments(wordId));
         }
 
         [Authorize]
@@ -57,31 +48,14 @@ namespace sd.Api.Controllers
         [HttpGet("{WordId}/{commentId}")]
         public async Task<ActionResult<int>> LikeComment(string wordId, string commentId)
         {
-            try
-            {
-                return Ok(await _commentService.Like((await _currUsrService.GetCurrentUser(User))?.UserId, wordId, commentId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
+            return Ok(await _commentService.Like((await _currUsrService.GetCurrentUser(User))?.UserId, wordId, commentId));
         }
 
         [Authorize]
         [HttpDelete("{wordId}/{commentId}")]
         public async Task<ActionResult<bool>> DeleteComment(string wordId, string commentId)
         {
-            try
-            {
-                return Ok(await _commentService.Delete((await _currUsrService.GetCurrentUser(User))?.UserId, wordId, commentId));
-
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error deleting data");
-            }
+            return Ok(await _commentService.Delete((await _currUsrService.GetCurrentUser(User))?.UserId, wordId, commentId));
         }
     }
 }

@@ -36,182 +36,113 @@ namespace sd.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<WordDto>> GetWord(string id)
         {
-            try
-            {
-                var currentUserId = (await _currUsrService.GetCurrentUser(User))?.UserId;
-                var wordDto = await _wordService.GetWordDtoById(id, currentUserId);
+            var currentUserId = (await _currUsrService.GetCurrentUser(User))?.UserId;
+            var wordDto = await _wordService.GetWordDtoById(id, currentUserId);
 
-                if (wordDto == null) return NotFound();
+            if (wordDto == null) return NotFound();
 
-                return Ok(wordDto);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
+            return Ok(wordDto);
         }
 
         [HttpGet("GetWordByText/{userId}/{title}")]
         public async Task<ActionResult<WordDto>> GetWord(string userId, string title)
         {
-            try
-            {
-                var result = await _wordService.GetWordByText(userId, title);
+            var result = await _wordService.GetWordByText(userId, title);
 
-                if (result == null) return NotFound();
+            if (result == null) return NotFound();
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
+            return result;
         }
 
         [HttpGet("GetWordsContainText/{title}")]
         public async Task<ActionResult<IEnumerable<string>>> GetWordsContainText(string title)
         {
-            try
-            {
-                var ws = await _wordService.GetWordsContainText((await _currUsrService.GetCurrentUser(User))?.UserId, title);
-                return Ok(ws);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
+            var ws = await _wordService.GetWordsContainText((await _currUsrService.GetCurrentUser(User))?.UserId, title);
+            return Ok(ws);
         }
 
         [AllowAnonymous]
         [HttpGet("GetPageWords/{userId}/{pageSize}/{currentPage}")]
         public async Task<ActionResult<List<WordDto>>> GetPageWords(string userId, int pageSize, int currentPage)
         {
-            try
-            {
-                var res = await _wordService.GetPageWords((await _currUsrService.GetCurrentUser(User))?.UserId, userId, null, pageSize, currentPage);
-                return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
+
+            var res = await _wordService.GetPageWords((await _currUsrService.GetCurrentUser(User))?.UserId, userId, null, pageSize, currentPage);
+            return Ok(res);
+
         }
 
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<WordDto>> Create(WordDto word)
         {
-            try
+
+            if (string.IsNullOrWhiteSpace(word?.Title))
+                return BadRequest();
+
+            word.UserId = (await _currUsrService.GetCurrentUser(User))?.UserId;
+
+            if (Guid.TryParse(word?.WordId, out Guid result) && await _wordService.GetWordById(word.WordId) != null)
             {
-                if (string.IsNullOrWhiteSpace(word?.Title))
-                    return BadRequest();
-
-                word.UserId = (await _currUsrService.GetCurrentUser(User))?.UserId;
-
-                if (Guid.TryParse(word?.WordId, out Guid result) && await _wordService.GetWordById(word.WordId) != null)
-                {
-                    await _wordService.UpdateWord(word);
-                    return StatusCode(StatusCodes.Status202Accepted,
-                       "Updated");
-                }
-
-                var wordToInsert = await _wordService.GetWordByText(word.UserId, word.Title);
-
-                if (wordToInsert != null)
-                {
-                    return StatusCode(StatusCodes.Status302Found, wordToInsert);
-                }
-
-                word.WordId = await _wordService.AddWord(word);
-
-                int statusCode = !string.IsNullOrWhiteSpace(word.WordId) ? StatusCodes.Status200OK : StatusCodes.Status500InternalServerError;
-
-                return StatusCode(statusCode, word);
+                await _wordService.UpdateWord(word);
+                return StatusCode(StatusCodes.Status202Accepted,
+                   "Updated");
             }
-            catch (Exception)
+
+            var wordToInsert = await _wordService.GetWordByText(word.UserId, word.Title);
+
+            if (wordToInsert != null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    $"Error in save {word.Title}");
+                return StatusCode(StatusCodes.Status302Found, wordToInsert);
             }
+
+            word.WordId = await _wordService.AddWord(word);
+
+            int statusCode = !string.IsNullOrWhiteSpace(word.WordId) ? StatusCodes.Status200OK : StatusCodes.Status500InternalServerError;
+
+            return StatusCode(statusCode, word);
         }
 
         [Authorize]
         [HttpPut]
         public async Task<ActionResult> UpdateWord(WordDto updatedWord)
         {
-            try
-            {
-                var currentUser = (await _currUsrService.GetCurrentUser(User))?.UserId;
-                if (updatedWord.UserId != currentUser) return StatusCode(StatusCodes.Status401Unauthorized);
+            var currentUser = (await _currUsrService.GetCurrentUser(User))?.UserId;
+            if (updatedWord.UserId != currentUser) return StatusCode(StatusCodes.Status401Unauthorized);
 
-                int statusCode = await _wordService.UpdateWord(updatedWord) ? StatusCodes.Status204NoContent : StatusCodes.Status500InternalServerError;
-                return StatusCode(statusCode);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error updating data");
-            }
+            int statusCode = await _wordService.UpdateWord(updatedWord) ? StatusCodes.Status204NoContent : StatusCodes.Status500InternalServerError;
+            return StatusCode(statusCode);
         }
 
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteWord(string id)
         {
-            try
-            {
-                var currentUser = (await _currUsrService.GetCurrentUser(User))?.UserId;
-                var w = await _wordService.GetWordById(id);
-                if (w?.UserId != currentUser) return StatusCode(StatusCodes.Status401Unauthorized);
+            var currentUser = (await _currUsrService.GetCurrentUser(User))?.UserId;
+            var w = await _wordService.GetWordById(id);
+            if (w?.UserId != currentUser) return StatusCode(StatusCodes.Status401Unauthorized);
 
-                await _wordService.RemoveWord(id);
-                return StatusCode(StatusCodes.Status200OK);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error deleting data");
-            }
+            await _wordService.RemoveWord(id);
+            return StatusCode(StatusCodes.Status200OK);
         }
 
         [Authorize]
         [HttpGet("Like/{wordId}")]
         public async Task<ActionResult<int>> Like(string wordId)
         {
-            try
-            {
-                return await _likeWord.Like((await _currUsrService.GetCurrentUser(User))?.UserId, wordId);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
+            return await _likeWord.Like((await _currUsrService.GetCurrentUser(User))?.UserId, wordId);
         }
 
         [AllowAnonymous]
         [HttpGet("GetLikedUsers/{wordId}")]
         public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetLikes(string wordId)
         {
-            try
-            {
-                var word = await _wordService.GetWordById(wordId);
+            var word = await _wordService.GetWordById(wordId);
 
-                var foundUsers = await _userService.GetUsers(word.Likes);
-                var result = await _relationshipService.GetRelationships((await _currUsrService.GetCurrentUser(User))?.UserId, foundUsers);
+            var foundUsers = await _userService.GetUsers(word.Likes);
+            var result = await _relationshipService.GetRelationships((await _currUsrService.GetCurrentUser(User))?.UserId, foundUsers);
 
-                if (result == null) return NotFound();
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database");
-            }
+            if (result == null) return NotFound();
+            return Ok(result);
         }
     }
 }

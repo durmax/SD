@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,108 +24,68 @@ namespace sd.Api.Controllers
         [HttpGet("{fromLangCode}/{toLangCode}")]
         public async Task<ActionResult<List<OtherPageResModel>>> GetLinks(string fromLangCode, string toLangCode)
         {
-            try
-            {
-                return Ok(await _otherPageService.GetOPResModels(fromLangCode, toLangCode));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
-            }
+            return Ok(await _otherPageService.GetOPResModels(fromLangCode, toLangCode));
         }
 
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult<OtherPageModel>> GetById(string id)
         {
-            try
-            {
-                var result = await _otherPageService.GetOtherPageById(id);
-                if (result == null) return NotFound();
-                return result;
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database");
-            }
+            var result = await _otherPageService.GetOtherPageById(id);
+            if (result == null) return NotFound();
+            return result;
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(OtherPageModel page)
         {
-            try
+            if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
+
+            if (page == null)
+                return BadRequest();
+
+            TransObj status = await _otherPageService.RegisterOtherPage(page);
+            if (status.BoolVar)
             {
-                if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
-
-                if (page == null)
-                    return BadRequest();
-
-                TransObj status = await _otherPageService.RegisterOtherPage(page);
-                if (status.BoolVar)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error creating new page record");
-                }
+                return Ok();
             }
-            catch (Exception)
+            else
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error creating new page record");
+                "Error creating new page record");
             }
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateOtherPage(OtherPageModel updatedPage)
         {
-            try
-            {
-                if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
+            if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
-                TransObj status = await _otherPageService.UpdateOtherPage(updatedPage.OtherPageId, updatedPage);
-                if (status.BoolVar)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                    status.SetringVar);
-                }
+            TransObj status = await _otherPageService.UpdateOtherPage(updatedPage.OtherPageId, updatedPage);
+            if (status.BoolVar)
+            {
+                return Ok();
             }
-            catch (Exception ex)
+            else
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    ex.Message);
+                status.SetringVar);
             }
         }
 
         [HttpDelete]
         public async Task<ActionResult<bool>> DeleteOtherPage(string id)
         {
-            try
+            if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
+
+            OtherPageModel pageToDelete = await _otherPageService.GetOtherPageById(id);
+
+            if (pageToDelete == null)
             {
-                if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
-
-                OtherPageModel pageToDelete = await _otherPageService.GetOtherPageById(id);
-
-                if (pageToDelete == null)
-                {
-                    return NotFound($"User with Id = {id} not found");
-                }
-
-                return Ok(await _otherPageService.RemoveOtherPage(id));
+                return NotFound($"User with Id = {id} not found");
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error deleting data");
-            }
+
+            return Ok(await _otherPageService.RemoveOtherPage(id));
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using SD.Shared;
-using System.Collections.Generic;
 
 namespace sd.Api.Mappings
 {

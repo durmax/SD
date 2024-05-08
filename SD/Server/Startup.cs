@@ -42,7 +42,7 @@ namespace sd.Api
 
             services.AddSingleton<IMongodbSettings>(sp =>
                                     sp.GetRequiredService<IOptions<MongodbSettings>>().Value);
-            //services.AddSingleton<MongodbContext>(x => new MongodbContext(x.GetRequiredService<IMongodbSettings>()));
+
             services.AddSingleton<MongodbContext>();
 
             services.AddScoped<CurrUsrService>();

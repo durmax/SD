@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using SD.Shared;
 using System;
 
@@ -8,18 +9,22 @@ namespace sd.Api.Models
     {
         private readonly IMongoDatabase _database = null;
         private readonly IMongodbSettings _settings;
+        private readonly ILogger<MongodbContext> _logger;
 
-        public MongodbContext(IMongodbSettings settings)
+        public MongodbContext(IMongodbSettings settings, ILogger<MongodbContext> logger)
         {
             _settings = settings;
+            _logger = logger;
             try
             {
                 var client = new MongoClient(_settings.ConnectionString);
                 if (client != null)
                     _database = client.GetDatabase(_settings.DatabaseName);
             }
-            catch
-            { }
+            catch(Exception ex) 
+            {
+                _logger.LogError(ex.ToString());
+            }
         }
 
         public IMongoCollection<UserModel> Users =>

@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using sd.Api.Helpers;
 using sd.Api.Interfaces;
@@ -12,10 +13,12 @@ namespace sd.Api.Repositories
     public class WordRepository : IWordRepository
     {
         private readonly MongodbContext _context;
+        private readonly ILogger<WordRepository> _logger;
 
-        public WordRepository(MongodbContext mongodbContext)
+        public WordRepository(MongodbContext mongodbContext, ILogger<WordRepository> logger)
         {
             _context = mongodbContext;
+            _logger = logger;
         }
 
         public async Task<long> GetDocCount(string userId, string lang)

@@ -38,7 +38,7 @@ namespace SD.Client.Pages
         protected void AddNewWord()
         {
             NewWords++;
-            Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang });
+            Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang, ShareWith = ShareWith.Public });
         }
 
         protected async Task GetNextPage()
@@ -95,7 +95,7 @@ namespace SD.Client.Pages
             }
             await DefaultLangsService.SetDefLangsAsync();
 
-            Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang });
+            Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang, ShareWith= ShareWith.Public });
 
 
             string uiLang = await LocalStorageAccessor.GetValueAsync<string>("UILang");

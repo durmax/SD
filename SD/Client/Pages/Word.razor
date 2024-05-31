@@ -71,7 +71,7 @@
                     <img width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" />
                 </button>
 
-                <input class="position-absolute text-center border-0 mt-1 w-25" style="right:20px" value="@WordDto.Score" />
+                <input class="position-absolute text-center border-0 mt-1 w-25" style="right:20px" @bind="@WordDto.Score" />
             </div>
             @if (loading)
             {

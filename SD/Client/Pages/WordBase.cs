@@ -223,6 +223,8 @@ namespace SD.Client.Pages
                 var wDto = await WordService.GetWordById(id);
                 if (wDto != null)
                 {
+                    wDto.Score++;
+                    await WordService.UpdateWord(wDto);
                     await OnWordFound.InvokeAsync(wDto); 
                 }
                 else

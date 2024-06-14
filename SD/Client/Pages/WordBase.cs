@@ -225,7 +225,7 @@ namespace SD.Client.Pages
                 {
                     wDto.Score++;
                     await WordService.UpdateWord(wDto);
-                    await OnWordFound.InvokeAsync(wDto); 
+                    await OnWordFound.InvokeAsync(wDto);
                 }
                 else
                 {
@@ -354,12 +354,17 @@ namespace SD.Client.Pages
         /// </summary>
         /// <returns></returns>
 
-        protected void OnCollapsed()
+        protected async void OnCollapsed()
         {
             Collapsed = !Collapsed;
 
             if (!Collapsed)
             {
+                if (WordDto.WordId != "0")
+                {
+                    WordDto.Score++;
+                    await WordService.UpdateWord(WordDto);
+                }
                 SetMyText();
             }
         }

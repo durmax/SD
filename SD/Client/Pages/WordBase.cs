@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazored.TextEditor;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -70,16 +71,8 @@ namespace SD.Client.Pages
 
         protected int Rows = 2;
 
-        string _myText;
-        protected string MyText
-        {
-            get => _myText;
-            set
-            {
-                _myText = value;
-                CalculateSize(value);
-            }
-        }
+        public BlazoredTextEditor QuillHtml { get; set; }
+
         protected async Task KeyupAsync(KeyboardEventArgs e)
         {
             if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(FavSite) && WordDto != null)
@@ -87,20 +80,6 @@ namespace SD.Client.Pages
                 string url = OtherPageService.BuildLink(FavSite, WordDto.Title, WordDto.WordLang, WordDto.ToLang);
 
                 await JsRuntime.InvokeVoidAsync("window.open", url, "popup");
-            }
-        }
-
-        private void CalculateSize(string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                Rows = Math.Max(value.Split('\n').Length, value.Split('\r').Length);
-                Rows = Math.Max(Rows, 2);
-                Rows = Math.Min(Rows, 20);
-            }
-            else
-            {
-                Rows = 2;
             }
         }
 
@@ -129,7 +108,7 @@ namespace SD.Client.Pages
             loading = true;
             if (CurrentUser.IsAuthenticated)
             {
-                WordDto.Explain = MyText;
+                WordDto.Explain = await QuillHtml.GetHTML();
 
                 HttpResponseMessage respons = await WordService.AddWord(WordDto);
 
@@ -170,6 +149,7 @@ namespace SD.Client.Pages
                 {
                     WordDto.WordId = foundWordDtoToUpdate.WordId;
                     WordDto.UserId = foundWordDtoToUpdate.UserId;
+                    WordDto.Explain = await QuillHtml.GetHTML();
                     cssClassUpdate = "d-none";
 
                     HttpResponseMessage respons = await WordService.UpdateWord(WordDto);
@@ -231,19 +211,6 @@ namespace SD.Client.Pages
                 {
                     note = "The Word is not found!";
                 }
-            }
-        }
-
-        protected void SetMyText()
-        {
-            try
-            {
-                MyText = WordDto?.Explain;
-                CalculateSize(MyText);
-                Rows = Rows < 3 ? Rows : Rows++;
-            }
-            catch
-            {
             }
         }
 
@@ -365,7 +332,8 @@ namespace SD.Client.Pages
                     WordDto.Score++;
                     await WordService.UpdateWord(WordDto);
                 }
-                SetMyText();
+                if(!string.IsNullOrEmpty(WordDto?.Explain))
+                await QuillHtml.LoadHTMLContent(WordDto?.Explain);
             }
         }
 
@@ -423,7 +391,6 @@ namespace SD.Client.Pages
         {
             ShareWithImageSRC = $"/icons/Save{WordDto.ShareWith.ToString()}.svg";
             note = null;
-            SetMyText();
             await GetFavLinkAsync();
         }
     }

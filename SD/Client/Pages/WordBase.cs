@@ -393,5 +393,12 @@ namespace SD.Client.Pages
             note = null;
             await GetFavLinkAsync();
         }
+
+        public ElementReference ReferenceToInputControl;
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+               await JsRuntime.InvokeVoidAsync("Utility.setFocus", ReferenceToInputControl);
+        }
     }
 }

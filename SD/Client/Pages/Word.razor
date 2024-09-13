@@ -19,7 +19,7 @@
         }
 
         <div class="input-group">
-            <input type="search" class="form-control font-weight-bold" placeholder=@languageContainer.Keys["NewWord"]
+            <input @ref=ReferenceToInputControl type="search" class="form-control font-weight-bold" placeholder=@languageContainer.Keys["NewWord"]
                    id="wordId"
                    value="@WordDto.Title"
                    @onkeyup="KeyupAsync"

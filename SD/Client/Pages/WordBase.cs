@@ -332,8 +332,16 @@ namespace SD.Client.Pages
                     WordDto.Score++;
                     await WordService.UpdateWord(WordDto);
                 }
-                if(!string.IsNullOrEmpty(WordDto?.Explain))
-                await QuillHtml.LoadHTMLContent(WordDto?.Explain);
+                if (QuillHtml != null && !string.IsNullOrEmpty(WordDto?.Explain))
+                {
+                    try
+                    {
+                        await QuillHtml.LoadHTMLContent(WordDto?.Explain);
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
             }
         }
 
@@ -398,7 +406,7 @@ namespace SD.Client.Pages
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
-               await JsRuntime.InvokeVoidAsync("Utility.setFocus", ReferenceToInputControl);
+                await JsRuntime.InvokeVoidAsync("Utility.setFocus", ReferenceToInputControl);
         }
     }
 }

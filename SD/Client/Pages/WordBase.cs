@@ -178,14 +178,41 @@ namespace SD.Client.Pages
             cssClassUpdate = "d-none";
             note = null;
             WordDto.Title = title.Trim();
+
             if (title.Length > 2)
             {
                 loading = true;
+
+                Task<List<string>> wordsTask = null;
+                Task<List<string>> languageToolWordsTask = null;
+
                 if (CurrentUser.IsAuthenticated)
                 {
-                    SameWords = await WordService.GetWordsContainText(title);
+                    // Start SameWords task
+                    wordsTask = WordService.GetWordsContainText(title);
+                    // Continue without waiting for SameWords to complete
                 }
-                LanguageToolWords = await WordService.GetLanguageToolWords(WordDto.WordLang, title);
+
+                // Start LanguageToolWords task
+                languageToolWordsTask = WordService.GetLanguageToolWords(WordDto.WordLang, title);
+
+                // Use continuations to update UI as each task completes
+                if (wordsTask != null)
+                {
+                    _ = wordsTask.ContinueWith(async task =>
+                    {
+                        SameWords = await task;
+                        // Trigger re-render after SameWords is set
+                        StateHasChanged();
+                    });
+                }
+
+                _ = languageToolWordsTask.ContinueWith(async task =>
+                {
+                    LanguageToolWords = await task;
+                    // Trigger re-render after LanguageToolWords is set
+                    StateHasChanged();
+                });
 
                 loading = false;
             }

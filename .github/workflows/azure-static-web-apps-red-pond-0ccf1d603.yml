@@ -16,22 +16,22 @@ jobs:
     name: Build and Deploy Job
     steps:
       - uses: actions/checkout@v3
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v3
         with:
-          submodules: true
-          lfs: false
+          dotnet-version: '8.0.x'
+      - name: Build the Blazor WebAssembly app
+        run: dotnet publish SD/Client -c Release -o build
       - name: Build And Deploy
         id: builddeploy
-        uses: Azure/static-web-apps-deploy@v1
+        uses: Azure/static-web-apps-deploy@v1.1.0
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_RED_POND_0CCF1D603 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "SD//Client" # App source code path
-          api_location: "SD//Api" # Api source code path - optional
-          output_location: "wwwroot" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+          app_location: "SD/Client"
+          api_location: "SD/Api"
+          output_location: "build/wwwroot"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -40,7 +40,7 @@ jobs:
     steps:
       - name: Close Pull Request
         id: closepullrequest
-        uses: Azure/static-web-apps-deploy@v1
+        uses: Azure/static-web-apps-deploy@v1.1.0
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_RED_POND_0CCF1D603 }}
           action: "close"

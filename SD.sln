@@ -9,6 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SD.Shared", "SD\Shared\SD.S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "sd.Api", "SD\Server\sd.Api.csproj", "{585154BE-2D1A-4B86-8D36-A290F70854C9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F4A732AF-7D13-41AE-A2DF-D08A81B409EA}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\azure-static-web-apps-red-pond-0ccf1d603.yml = .github\workflows\azure-static-web-apps-red-pond-0ccf1d603.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

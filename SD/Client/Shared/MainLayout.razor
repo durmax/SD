@@ -1,5 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@inject ILanguageContainerService languageContainer
 
 <div class="sidebar">
     <NavMenu />
@@ -8,7 +7,6 @@
 <div class="main" style="max-width:550px">
     <div class="top-row px-4 auth">
         <LoginDisplay />
-        <a href="/" target="_blank">@languageContainer.Keys["About"]</a>
     </div>
 
     <div class="content px-0">

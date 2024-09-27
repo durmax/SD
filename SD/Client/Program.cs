@@ -8,6 +8,7 @@ using System.Reflection;
 using SD.Client;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
+using Microsoft.FluentUI.AspNetCore.Components;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("app");
@@ -39,6 +40,9 @@ builder.Services.AddMsalAuthentication(options =>
     options.ProviderOptions.LoginMode = "redirect";
     options.ProviderOptions.Cache.CacheLocation = "localStorage"; // remove this option to use Session storage.
 }) ;
+
+builder.Services.AddFluentUIComponents();
+
 builder.Services.AddScoped<CurrentUserService>();
 
 builder.Services.AddScoped<LangCodeService>();

@@ -1,8 +1,11 @@
 ﻿using AKSoftware.Localization.MultiLanguages;
 using Microsoft.AspNetCore.Components;
+using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using SD.Client.Models;
 using SD.Client.Services;
+using SD.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,7 +41,7 @@ namespace SD.Client.Pages
 
         protected string Fl { get; set; }
         protected string Tl { get; set; }
-
+        //protected string TlT { get; set; }
         protected void Reverse()
         {
             (Tl, Fl) = (Fl, Tl);
@@ -149,22 +152,40 @@ namespace SD.Client.Pages
         }
 
 
-
-        [Parameter] public List<LangCode> LangCodes { get; set; }
+        [Parameter] public IEnumerable<LangCode> LangCodes { get; set; }
         protected async Task<IEnumerable<LangCode>> SearchLangs(string searchText)
         {
             return await Task.FromResult(LangCodes.Where(x => x.Value.ToLower().Contains(searchText.ToLower())).ToList());
         }
 
-        protected void RemoveKnownLang(string lang)
-        {
-            if (lang != SelectedFL.Key && lang != SelectedTL.Key)
+        protected IEnumerable<LangCode> SelectedItemsT { get; set; }  //new List<LangCode>();
+        public IEnumerable<LangCode> SelectedItems {
+            get { return SelectedItemsT; }
+            set
             {
-                KnownLangs.Remove(lang);
-                SetLangsStr();
+
+                    SelectedItemsT = value;
+                    KnownLangsService.LangsStr = string.Empty;
+                    foreach (var item in SelectedItemsT)
+                    {
+                        KnownLangsService.LangsStr += "," + item.Key;
+                    }
+                BuildKnownLangs();
+
             }
         }
 
+        protected async Task OnMotherlanguageChanged(LangCode selectedOption)
+        {
+            SelectedTL = selectedOption;
+            // Handle the selected option change
+            await Task.CompletedTask;
+        }
+
+        protected async Task OnSearchAsync(OptionsSearchEventArgs<LangCode> e)
+        {
+            e.Items = LangCodes.Where(i => i.Value.Contains(e.Text, StringComparison.OrdinalIgnoreCase)).ToArray();
+        }     
 
         protected async Task ResetOPAsync()
         {
@@ -189,7 +210,7 @@ namespace SD.Client.Pages
             }
         }
 
-        protected void BuildKnownLangs()
+        protected async Task BuildKnownLangs()
         {
             KnownLangsService.AddKnownLang(SelectedFL?.Key);
             KnownLangsService.AddKnownLang(SelectedTL?.Key);
@@ -197,17 +218,19 @@ namespace SD.Client.Pages
             KnownLangs = new List<string>();
             KnownLangs = KnownLangsService.KnownLangs;
 
-            SetLangsStr();
+           await SetLangsStr();
         }
 
-        private void SetLangsStr()
+        private async Task SetLangsStr()
         {
             KnownLangsService.LangsStr = null;
+            KnownLangs = KnownLangs.Distinct().ToList();
+
             foreach (var item in KnownLangs)
             {
                 KnownLangsService.LangsStr += "," + item;
             }
-            LocalStorageAccessor.SetValueAsync("Langs", KnownLangsService.LangsStr);
+           await LocalStorageAccessor.SetValueAsync("Langs", KnownLangsService.LangsStr);
         }
 
         protected override async Task OnInitializedAsync()
@@ -230,19 +253,21 @@ namespace SD.Client.Pages
             };
 
             KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>("Langs");
-            BuildKnownLangs();
 
-            LangCodes = new List<LangCode>();
-            foreach (var item in LangCodeService.Langs)
-            {
-                LangCode langCode = new()
+            await BuildKnownLangs();
+
+            LangCodes = LangCodeService.Langs
+                .Select(item => new LangCode
                 {
                     Key = item.Key,
                     Value = item.Value
-                };
+                })
+                .ToList();
 
-                LangCodes.Add(langCode);
-            }
-        }
+            SelectedTL.Key = await LocalStorageAccessor.GetValueAsync<string>("UILang");
+
+
+             SelectedItemsT  = LangCodes.Where(l => KnownLangs.Contains(l.Key)); //new List<LangCode>();
+    }
     }
 }

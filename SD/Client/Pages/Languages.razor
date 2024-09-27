@@ -1,6 +1,8 @@
 ﻿@page "/Languages"
 @inherits LanguagesBase
 @using Blazored.Typeahead
+@using SD.Client.Models
+@using SD.Client.Services
 
 @inject SD.Client.Services.LocalStorageAccessor LocalStorageAccessor;
 
@@ -10,80 +12,39 @@
 
     <div class="card-body">
 
-        <div class="row pb-1">
-            <div class="col-6"><lable>@LanguageContainer.Keys["Motherlanguage"]</lable></div>
-            <div class="col-6">
-                <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedTL">
-                    <SelectedTemplate>
-                        @context.Value
-                    </SelectedTemplate>
-                    <ResultTemplate>
-                        @context.Value
-                    </ResultTemplate>
-                </BlazoredTypeahead>
-            </div>
-        </div>
+        <p>
+            @LanguageContainer.Keys["Motherlanguage"]
+        </p>
 
-        <div class="row pb-1">
-            <div class="col-6"><lable>@LanguageContainer.Keys["Secondlanguage"]</lable></div>
-            <div class="col-6">
-                <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="SelectedFL">
-                    <SelectedTemplate>
-                        @context.Value
-                    </SelectedTemplate>
-                    <ResultTemplate>
-                        @context.Value
-                    </ResultTemplate>
-                </BlazoredTypeahead>
-            </div>
-        </div>
+        @if (LangCodes != null && SelectedTL != null)
+        {
+            <FluentCombobox TOption="LangCode" Items=@LangCodes.Where(l => l.Key is "en" or "de" or "ar" or "fr" or "es" or "fa" or "it" or "pt" or "ru" or "tr")
+                            OptionText="@(i => i.Value)"
+                            OptionValue="@(i => i.Key)"
+                            Value="@SelectedTL.Value"
+                            Autocomplete="ComboboxAutocomplete.Inline"
+                            SelectedOptionChanged=" OnMotherlanguageChanged" />
+        }
+
     </div>
 </div>
 <div class="card mt-2">
     <div class="card-header"><b>@LanguageContainer.Keys["LList"]</b></div>
 
     <div class="card-body">
-        <div class="row pb-1">
-            <div class="col-6">
-                <label>
-                    @LanguageContainer.Keys["AddLang"]
-                </label>
-            </div>
-            <div class="col-6">
-                <BlazoredTypeahead SearchMethod="SearchLangs" @bind-Value="LangToAdd">
-                    <SelectedTemplate>
-                        @context.Value
-                    </SelectedTemplate>
-                    <ResultTemplate>
-                        @context.Value
-                    </ResultTemplate>
-                </BlazoredTypeahead>
-            </div>
-        </div>
 
+        <p>
+            @LanguageContainer.Keys["AddLang"]
+        </p>
 
-        @if (KnownLangs != null)
-        {
-
-            <div class="list-group">
-
-                @foreach (var item in KnownLangs)
-                {
-                    <div @key="item"
-                         class="list-group-item">
-                        <label class="form-check-label">
-                            @item
-                        </label>
-                        <button type="button" class="btn btn-link"
-                                @onclick="(() => RemoveKnownLang(item))">
-                            <i class="oi oi-delete"></i>
-                        </button>
-
-                    </div>
-                }
-            </div>
-        }
-
+        <FluentAutocomplete TOption="LangCode"
+                            AutoComplete="off"
+                            Autofocus="true"
+                            Width="250px"
+                            Placeholder="@LanguageContainer.Keys["AddLang"]"
+                            OnOptionsSearch="@OnSearchAsync"
+                            OptionText="@(item => item.Value)"
+                            @bind-SelectedOptions="@SelectedItems" />
     </div>
 </div>
 @if (KnownLangs != null)
@@ -125,7 +86,7 @@
     </div>
 
     @*     <AuthorizeView>
-        <Authorized> *@
+    <Authorized> *@
     <div class="mb-2">
         <button type="reset" class="btn btn-light" @onclick="ResetOPAsync"> Reset for @Fl-@Tl </button>
         <button type="reset" class="btn btn-danger float-right" @onclick="RemoveAllDataAsync">Remove all stored data</button>

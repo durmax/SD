@@ -10,7 +10,7 @@
 <div class="card">
     <div class="card-header"><b>@LanguageContainer.Keys["LangConfig"]</b></div>
 
-    <FluentGrid Spacing="1" AdaptiveRendering="true" Justify=JustifyContent.Center Style="padding: 4px; ">
+    <FluentGrid Spacing="1" AdaptiveRendering="true" Justify=JustifyContent.Center Style="padding: 2px; ">
         <FluentGridItem xs="12">
 
             <FluentAutocomplete TOption="LangCode"
@@ -27,7 +27,7 @@
         </FluentGridItem>
         @if (SelectedItems != null && SelectedTL != null)
         {
-            <FluentGridItem xs="12" sm="6" HiddenWhen="GridItemHidden.SmAndDown">
+            <FluentGridItem xs="6">
                 <FluentCombobox TOption="LangCode" Items=@SelectedItems
                                 Width="75%"
                                 Label="@LanguageContainer.Keys["Motherlanguage"]"
@@ -37,7 +37,7 @@
                                 Autocomplete="ComboboxAutocomplete.Inline"
                                 SelectedOptionChanged=" OnMotherlanguageChanged" />
             </FluentGridItem>
-            <FluentGridItem xs="12" sm="6">
+            <FluentGridItem xs="6">
                 <FluentCombobox TOption="LangCode" Items=@SelectedItems
                                 Width="75%"
                                 Label="@LanguageContainer.Keys["Secondlanguage"]"

@@ -10,87 +10,91 @@
 <div class="card">
     <div class="card-header"><b>@LanguageContainer.Keys["LangConfig"]</b></div>
 
-    <div class="card-body">
+    <FluentGrid Spacing="1" AdaptiveRendering="true" Justify=JustifyContent.Center Style="padding: 4px; ">
+        <FluentGridItem xs="12">
 
-        <p>
-            @LanguageContainer.Keys["Motherlanguage"]
-        </p>
+            <FluentAutocomplete TOption="LangCode"
+                                Label="@LanguageContainer.Keys["AddLang"]"
+                                dir="rtl"
+                                AutoComplete="off"
+                                Autofocus="true"
+                                Width="250px"
+                                Placeholder="@LanguageContainer.Keys["AddLang"]"
+                                OnOptionsSearch="@OnSearchAsync"
+                                OptionText="@(item => item.Value)"
+                                @bind-SelectedOptions="@SelectedItems" />
 
-        @if (LangCodes != null && SelectedTL != null)
+        </FluentGridItem>
+        @if (SelectedItems != null && SelectedTL != null)
         {
-            <FluentCombobox TOption="LangCode" Items=@LangCodes.Where(l => l.Key is "en" or "de" or "ar" or "fr" or "es" or "fa" or "it" or "pt" or "ru" or "tr")
-                            OptionText="@(i => i.Value)"
-                            OptionValue="@(i => i.Key)"
-                            Value="@SelectedTL.Value"
-                            Autocomplete="ComboboxAutocomplete.Inline"
-                            SelectedOptionChanged=" OnMotherlanguageChanged" />
+            <FluentGridItem xs="12" sm="6" HiddenWhen="GridItemHidden.SmAndDown">
+                <FluentCombobox TOption="LangCode" Items=@SelectedItems
+                                Width="75%"
+                                Label="@LanguageContainer.Keys["Motherlanguage"]"
+                                OptionText="@(i => i.Value)"
+                                OptionValue="@(i => i.Key)"
+                                Value="@SelectedTL.Value"
+                                Autocomplete="ComboboxAutocomplete.Inline"
+                                SelectedOptionChanged=" OnMotherlanguageChanged" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="6">
+                <FluentCombobox TOption="LangCode" Items=@SelectedItems
+                                Width="75%"
+                                Label="@LanguageContainer.Keys["Secondlanguage"]"
+                                OptionText="@(i => i.Value)"
+                                OptionValue="@(i => i.Key)"
+                                Value="@SelectedFL.Value"
+                                Autocomplete="ComboboxAutocomplete.Inline"
+                                SelectedOptionChanged=" OnSecondlanguageChanged" />
+            </FluentGridItem>
         }
+    </FluentGrid>
 
-    </div>
-</div>
-<div class="card mt-2">
-    <div class="card-header"><b>@LanguageContainer.Keys["LList"]</b></div>
+    @if (KnownLangs != null)
+    {
+        <div class="card mt-2 mb-2">
+            <div class="input-group">
+                <select class="bg-transparent rounded-0 border-0" @bind="Fl">
+                    @foreach (var item in KnownLangs)
+                    {
+                        if (item == SelectedFL?.Key)
+                        {
+                            <option selected value="@SelectedFL?.Key">@item</option>
+                        }
+                        else
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    }
+                </select>
+                <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
+                    <i class="oi oi-loop"></i>
+                </button>
+                <select class="bg-transparent rounded-0 border-0" @bind="Tl">
+                    @foreach (var item in KnownLangs)
+                    {
+                        if (item == SelectedTL?.Key)
+                        {
+                            <option selected value="@SelectedTL?.Key">@item</option>
+                        }
+                        else
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    }
+                </select>
+            </div>
 
-    <div class="card-body">
-
-        <p>
-            @LanguageContainer.Keys["AddLang"]
-        </p>
-
-        <FluentAutocomplete TOption="LangCode"
-                            AutoComplete="off"
-                            Autofocus="true"
-                            Width="250px"
-                            Placeholder="@LanguageContainer.Keys["AddLang"]"
-                            OnOptionsSearch="@OnSearchAsync"
-                            OptionText="@(item => item.Value)"
-                            @bind-SelectedOptions="@SelectedItems" />
-    </div>
-</div>
-@if (KnownLangs != null)
-{
-    <div class="card mt-2 mb-2">
-        <div class="input-group">
-            <select class="bg-transparent rounded-0 border-0" @bind="Fl">
-                @foreach (var item in KnownLangs)
-                {
-                    if (item == SelectedFL?.Key)
-                    {
-                        <option selected value="@SelectedFL?.Key">@item</option>
-                    }
-                    else
-                    {
-                        <option value="@item">@item</option>
-                    }
-                }
-            </select>
-            <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
-                <i class="oi oi-loop"></i>
-            </button>
-            <select class="bg-transparent rounded-0 border-0" @bind="Tl">
-                @foreach (var item in KnownLangs)
-                {
-                    if (item == SelectedTL?.Key)
-                    {
-                        <option selected value="@SelectedTL?.Key">@item</option>
-                    }
-                    else
-                    {
-                        <option value="@item">@item</option>
-                    }
-                }
-            </select>
+            <OtherPages FLangCode="@Fl" TLangCode="@Tl" Collapsed="false" CanSetFavSite="true"></OtherPages>
         </div>
 
-        <OtherPages FLangCode="@Fl" TLangCode="@Tl" Collapsed="false" CanSetFavSite="true"></OtherPages>
-    </div>
-
-    @*     <AuthorizeView>
+        @*     <AuthorizeView>
     <Authorized> *@
-    <div class="mb-2">
-        <button type="reset" class="btn btn-light" @onclick="ResetOPAsync"> Reset for @Fl-@Tl </button>
-        <button type="reset" class="btn btn-danger float-right" @onclick="RemoveAllDataAsync">Remove all stored data</button>
-    </div>
-    @*         </Authorized>
+        <div class="mb-2">
+            <button type="reset" class="btn btn-light" @onclick="ResetOPAsync"> Reset for @Fl-@Tl </button>
+            <button type="reset" class="btn btn-danger float-right" @onclick="RemoveAllDataAsync">Remove all stored data</button>
+        </div>
+        @*         </Authorized>
     </AuthorizeView> *@
-}
+    }
+</div>

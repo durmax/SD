@@ -181,6 +181,12 @@ namespace SD.Client.Pages
             // Handle the selected option change
             await Task.CompletedTask;
         }
+        protected async Task OnSecondlanguageChanged(LangCode selectedOption)
+        {
+            SelectedFL = selectedOption;
+            // Handle the selected option change
+            await Task.CompletedTask;
+        }
 
         protected async Task OnSearchAsync(OptionsSearchEventArgs<LangCode> e)
         {

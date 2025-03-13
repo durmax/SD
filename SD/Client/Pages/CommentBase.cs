@@ -17,7 +17,9 @@ namespace SD.Client.Pages
         [Inject]
         NavigationManager NavigationManager { get; set; }
         [Inject]
-        protected CurrentUserService CurrentUser { get; set; }
+        protected CurrentUserService CurrentUser { get; set; }    
+        [Inject]
+        protected ApiService ApiService { get; set; }
         [Inject]
         protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
 
@@ -83,7 +85,7 @@ namespace SD.Client.Pages
                 if (CurrentUser.IsAuthenticated)
                 {
                     CommentModel.CommentText = MyText;
-                    HttpResponseMessage respons = await CurrentUser.HttpClient.PostAsJsonAsync($"api/Comment/SaveComment/{WordId}", CommentModel);
+                    HttpResponseMessage respons = await ApiService.PostAsync<HttpResponseMessage>($"api/Comment/SaveComment/{WordId}", CommentModel);
                     if (!respons.IsSuccessStatusCode)
                     {
                         IsChanged = false;
@@ -111,7 +113,7 @@ namespace SD.Client.Pages
                 {
                     if (!string.IsNullOrWhiteSpace(WordId) && !string.IsNullOrWhiteSpace(CommentModel.CommentId) && !string.IsNullOrWhiteSpace(CommentModel.UserId))
                     {
-                        await CurrentUser.HttpClient.DeleteAsync($"api/Comment/DeleteComment/{WordId}/{CommentModel.CommentId}");
+                        await ApiService.DeleteAsync($"api/Comment/DeleteComment/{WordId}/{CommentModel.CommentId}");
                         await OnCommentDelete.InvokeAsync(CommentModel);
                     }
                 }

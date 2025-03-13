@@ -44,6 +44,7 @@ builder.Services.AddMsalAuthentication(options =>
 builder.Services.AddFluentUIComponents();
 
 builder.Services.AddScoped<CurrentUserService>();
+builder.Services.AddScoped<ApiService>();
 
 builder.Services.AddScoped<LangCodeService>();
 builder.Services.AddScoped<KnownLangsService>();

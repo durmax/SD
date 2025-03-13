@@ -17,6 +17,8 @@ namespace SD.Client.Pages
 
         [Inject]
         public CurrentUserService CurrentUser { set; get; }
+        [Inject]
+        protected ApiService ApiService { get; set; }
 
         protected bool SendFriendReqWait = false;
 
@@ -30,7 +32,7 @@ namespace SD.Client.Pages
             {
                 SearchDisplayClass = null;
 
-                FoundUsers = await CurrentUser.HttpClient.GetFromJsonAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/User/GetUsersByText/{SearchText}");
+                FoundUsers = await ApiService.GetAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/User/GetUsersByText/{SearchText}");
             }
             else
             {
@@ -44,7 +46,7 @@ namespace SD.Client.Pages
             if (CurrentUser.IsAuthenticated)
             {
                 FriendsDictionary = new Dictionary<string, string>();
-                FriendsDictionary = await CurrentUser.HttpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetAllFriends");
+                FriendsDictionary = await ApiService.GetAsync<Dictionary<string, string>>($"api/Relationship/GetAllFriends");
 
                 FriendsCount = FriendsDictionary.Count;
             }

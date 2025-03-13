@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SD.Shared;
 using SD.Client.Services;
 using System.Net.Http.Json;
+using System.Net.Http;
 
 namespace SD.Client.Pages
 {
@@ -15,7 +16,8 @@ namespace SD.Client.Pages
 
         [Inject]
         public CurrentUserService CurrentUser { set; get; }
-
+        [Inject]
+        protected ApiService ApiService { get; set; }
         [Parameter]
         public string UserId { get; set; }
         //protected string Email { get; set; }
@@ -39,7 +41,7 @@ namespace SD.Client.Pages
                         {
                             userModel.Role = Role.User;
 
-                            var status = await CurrentUser.HttpClient.PostAsJsonAsync("api/User/Create", userModel);
+                            var status = await ApiService.PostAsync<HttpResponseMessage>("api/User/Create", userModel);
                             if (status.IsSuccessStatusCode)
                             {
                                 Info = $"Willcome {userModel.Email}!, your data saved successfully";
@@ -53,7 +55,7 @@ namespace SD.Client.Pages
                         else
                         {
                             // userModel.Email = Email;
-                            var status = await CurrentUser.HttpClient.PutAsJsonAsync($"api/User/UpdateUser/{userModel.UserId}", userModel);
+                            var status = await ApiService.PutAsync<HttpResponseMessage>($"api/User/UpdateUser/{userModel.UserId}", userModel);
                             Info = status.ReasonPhrase;
                         }
                     }
@@ -79,7 +81,7 @@ namespace SD.Client.Pages
             {
                 try
                 {
-                    userModel = await CurrentUser.HttpClient.GetFromJsonAsync<UserModel>($"api/User/GetCurrentUser");
+                    userModel = await ApiService.GetAsync<UserModel>($"api/User/GetCurrentUser");
                 }
                 catch
                 {

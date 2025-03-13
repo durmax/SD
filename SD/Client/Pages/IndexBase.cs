@@ -19,6 +19,8 @@ namespace SD.Client.Pages
         [Inject]
         public CurrentUserService CurrentUser { set; get; }
         [Inject]
+        protected ApiService ApiService { get; set; }
+        [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
 
         protected bool CollapsedFriend { get; set; } = true;    // hide by default
@@ -116,7 +118,7 @@ namespace SD.Client.Pages
             {
                 try
                 {
-                    FriendRequestsDictionary = await CurrentUser.HttpClient.GetFromJsonAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequests");
+                    FriendRequestsDictionary = await ApiService.GetAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequests");
                 }
                 catch
                 {

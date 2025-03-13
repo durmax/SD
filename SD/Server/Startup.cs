@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
 using sd.Api.Helpers;
+using sd.Api.Midlleware;
 
 namespace sd.Api
 {
@@ -119,8 +120,9 @@ namespace sd.Api
                        .AllowAnyHeader();
             });
 
-            app.UseRouting();
             app.UseAuthentication();
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseRouting();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

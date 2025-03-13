@@ -81,7 +81,12 @@ namespace SD.Client.Services
         {
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<T>();
+                if (typeof(T) == typeof(HttpResponseMessage))
+                {
+                    return (T)(object)response;
+                }
+
+                return await response.Content?.ReadFromJsonAsync<T>();
             }
             else
             {

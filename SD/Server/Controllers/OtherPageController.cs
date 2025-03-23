@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -36,7 +37,8 @@ namespace sd.Api.Controllers
         {
             if ((await _userRepo.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
-            var result = await _otherPageRepo.GetOtherPageById(id);
+            var results = await _otherPageRepo.GetByCondation(u => u.OtherPageId == id);
+            var result = results?.FirstOrDefault();
             if (result == null) return NotFound();
             return result;
         }
@@ -49,8 +51,8 @@ namespace sd.Api.Controllers
             if (page == null)
                 return BadRequest();
 
-            TransObj status = await _otherPageRepo.Create(page);
-            if (status.BoolVar)
+            var status = await _otherPageRepo.Create(page);
+            if (status)
             {
                 return Ok();
             }
@@ -66,15 +68,15 @@ namespace sd.Api.Controllers
         {
             if ((await _userRepo.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
-            TransObj status = await _otherPageRepo.Update(updatedPage.OtherPageId, updatedPage);
-            if (status.BoolVar)
+            var status = await _otherPageRepo.Update(updatedPage);
+            if (status)
             {
                 return Ok();
             }
             else
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                status.SetringVar);
+                status);
             }
         }
 
@@ -83,7 +85,8 @@ namespace sd.Api.Controllers
         {
             if ((await _userRepo.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
-            OtherPageModel pageToDelete = await _otherPageRepo.GetOtherPageById(id);
+            var pagesToDelete = await _otherPageRepo.GetByCondation(u => u.OtherPageId == id);
+            var pageToDelete = pagesToDelete?.FirstOrDefault();
 
             if (pageToDelete == null)
             {

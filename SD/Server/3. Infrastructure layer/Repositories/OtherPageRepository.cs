@@ -5,16 +5,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver.Linq;
 using System.Linq;
+using System.Linq.Expressions;
+using System;
 
 namespace sd.Api.Infrastructure.Repositories
 {
-    public interface IOtherPageRepository
+    public interface IOtherPageRepository : ICrudBase<OtherPageModel>
     {
         Task<List<OtherPageModel>> FilterByLangs(string fromLang, string toLang);
-        Task<OtherPageModel> GetOtherPageById(string id);
-        Task<TransObj> Create(OtherPageModel otherPage);
-        Task<TransObj> Update(string id, OtherPageModel newOtherPage);
-        Task<bool> Delete(string id);
 
         Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang);
     }
@@ -26,11 +24,6 @@ namespace sd.Api.Infrastructure.Repositories
         public OtherPageRepository(MongodbContext mongodbContext)
         {
             _context = mongodbContext;
-        }
-
-        public async Task<OtherPageModel> GetOtherPageById(string id)
-        {
-            return await _context.OtherPages.Find<OtherPageModel>(u => u.OtherPageId == id).FirstOrDefaultAsync();
         }
 
         public async Task<List<OtherPageModel>> FilterByLangs(string fromLang, string toLang)
@@ -61,20 +54,18 @@ namespace sd.Api.Infrastructure.Repositories
             }
         }
 
-        public async Task<TransObj> Update(string id, OtherPageModel newOtherPage)
+        public async Task<bool> Update(OtherPageModel newOtherPage)
         {
             try
             {
                 await _context.OtherPages.FindOneAndReplaceAsync(
-      Builders<OtherPageModel>.Filter.Eq("OtherPageId", id), newOtherPage);
-
+      Builders<OtherPageModel>.Filter.Eq("OtherPageId", newOtherPage.OtherPageId), newOtherPage);
+                return true;
             }
             catch
             {
-                return new TransObj { BoolVar = false, SetringVar = "Sorry, update data error" };
+                return false;
             }
-
-            return new TransObj { BoolVar = true, SetringVar = "Your data updated successfully" };
         }
 
         public async Task<bool> Delete(string id)
@@ -108,6 +99,16 @@ namespace sd.Api.Infrastructure.Repositories
                 // return res;
             }
             return res.OrderBy(o => o.Eval).ToList();
+        }
+
+        public async Task<IEnumerable<OtherPageModel>> GetByCondation(Expression<Func<OtherPageModel, bool>> expression)
+        {
+            return await _context.OtherPages.Find(expression).ToListAsync();
+        }
+
+        Task<bool> ICrudBase<OtherPageModel>.Create(OtherPageModel entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

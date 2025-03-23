@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +28,7 @@ namespace sd.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserModel>>> Get()
         {
-            return Ok(await _userRepo.GetAllUsers());
+            return Ok(await _userRepo.GetByCondation(u => true));
         }
 
         // GET: api/User/GetUsersByText/Dured
@@ -46,18 +47,20 @@ namespace sd.Api.Controllers
         [HttpGet("GetCurrentUser")]
         public async Task<ActionResult<UserModel>> GetCurrentUser()
         {
-            var result = await _userRepo.GetUserById((await _userRepo.GetCurrentUser(User))?.UserId);
+            var cu =await _userRepo.GetCurrentUser(User);
+
+            var result = await _userRepo.GetByCondation(u => u.UserId == cu.UserId);
             if (result == null) return NotFound();
-            return result;
+            return result.FirstOrDefault();
         }
 
         // GET: api/User/GetUserById/5
         [HttpGet("GetUserByEmail/{email}")]
         public async Task<ActionResult<UserModel>> GetUserByEmail(string email)
         {
-            var result = await _userRepo.GetUserByEmail(email);
-            if (result == null) return NotFound();
-            return result;
+            var result = await _userRepo.GetByCondation(u => u.Email == email);
+            if (result.First() == null) return NotFound();
+            return result.First();
         }
 
         [AllowAnonymous]

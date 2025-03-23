@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -8,21 +10,11 @@ using SD.Shared;
 
 namespace sd.Api.Infrastructure.Repositories
 {
-    public interface IUserRepository
+    public interface IUserRepository: ICrudBase<UserModel>
     {
-        Task<IEnumerable<UserModel>> GetAllUsers();
-        Task<UserModel> GetUserById(string id);
-        Task<UserModel> GetUserByEmail(string email);
         Task<List<UserModel>> SearchUser(string searchText);
-        Task<List<UserModel>> GetUsers(List<string> userIds);
-
-        Task Create(UserModel user);
-        Task Update(string id, UserModel newUser);
-        Task<bool> Delete(string id);
-
         Task<UserModel?> RegisterUserAsync(string userEmail);
         Task<TransObj> UpdateUser(string id, UserModel newVer);
-
         Task<UserModel?> GetCurrentUser(ClaimsPrincipal user);
     }
     public class UserRepository : IUserRepository
@@ -34,63 +26,37 @@ namespace sd.Api.Infrastructure.Repositories
             _context = mongodbContext;
         }
 
-        public async Task<IEnumerable<UserModel>> GetAllUsers()
-        {
-            return await _context.Users
-                    .Find(user => true).ToListAsync();
-        }
         public async Task<List<UserModel>> SearchUser(string searchText)
         {
             return await _context.Users
                 .Find(u => u.Name.ToLower().Contains(searchText.ToLower())).ToListAsync();
         }
 
-        public async Task<List<UserModel>> GetUsers(List<string> userIds)
+        public async Task<bool> Create(UserModel user)
         {
-            return await _context.Users
-                  .Find(u => userIds.Contains(u.UserId)).ToListAsync();
+           await _context.Users.InsertOneAsync(user);
+           return true;
         }
 
-        public async Task<UserModel> GetUserById(string id)
+        public async Task<bool> Update(UserModel newVer)
         {
-            try
-            {
-                return await _context.Users.Find<UserModel>(u => u.UserId == id).FirstOrDefaultAsync();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public async Task<UserModel> GetUserByEmail(string email)
-        {
-            return await _context.Users.Find<UserModel>(u => u.Email == email).FirstOrDefaultAsync();
-        }
-
-        public async Task Create(UserModel user)
-        {
-            await _context.Users.InsertOneAsync(user);
-        }
-
-        public async Task Update(string id, UserModel newVer)
-        {
-            await _context.Users.FindOneAndReplaceAsync(Builders<UserModel>.Filter.Eq("UserId", id), newVer);
+            await _context.Users.FindOneAndReplaceAsync(Builders<UserModel>.Filter.Eq("UserId", newVer.UserId), newVer);
+            return true;
         }
 
         public async Task<bool> Delete(string id)
         {
-            MongoDB.Driver.DeleteResult DeleteRecored;
+            DeleteResult DeleteRecored;
             DeleteRecored = await _context.Users.DeleteOneAsync(Builders<UserModel>.Filter.Eq("UserId", id));
             return DeleteRecored.DeletedCount > 0;
         }
 
-        public async Task<UserModel?> RegisterUserAsync(string userEmail)
+        public async Task<UserModel?> RegisterUserAsync(string email)
         {
-            var existingUser = await GetUserByEmail(userEmail);
+            var result = await GetByCondation(u => u.Email == email);
 
-            if (existingUser != null)
-                return existingUser;
+            if (result?.First() != null)
+                return result.First();
             else
             {
                 UserModel userModel = new UserModel();
@@ -98,29 +64,30 @@ namespace sd.Api.Infrastructure.Repositories
                 userModel.CreatedAt = DateTime.Now;
 
                 await Create(userModel);
-
-                return await GetUserByEmail(userModel.Email);
+                var res = await GetByCondation(u => u.Email == userModel.Email);
+                return res.First();
             }
         }
 
         public async Task<TransObj> UpdateUser(string id, UserModel newVer)
         {
-            UserModel oldVer = await GetUserById(id);
-            if (oldVer == null || newVer == null)
+            var oldVer = await GetByCondation(u => u.UserId == id);
+            if (oldVer.Count() == 0 || newVer == null)
             {
                 return new TransObj { BoolVar = false, SetringVar = $"Sorry, update error." };
             }
 
-            if (oldVer.Email != newVer.Email)
+            if (oldVer.First().Email != newVer.Email)
             {
-                if (await GetUserByEmail(newVer.Email) != null)
+                var res = await GetByCondation(u => u.Email == newVer.Email);
+                if (res?.First() != null)
                     return new TransObj { BoolVar = false, SetringVar = $"Sorry, {newVer.Email}  is already in use." };
                 else newVer.IsEmailReg = false;
             }
 
             try
             {
-                await Update(id, newVer);
+                await Update(newVer);
             }
             catch
             {
@@ -138,6 +105,12 @@ namespace sd.Api.Infrastructure.Repositories
                 return await RegisterUserAsync(email);
             }
             else return null;
+        }
+
+        public async Task<IEnumerable<UserModel>> GetByCondation(Expression<Func<UserModel, bool>> expression)
+        {
+            return await _context.Users
+                    .Find(expression).ToListAsync();
         }
     }
 }

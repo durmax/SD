@@ -5,6 +5,7 @@ using sd.Api.Models;
 using MongoDB.Driver;
 using System;
 using sd.Api.Infrastructure.Repositories;
+using System.Linq;
 
 namespace sd.Api.Repositories
 {
@@ -128,13 +129,13 @@ namespace sd.Api.Repositories
                 {
                     if (!friendsIds.ContainsKey(relation.UserId1))
                     {
-                        var user = await _userRepo.GetUserById(relation.UserId1) ?? throw new NullReferenceException();
-                        friendsIds.Add(relation.UserId1, user.Name);
+                        var users = await _userRepo.GetByCondation(u => u.UserId== relation.UserId1) ?? throw new NullReferenceException();
+                        friendsIds.Add(relation.UserId1, users.First().Name);
                     }
                     if (!friendsIds.ContainsKey(relation.UserId2))
                     {
-                        var user = await _userRepo.GetUserById(relation.UserId2) ?? throw new NullReferenceException();
-                        friendsIds.Add(relation.UserId2, user.Name);
+                        var users = await _userRepo.GetByCondation(u => u.UserId ==  relation.UserId2) ?? throw new NullReferenceException();
+                        friendsIds.Add(relation.UserId2, users.First().Name);
                     }
                 }
                 friendsIds.Remove(userId);
@@ -174,8 +175,8 @@ namespace sd.Api.Repositories
 
             foreach (var relation in relationships)
             {
-                var user = await _userRepo.GetUserById(relation.UserId2);
-                friendRequests.Add(relation.UserId1, user.Name);
+                var users = await _userRepo.GetByCondation(u => u.UserId == relation.UserId2);
+                friendRequests.Add(relation.UserId1, users.First().Name);
             }
             return friendRequests;
         }

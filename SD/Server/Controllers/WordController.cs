@@ -7,6 +7,7 @@ using SD.Shared;
 using Microsoft.AspNetCore.Authorization;
 using sd.Api.Infrastructure.Repositories;
 using sd.Api.Repositories;
+using System.Linq;
 
 
 namespace sd.Api.Controllers
@@ -134,8 +135,8 @@ namespace sd.Api.Controllers
         {
             var word = await _wordRepo.GetWordById(wordId);
 
-            var foundUsers = await _userRepo.GetUsers(word.Likes);
-            var result = await _relationshipRepo.GetRelationships((await _userRepo.GetCurrentUser(User))?.UserId, foundUsers);
+            var foundUsers = await _userRepo.GetByCondation(u => word.Likes.Contains(u.UserId));
+            var result = await _relationshipRepo.GetRelationships((await _userRepo.GetCurrentUser(User))?.UserId, foundUsers.ToList());
 
             if (result == null) return NotFound();
             return Ok(result);

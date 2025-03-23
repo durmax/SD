@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace sd.Api.Infrastructure.Repositories
 {
-    public interface IRepositoryBase<T>
+    public interface ICrudBase<T>
     {
-        IQueryable<Task<T>> GetByCondation(Expression<Func<T,bool>> expression);
+        Task<IEnumerable<T>> GetByCondation(Expression<Func<T,bool>> expression);
         Task<bool> Create(T entity);
         Task<bool> Update(T entity);
-        Task<bool> Delete(T entity);
+        Task<bool> Delete(string id);
     }
 }

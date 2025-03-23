@@ -176,8 +176,8 @@ namespace sd.Api.Infrastructure.Repositories
                         if (word.Likes != null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
                         if (currentUserId != wordDto?.UserId)
                         {
-                            var user = await _userRepo.GetUserById(wordDto.UserId);
-                            wordDto.UserName = user?.Name;
+                            var user = await _userRepo.GetByCondation(u => u.UserId == wordDto.UserId);
+                            wordDto.UserName = user.FirstOrDefault()?.Name;
                         }
                         wordDtos.Add(wordDto);
                     }
@@ -217,8 +217,8 @@ namespace sd.Api.Infrastructure.Repositories
                 if (word?.Likes != null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
                 if (currentUserId != wordDto?.UserId)
                 {
-                    var user = await _userRepo.GetUserById(wordDto.UserId);
-                    wordDto.UserName = user?.Name;
+                    var user = await _userRepo.GetByCondation(u => u.UserId == wordDto.UserId);
+                    wordDto.UserName = user.FirstOrDefault()?.Name;
                 }
                 return wordDto;
             }

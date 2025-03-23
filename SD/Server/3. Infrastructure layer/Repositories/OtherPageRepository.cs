@@ -59,7 +59,7 @@ namespace sd.Api.Infrastructure.Repositories
             try
             {
                 await _context.OtherPages.FindOneAndReplaceAsync(
-      Builders<OtherPageModel>.Filter.Eq("OtherPageId", newOtherPage.OtherPageId), newOtherPage);
+                            Builders<OtherPageModel>.Filter.Eq("OtherPageId", newOtherPage.OtherPageId), newOtherPage);
                 return true;
             }
             catch

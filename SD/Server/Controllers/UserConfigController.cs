@@ -31,7 +31,7 @@ namespace sd.Api.Controllers
             if (userConfigModel == null)
                 return BadRequest();
 
-            var status = await _userConfigRepo.SetUserConfigs(userConfigModel);
+            var status = await _userConfigRepo.Update(userConfigModel);
 
             return Ok(status);
         }

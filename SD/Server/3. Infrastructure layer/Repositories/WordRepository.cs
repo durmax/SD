@@ -44,17 +44,15 @@ namespace sd.Api.Infrastructure.Repositories
     {
         private readonly MongodbContext _context;
         private readonly IMapper _mapper;
-        private readonly ILogger<WordRepository> _logger;
         private readonly IUserRepository _userRepo;
         private readonly IRelationshipRepository _relationshipRepo;
 
         public WordRepository(MongodbContext mongodbContext, IMapper mapper, ILogger<WordRepository> logger, IUserRepository userRepos, IRelationshipRepository relationshipRepo)
         {
             _context = mongodbContext;
-            this._mapper = mapper;
-            _logger = logger;
-            this._userRepo = userRepos;
-            this._relationshipRepo = relationshipRepo;
+            _mapper = mapper;
+            _userRepo = userRepos;
+            _relationshipRepo = relationshipRepo;
         }
 
         public async Task<long> GetDocCount(string userId, string lang)

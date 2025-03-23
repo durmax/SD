@@ -74,5 +74,3 @@ namespace sd.Api.Infrastructure.Repositories
         }
     }
 }
-
-

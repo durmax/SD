@@ -16,12 +16,12 @@ namespace sd.Api.Controllers
     {
 
         private readonly IUserRepository _userRepo;
-        private readonly IRelationshipRepository relationshipRepo;
+        private readonly IRelationshipRepository _relationshipRepo;
 
         public UserController(IRelationshipRepository relationshipRepo, IUserRepository userRepo)
         {
-            this._userRepo = userRepo;
-            this.relationshipRepo = relationshipRepo;
+            _userRepo = userRepo;
+            _relationshipRepo = relationshipRepo;
         }
 
         [HttpGet]
@@ -37,7 +37,7 @@ namespace sd.Api.Controllers
             List<UserModel> foundUsers;
             foundUsers = await _userRepo.SearchUser(searchText);
 
-            IEnumerable<UserRelationshipsWithOneUserDto> result = await relationshipRepo.GetRelationships((await _userRepo.GetCurrentUser(User))?.UserId, foundUsers);
+            IEnumerable<UserRelationshipsWithOneUserDto> result = await _relationshipRepo.GetRelationships((await _userRepo.GetCurrentUser(User))?.UserId, foundUsers);
             if (result == null) return NotFound();
             return Ok(result);
         }

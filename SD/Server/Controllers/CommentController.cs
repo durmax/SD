@@ -18,7 +18,7 @@ namespace sd.Api.Controllers
         public CommentController(IUserRepository userRepo, IWordRepository wordRepo)
         {
             _userRepo = userRepo;
-            this._wordRepo = wordRepo;
+            _wordRepo = wordRepo;
         }
 
         [HttpGet("{wordId}")]

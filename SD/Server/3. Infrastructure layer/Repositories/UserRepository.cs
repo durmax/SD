@@ -28,7 +28,6 @@ namespace sd.Api.Infrastructure.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly MongodbContext _context = null;
-        private readonly IUserRepository _userRepository;
 
         public UserRepository(MongodbContext mongodbContext)
         {
@@ -98,7 +97,7 @@ namespace sd.Api.Infrastructure.Repositories
                 userModel.UserId = Guid.NewGuid().ToString();
                 userModel.CreatedAt = DateTime.Now;
 
-                await _userRepository.Create(userModel);
+                await Create(userModel);
 
                 return await GetUserByEmail(userModel.Email);
             }
@@ -121,7 +120,7 @@ namespace sd.Api.Infrastructure.Repositories
 
             try
             {
-                await _userRepository.Update(id, newVer);
+                await Update(id, newVer);
             }
             catch
             {

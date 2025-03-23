@@ -15,8 +15,6 @@ namespace sd.Api.Repositories
         Task<string> GetRelationshipId(string UserId1, Relation reletion, string UserId2);
 
         Task<List<RelationshipModel>> GetAllFrindsRelationships(string userId);
-        // Task<List<Relationship>> FrindRequestsFromUser(string userId);
-        //Task<List<RelationshipModel>> FriendRequestsToUser1(string userId);
         Task<Relation> GetRelationshipsBetweenTwoUsers(string userId1, string userId2);
 
         Task<bool> Create(RelationshipModel relationship);
@@ -38,7 +36,7 @@ namespace sd.Api.Repositories
         public RelationshipRepository(MongodbContext mongodbContext, IUserRepository userRepo)
         {
             _context = mongodbContext;
-            this._userRepo = userRepo;
+            _userRepo = userRepo;
         }
 
         public async Task<bool> Create(RelationshipModel relationship)
@@ -68,11 +66,6 @@ namespace sd.Api.Repositories
         {
             return await _context.Relationships.Find<RelationshipModel>(r => (r.UserId1 == userId || r.UserId2 == userId) && r.Reletion == Relation.Friend).ToListAsync();
         }
-
-        //public async Task<List<RelationshipModel>> FriendRequestsToUser1(string userId)
-        //{
-        //    return await _context.Relationships.Find<RelationshipModel>(r => r.UserId2 == userId && r.Reletion == Relation.FriendRequestTo).ToListAsync();
-        //}
 
         public async Task<RelationshipModel> GetRelationshipById(string id)
         {

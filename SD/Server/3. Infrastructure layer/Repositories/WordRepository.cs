@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using sd.Api.Helpers;
 using sd.Api.Models;
 using sd.Api.Repositories;
 using SD.Shared;
@@ -54,13 +53,13 @@ namespace sd.Api.Infrastructure.Repositories
 
         public async Task<long> GetDocCount(string userId, string lang)
         {
-            var filter = WordHelper.GetFilter(null, userId, lang);
+            var filter = GetFilter(null, userId, lang);
             return await _context.Words.CountDocumentsAsync(filter);
         }
 
         public async Task<WordModel?> GetWord(string userId, string lang, int currentPage, int limit)
         {
-            var filter = WordHelper.GetFilter(null, userId, lang);
+            var filter = GetFilter(null, userId, lang);
             var sort = Builders<WordModel>.Sort.Descending("Score").Descending("CreatedAt");
             try
             {
@@ -347,6 +346,16 @@ namespace sd.Api.Infrastructure.Repositories
         public async Task<IEnumerable<WordModel>> GetByCondation(Expression<Func<WordModel, bool>> expression)
         {
             return await _context.Words.Find(expression).ToListAsync();
+        }
+
+        private static FilterDefinition<WordModel> GetFilter(string? wordId, string userId, string lang)
+        {
+            FilterDefinition<WordModel> filter = Builders<WordModel>.Filter.Empty;
+            if (wordId != null) filter &= Builders<WordModel>.Filter.Eq(x => x.WordId, wordId);
+            if (userId != null && userId != "0") filter &= Builders<WordModel>.Filter.Eq(x => x.UserId, userId);
+            if (lang != null) filter &= Builders<WordModel>.Filter.Eq(x => x.ToLang, lang);
+
+            return filter;
         }
     }
 }

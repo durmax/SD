@@ -20,7 +20,7 @@ namespace sd.Api.Controllers
         public OtherPageController(OtherPageRepository otherPageRepo, IUserRepository userRepo)
         {
             _otherPageRepo = otherPageRepo;
-            this._userRepo = userRepo;
+            _userRepo = userRepo;
         }
 
         // GET: api/OtherPage/ar/de

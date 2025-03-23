@@ -9,22 +9,14 @@ namespace sd.Api.Models
     {
         private readonly IMongoDatabase _database = null;
         private readonly IMongodbSettings _settings;
-        private readonly ILogger<MongodbContext> _logger;
 
-        public MongodbContext(IMongodbSettings settings, ILogger<MongodbContext> logger)
+        public MongodbContext(IMongodbSettings settings)
         {
             _settings = settings;
-            _logger = logger;
-            try
-            {
+
                 var client = new MongoClient(_settings.ConnectionString);
                 if (client != null)
                     _database = client.GetDatabase(_settings.DatabaseName);
-            }
-            catch(Exception ex) 
-            {
-                _logger.LogError(ex.ToString());
-            }
         }
 
         public IMongoCollection<UserModel> Users =>

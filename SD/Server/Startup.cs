@@ -9,7 +9,6 @@ using Microsoft.Identity.Web;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
-using sd.Api.Helpers;
 using sd.Api.Midlleware;
 using sd.Api.Infrastructure.Repositories;
 using sd.Api.Repositories;
@@ -52,10 +51,7 @@ namespace sd.Api
 
             services.AddDataProtection();
 
-            services.AddControllers(options =>
-            {
-                options.Filters.Add<GlobalExceptionFilter>();
-            });
+            services.AddControllers();
 
             services.AddAutoMapper(typeof(Startup));
 

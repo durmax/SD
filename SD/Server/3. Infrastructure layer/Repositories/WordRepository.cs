@@ -9,20 +9,17 @@ using SD.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace sd.Api.Infrastructure.Repositories
 {
-    public interface IWordRepository
+    public interface IWordRepository: ICrudBase<WordModel>
     {
         Task<long> GetDocCount(string userId, string lang);
         Task<WordModel?> GetWord(string userId, string lang, int currentPage, int limit);
-        Task<WordModel> GetWordById(string id);
-        Task<IEnumerable<WordModel>> GetWordsContainTextWWW(string userId, string text);
+        Task<IEnumerable<WordModel>> GetWordModelsContainText(string userId, string text);
 
-        Task<bool> Create(WordModel word);
-        Task<bool> Update(string id, WordModel newWord);
-        Task<bool> Delete(string id);
 
         Task<int> Like(string userId, string wordId);
 
@@ -75,12 +72,7 @@ namespace sd.Api.Infrastructure.Repositories
             }
         }
 
-        public async Task<WordModel> GetWordById(string id)
-        {
-            return await _context.Words.Find(w => w.WordId == id).FirstOrDefaultAsync();
-        }
-
-        public async Task<IEnumerable<WordModel>> GetWordsContainTextWWW(string userId, string text)
+        public async Task<IEnumerable<WordModel>> GetWordModelsContainText(string userId, string text)
         {
             FilterDefinition<WordModel> filter = Builders<WordModel>.Filter.Empty;
 
@@ -106,11 +98,11 @@ namespace sd.Api.Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> Update(string wordId, WordModel updatedWord)
+        public async Task<bool> Update(WordModel updatedWord)
         {
             try
             {
-                await _context.Words.ReplaceOneAsync(word => word.WordId == wordId, updatedWord);
+                await _context.Words.ReplaceOneAsync(word => word.WordId == updatedWord.WordId, updatedWord);
                 return true;
             }
             catch
@@ -134,7 +126,8 @@ namespace sd.Api.Infrastructure.Repositories
 
         public async Task<int> Like(string userId, string wordId)
         {
-            WordModel wordModel = await GetWordById(wordId);
+            var wordModels = await GetByCondation(w => w.WordId == wordId);
+            var wordModel = wordModels.FirstOrDefault();
             if (wordModel != null)
             {
                 if (wordModel.Likes == null) wordModel.Likes = new List<string>();
@@ -146,7 +139,7 @@ namespace sd.Api.Infrastructure.Repositories
                 {
                     wordModel.Likes.Remove(userId);
                 }
-                await Update(wordModel.WordId, wordModel);
+                await Update(wordModel);
                 return wordModel.Likes.Count();
             }
             else return -1;
@@ -209,7 +202,8 @@ namespace sd.Api.Infrastructure.Repositories
 
         public async Task<WordDto> GetWordDtoById(string id, string? currentUserId)
         {
-            var word = await GetWordById(id);
+            var words = await GetByCondation(w => w.WordId == id);
+            var word = words.First();
             var wordDto = _mapper.Map<WordDto>(word);
 
             if (await IsWordSharedWithUser(wordDto, currentUserId))
@@ -232,7 +226,7 @@ namespace sd.Api.Infrastructure.Repositories
             if (word != null)
             {
                 word.Score++;
-                await Update(word.WordId, word);
+                await Update(word);
             }
             return _mapper.Map<WordDto>(word);
         }
@@ -240,7 +234,7 @@ namespace sd.Api.Infrastructure.Repositories
         public async Task<IEnumerable<string>> GetWordsContainText(string userId, string text)
         {
             List<string> res = new();
-            var words = await GetWordsContainTextWWW(userId, text);
+            var words = await GetWordModelsContainText(userId, text);
             foreach (var w in words)
             {
                 res.Add($"{w.Title}:{w.WordId}");
@@ -259,21 +253,24 @@ namespace sd.Api.Infrastructure.Repositories
 
         public async Task<bool> UpdateWord(WordDto updatedWordDto)
         {
-            var oldWord = await GetWordById(updatedWordDto.WordId);
+            var oldWords = await GetByCondation(w => w.WordId == updatedWordDto.WordId);
+            var oldWord = oldWords.FirstOrDefault();
+
             if (oldWord == null) return false;
 
             var word = _mapper.Map<WordModel>(updatedWordDto);
             word.Comments = oldWord.Comments;
             word.Likes = oldWord.Likes;
             word.CreatedAt = DateTime.Now;
-            return await Update(updatedWordDto.WordId, word);
+            return await Update(word);
         }
 
         public async Task<bool> SaveComment(string wordId, CommentModel newComment)
         {
             try
             {
-                WordModel word = await GetWordById(wordId);
+                var words = await GetByCondation(w => w.WordId == wordId);
+                var word = words.First();
                 if (word != null)
                 {
                     if (word.Comments != null)
@@ -291,7 +288,7 @@ namespace sd.Api.Infrastructure.Repositories
                     }
 
                     word.Comments.Add(newComment);
-                    await Update(wordId, word);
+                    await Update(word);
                     return true;
                 }
                 else return false;
@@ -304,7 +301,8 @@ namespace sd.Api.Infrastructure.Repositories
 
         public async Task<int> LikeComment(string userId, string wordId, string commentId)
         {
-            WordModel word = await GetWordById(wordId);
+            var words = await GetByCondation(w => w.WordId == wordId);
+            var word = words.First();
             CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
             if (comment == null) return 0;
             if (comment == null) comment.Likes = new List<string>();
@@ -323,7 +321,8 @@ namespace sd.Api.Infrastructure.Repositories
 
         public async Task<bool> DeleteComment(string currUsr, string wordId, string commentId)
         {
-            WordModel word = await GetWordById(wordId);
+            var words = await GetByCondation(w => w.WordId == wordId);
+            var word = words.First();
 
             CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
             if (comment == null) return false;
@@ -332,7 +331,7 @@ namespace sd.Api.Infrastructure.Repositories
             if (word.Comments.Contains(comment))
             {
                 word.Comments.Remove(comment);
-                await Update(wordId, word);
+                await Update(word);
                 return true;
             }
             return false;
@@ -340,8 +339,14 @@ namespace sd.Api.Infrastructure.Repositories
 
         public async Task<IEnumerable<CommentModel?>> GetWordComments(string wordId)
         {
-            WordModel word = await GetWordById(wordId);
+            var words = await GetByCondation(w => w.WordId == wordId);
+            var word = words.First();
             return word?.Comments;
+        }
+
+        public async Task<IEnumerable<WordModel>> GetByCondation(Expression<Func<WordModel, bool>> expression)
+        {
+            return await _context.Words.Find(expression).ToListAsync();
         }
     }
 }

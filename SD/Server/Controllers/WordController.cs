@@ -78,7 +78,10 @@ namespace sd.Api.Controllers
 
             word.UserId = (await _userRepo.GetCurrentUser(User))?.UserId;
 
-            if (Guid.TryParse(word?.WordId, out Guid result) && await _wordRepo.GetWordById(word.WordId) != null)
+            var wordMs = await _wordRepo.GetByCondation(w => w.WordId == word.WordId);
+            var wordM = wordMs.First();
+
+            if (Guid.TryParse(word?.WordId, out Guid result) && wordM != null)
             {
                 await _wordRepo.UpdateWord(word);
                 return StatusCode(StatusCodes.Status202Accepted,
@@ -115,7 +118,9 @@ namespace sd.Api.Controllers
         public async Task<ActionResult> DeleteWord(string id)
         {
             var currentUser = (await _userRepo.GetCurrentUser(User))?.UserId;
-            var w = await _wordRepo.GetWordById(id);
+            var ws = await _wordRepo.GetByCondation(w => w.WordId == id);
+            var w = ws.First();
+
             if (w?.UserId != currentUser) return StatusCode(StatusCodes.Status401Unauthorized);
 
             await _wordRepo.Delete(id);
@@ -133,7 +138,8 @@ namespace sd.Api.Controllers
         [HttpGet("GetLikedUsers/{wordId}")]
         public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetLikes(string wordId)
         {
-            var word = await _wordRepo.GetWordById(wordId);
+            var ws = await _wordRepo.GetByCondation(w => w.WordId == wordId);
+            var word = ws.First();
 
             var foundUsers = await _userRepo.GetByCondation(u => word.Likes.Contains(u.UserId));
             var result = await _relationshipRepo.GetRelationships((await _userRepo.GetCurrentUser(User))?.UserId, foundUsers.ToList());

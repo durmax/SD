@@ -3,7 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace sd.Api.Interfaces
+namespace sd.Api.Infrastructure.Repositories
 {
     public interface IRepositoryBase<T>
     {

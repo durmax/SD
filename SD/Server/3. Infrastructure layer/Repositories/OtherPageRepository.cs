@@ -1,5 +1,4 @@
 ﻿using MongoDB.Driver;
-using sd.Api.Interfaces;
 using sd.Api.Models;
 using SD.Shared;
 using System.Collections.Generic;
@@ -7,8 +6,20 @@ using System.Threading.Tasks;
 using MongoDB.Driver.Linq;
 using System.Linq;
 
-namespace sd.Api.Repositories
+namespace sd.Api.Infrastructure.Repositories
 {
+    public interface IOtherPageRepository
+    {
+        //Task<IEnumerable<OtherPageResModel>> GetOPResModels(string fromLang, string toLang);
+        Task<List<OtherPageModel>> FilterByLangs(string fromLang, string toLang);
+        Task<OtherPageModel> GetOtherPageById(string id);
+        Task<TransObj> Create(OtherPageModel otherPage);
+        Task<TransObj> Update(string id, OtherPageModel newOtherPage);
+        Task<bool> Delete(string id);
+
+        Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang);
+    }
+
     public class OtherPageRepository : IOtherPageRepository
     {
         private readonly MongodbContext _context = null;
@@ -73,6 +84,31 @@ namespace sd.Api.Repositories
             DeleteRecored = await _context.OtherPages.DeleteOneAsync(
               Builders<OtherPageModel>.Filter.Eq("OtherPageId", id));
             return DeleteRecored.DeletedCount > 0;
+        }
+
+        public async Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
+        {
+            List<OtherPageResModel> res = new List<OtherPageResModel>();
+            var otherPages = await FilterByLangs(fromLang, toLang);
+
+            if (otherPages != null)
+            {
+                int i = 0;
+                foreach (var otherPage in otherPages)
+                {
+                    if (!string.IsNullOrEmpty(otherPage.Pattern))
+                    {
+                        OtherPageResModel otherPageResModel = new OtherPageResModel();
+                        otherPageResModel.Pattern = otherPage.Pattern;
+                        otherPageResModel.Host = otherPage.Host;
+                        otherPageResModel.Type = otherPage.PageType;
+                        otherPageResModel.Eval = otherPage.Eval == 0 ? i++ : otherPage.Eval;
+                        res.Add(otherPageResModel);
+                    }
+                }
+                // return res;
+            }
+            return res.OrderBy(o => o.Eval).ToList();
         }
     }
 }

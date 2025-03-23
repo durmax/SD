@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using sd.Api.Services;
 using SD.Shared;
 using Microsoft.AspNetCore.Authorization;
+using sd.Api.Repositories;
+using sd.Api.Infrastructure.Repositories;
 
 namespace sd.Api.Controllers
 {
@@ -13,19 +14,19 @@ namespace sd.Api.Controllers
     [ApiController]
     public class RelationshipController : ControllerBase
     {
-        private readonly CurrUsrService _currUsrService;
-        private readonly RelationshipService _relationshipService;
+        private readonly IUserRepository _userRepo;
+        private readonly IRelationshipRepository _relationshipRepo;
 
-        public RelationshipController(RelationshipService relationshipService, CurrUsrService currUsrService)
+        public RelationshipController(RelationshipRepository relationshipRepo, IUserRepository userRepo)
         {
-            _currUsrService = currUsrService;
-            _relationshipService = relationshipService;
+            _userRepo = userRepo;
+            _relationshipRepo = relationshipRepo;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<RelationshipModel>> GetRelationshipById(string id)
         {
-            var result = await _relationshipService.GetRelationshipById(id);
+            var result = await _relationshipRepo.GetRelationshipById(id);
 
             if (result == null) return NotFound();
 
@@ -35,20 +36,20 @@ namespace sd.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<bool>> AddRelationship(RelationshipModel relationship)
         {
-            relationship.UserId1 = (await _currUsrService.GetCurrentUser(User))?.UserId;
-            return await _relationshipService.AddRelationship(relationship);
+            relationship.UserId1 = (await _userRepo.GetCurrentUser(User))?.UserId;
+            return await _relationshipRepo.AddRelationship(relationship);
         }
 
         [HttpPost("{oldRelationshipId}")]
         public async Task<ActionResult<bool>> UpdatRelationship(string oldRelationshipId, RelationshipModel newRelationship)
         {
-            return await _relationshipService.UpdatRelationship(oldRelationshipId, newRelationship);
+            return await _relationshipRepo.Updat(oldRelationshipId, newRelationship);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> RemoveRelationship(string id)
         {
-            await _relationshipService.RemoveRelationship(id);
+            await _relationshipRepo.Delete(id);
             return StatusCode(StatusCodes.Status200OK);
         }
 
@@ -56,8 +57,8 @@ namespace sd.Api.Controllers
         [HttpDelete("{UserId}/{reletion}/{friendId}")]
         public async Task<ActionResult> RemoveFriendship(Relation reletion, string friendId)
         {
-            var rId = await _relationshipService.GetRelationshipId((await _currUsrService.GetCurrentUser(User))?.UserId, reletion, friendId);
-            await _relationshipService.RemoveRelationship(rId);
+            var rId = await _relationshipRepo.GetRelationshipId((await _userRepo.GetCurrentUser(User))?.UserId, reletion, friendId);
+            await _relationshipRepo.Delete(rId);
             return StatusCode(StatusCodes.Status200OK);
         }
 
@@ -65,7 +66,7 @@ namespace sd.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<Dictionary<string, string>>> GetAllFriends()
         {
-            var result = await _relationshipService.GetAllFriends((await _currUsrService.GetCurrentUser(User))?.UserId);
+            var result = await _relationshipRepo.GetAllFriends((await _userRepo.GetCurrentUser(User))?.UserId);
 
             if (result == null) return NotFound();
 
@@ -76,7 +77,7 @@ namespace sd.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<Dictionary<string, string>>> GetFriendRequests()
         {
-            var result = await _relationshipService.FriendRequestsToUser((await _currUsrService.GetCurrentUser(User))?.UserId);
+            var result = await _relationshipRepo.FriendRequestsToUser((await _userRepo.GetCurrentUser(User))?.UserId);
 
             if (result == null) return NotFound();
 

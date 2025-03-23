@@ -3,7 +3,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using sd.Api.Services;
+using sd.Api.Infrastructure.Repositories;
+using sd.Api.Repositories;
 using SD.Shared;
 
 namespace sd.Api.Controllers
@@ -13,21 +14,20 @@ namespace sd.Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly CurrUsrService _currUsrService;
-        private readonly UserService _userService;
-        private readonly RelationshipService _relationshipService;
 
-        public UserController(UserService userService, RelationshipService relationshipService, CurrUsrService currUsrService)
+        private readonly IUserRepository _userRepo;
+        private readonly IRelationshipRepository relationshipRepo;
+
+        public UserController(IRelationshipRepository relationshipRepo, IUserRepository userRepo)
         {
-            _currUsrService = currUsrService;
-            _userService = userService;
-            _relationshipService = relationshipService;
+            this._userRepo = userRepo;
+            this.relationshipRepo = relationshipRepo;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserModel>>> Get()
         {
-            return Ok(await _userService.GetAllUsers());
+            return Ok(await _userRepo.GetAllUsers());
         }
 
         // GET: api/User/GetUsersByText/Dured
@@ -35,9 +35,9 @@ namespace sd.Api.Controllers
         public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetUsersByText(string searchText)
         {
             List<UserModel> foundUsers;
-            foundUsers = await _userService.SearchUser(searchText);
+            foundUsers = await _userRepo.SearchUser(searchText);
 
-            IEnumerable<UserRelationshipsWithOneUserDto> result = await _relationshipService.GetRelationships((await _currUsrService.GetCurrentUser(User))?.UserId, foundUsers);
+            IEnumerable<UserRelationshipsWithOneUserDto> result = await relationshipRepo.GetRelationships((await _userRepo.GetCurrentUser(User))?.UserId, foundUsers);
             if (result == null) return NotFound();
             return Ok(result);
         }
@@ -46,7 +46,7 @@ namespace sd.Api.Controllers
         [HttpGet("GetCurrentUser")]
         public async Task<ActionResult<UserModel>> GetCurrentUser()
         {
-            var result = await _userService.GetUserById((await _currUsrService.GetCurrentUser(User))?.UserId);
+            var result = await _userRepo.GetUserById((await _userRepo.GetCurrentUser(User))?.UserId);
             if (result == null) return NotFound();
             return result;
         }
@@ -55,7 +55,7 @@ namespace sd.Api.Controllers
         [HttpGet("GetUserByEmail/{email}")]
         public async Task<ActionResult<UserModel>> GetUserByEmail(string email)
         {
-            var result = await _userService.GetUserByEmail(email);
+            var result = await _userRepo.GetUserByEmail(email);
             if (result == null) return NotFound();
             return result;
         }
@@ -71,7 +71,7 @@ namespace sd.Api.Controllers
                 user.Email = User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
             }
 
-            var registeredUser = await _userService.RegisterUserAsync(user.Email);
+            var registeredUser = await _userRepo.RegisterUserAsync(user.Email);
             return Ok(registeredUser);
         }
 
@@ -82,13 +82,13 @@ namespace sd.Api.Controllers
             {
                 return NotFound(new TransObj { BoolVar = false, SetringVar = $"Sorry, update error." });
             }
-            return Ok(await _userService.UpdateUser(id, updatedUser));
+            return Ok(await _userRepo.UpdateUser(id, updatedUser));
         }
 
         [HttpDelete]
         public async Task<ActionResult<bool>> DeleteUser(string id)
         {
-            return Ok(await _userService.RemoveUser(id));
+            return Ok(await _userRepo.Delete(id));
         }
     }
 }

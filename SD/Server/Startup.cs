@@ -4,16 +4,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using sd.Api.Interfaces;
 using sd.Api.Models;
-using sd.Api.Repositories;
-using sd.Api.Services;
 using Microsoft.Identity.Web;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
 using sd.Api.Helpers;
 using sd.Api.Midlleware;
+using sd.Api.Infrastructure.Repositories;
+using sd.Api.Repositories;
 
 namespace sd.Api
 {
@@ -46,18 +45,10 @@ namespace sd.Api
 
             services.AddSingleton<MongodbContext>();
 
-            services.AddScoped<CurrUsrService>();
-
             services.AddScoped<IOtherPageRepository, OtherPageRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IWordRepository, WordRepository>();
-            services.AddScoped<ICommentService, CommentService>();
-            services.AddScoped<ILikeWordService, LikeWordService>();
             services.AddScoped<IRelationshipRepository, RelationshipRepository>();
-            services.AddScoped<WordService>();
-            services.AddScoped<RelationshipService>();
-            services.AddScoped<UserService>();
-            services.AddScoped<OtherPageService>();
 
             services.AddDataProtection();
 

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using sd.Api.Services;
+using sd.Api.Infrastructure.Repositories;
 using SD.Shared;
 
 namespace sd.Api.Controllers
@@ -13,12 +13,13 @@ namespace sd.Api.Controllers
     [ApiController]
     public class OtherPageController : ControllerBase
     {
-        private readonly CurrUsrService _currUsrService;
-        private readonly OtherPageService _otherPageService;
-        public OtherPageController(OtherPageService otherPageService, CurrUsrService currUsrService)
+        private readonly IOtherPageRepository _otherPageRepo;
+        private readonly IUserRepository _userRepo;
+
+        public OtherPageController(OtherPageRepository otherPageRepo, IUserRepository userRepo)
         {
-            _currUsrService = currUsrService;
-            _otherPageService = otherPageService;
+            _otherPageRepo = otherPageRepo;
+            this._userRepo = userRepo;
         }
 
         // GET: api/OtherPage/ar/de
@@ -26,16 +27,16 @@ namespace sd.Api.Controllers
         [HttpGet("{fromLangCode}/{toLangCode}")]
         public async Task<ActionResult<List<OtherPageResModel>>> GetLinks(string fromLangCode, string toLangCode)
         {
-            return Ok(await _otherPageService.GetOPResModels(fromLangCode, toLangCode));
+            return Ok(await _otherPageRepo.GetOPResModels(fromLangCode, toLangCode));
         }
 
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult<OtherPageModel>> GetById(string id)
         {
-            if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
+            if ((await _userRepo.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
-            var result = await _otherPageService.GetOtherPageById(id);
+            var result = await _otherPageRepo.GetOtherPageById(id);
             if (result == null) return NotFound();
             return result;
         }
@@ -43,12 +44,12 @@ namespace sd.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(OtherPageModel page)
         {
-            if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
+            if ((await _userRepo.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
             if (page == null)
                 return BadRequest();
 
-            TransObj status = await _otherPageService.RegisterOtherPage(page);
+            TransObj status = await _otherPageRepo.Create(page);
             if (status.BoolVar)
             {
                 return Ok();
@@ -63,9 +64,9 @@ namespace sd.Api.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateOtherPage(OtherPageModel updatedPage)
         {
-            if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
+            if ((await _userRepo.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
-            TransObj status = await _otherPageService.UpdateOtherPage(updatedPage.OtherPageId, updatedPage);
+            TransObj status = await _otherPageRepo.Update(updatedPage.OtherPageId, updatedPage);
             if (status.BoolVar)
             {
                 return Ok();
@@ -80,16 +81,16 @@ namespace sd.Api.Controllers
         [HttpDelete]
         public async Task<ActionResult<bool>> DeleteOtherPage(string id)
         {
-            if ((await _currUsrService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
+            if ((await _userRepo.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
-            OtherPageModel pageToDelete = await _otherPageService.GetOtherPageById(id);
+            OtherPageModel pageToDelete = await _otherPageRepo.GetOtherPageById(id);
 
             if (pageToDelete == null)
             {
                 return NotFound($"User with Id = {id} not found");
             }
 
-            return Ok(await _otherPageService.RemoveOtherPage(id));
+            return Ok(await _otherPageRepo.Delete(id));
         }
     }
 }

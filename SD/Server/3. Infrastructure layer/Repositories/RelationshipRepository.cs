@@ -6,21 +6,16 @@ using MongoDB.Driver;
 using System;
 using sd.Api.Infrastructure.Repositories;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace sd.Api.Repositories
 {
-    public interface IRelationshipRepository
+    public interface IRelationshipRepository : ICrudBase<RelationshipModel>
     {
-        Task<RelationshipModel> GetRelationshipById(string id);
-
         Task<string> GetRelationshipId(string UserId1, Relation reletion, string UserId2);
 
-        Task<List<RelationshipModel>> GetAllFrindsRelationships(string userId);
-        Task<Relation> GetRelationshipsBetweenTwoUsers(string userId1, string userId2);
 
-        Task<bool> Create(RelationshipModel relationship);
-        Task<bool> Updat(string oldRelationshipId, RelationshipModel newRelationship);
-        Task<bool> Delete(string oldRelationshipId);
+        Task<Relation> GetRelationshipsBetweenTwoUsers(string userId1, string userId2);
 
         Task<bool> AddRelationship(RelationshipModel relationship);
         Task<bool> RemoveFriendship(string UserId, string friendId);
@@ -52,25 +47,15 @@ namespace sd.Api.Repositories
                 return false;
             }
         }
-        public async Task<bool> Updat(string oldRelationshipId, RelationshipModel newRelationship)
+        public async Task<bool> Update(RelationshipModel newRelationship)
         {
-            await _context.Relationships.FindOneAndReplaceAsync(r => r.RelationshipId == oldRelationshipId, newRelationship);
+            await _context.Relationships.FindOneAndReplaceAsync(r => r.RelationshipId == newRelationship.RelationshipId, newRelationship);
             return true;
         }
         public async Task<bool> Delete(string oldRelationshipId)
         {
             await _context.Relationships.DeleteOneAsync(r => r.RelationshipId == oldRelationshipId);
             return true;
-        }
-
-        public async Task<List<RelationshipModel>> GetAllFrindsRelationships(string userId)
-        {
-            return await _context.Relationships.Find<RelationshipModel>(r => (r.UserId1 == userId || r.UserId2 == userId) && r.Reletion == Relation.Friend).ToListAsync();
-        }
-
-        public async Task<RelationshipModel> GetRelationshipById(string id)
-        {
-            return await _context.Relationships.Find<RelationshipModel>(r => r.RelationshipId == id).FirstOrDefaultAsync();
         }
 
         private FilterDefinition<RelationshipModel> GetFilter(string userId1, Relation reletion, string userId2)
@@ -122,7 +107,7 @@ namespace sd.Api.Repositories
         {
             Dictionary<string, string> friendsIds = new Dictionary<string, string>();
 
-            List<RelationshipModel> relationships = await GetAllFrindsRelationships(userId);
+            var relationships = await GetByCondation(r => (r.UserId1 == userId || r.UserId2 == userId) && r.Reletion == Relation.Friend);
             if (relationships != null)
             {
                 foreach (var relation in relationships)
@@ -179,6 +164,11 @@ namespace sd.Api.Repositories
                 friendRequests.Add(relation.UserId1, users.First().Name);
             }
             return friendRequests;
+        }
+
+        public async Task<IEnumerable<RelationshipModel>> GetByCondation(Expression<Func<RelationshipModel, bool>> expression)
+        {
+            return await _context.Relationships.Find(expression).ToListAsync();
         }
     }
 }

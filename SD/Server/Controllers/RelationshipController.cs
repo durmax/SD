@@ -6,6 +6,7 @@ using SD.Shared;
 using Microsoft.AspNetCore.Authorization;
 using sd.Api.Repositories;
 using sd.Api.Infrastructure.Repositories;
+using System.Linq;
 
 namespace sd.Api.Controllers
 {
@@ -26,7 +27,8 @@ namespace sd.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<RelationshipModel>> GetRelationshipById(string id)
         {
-            var result = await _relationshipRepo.GetRelationshipById(id);
+            var rs = await _relationshipRepo.GetByCondation(r => r.RelationshipId == id);
+            var result = rs?.FirstOrDefault();
 
             if (result == null) return NotFound();
 
@@ -43,7 +45,7 @@ namespace sd.Api.Controllers
         [HttpPost("{oldRelationshipId}")]
         public async Task<ActionResult<bool>> UpdatRelationship(string oldRelationshipId, RelationshipModel newRelationship)
         {
-            return await _relationshipRepo.Updat(oldRelationshipId, newRelationship);
+            return await _relationshipRepo.Update(newRelationship);
         }
 
         [HttpDelete("{id}")]

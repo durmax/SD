@@ -19,7 +19,6 @@ namespace sd.Api.Repositories
 
         Task<bool> AddRelationship(RelationshipModel relationship);
         Task<bool> RemoveFriendship(string UserId, string friendId);
-        Task<Dictionary<string, string>> GetAllFriends(string userId);
         Task<List<UserRelationshipsWithOneUserDto>> GetRelationships(string CurrentUserId, List<UserModel> users);
         Task<Dictionary<string, string>> FriendRequestsToUser(string userId);
     }
@@ -83,9 +82,7 @@ namespace sd.Api.Repositories
         public async Task<Relation> GetRelationshipsBetweenTwoUsers(string userId1, string userId2)
         {
             RelationshipModel relationship = await _context.Relationships.Find(GetFilter(userId1, Relation.None, userId2)).FirstOrDefaultAsync();
-            if (relationship == null) return Relation.None;
-            return relationship.Reletion;
-
+            return relationship == null ? Relation.None : relationship.Reletion;
         }
 
         public async Task<bool> AddRelationship(RelationshipModel relationship)
@@ -102,30 +99,6 @@ namespace sd.Api.Repositories
         {
             string relationshipId = await GetRelationshipId(UserId, Relation.None, friendId);
             return await Delete(relationshipId);
-        }
-        public async Task<Dictionary<string, string>> GetAllFriends(string userId)
-        {
-            Dictionary<string, string> friendsIds = new Dictionary<string, string>();
-
-            var relationships = await GetByCondation(r => (r.UserId1 == userId || r.UserId2 == userId) && r.Reletion == Relation.Friend);
-            if (relationships != null)
-            {
-                foreach (var relation in relationships)
-                {
-                    if (!friendsIds.ContainsKey(relation.UserId1))
-                    {
-                        var users = await _userRepo.GetByCondation(u => u.UserId== relation.UserId1) ?? throw new NullReferenceException();
-                        friendsIds.Add(relation.UserId1, users.First().Name);
-                    }
-                    if (!friendsIds.ContainsKey(relation.UserId2))
-                    {
-                        var users = await _userRepo.GetByCondation(u => u.UserId ==  relation.UserId2) ?? throw new NullReferenceException();
-                        friendsIds.Add(relation.UserId2, users.First().Name);
-                    }
-                }
-                friendsIds.Remove(userId);
-            }
-            return friendsIds;
         }
 
         public async Task<List<UserRelationshipsWithOneUserDto>> GetRelationships(string CurrentUserId, List<UserModel> users)

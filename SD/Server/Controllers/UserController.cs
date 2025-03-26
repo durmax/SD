@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using sd.Api.Infrastructure.Repositories;
+using sd.Api.Application.Services;
 using sd.Api.Repositories;
 using SD.Shared;
 
@@ -16,19 +16,19 @@ namespace sd.Api.Controllers
     public class UserController : ControllerBase
     {
 
-        private readonly IUserRepository _userRepo;
-        private readonly IRelationshipRepository _relationshipRepo;
+        private readonly IUserService _userService;
+        private readonly IRelationshipService relationshipService;
 
-        public UserController(IRelationshipRepository relationshipRepo, IUserRepository userRepo)
+        public UserController(IUserService userService, IRelationshipService relationshipService)
         {
-            _userRepo = userRepo;
-            _relationshipRepo = relationshipRepo;
+            _userService = userService;
+            this.relationshipService = relationshipService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserModel>>> Get()
         {
-            return Ok(await _userRepo.GetByCondation(u => true));
+            return Ok(await _userService.GetByCondation(u => true));
         }
 
         // GET: api/User/GetUsersByText/Dured
@@ -36,9 +36,9 @@ namespace sd.Api.Controllers
         public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetUsersByText(string searchText)
         {
             List<UserModel> foundUsers;
-            foundUsers = await _userRepo.SearchUser(searchText);
+            foundUsers = await _userService.SearchUser(searchText);
 
-            IEnumerable<UserRelationshipsWithOneUserDto> result = await _relationshipRepo.GetRelationships((await _userRepo.GetCurrentUser(User))?.UserId, foundUsers);
+            IEnumerable<UserRelationshipsWithOneUserDto> result = await relationshipService.GetRelationships((await _userService.GetCurrentUser(User))?.UserId, foundUsers);
             if (result == null) return NotFound();
             return Ok(result);
         }
@@ -47,9 +47,9 @@ namespace sd.Api.Controllers
         [HttpGet("GetCurrentUser")]
         public async Task<ActionResult<UserModel>> GetCurrentUser()
         {
-            var cu =await _userRepo.GetCurrentUser(User);
+            var cu =await _userService.GetCurrentUser(User);
 
-            var result = await _userRepo.GetByCondation(u => u.UserId == cu.UserId);
+            var result = await _userService.GetByCondation(u => u.UserId == cu.UserId);
             if (result == null) return NotFound();
             return result.FirstOrDefault();
         }
@@ -58,7 +58,7 @@ namespace sd.Api.Controllers
         [HttpGet("GetUserByEmail/{email}")]
         public async Task<ActionResult<UserModel>> GetUserByEmail(string email)
         {
-            var result = await _userRepo.GetByCondation(u => u.Email == email);
+            var result = await _userService.GetByCondation(u => u.Email == email);
             if (result.First() == null) return NotFound();
             return result.First();
         }
@@ -74,7 +74,7 @@ namespace sd.Api.Controllers
                 user.Email = User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
             }
 
-            var registeredUser = await _userRepo.RegisterUserAsync(user.Email);
+            var registeredUser = await _userService.RegisterUserAsync(user.Email);
             return Ok(registeredUser);
         }
 
@@ -85,13 +85,13 @@ namespace sd.Api.Controllers
             {
                 return NotFound(new TransObj { BoolVar = false, SetringVar = $"Sorry, update error." });
             }
-            return Ok(await _userRepo.UpdateUser(id, updatedUser));
+            return Ok(await _userService.UpdateUser(id, updatedUser));
         }
 
         [HttpDelete]
         public async Task<ActionResult<bool>> DeleteUser(string id)
         {
-            return Ok(await _userRepo.Delete(id));
+            return Ok(await _userService.Delete(id));
         }
     }
 }

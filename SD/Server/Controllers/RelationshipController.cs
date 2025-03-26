@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using sd.Api.Repositories;
 using sd.Api.Infrastructure.Repositories;
 using System.Linq;
+using sd.Api.Application.Services;
 
 namespace sd.Api.Controllers
 {
@@ -15,19 +16,19 @@ namespace sd.Api.Controllers
     [ApiController]
     public class RelationshipController : ControllerBase
     {
-        private readonly IUserRepository _userRepo;
-        private readonly IRelationshipRepository _relationshipRepo;
+        private readonly IRelationshipService _relationshipService;
+        private readonly IUserService _userService;
 
-        public RelationshipController(RelationshipRepository relationshipRepo, IUserRepository userRepo)
+        public RelationshipController(IRelationshipService relationshipService, IUserService userService)
         {
-            _userRepo = userRepo;
-            _relationshipRepo = relationshipRepo;
+            _relationshipService = relationshipService;
+            _userService = userService;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<RelationshipModel>> GetRelationshipById(string id)
         {
-            var rs = await _relationshipRepo.GetByCondation(r => r.RelationshipId == id);
+            var rs = await _relationshipService.GetByCondation(r => r.RelationshipId == id);
             var result = rs?.FirstOrDefault();
 
             if (result == null) return NotFound();
@@ -38,20 +39,20 @@ namespace sd.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<bool>> AddRelationship(RelationshipModel relationship)
         {
-            relationship.UserId1 = (await _userRepo.GetCurrentUser(User))?.UserId;
-            return await _relationshipRepo.AddRelationship(relationship);
+            relationship.UserId1 = (await _userService.GetCurrentUser(User))?.UserId;
+            return await _relationshipService.AddRelationship(relationship);
         }
 
         [HttpPost("{oldRelationshipId}")]
         public async Task<ActionResult<bool>> UpdatRelationship(string oldRelationshipId, RelationshipModel newRelationship)
         {
-            return await _relationshipRepo.Update(newRelationship);
+            return await _relationshipService.Update(newRelationship);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> RemoveRelationship(string id)
         {
-            await _relationshipRepo.Delete(id);
+            await _relationshipService.Delete(id);
             return StatusCode(StatusCodes.Status200OK);
         }
 
@@ -59,8 +60,8 @@ namespace sd.Api.Controllers
         [HttpDelete("{UserId}/{reletion}/{friendId}")]
         public async Task<ActionResult> RemoveFriendship(Relation reletion, string friendId)
         {
-            var rId = await _relationshipRepo.GetRelationshipId((await _userRepo.GetCurrentUser(User))?.UserId, reletion, friendId);
-            await _relationshipRepo.Delete(rId);
+            var rId = await _relationshipService.GetRelationshipId((await _userService.GetCurrentUser(User))?.UserId, reletion, friendId);
+            await _relationshipService.Delete(rId);
             return StatusCode(StatusCodes.Status200OK);
         }
 
@@ -68,7 +69,7 @@ namespace sd.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<Dictionary<string, string>>> GetAllFriends()
         {
-            var result = await _relationshipRepo.GetAllFriends((await _userRepo.GetCurrentUser(User))?.UserId);
+            var result = await _relationshipService.GetAllFriends((await _userService.GetCurrentUser(User))?.UserId);
 
             if (result == null) return NotFound();
 
@@ -79,7 +80,7 @@ namespace sd.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<Dictionary<string, string>>> GetFriendRequests()
         {
-            var result = await _relationshipRepo.FriendRequestsToUser((await _userRepo.GetCurrentUser(User))?.UserId);
+            var result = await _relationshipService.FriendRequestsToUser((await _userService.GetCurrentUser(User))?.UserId);
 
             if (result == null) return NotFound();
 

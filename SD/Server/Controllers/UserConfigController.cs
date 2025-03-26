@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using sd.Api.Infrastructure.Repositories;
+using sd.Api.Application.Services;
 using SD.Shared;
 
 namespace sd.Api.Controllers
@@ -12,17 +12,17 @@ namespace sd.Api.Controllers
     [ApiController]
     public class UserConfigController : ControllerBase
     {
-        private readonly IUserConfigRepository _userConfigRepo;
+        private readonly IUserConfigService userConfigService;
 
-        public UserConfigController(UserConfigRepository userConfigRepo)
+        public UserConfigController(IUserConfigService userConfigService)
         {
-            _userConfigRepo = userConfigRepo;
+            this.userConfigService = userConfigService;
         }
 
         [HttpGet]
         public async Task<IEnumerable<string>> GetUserLables(string userId)
         {
-            return await _userConfigRepo.GetUserLabels(userId);
+            return await userConfigService.GetUserLabels(userId);
         }
 
         [HttpPost]
@@ -31,7 +31,7 @@ namespace sd.Api.Controllers
             if (userConfigModel == null)
                 return BadRequest();
 
-            var status = await _userConfigRepo.Update(userConfigModel);
+            var status = await userConfigService.Update(userConfigModel);
 
             return Ok(status);
         }
@@ -43,7 +43,7 @@ namespace sd.Api.Controllers
             if (string.IsNullOrWhiteSpace(label) || string.IsNullOrWhiteSpace(userId))
                 return BadRequest();
 
-            var status = await _userConfigRepo.AddUserLabel(userId, label);
+            var status = await userConfigService.AddUserLabel(userId, label);
             return Ok(status);
         }
     }

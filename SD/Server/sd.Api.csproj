@@ -24,6 +24,5 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="1. Core layer\UseCases\" />
-	  <Folder Include="2. Application layer\Services\" />
 	</ItemGroup>
 </Project>

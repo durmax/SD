@@ -5,9 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SD.Shared;
 using Microsoft.AspNetCore.Authorization;
-using sd.Api.Infrastructure.Repositories;
-using sd.Api.Repositories;
 using System.Linq;
+using sd.Api.Application.Services;
 
 
 namespace sd.Api.Controllers
@@ -17,24 +16,23 @@ namespace sd.Api.Controllers
     [ApiController]
     public class WordController : ControllerBase
     {
-        private readonly IUserRepository _userRepo;
-        private readonly IWordRepository _wordRepo;
-        private readonly IRelationshipRepository _relationshipRepo;
+        private readonly IUserService userService;
+        private readonly IWordService wordService;
+        private readonly IRelationshipService relationshipService;
 
-        public WordController(IUserRepository userRepo,
-        IWordRepository wordRepo, IRelationshipRepository relationshipRepo)
+        public WordController(IUserService userService, IWordService wordService, IRelationshipService relationshipService)
         {
-            _userRepo = userRepo;
-            _wordRepo = wordRepo;
-            _relationshipRepo = relationshipRepo;
+            this.userService = userService;
+            this.wordService = wordService;
+            this.relationshipService = relationshipService;
         }
 
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<WordDto>> GetWord(string id)
         {
-            var currentUserId = (await _userRepo.GetCurrentUser(User))?.UserId;
-            var wordDto = await _wordRepo.GetWordDtoById(id, currentUserId);
+            var currentUserId = (await userService.GetCurrentUser(User))?.UserId;
+            var wordDto = await wordService.GetWordDtoById(id, currentUserId);
 
             if (wordDto == null) return NotFound();
 
@@ -44,7 +42,7 @@ namespace sd.Api.Controllers
         [HttpGet("GetWordByText/{userId}/{title}")]
         public async Task<ActionResult<WordDto>> GetWord(string userId, string title)
         {
-            var result = await _wordRepo.GetWordByText(userId, title);
+            var result = await wordService.GetWordByText(userId, title);
 
             if (result == null) return NotFound();
 
@@ -54,7 +52,7 @@ namespace sd.Api.Controllers
         [HttpGet("GetWordsContainText/{title}")]
         public async Task<ActionResult<IEnumerable<string>>> GetWordsContainText(string title)
         {
-            var ws = await _wordRepo.GetWordsContainText((await _userRepo.GetCurrentUser(User))?.UserId, title);
+            var ws = await wordService.GetWordsContainText((await userService.GetCurrentUser(User))?.UserId, title);
             return Ok(ws);
         }
 
@@ -62,10 +60,8 @@ namespace sd.Api.Controllers
         [HttpGet("GetPageWords/{userId}/{pageSize}/{currentPage}")]
         public async Task<ActionResult<List<WordDto>>> GetPageWords(string userId, int pageSize, int currentPage)
         {
-
-            var res = await _wordRepo.GetPageWords((await _userRepo.GetCurrentUser(User))?.UserId, userId, null, pageSize, currentPage);
+            var res = await wordService.GetPageWords((await userService.GetCurrentUser(User))?.UserId, userId, null, pageSize, currentPage);
             return Ok(res);
-
         }
 
         [Authorize]
@@ -76,26 +72,26 @@ namespace sd.Api.Controllers
             if (string.IsNullOrWhiteSpace(word?.Title))
                 return BadRequest();
 
-            word.UserId = (await _userRepo.GetCurrentUser(User))?.UserId;
+            word.UserId = (await userService.GetCurrentUser(User))?.UserId;
 
-            var wordMs = await _wordRepo.GetByCondation(w => w.WordId == word.WordId);
-            var wordM = wordMs.First();
+            var wordMs = await wordService.GetByCondation(w => w.WordId == word.WordId);
+            var wordM = wordMs.FirstOrDefault();
 
             if (Guid.TryParse(word?.WordId, out Guid result) && wordM != null)
             {
-                await _wordRepo.UpdateWord(word);
+                await wordService.UpdateWord(word);
                 return StatusCode(StatusCodes.Status202Accepted,
                    "Updated");
             }
 
-            var wordToInsert = await _wordRepo.GetWordByText(word.UserId, word.Title);
+            var wordToInsert = await wordService.GetWordByText(word.UserId, word.Title);
 
             if (wordToInsert != null)
             {
                 return StatusCode(StatusCodes.Status302Found, wordToInsert);
             }
 
-            word.WordId = await _wordRepo.AddWord(word);
+            word.WordId = await wordService.AddWord(word);
 
             int statusCode = !string.IsNullOrWhiteSpace(word.WordId) ? StatusCodes.Status200OK : StatusCodes.Status500InternalServerError;
 
@@ -106,10 +102,10 @@ namespace sd.Api.Controllers
         [HttpPut]
         public async Task<ActionResult> UpdateWord(WordDto updatedWord)
         {
-            var currentUser = (await _userRepo.GetCurrentUser(User))?.UserId;
+            var currentUser = (await userService.GetCurrentUser(User))?.UserId;
             if (updatedWord.UserId != currentUser) return StatusCode(StatusCodes.Status401Unauthorized);
 
-            int statusCode = await _wordRepo.UpdateWord(updatedWord) ? StatusCodes.Status204NoContent : StatusCodes.Status500InternalServerError;
+            int statusCode = await wordService.UpdateWord(updatedWord) ? StatusCodes.Status204NoContent : StatusCodes.Status500InternalServerError;
             return StatusCode(statusCode);
         }
 
@@ -117,13 +113,13 @@ namespace sd.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteWord(string id)
         {
-            var currentUser = (await _userRepo.GetCurrentUser(User))?.UserId;
-            var ws = await _wordRepo.GetByCondation(w => w.WordId == id);
+            var currentUser = (await userService.GetCurrentUser(User))?.UserId;
+            var ws = await wordService.GetByCondation(w => w.WordId == id);
             var w = ws.First();
 
             if (w?.UserId != currentUser) return StatusCode(StatusCodes.Status401Unauthorized);
 
-            await _wordRepo.Delete(id);
+            await wordService.Delete(id);
             return StatusCode(StatusCodes.Status200OK);
         }
 
@@ -131,18 +127,18 @@ namespace sd.Api.Controllers
         [HttpGet("Like/{wordId}")]
         public async Task<ActionResult<int>> Like(string wordId)
         {
-            return await _wordRepo.Like((await _userRepo.GetCurrentUser(User))?.UserId, wordId);
+            return await wordService.Like((await userService.GetCurrentUser(User))?.UserId, wordId);
         }
 
         [AllowAnonymous]
         [HttpGet("GetLikedUsers/{wordId}")]
         public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetLikes(string wordId)
         {
-            var ws = await _wordRepo.GetByCondation(w => w.WordId == wordId);
+            var ws = await wordService.GetByCondation(w => w.WordId == wordId);
             var word = ws.First();
 
-            var foundUsers = await _userRepo.GetByCondation(u => word.Likes.Contains(u.UserId));
-            var result = await _relationshipRepo.GetRelationships((await _userRepo.GetCurrentUser(User))?.UserId, foundUsers.ToList());
+            var foundUsers = await userService.GetByCondation(u => word.Likes.Contains(u.UserId));
+            var result = await relationshipService.GetRelationships((await userService.GetCurrentUser(User))?.UserId, foundUsers.ToList());
 
             if (result == null) return NotFound();
             return Ok(result);

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using sd.Api.Midlleware;
 using sd.Api.Infrastructure.Repositories;
 using sd.Api.Repositories;
+using sd.Api.Application.Services;
 
 namespace sd.Api
 {
@@ -48,6 +49,12 @@ namespace sd.Api
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IWordRepository, WordRepository>();
             services.AddScoped<IRelationshipRepository, RelationshipRepository>();
+
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserConfigRepository, UserConfigRepository>();
+            services.AddScoped<IRelationshipService, RelationshipService>();
+            services.AddScoped<IOtherPageService, OtherPageService>();
+            services.AddScoped<IWordService, WordService>();
 
             services.AddDataProtection();
 

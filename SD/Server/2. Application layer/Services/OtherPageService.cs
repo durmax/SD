@@ -2,6 +2,7 @@
 using SD.Shared;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -10,7 +11,6 @@ namespace sd.Api.Application.Services
     public interface IOtherPageService : ICrudBase<OtherPageModel>
     {
         Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang);
-        Task<List<OtherPageResModel>> GetOtherPageResModels(string fromLang, string toLang);
         Task<bool> AddOtherPage(OtherPageModel otherPage);
         Task<bool> ModifyOtherPage(OtherPageModel otherPage);
         Task<bool> RemoveOtherPage(string id);
@@ -24,9 +24,35 @@ namespace sd.Api.Application.Services
             _otherPageRepository = otherPageRepository;
         }
 
-        public async Task<List<OtherPageResModel>> GetOtherPageResModels(string fromLang, string toLang)
+        public async Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
         {
-            return await _otherPageRepository.GetOPResModels(fromLang, toLang);
+            List<OtherPageResModel> res = new List<OtherPageResModel>();
+
+
+            var otherPages = await _otherPageRepository.GetByCondation(o =>
+                  (o.PrimLangs == "All" && o.SecLangs == "All")
+               || (o.PrimLangs.Contains(fromLang) && (o.SecLangs.Contains(toLang) || o.SecLangs == "All"))
+               || (o.PrimLangs.Contains(toLang) && o.SecLangs.Contains(fromLang))
+                   );
+
+            if (otherPages != null)
+            {
+                int i = 0;
+                foreach (var otherPage in otherPages)
+                {
+                    if (!string.IsNullOrEmpty(otherPage.Pattern))
+                    {
+                        OtherPageResModel otherPageResModel = new OtherPageResModel();
+                        otherPageResModel.Pattern = otherPage.Pattern;
+                        otherPageResModel.Host = otherPage.Host;
+                        otherPageResModel.Type = otherPage.PageType;
+                        otherPageResModel.Eval = otherPage.Eval == 0 ? i++ : otherPage.Eval;
+                        res.Add(otherPageResModel);
+                    }
+                }
+                // return res;
+            }
+            return res.OrderBy(o => o.Eval).ToList();
         }
 
         public async Task<bool> AddOtherPage(OtherPageModel otherPage)
@@ -62,11 +88,6 @@ namespace sd.Api.Application.Services
         public Task<bool> Delete(string id)
         {
             return _otherPageRepository.Delete(id);
-        }
-
-        public Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
-        {
-            return _otherPageRepository.GetOPResModels(fromLang, toLang);
         }
     }
 }

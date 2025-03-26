@@ -12,9 +12,6 @@ namespace sd.Api.Infrastructure.Repositories
 {
     public interface IOtherPageRepository : ICrudBase<OtherPageModel>
     {
-        Task<List<OtherPageModel>> FilterByLangs(string fromLang, string toLang);
-
-        Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang);
     }
 
     public class OtherPageRepository : IOtherPageRepository
@@ -24,17 +21,6 @@ namespace sd.Api.Infrastructure.Repositories
         public OtherPageRepository(MongodbContext mongodbContext)
         {
             _context = mongodbContext;
-        }
-
-        public async Task<List<OtherPageModel>> FilterByLangs(string fromLang, string toLang)
-        {
-
-            return await _context.OtherPages.AsQueryable<OtherPageModel>()
-               .Where(o =>
-                  (o.PrimLangs == "All" && o.SecLangs == "All")
-               || (o.PrimLangs.Contains(fromLang) && (o.SecLangs.Contains(toLang) || o.SecLangs == "All"))
-               || (o.PrimLangs.Contains(toLang) && o.SecLangs.Contains(fromLang))
-                   ).ToListAsync();
         }
 
         public async Task<TransObj> Create(OtherPageModel otherPage)
@@ -76,34 +62,9 @@ namespace sd.Api.Infrastructure.Repositories
             return DeleteRecored.DeletedCount > 0;
         }
 
-        public async Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
-        {
-            List<OtherPageResModel> res = new List<OtherPageResModel>();
-            var otherPages = await FilterByLangs(fromLang, toLang);
-
-            if (otherPages != null)
-            {
-                int i = 0;
-                foreach (var otherPage in otherPages)
-                {
-                    if (!string.IsNullOrEmpty(otherPage.Pattern))
-                    {
-                        OtherPageResModel otherPageResModel = new OtherPageResModel();
-                        otherPageResModel.Pattern = otherPage.Pattern;
-                        otherPageResModel.Host = otherPage.Host;
-                        otherPageResModel.Type = otherPage.PageType;
-                        otherPageResModel.Eval = otherPage.Eval == 0 ? i++ : otherPage.Eval;
-                        res.Add(otherPageResModel);
-                    }
-                }
-                // return res;
-            }
-            return res.OrderBy(o => o.Eval).ToList();
-        }
-
         public async Task<IEnumerable<OtherPageModel>> GetByCondation(Expression<Func<OtherPageModel, bool>> expression)
         {
-            return await _context.OtherPages.Find(expression).ToListAsync();
+            return await _context.OtherPages.AsQueryable().Where(expression).ToListAsync();
         }
 
         Task<bool> ICrudBase<OtherPageModel>.Create(OtherPageModel entity)

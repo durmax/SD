@@ -32,12 +32,19 @@ namespace sd.Api.Application.Services
 
         public async Task<bool> AddRelationship(RelationshipModel relationship)
         {
-            return await _relationshipRepository.AddRelationship(relationship);
+            bool res = false;
+            Relation relation = await _relationshipRepository.GetRelationshipsBetweenTwoUsers(relationship.UserId1, relationship.UserId2);
+            if (relation == Relation.None)
+            {
+                res = await Create(relationship);
+            }
+            return res;
         }
 
         public async Task<bool> RemoveFriendship(string userId, string friendId)
         {
-            return await _relationshipRepository.RemoveFriendship(userId, friendId);
+            string relationshipId = await _relationshipRepository.GetRelationshipId(userId, Relation.None, friendId);
+            return await Delete(relationshipId);
         }
 
         public async Task<Relation> GetRelationshipsBetweenTwoUsers(string userId1, string userId2)

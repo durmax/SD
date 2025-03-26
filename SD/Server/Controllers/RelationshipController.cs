@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SD.Shared;
 using Microsoft.AspNetCore.Authorization;
-using sd.Api.Repositories;
-using sd.Api.Infrastructure.Repositories;
 using System.Linq;
 using sd.Api.Application.Services;
 

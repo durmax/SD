@@ -13,12 +13,7 @@ namespace sd.Api.Repositories
     public interface IRelationshipRepository : ICrudBase<RelationshipModel>
     {
         Task<string> GetRelationshipId(string UserId1, Relation reletion, string UserId2);
-
-
         Task<Relation> GetRelationshipsBetweenTwoUsers(string userId1, string userId2);
-
-        Task<bool> AddRelationship(RelationshipModel relationship);
-        Task<bool> RemoveFriendship(string UserId, string friendId);
         Task<List<UserRelationshipsWithOneUserDto>> GetRelationships(string CurrentUserId, List<UserModel> users);
         Task<Dictionary<string, string>> FriendRequestsToUser(string userId);
     }
@@ -83,22 +78,6 @@ namespace sd.Api.Repositories
         {
             RelationshipModel relationship = await _context.Relationships.Find(GetFilter(userId1, Relation.None, userId2)).FirstOrDefaultAsync();
             return relationship == null ? Relation.None : relationship.Reletion;
-        }
-
-        public async Task<bool> AddRelationship(RelationshipModel relationship)
-        {
-            bool res = false;
-            Relation relation = await GetRelationshipsBetweenTwoUsers(relationship.UserId1, relationship.UserId2);
-            if (relation == Relation.None)
-            {
-                res = await Create(relationship);
-            }
-            return res;
-        }
-        public async Task<bool> RemoveFriendship(string UserId, string friendId)
-        {
-            string relationshipId = await GetRelationshipId(UserId, Relation.None, friendId);
-            return await Delete(relationshipId);
         }
 
         public async Task<List<UserRelationshipsWithOneUserDto>> GetRelationships(string CurrentUserId, List<UserModel> users)

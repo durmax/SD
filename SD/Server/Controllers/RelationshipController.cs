@@ -58,8 +58,8 @@ namespace sd.Api.Controllers
         [HttpDelete("{UserId}/{reletion}/{friendId}")]
         public async Task<ActionResult> RemoveFriendship(Relation reletion, string friendId)
         {
-            var rId = await _relationshipService.GetRelationshipId((await _userService.GetCurrentUser(User))?.UserId, reletion, friendId);
-            await _relationshipService.Delete(rId);
+            var r = await _relationshipService.GetRelationship((await _userService.GetCurrentUser(User))?.UserId, reletion, friendId);
+            await _relationshipService.Delete(r.RelationshipId);
             return StatusCode(StatusCodes.Status200OK);
         }
 

@@ -115,9 +115,9 @@ namespace sd.Api.Application.Services
                 return true;
             }
 
-            var relationshipId = await _relationshipRepo.GetRelationshipId(userId, Relation.Friend, wordDto?.UserId);
+            var relationship = await _relationshipRepo.GetRelationship(userId, Relation.Friend, wordDto?.UserId);
 
-            if (!string.IsNullOrEmpty(relationshipId))
+            if (!string.IsNullOrEmpty(relationship.RelationshipId))
             {
                 return wordDto.ShareWith == ShareWith.Friends || wordDto.ShareWith == ShareWith.Public;
             }

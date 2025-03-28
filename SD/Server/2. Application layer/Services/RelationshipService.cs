@@ -11,10 +11,9 @@ namespace sd.Api.Application.Services
 {
     public interface IRelationshipService : ICrudBase<RelationshipModel>
     {
-        Task<string> GetRelationshipId(string UserId1, Relation reletion, string UserId2);
+        Task<RelationshipModel> GetRelationship(string UserId1, Relation reletion, string UserId2);
         Task<bool> AddRelationship(RelationshipModel relationship);
-        Task<bool> RemoveFriendship(string userId, string friendId);
-        Task<Relation> GetRelationshipsBetweenTwoUsers(string userId1, string userId2);
+        Task<bool> delete(string userId, string friendId);
         Task<Dictionary<string, string>> GetAllFriends(string userId);
         Task<List<UserRelationshipsWithOneUserDto>> GetRelationships(string currentUserId, List<UserModel> users);
         Task<Dictionary<string, string>> FriendRequestsToUser(string userId);
@@ -33,23 +32,19 @@ namespace sd.Api.Application.Services
         public async Task<bool> AddRelationship(RelationshipModel relationship)
         {
             bool res = false;
-            Relation relation = await _relationshipRepository.GetRelationshipsBetweenTwoUsers(relationship.UserId1, relationship.UserId2);
-            if (relation == Relation.None)
+            var r = await _relationshipRepository.GetRelationship(relationship.UserId1, Relation.None, relationship.UserId2);
+
+            if (r.Reletion == Relation.None)
             {
                 res = await Create(relationship);
             }
             return res;
         }
 
-        public async Task<bool> RemoveFriendship(string userId, string friendId)
+        public async Task<bool> delete(string userId, string friendId)
         {
-            string relationshipId = await _relationshipRepository.GetRelationshipId(userId, Relation.None, friendId);
-            return await Delete(relationshipId);
-        }
-
-        public async Task<Relation> GetRelationshipsBetweenTwoUsers(string userId1, string userId2)
-        {
-            return await _relationshipRepository.GetRelationshipsBetweenTwoUsers(userId1, userId2);
+            var relationship = await _relationshipRepository.GetRelationship(userId, Relation.None, friendId);
+            return await Delete(relationship.RelationshipId);
         }
 
         public async Task<Dictionary<string, string>> GetAllFriends(string userId)
@@ -79,12 +74,40 @@ namespace sd.Api.Application.Services
 
         public async Task<List<UserRelationshipsWithOneUserDto>> GetRelationships(string currentUserId, List<UserModel> users)
         {
-            return await _relationshipRepository.GetRelationships(currentUserId, users);
+            List<UserRelationshipsWithOneUserDto> relationships = new List<UserRelationshipsWithOneUserDto>();
+
+            if (!string.IsNullOrWhiteSpace(currentUserId) && currentUserId != "0")
+            {
+                users.RemoveAll(u => u.UserId == currentUserId); //remove Searcher from list
+            }
+
+            foreach (var user in users)
+            {
+                var r = await GetRelationship(currentUserId, Relation.None, user.UserId);
+                var s = new UserRelationshipsWithOneUserDto(user.UserId, user.Name, r.Reletion);
+                if (s != null)
+                {
+                    relationships.Add(s);
+                }
+
+                r.Reletion = Relation.None;
+            }
+
+            return relationships;
         }
 
         public async Task<Dictionary<string, string>> FriendRequestsToUser(string userId)
         {
-            return await _relationshipRepository.FriendRequestsToUser(userId);
+            var relationships = await GetByCondation(r => r.UserId2 == userId && r.Reletion == Relation.FriendRequestTo) ;
+
+            Dictionary<string, string> friendRequests = new Dictionary<string, string>();
+
+            foreach (var relation in relationships)
+            {
+                var users = await _userRepository.GetByCondation(u => u.UserId == relation.UserId2);
+                friendRequests.Add(relation.UserId1, users.First().Name);
+            }
+            return friendRequests;
         }
 
         public Task<IEnumerable<RelationshipModel>> GetByCondation(Expression<Func<RelationshipModel, bool>> expression)
@@ -107,9 +130,9 @@ namespace sd.Api.Application.Services
             return _relationshipRepository.Delete(id);
         }
 
-        public async Task<string> GetRelationshipId(string userId1, Relation relation, string userId2)
+        public async Task<RelationshipModel> GetRelationship(string userId1, Relation relation, string userId2)
         {
-            return await _relationshipRepository.GetRelationshipId(userId1, relation, userId2);
+            return await _relationshipRepository.GetRelationship(userId1, relation, userId2);
         }
     }
 }

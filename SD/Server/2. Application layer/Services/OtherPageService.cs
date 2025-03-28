@@ -11,10 +11,8 @@ namespace sd.Api.Application.Services
     public interface IOtherPageService : ICrudBase<OtherPageModel>
     {
         Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang);
-        Task<bool> AddOtherPage(OtherPageModel otherPage);
-        Task<bool> ModifyOtherPage(OtherPageModel otherPage);
-        Task<bool> RemoveOtherPage(string id);
     }
+
     public class OtherPageService : IOtherPageService
     {
         private readonly IOtherPageRepository _otherPageRepository;
@@ -42,32 +40,19 @@ namespace sd.Api.Application.Services
                 {
                     if (!string.IsNullOrEmpty(otherPage.Pattern))
                     {
-                        OtherPageResModel otherPageResModel = new OtherPageResModel();
-                        otherPageResModel.Pattern = otherPage.Pattern;
-                        otherPageResModel.Host = otherPage.Host;
-                        otherPageResModel.Type = otherPage.PageType;
-                        otherPageResModel.Eval = otherPage.Eval == 0 ? i++ : otherPage.Eval;
+                        OtherPageResModel otherPageResModel = new OtherPageResModel()
+                        {
+                            Pattern = otherPage.Pattern,
+                            Host = otherPage.Host,
+                            Type = otherPage.PageType,
+                            Eval = otherPage.Eval == 0 ? i++ : otherPage.Eval
+                        };
                         res.Add(otherPageResModel);
                     }
                 }
                 // return res;
             }
             return res.OrderBy(o => o.Eval).ToList();
-        }
-
-        public async Task<bool> AddOtherPage(OtherPageModel otherPage)
-        {
-            return await _otherPageRepository.Create(otherPage);
-        }
-
-        public async Task<bool> ModifyOtherPage(OtherPageModel otherPage)
-        {
-            return await _otherPageRepository.Update(otherPage);
-        }
-
-        public async Task<bool> RemoveOtherPage(string id)
-        {
-            return await _otherPageRepository.Delete(id);
         }
 
         public async Task<IEnumerable<OtherPageModel>> GetByCondation(Expression<Func<OtherPageModel, bool>> expression)

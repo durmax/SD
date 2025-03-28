@@ -23,29 +23,16 @@ namespace sd.Api.Infrastructure.Repositories
             _context = mongodbContext;
         }
 
-        public async Task<TransObj> Create(OtherPageModel otherPage)
+        public async Task<bool> Create(OtherPageModel otherPage)
         {
-            // Add custom model validation error
-            bool IsExist = await _context.OtherPages.Find<OtherPageModel>(u => u.Host == otherPage.Host).AnyAsync();
-
-            if (!IsExist)
-            {
-                await _context.OtherPages.InsertOneAsync(otherPage);
-                return new TransObj
-                { BoolVar = true, SetringVar = "User Details Inserted Successfully" };
-            }
-            else
-            {
-                return new TransObj { BoolVar = false, SetringVar = $"Sorry, this Host is already in DB." };
-            }
+            return await _context.OtherPages.Find<OtherPageModel>(u => u.Host == otherPage.Host).AnyAsync();
         }
 
         public async Task<bool> Update(OtherPageModel newOtherPage)
         {
             try
             {
-                await _context.OtherPages.FindOneAndReplaceAsync(
-                            Builders<OtherPageModel>.Filter.Eq("OtherPageId", newOtherPage.OtherPageId), newOtherPage);
+                await _context.OtherPages.FindOneAndReplaceAsync(Builders<OtherPageModel>.Filter.Eq("OtherPageId", newOtherPage.OtherPageId), newOtherPage);
                 return true;
             }
             catch
@@ -56,8 +43,7 @@ namespace sd.Api.Infrastructure.Repositories
 
         public async Task<bool> Delete(string id)
         {
-            DeleteResult DeleteRecored;
-            DeleteRecored = await _context.OtherPages.DeleteOneAsync(
+            var DeleteRecored = await _context.OtherPages.DeleteOneAsync(
               Builders<OtherPageModel>.Filter.Eq("OtherPageId", id));
             return DeleteRecored.DeletedCount > 0;
         }
@@ -65,11 +51,6 @@ namespace sd.Api.Infrastructure.Repositories
         public async Task<IEnumerable<OtherPageModel>> GetByCondation(Expression<Func<OtherPageModel, bool>> expression)
         {
             return await _context.OtherPages.AsQueryable().Where(expression).ToListAsync();
-        }
-
-        Task<bool> ICrudBase<OtherPageModel>.Create(OtherPageModel entity)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -13,7 +13,6 @@ namespace sd.Api.Application.Services
     {
         Task<RelationshipModel> GetRelationship(string UserId1, Relation reletion, string UserId2);
         Task<bool> AddRelationship(RelationshipModel relationship);
-        Task<bool> delete(string userId, string friendId);
         Task<Dictionary<string, string>> GetAllFriends(string userId);
         Task<List<UserRelationshipsWithOneUserDto>> GetRelationships(string currentUserId, List<UserModel> users);
         Task<Dictionary<string, string>> FriendRequestsToUser(string userId);
@@ -31,20 +30,18 @@ namespace sd.Api.Application.Services
 
         public async Task<bool> AddRelationship(RelationshipModel relationship)
         {
-            bool res = false;
-            var r = await _relationshipRepository.GetRelationship(relationship.UserId1, Relation.None, relationship.UserId2);
+            var rs = await _relationshipRepository.GetByCondation(x =>
+                (x.UserId1 == relationship.UserId1 && x.UserId2 == relationship.UserId2) ||
+                 (x.UserId1 == relationship.UserId2 && x.UserId2 == relationship.UserId1)
+                 );
 
-            if (r.Reletion == Relation.None)
+            bool res = false;
+
+            if (rs?.FirstOrDefault()?.Reletion == Relation.None)
             {
                 res = await Create(relationship);
             }
             return res;
-        }
-
-        public async Task<bool> delete(string userId, string friendId)
-        {
-            var relationship = await _relationshipRepository.GetRelationship(userId, Relation.None, friendId);
-            return await Delete(relationship.RelationshipId);
         }
 
         public async Task<Dictionary<string, string>> GetAllFriends(string userId)
@@ -98,7 +95,7 @@ namespace sd.Api.Application.Services
 
         public async Task<Dictionary<string, string>> FriendRequestsToUser(string userId)
         {
-            var relationships = await GetByCondation(r => r.UserId2 == userId && r.Reletion == Relation.FriendRequestTo) ;
+            var relationships = await GetByCondation(r => r.UserId2 == userId && r.Reletion == Relation.FriendRequestTo);
 
             Dictionary<string, string> friendRequests = new Dictionary<string, string>();
 
@@ -132,7 +129,13 @@ namespace sd.Api.Application.Services
 
         public async Task<RelationshipModel> GetRelationship(string userId1, Relation relation, string userId2)
         {
-            return await _relationshipRepository.GetRelationship(userId1, relation, userId2);
+            var rs = await _relationshipRepository.GetByCondation(x =>
+                (relation == Relation.None || x.Reletion == relation) &&
+                ((x.UserId1 == userId1 && x.UserId2 == userId2) ||
+                 (x.UserId1 == userId2 && x.UserId2 == userId1))
+                );
+
+            return rs?.FirstOrDefault();
         }
     }
 }

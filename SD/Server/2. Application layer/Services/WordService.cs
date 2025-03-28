@@ -115,9 +115,13 @@ namespace sd.Api.Application.Services
                 return true;
             }
 
-            var relationship = await _relationshipRepo.GetRelationship(userId, Relation.Friend, wordDto?.UserId);
+            var rs = await _relationshipRepo.GetByCondation(x =>
+                ( x.Reletion == Relation.Friend) &&
+                ((x.UserId1 == userId && x.UserId2 == wordDto.UserId) ||
+                 (x.UserId1 == wordDto.UserId && x.UserId2 == userId))
+                );
 
-            if (!string.IsNullOrEmpty(relationship.RelationshipId))
+            if (!string.IsNullOrEmpty(rs.FirstOrDefault().RelationshipId))
             {
                 return wordDto.ShareWith == ShareWith.Friends || wordDto.ShareWith == ShareWith.Public;
             }

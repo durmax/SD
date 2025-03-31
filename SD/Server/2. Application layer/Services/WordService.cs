@@ -13,14 +13,11 @@ namespace sd.Api.Application.Services
     public interface IWordService : ICrudBase<WordModel>
     {
         Task<int> Like(string userId, string wordId);
-        Task<long> GetDocCount(string userId, string lang);
-        Task<WordModel?> GetWord(string userId, string lang, int currentPage, int limit);
         Task<List<WordDto>> GetPageWords(string? currentUserId, string userId, string lang, int pageSize, int currentPage);
         Task<WordDto> GetWordDtoById(string id, string? currentUserId);
         Task<WordDto> GetWordByText(string userId, string text);
         Task<IEnumerable<string>> GetWordsContainText(string userId, string text);
         Task<string> AddWord(WordDto wordDto);
-        Task<bool> UpdateWord(WordDto updatedWordDto);
         Task<IEnumerable<CommentModel?>> GetWordComments(string wordId);
         Task<bool> SaveComment(string wordId, CommentModel newComment);
         Task<int> LikeComment(string userId, string wordId, string commentId);
@@ -42,16 +39,6 @@ namespace sd.Api.Application.Services
             _relationshipRepo = relationshipRepo;
         }
 
-        public async Task<long> GetDocCount(string userId, string lang)
-        {
-            return await _wordRepo.GetDocCount(userId, lang);
-        }
-
-        public async Task<WordModel?> GetWord(string userId, string lang, int currentPage, int limit)
-        {
-            return await _wordRepo.GetWord(userId, lang, currentPage, limit);
-        }
-
         public async Task<List<WordDto>> GetPageWords(string? currentUserId, string userId, string lang, int pageSize, int currentPage)
         {
             List<WordDto> wordDtos = new();
@@ -60,7 +47,7 @@ namespace sd.Api.Application.Services
             int newCurrentPage = currentPage;
             Tuple<int, List<WordDto>> Res;
 
-            long wordsCount = await GetDocCount(userId, lang);
+            long wordsCount = await _wordRepo.GetDocCount(userId, lang);
 
             while (wordDtos?.Count < pageSize)
             {
@@ -68,7 +55,7 @@ namespace sd.Api.Application.Services
                 {
                     break;
                 }
-                word = await GetWord(userId, lang, newCurrentPage, 1);
+                word = await _wordRepo.GetWord(userId, lang, newCurrentPage, 1);
                 if (word != null)
                 {
                     wordDto = _mapper.Map<WordDto>(word);
@@ -91,7 +78,7 @@ namespace sd.Api.Application.Services
 
         public async Task<WordDto> GetWordDtoById(string id, string? currentUserId)
         {
-            var words = await GetByCondation(w => w.WordId == id);
+            var words = await _wordRepo.GetByCondation(w => w.WordId == id);
             var word = words.First();
             var wordDto = _mapper.Map<WordDto>(word);
 
@@ -139,7 +126,7 @@ namespace sd.Api.Application.Services
             if (word != null)
             {
                 word.Score++;
-                await Update(word);
+                await _wordRepo.Update(word);
             }
             return _mapper.Map<WordDto>(word);
         }
@@ -161,27 +148,26 @@ namespace sd.Api.Application.Services
             var word = _mapper.Map<WordModel>(wordDto);
             word.WordId = Guid.NewGuid().ToString();
             word.CreatedAt = DateTime.Now;
-            if (await Create(word)) return word.WordId;
+            if (await _wordRepo.Create(word)) return word.WordId;
             else return null;
         }
 
-        public async Task<bool> UpdateWord(WordDto updatedWordDto)
+        public async Task<bool> Update(WordModel word)
         {
-            var oldWords = await GetByCondation(w => w.WordId == updatedWordDto.WordId);
+            var oldWords = await _wordRepo.GetByCondation(w => w.WordId == word.WordId);
             var oldWord = oldWords.FirstOrDefault();
 
             if (oldWord == null) return false;
 
-            var word = _mapper.Map<WordModel>(updatedWordDto);
             word.Comments = oldWord.Comments;
             word.Likes = oldWord.Likes;
             word.CreatedAt = DateTime.Now;
-            return await Update(word);
+            return await _wordRepo.Update(word);
         }
 
         public async Task<IEnumerable<CommentModel?>> GetWordComments(string wordId)
         {
-            var words = await GetByCondation(w => w.WordId == wordId);
+            var words = await _wordRepo.GetByCondation(w => w.WordId == wordId);
             var word = words.First();
             return word?.Comments;
         }
@@ -190,7 +176,7 @@ namespace sd.Api.Application.Services
         {
             try
             {
-                var words = await GetByCondation(w => w.WordId == wordId);
+                var words = await _wordRepo.GetByCondation(w => w.WordId == wordId);
                 var word = words.First();
                 if (word != null)
                 {
@@ -209,7 +195,7 @@ namespace sd.Api.Application.Services
                     }
 
                     word.Comments.Add(newComment);
-                    await Update(word);
+                    await _wordRepo.Update(word);
                     return true;
                 }
                 else return false;
@@ -222,7 +208,7 @@ namespace sd.Api.Application.Services
 
         public async Task<int> LikeComment(string userId, string wordId, string commentId)
         {
-            var words = await GetByCondation(w => w.WordId == wordId);
+            var words = await _wordRepo.GetByCondation(w => w.WordId == wordId);
             var word = words.First();
             CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
             if (comment == null) return 0;
@@ -242,7 +228,7 @@ namespace sd.Api.Application.Services
 
         public async Task<bool> DeleteComment(string currUsr, string wordId, string commentId)
         {
-            var words = await GetByCondation(w => w.WordId == wordId);
+            var words = await _wordRepo.GetByCondation(w => w.WordId == wordId);
             var word = words.First();
 
             CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
@@ -252,7 +238,7 @@ namespace sd.Api.Application.Services
             if (word.Comments.Contains(comment))
             {
                 word.Comments.Remove(comment);
-                await Update(word);
+                await _wordRepo.Update(word);
                 return true;
             }
             return false;
@@ -265,12 +251,7 @@ namespace sd.Api.Application.Services
 
         public async Task<bool> Create(WordModel entity)
         {
-            return await _wordRepo.Create(entity);
-        }
-
-        public async Task<bool> Update(WordModel entity)
-        {
-            return await _wordRepo.Update(entity);
+            throw new NotImplementedException();
         }
 
         public async Task<bool> Delete(string id)
@@ -293,7 +274,7 @@ namespace sd.Api.Application.Services
                 {
                     wordModel.Likes.Remove(userId);
                 }
-                await Update(wordModel);
+                await _wordRepo.Update(wordModel);
                 return wordModel.Likes.Count();
             }
             else return -1;

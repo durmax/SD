@@ -79,7 +79,7 @@ namespace SD.Client.Services
 
         private async Task<T> HandleResponse<T>(HttpResponseMessage response)
         {
-            if (response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.Found)
             {
                 if (typeof(T) == typeof(HttpResponseMessage))
                 {

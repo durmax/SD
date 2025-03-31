@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,17 +13,18 @@ namespace sd.Api.Controllers
     [ApiController]
     public class UserConfigController : ControllerBase
     {
-        private readonly IUserConfigService userConfigService;
+        private readonly IUserConfigService _userConfigService;
 
         public UserConfigController(IUserConfigService userConfigService)
         {
-            this.userConfigService = userConfigService;
+            this._userConfigService = userConfigService;
         }
 
         [HttpGet]
         public async Task<IEnumerable<string>> GetUserLables(string userId)
         {
-            return await userConfigService.GetUserLabels(userId);
+            var userConfigs = await _userConfigService.GetByCondation(u => u.UserId == userId);
+            return userConfigs.Any() ? ListStringConverter.ToList(userConfigs.First().Labels) : Enumerable.Empty<string>();
         }
 
         [HttpPost]
@@ -31,7 +33,7 @@ namespace sd.Api.Controllers
             if (userConfigModel == null)
                 return BadRequest();
 
-            var status = await userConfigService.Update(userConfigModel);
+            var status = await _userConfigService.Update(userConfigModel);
 
             return Ok(status);
         }
@@ -43,7 +45,7 @@ namespace sd.Api.Controllers
             if (string.IsNullOrWhiteSpace(label) || string.IsNullOrWhiteSpace(userId))
                 return BadRequest();
 
-            var status = await userConfigService.AddUserLabel(userId, label);
+            var status = await _userConfigService.AddUserLabel(userId, label);
             return Ok(status);
         }
     }

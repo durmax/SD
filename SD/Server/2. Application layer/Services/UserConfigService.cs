@@ -10,7 +10,6 @@ namespace sd.Api.Application.Services
 {
     public interface IUserConfigService : ICrudBase<UserConfigModel>
     {
-        Task<IEnumerable<string>> GetUserLabels(string userId);
         Task<bool> AddUserLabel(string userId, string label);
         Task<bool> RemoveUserLabel(string userId, string label);
 
@@ -27,14 +26,6 @@ namespace sd.Api.Application.Services
         public async Task<bool> Update(UserConfigModel entity)
         {
             return await _userConfigRepository.Update(entity);
-        }
-
-        public async Task<IEnumerable<string>> GetUserLabels(string userId)
-        {
-            var userConfigs = await _userConfigRepository.GetByCondation(u => u.UserId == userId);
-            if (!userConfigs.Any()) return Enumerable.Empty<string>();
-
-            return ListStringConverter.ToList(userConfigs.First().Labels);
         }
 
         public async Task<bool> AddUserLabel(string userId, string label)

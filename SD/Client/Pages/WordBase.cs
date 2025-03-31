@@ -113,13 +113,12 @@ namespace SD.Client.Pages
                 WordDto.Explain = await QuillHtml.GetHTML();
 
                 HttpResponseMessage respons = await WordService.AddWord(WordDto);
-
+                foundWordDtoToUpdate = JsonConvert.DeserializeObject<WordDto>(await respons.Content.ReadAsStringAsync());
                 if (!respons.IsSuccessStatusCode)
                 {
                     if ((int)respons.StatusCode == 302)
                     {
                         cssClassUpdate = null;
-                        foundWordDtoToUpdate = JsonConvert.DeserializeObject<WordDto>(await respons.Content.ReadAsStringAsync());
                     }
                     //note = await respons.Content.ReadAsStringAsync();
                 }
@@ -128,7 +127,7 @@ namespace SD.Client.Pages
                     if ((int)respons.StatusCode == 200)
                     {
                         note = $"{WordDto.Title} is Saved";
-
+                        WordDto.UserId = foundWordDtoToUpdate.UserId;
                         WordDto.WordId = foundWordDtoToUpdate?.WordId;
                         await OnWordSave.InvokeAsync(WordDto);
                     }
@@ -359,7 +358,14 @@ namespace SD.Client.Pages
                 if (WordDto.WordId != "0")
                 {
                     WordDto.Score++;
-                    await WordService.UpdateWord(WordDto);
+                    try
+                    {
+                        await WordService.UpdateWord(WordDto);
+                    }
+                    catch
+                    {
+                        WordDto.Score--;
+                    }                 
                 }
                 await LoadHtmlExplain();
             }

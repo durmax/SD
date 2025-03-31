@@ -11,9 +11,7 @@ namespace sd.Api.Application.Services
 {
     public interface IUserService: ICrudBase<UserModel>
     {
-        Task<List<UserModel>> SearchUser(string searchText);
-        Task<UserModel?> RegisterUserAsync(string userEmail);
-        Task<TransObj> UpdateUser(string id, UserModel newVer);
+        Task<UserModel?> Create(string userEmail);
         Task<UserModel?> GetCurrentUser(ClaimsPrincipal user);
     }
 
@@ -34,22 +32,12 @@ namespace sd.Api.Application.Services
         {
             return await _userRepository.Create(entity);
         }
-        public async Task<bool> Update(UserModel entity)
-        {
-            return await _userRepository.Update(entity);
-        }
         public async Task<bool> Delete(string id)
         {
             return await _userRepository.Delete(id);
         }
 
-        public async Task<List<UserModel>> SearchUser(string searchText)
-        {
-            var res= await _userRepository.GetByCondation(u => u.Name.ToLower().Contains(searchText.ToLower()));
-            return res.ToList();
-        }
-
-        public async Task<UserModel?> RegisterUserAsync(string email)
+        public async Task<UserModel?> Create(string email)
         {
             var result = await _userRepository.GetByCondation(u => u.Email == email);
 
@@ -61,38 +49,38 @@ namespace sd.Api.Application.Services
                 userModel.UserId = Guid.NewGuid().ToString();
                 userModel.CreatedAt = DateTime.Now;
 
-                await Create(userModel);
+                await _userRepository.Create(userModel);
                 var res = await GetByCondation(u => u.Email == userModel.Email);
                 return res.First();
             }
         }
 
-        public async Task<TransObj> UpdateUser(string id, UserModel newVer)
+        public async Task<bool> Update(UserModel newVer)
         {
-            var oldVer = await _userRepository.GetByCondation(u => u.UserId == id);
+            var oldVer = await _userRepository.GetByCondation(u => u.UserId ==  newVer.UserId);
             if (oldVer.Count() == 0 || newVer == null)
             {
-                return new TransObj { BoolVar = false, SetringVar = $"Sorry, update error." };
+                return false;
             }
 
             if (oldVer.First().Email != newVer.Email)
             {
                 var res = await _userRepository.GetByCondation(u => u.Email == newVer.Email);
                 if (res?.First() != null)
-                    return new TransObj { BoolVar = false, SetringVar = $"Sorry, {newVer.Email}  is already in use." };
+                    return false; // {newVer.Email}  is already in use
                 else newVer.IsEmailReg = false;
             }
 
             try
             {
-                await Update(newVer);
+                await _userRepository.Update(newVer);
             }
             catch
             {
-                return new TransObj { BoolVar = false, SetringVar = "Sorry, update data error" };
+                return false;
             }
 
-            return new TransObj { BoolVar = true, SetringVar = "Your data updated successfully" };
+            return true;
         }
         public async Task<UserModel?> GetCurrentUser(ClaimsPrincipal user)
         {
@@ -100,7 +88,7 @@ namespace sd.Api.Application.Services
             {
                 var email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
 
-                return await RegisterUserAsync(email);
+                return await Create(email);
             }
             else return null;
         }

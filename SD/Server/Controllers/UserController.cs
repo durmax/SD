@@ -35,8 +35,8 @@ namespace sd.Api.Controllers
         [HttpGet("GetUsersByText/{searchText}")]
         public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetUsersByText(string searchText)
         {
-            List<UserModel> foundUsers;
-            foundUsers = await _userService.SearchUser(searchText);
+            var res = await _userService.GetByCondation(u => u.Name.ToLower().Contains(searchText.ToLower()));
+            List<UserModel> foundUsers = res.ToList();
 
             IEnumerable<UserRelationshipsWithOneUserDto> result = await relationshipService.GetRelationships((await _userService.GetCurrentUser(User))?.UserId, foundUsers);
             if (result == null) return NotFound();
@@ -74,18 +74,18 @@ namespace sd.Api.Controllers
                 user.Email = User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
             }
 
-            var registeredUser = await _userService.RegisterUserAsync(user.Email);
+            var registeredUser = await _userService.Create(user.Email);
             return Ok(registeredUser);
         }
 
         [HttpPut("UpdateUser/{id}")]
-        public async Task<ActionResult<TransObj>> UpdateUser(string id, UserModel updatedUser)
+        public async Task<ActionResult<bool>> UpdateUser(string id, UserModel updatedUser)
         {
             if (id != updatedUser.UserId)
             {
                 return NotFound(new TransObj { BoolVar = false, SetringVar = $"Sorry, update error." });
             }
-            return Ok(await _userService.UpdateUser(id, updatedUser));
+            return Ok(await _userService.Update(updatedUser));
         }
 
         [HttpDelete]

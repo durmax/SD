@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using sd.Api.Helper;
 using sd.Api.Infrastructure.Repositories;
 using SD.Shared;
 using System;
@@ -18,13 +18,13 @@ namespace sd.Api.Application.Services
 
     public class UserService : IUserService
     {
+        private readonly CachingHelper _cacheHelper;
         private readonly IUserRepository _userRepository;
-        private readonly IMemoryCache _cache;
 
-        public UserService(IUserRepository userRepository, IMemoryCache cache)
+        public UserService(IUserRepository userRepository, CachingHelper cacheHelper)
         {
+            _cacheHelper = cacheHelper;
             _userRepository = userRepository;
-            _cache = cache;
         }
 
         public async Task<IEnumerable<UserModel>> GetByCondation(Expression<Func<UserModel, bool>> expression)
@@ -87,25 +87,21 @@ namespace sd.Api.Application.Services
         }
         public async Task<UserModel?> GetCurrentUser(ClaimsPrincipal user)
         {
-            string cacheKey = $"User-{ClaimTypes.Email}";
+            if (user?.Identity == null || !user.Identity.IsAuthenticated)
+                return null;
 
-            if (!_cache.TryGetValue(cacheKey, out UserModel userModel))
-            {
-                if (user?.Identity != null && user.Identity.IsAuthenticated)
-                {
-                    var email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+            var email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(email))
+                return null;
 
-                    userModel = await Create(email) ?? null;
+            string cacheKey = $"User-{email}";
 
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Reset expiration when accessed
-                        .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Remove after 1 hour
+            var userModel = _cacheHelper.GetValue<UserModel>(cacheKey);
 
-                    _cache.Set(cacheKey, userModel, cacheEntryOptions);
-                }
-                else return null;
-            }
-            return userModel;
+            if (userModel == null)
+                userModel = await Create(email);
+
+            return _cacheHelper.SetValue<UserModel>(cacheKey, userModel);
         }
     }
 }

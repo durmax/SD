@@ -13,6 +13,7 @@ using sd.Api.Midlleware;
 using sd.Api.Infrastructure.Repositories;
 using sd.Api.Repositories;
 using sd.Api.Application.Services;
+using sd.Api.Helper;
 
 namespace sd.Api
 {
@@ -44,6 +45,7 @@ namespace sd.Api
                                     sp.GetRequiredService<IOptions<MongodbSettings>>().Value);
 
             services.AddSingleton<MongodbContext>();
+            services.AddSingleton(typeof(CachingHelper));
 
             services.AddScoped<IOtherPageRepository, OtherPageRepository>();
             services.AddScoped<IUserRepository, UserRepository>();

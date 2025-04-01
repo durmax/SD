@@ -1,4 +1,5 @@
-﻿using sd.Api.Infrastructure.Repositories;
+﻿using Microsoft.Extensions.Caching.Memory;
+using sd.Api.Infrastructure.Repositories;
 using SD.Shared;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace sd.Api.Application.Services
 {
-    public interface IUserService: ICrudBase<UserModel>
+    public interface IUserService : ICrudBase<UserModel>
     {
         Task<UserModel?> Create(string userEmail);
         Task<UserModel?> GetCurrentUser(ClaimsPrincipal user);
@@ -18,10 +19,12 @@ namespace sd.Api.Application.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IMemoryCache _cache;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IMemoryCache cache)
         {
             _userRepository = userRepository;
+            _cache = cache;
         }
 
         public async Task<IEnumerable<UserModel>> GetByCondation(Expression<Func<UserModel, bool>> expression)
@@ -57,7 +60,7 @@ namespace sd.Api.Application.Services
 
         public async Task<bool> Update(UserModel newVer)
         {
-            var oldVer = await _userRepository.GetByCondation(u => u.UserId ==  newVer.UserId);
+            var oldVer = await _userRepository.GetByCondation(u => u.UserId == newVer.UserId);
             if (oldVer.Count() == 0 || newVer == null)
             {
                 return false;
@@ -84,13 +87,25 @@ namespace sd.Api.Application.Services
         }
         public async Task<UserModel?> GetCurrentUser(ClaimsPrincipal user)
         {
-            if (user?.Identity != null && user.Identity.IsAuthenticated)
-            {
-                var email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+            string cacheKey = $"User-{ClaimTypes.Email}";
 
-                return await Create(email);
+            if (!_cache.TryGetValue(cacheKey, out UserModel userModel))
+            {
+                if (user?.Identity != null && user.Identity.IsAuthenticated)
+                {
+                    var email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+
+                    userModel = await Create(email) ?? null;
+
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // Reset expiration when accessed
+                        .SetAbsoluteExpiration(TimeSpan.FromHours(1)); // Remove after 1 hour
+
+                    _cache.Set(cacheKey, userModel, cacheEntryOptions);
+                }
+                else return null;
             }
-            else return null;
+            return userModel;
         }
     }
 }

@@ -62,6 +62,8 @@ namespace sd.Api
 
             services.AddAutoMapper(typeof(Startup));
 
+            services.AddMemoryCache();
+
             // Swagger
             services.AddEndpointsApiExplorer();
 

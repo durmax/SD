@@ -76,9 +76,18 @@ namespace sd.Api.Controllers
 
             if (Guid.TryParse(word?.WordId, out Guid result) && wordM != null)
             {
-               var res = await _wordService.Update(wordM);
+                if (wordM.UserId != word.UserId) return StatusCode(StatusCodes.Status401Unauthorized);
+
+                wordM.Title = word.Title;
+                wordM.Explain = word.Explain;
+                wordM.ShareWith = (int)word.ShareWith;
+                wordM.WordLang = word.WordLang;
+                wordM.ToLang = word.ToLang;
+                wordM.Score = word.Score;
+
+                var res = await _wordService.Update(wordM);
                 return StatusCode(StatusCodes.Status202Accepted,
-                   "Updated");
+                   word);
             }
 
             var wordToInsert = await _wordService.GetWordByText(word.UserId, word.Title);

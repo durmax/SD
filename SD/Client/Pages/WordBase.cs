@@ -117,7 +117,16 @@ namespace SD.Client.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    foundWordDtoToUpdate = JsonConvert.DeserializeObject<WordDto>(json);
+                    Console.WriteLine(json);
+                    try
+                    {
+                        foundWordDtoToUpdate = JsonConvert.DeserializeObject<WordDto>(json);
+                        Console.WriteLine("Deserialize is done");
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Deserialize error");
+                    }
                 }
                 else
                 {

@@ -86,8 +86,7 @@ namespace sd.Api.Controllers
                 wordM.Score = word.Score;
 
                 var res = await _wordService.Update(wordM);
-                return StatusCode(StatusCodes.Status202Accepted,
-                   word);
+                return Accepted(word);
             }
 
             var wordToInsert = await _wordService.GetWordByText(word.UserId, word.Title);

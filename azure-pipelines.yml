@@ -27,7 +27,7 @@ stages:
         command: 'restore'
         projects: |
           SD/Client/SD.Client.csproj
-          SD/Server/SD.Server.csproj
+          SD/Server/SD.Api.csproj
 
     - task: DotNetCoreCLI@2
       displayName: 'Build Client'
@@ -40,7 +40,7 @@ stages:
       displayName: 'Build Server'
       inputs:
         command: 'build'
-        projects: 'SD/Server/SD.Server.csproj'
+        projects: 'SD/Server/SD.Api.csproj'
         arguments: '--configuration $(buildConfiguration)'
 
     - task: DotNetCoreCLI@2
@@ -48,7 +48,7 @@ stages:
       inputs:
         command: 'publish'
         publishWebProjects: false
-        projects: 'SD/Server/SD.Server.csproj'
+        projects: 'SD/Server/SD.Api.csproj'
         arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Server'
         zipAfterPublish: true
 
@@ -72,7 +72,6 @@ stages:
     - task: AzureStaticWebApp@0
       inputs:
         app_location: 'SD/Client'
-        api_location: 'SD/Server'
         output_location: 'wwwroot'
         azure_static_web_apps_api_token: '$(AZURE_STATIC_WEB_APPS_API_TOKEN_RED_POND_0CCF1D603)'
 

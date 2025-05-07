@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F4A732AF-7D13-41AE-A2DF-D08A81B409EA}"
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
+		azure-static-web-app-GitHub.yml = azure-static-web-app-GitHub.yml
 	EndProjectSection
 EndProject
 Global

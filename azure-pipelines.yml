@@ -59,21 +59,21 @@ stages:
         publishLocation: 'Container'
 
 # ---------- Deploy Blazor to Azure Static Web App ----------
-- stage: Deploy_StaticWebApp
-  displayName: 'Deploy Blazor WASM to Azure Static Web App'
-  dependsOn: Build
-  jobs:
-  - job: DeployClient
-    displayName: 'Deploy Blazor App'
-    pool:
-      vmImage: 'ubuntu-latest'
+# - stage: Deploy_StaticWebApp
+#   displayName: 'Deploy Blazor WASM to Azure Static Web App'
+#   dependsOn: Build
+#   jobs:
+#   - job: DeployClient
+#     displayName: 'Deploy Blazor App'
+#     pool:
+#       vmImage: 'ubuntu-latest'
 
-    steps:
-    - task: AzureStaticWebApp@0
-      inputs:
-        app_location: 'SD/Client'
-        output_location: 'wwwroot'
-        azure_static_web_apps_api_token: '$(AZURE_STATIC_WEB_APPS_API_TOKEN_RED_POND_0CCF1D603)'
+#     steps:
+#     - task: AzureStaticWebApp@0
+#       inputs:
+#         app_location: 'SD/Client'
+#         output_location: 'wwwroot'
+#         deployment_token: '$(AZURE_STATIC_WEB_APPS_DEPLOYMENT_TOKEN)'
 
 # ---------- Deploy WebAPI to Azure App Service ----------
 - stage: Deploy_WebAPI

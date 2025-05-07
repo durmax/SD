@@ -1,0 +1,103 @@
+trigger:
+- work
+
+variables:
+  buildConfiguration: 'Release'
+
+stages:
+
+# ---------- Build Stage ----------
+- stage: Build
+  displayName: 'Build Stage'
+  jobs:
+  - job: BuildProjects
+    displayName: 'Build Client and Server'
+    pool:
+      vmImage: 'windows-latest'
+
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '8.0.x'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore solution'
+      inputs:
+        command: 'restore'
+        projects: |
+          SD/Client/SD.Client.csproj
+          SD/Server/SD.Server.csproj
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build Client'
+      inputs:
+        command: 'build'
+        projects: 'SD/Client/SD.Client.csproj'
+        arguments: '--configuration $(buildConfiguration)'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build Server'
+      inputs:
+        command: 'build'
+        projects: 'SD/Server/SD.Server.csproj'
+        arguments: '--configuration $(buildConfiguration)'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish Server'
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: 'SD/Server/SD.Server.csproj'
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Server'
+        zipAfterPublish: true
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)/Server'
+        artifactName: 'webapi'
+        publishLocation: 'Container'
+
+# ---------- Deploy Blazor to Azure Static Web App ----------
+- stage: Deploy_StaticWebApp
+  displayName: 'Deploy Blazor WASM to Azure Static Web App'
+  dependsOn: Build
+  jobs:
+  - job: DeployClient
+    displayName: 'Deploy Blazor App'
+    pool:
+      vmImage: 'windows-latest'
+
+    steps:
+    - task: AzureStaticWebApp@0
+      inputs:
+        app_location: 'SD/Client'
+        api_location: 'SD/Server'
+        output_location: 'wwwroot'
+        azure_static_web_apps_api_token: '$(AZURE_STATIC_WEB_APPS_API_TOKEN_RED_POND_0CCF1D603)'
+
+# ---------- Deploy WebAPI to Azure App Service ----------
+- stage: Deploy_WebAPI
+  displayName: 'Deploy WebAPI to Azure App Service'
+  dependsOn: Build
+  jobs:
+  - deployment: DeployAPI
+    displayName: 'Deploy API'
+    environment: 'production'
+    pool:
+      vmImage: 'windows-latest'
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: webapi
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy WebAPI to App Service'
+            inputs:
+              azureSubscription: 'sdApi20200529140234'   # Replace with your actual service connection name
+              appType: 'webApp'
+              appName: 'sdApi20200529140234'
+              package: '$(Pipeline.Workspace)/webapi/*.zip'

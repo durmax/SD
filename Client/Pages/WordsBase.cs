@@ -10,8 +10,7 @@ namespace SD.Client.Pages
     public class WordsBase : ComponentBase
     {
         [Inject]
-        public WordService WordService { set; get; }
-
+        protected ApiService ApiService { get; set; }
         [Parameter]
         public string UserId { get; set; }
         public string PageHeader { get; set; }
@@ -36,7 +35,8 @@ namespace SD.Client.Pages
         {
             loading = true;
             var wordsCountBefor = Words.Count;
-            Words.AddRange(await WordService.GetPageWords(UserId ?? "0", 10, currentPage));
+            Words.AddRange(await ApiService.GetAsync<List<WordDto>>($"api/Word/GetPageWords/0/10/{currentPage}"));
+
             currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }

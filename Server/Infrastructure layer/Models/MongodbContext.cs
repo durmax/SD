@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using SD.Shared;
-using System;
 
 namespace sd.Api.Models
 {

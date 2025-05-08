@@ -30,9 +30,6 @@ namespace SD.Client.Pages
         protected List<WordDto> Words { get; set; } = new List<WordDto>();
         protected int NewWords { get; set; }
 
-        [Inject]
-        public WordService WordService { set; get; }
-
 
         protected bool loading;
         protected int currentPage = 1;
@@ -47,7 +44,7 @@ namespace SD.Client.Pages
         {
             loading = true;
             var wordsCountBefor = Words.Count;
-            Words.AddRange(await WordService.GetPageWords("0", 10, currentPage));
+            Words.AddRange(await ApiService.GetAsync<List<WordDto>>($"api/Word/GetPageWords/0/10/{currentPage}"));
             currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }

@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
+using SD.Client.Models;
 using SD.Client.Services;
 using SD.Shared;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages
@@ -30,6 +31,7 @@ namespace SD.Client.Pages
         protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
         [Inject]
         NavigationManager NavigationManager { get; set; }
+
         [Inject]
         KnownLangsService KnownLangsService { get; set; }
         [Parameter]
@@ -39,8 +41,7 @@ namespace SD.Client.Pages
 
         [Parameter]
         public string WordId { get; set; }
-        [Inject]
-        public WordService WordService { set; get; }
+
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
 
@@ -112,21 +113,12 @@ namespace SD.Client.Pages
             {
                 WordDto.Explain = await QuillHtml.GetHTML();
 
-                HttpResponseMessage response = await WordService.AddWord(WordDto);
+                HttpResponseMessage response = await ApiService.PostAsync<HttpResponseMessage>("api/Word", WordDto);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine(json);
-                    try
-                    {
-                        foundWordDtoToUpdate = JsonConvert.DeserializeObject<WordDto>(json);
-                        Console.WriteLine("Deserialize is done");
-                    }
-                    catch (Exception)
-                    {
-                        Console.WriteLine("Deserialize error");
-                    }
+                    foundWordDtoToUpdate = JsonConvert.DeserializeObject<WordDto>(json);
                 }
                 else
                 {
@@ -173,7 +165,7 @@ namespace SD.Client.Pages
                     WordDto.Explain = await QuillHtml.GetHTML();
                     cssClassUpdate = "d-none";
 
-                    HttpResponseMessage respons = await WordService.UpdateWord(WordDto);
+                    HttpResponseMessage respons = await ApiService.PutAsync<HttpResponseMessage>($"api/Word", WordDto);
                     if (!respons.IsSuccessStatusCode)
                     {
                         //note = $"Sorry, {wordModel.Title} did not updated!";
@@ -210,12 +202,12 @@ namespace SD.Client.Pages
                 if (CurrentUser.IsAuthenticated)
                 {
                     // Start SameWords task
-                    wordsTask = WordService.GetWordsContainText(title);
+                    wordsTask = ApiService.GetAsync<List<string>>($"api/Word/GetWordsContainText/{title}");
                     // Continue without waiting for SameWords to complete
                 }
 
                 // Start LanguageToolWords task
-                languageToolWordsTask = WordService.GetLanguageToolWords(WordDto.WordLang, title);
+                languageToolWordsTask = GetLanguageToolWords(WordDto.WordLang, title);
 
                 // Use continuations to update UI as each task completes
                 if (wordsTask != null)
@@ -244,15 +236,36 @@ namespace SD.Client.Pages
             }
         }
 
+        private async Task<List<string>> GetLanguageToolWords(string wordLang, string str)
+        {
+            wordLang = wordLang switch
+            {
+                "de" => "de-DE",
+                "en" => "en-US",
+                _ => string.Empty,
+            };
+            if (!string.IsNullOrEmpty(wordLang))
+            {
+                var response = await ApiService.GetAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text={str}");
+
+                // Extract the list of string values from Matches.Replacements.Value
+                return response.Matches
+                    .SelectMany(match => match.Replacements)
+                    .Select(replacement => replacement.Value) //.Where(value =>  value.ToLower() != str.ToLower())
+                    .Take(15)
+                    .ToList();
+            }
+            return null;
+        }
         protected async Task SetWord(string id)
         {
             if (CurrentUser.IsAuthenticated && !string.IsNullOrEmpty(id))
             {
-                var wDto = await WordService.GetWordById(id);
+                var wDto = await ApiService.GetAsync<WordDto>($"api/Word/{id}");
                 if (wDto != null)
                 {
                     wDto.Score++;
-                    await WordService.UpdateWord(wDto);
+                    await ApiService.PutAsync<HttpResponseMessage>($"api/Word", wDto);
                     await OnWordFound.InvokeAsync(wDto);
                 }
                 else
@@ -321,7 +334,7 @@ namespace SD.Client.Pages
                         bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete '" + WordDto.Title + "', are you sure?");
                         if (confirmed)
                         {
-                            var response = await WordService.RemoveWord(WordDto.WordId);
+                            var response = await ApiService.DeleteAsync($"api/Word/{WordDto.WordId}");
                             if (response.IsSuccessStatusCode)
                             {
                                 await OnWordDelete.InvokeAsync(WordDto);
@@ -347,7 +360,7 @@ namespace SD.Client.Pages
             CollapsedLike = !CollapsedLike;
             if (!CollapsedLike && likesCount != null)
             {
-                likedUsers = await WordService.GetLikedUsers(WordDto.WordId);
+                likedUsers = await ApiService.GetAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{WordDto.WordId}");
             }
         }
         protected async Task LikeAsync()
@@ -356,7 +369,7 @@ namespace SD.Client.Pages
             {
                 CULiked = !CULiked;
                 LikesCount += CULiked ? 1 : -1;
-                await WordService.Like(WordDto.WordId);
+                await ApiService.GetAsync<int>($"api/Word/Like/{WordDto.WordId}");
             }
             else
             {
@@ -380,12 +393,12 @@ namespace SD.Client.Pages
                     WordDto.Score++;
                     try
                     {
-                        await WordService.UpdateWord(WordDto);
+                        await ApiService.PutAsync<HttpResponseMessage>($"api/Word", WordDto);
                     }
                     catch
                     {
                         WordDto.Score--;
-                    }                 
+                    }
                 }
                 await LoadHtmlExplain();
             }
@@ -425,7 +438,7 @@ namespace SD.Client.Pages
             {
                 try
                 {
-                    WordDto = await WordService.GetWordById(WordId);
+                    WordDto = await ApiService.GetAsync<WordDto>($"api/Word/{WordId}");
                 }
                 catch (Exception x)
                 {

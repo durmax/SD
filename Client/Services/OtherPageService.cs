@@ -1,27 +1,18 @@
 ﻿using SD.Client.Models;
 using SD.Shared;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace SD.Client.Services
 {
     public class OtherPageService
     {
-        private readonly ApiService _apiService;
         private readonly UriService _uriService;
         private readonly LinkParam _reqLinkP;
 
-        public OtherPageService(ApiService apiService, UriService uriService, LinkParam reqLinkP)
+        public OtherPageService(UriService uriService, LinkParam reqLinkP)
         {
-            _apiService = apiService;
             _uriService = uriService;
             _reqLinkP = reqLinkP;
-        }
-
-        public async Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
-        {
-            return await _apiService.GetAsync<List<OtherPageResModel>>($"api/OtherPage/{fromLang}/{toLang}");
         }
 
         public IEnumerable<OtherPageResModel> MakeLinks(IEnumerable<OtherPageResModel> OtherPageModels, string word, string fromLang, string toLang)
@@ -52,26 +43,6 @@ namespace SD.Client.Services
             _reqLinkP.TLangCode = toLang;
 
             return _uriService.UriBuild(_reqLinkP);
-        }
-
-        public async Task<OtherPageModel> GetOtherPageById(string id)
-        {
-            return await _apiService.GetAsync<OtherPageModel>($"api/OtherPage/{id}");
-        }
-
-        public async Task<HttpResponseMessage> RegisterOtherPage(OtherPageModel otherPage)
-        {
-            return await _apiService.PostAsync<HttpResponseMessage>("api/OtherPage", otherPage);
-        }
-
-        public async Task<HttpResponseMessage> RemoveOtherPage(string id)
-        {
-            return await _apiService.DeleteAsync($"api/OtherPage/?id={id}");
-        }
-
-        public async Task<HttpResponseMessage> UpdateOtherPage(OtherPageModel newOtherPage)
-        {
-            return await _apiService.PutAsync<HttpResponseMessage>("api/OtherPage", newOtherPage);
         }
     }
 }

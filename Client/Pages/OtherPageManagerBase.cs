@@ -14,7 +14,7 @@ namespace SD.Client.Pages
         public OtherPageModel otherPageModel = new OtherPageModel();
 
         [Inject]
-        public OtherPageService OtherPageService { set; get; }
+        protected ApiService ApiService { get; set; }
 
         [Inject]
         protected LangCodeService LangCodeService { get; set; }
@@ -90,14 +90,14 @@ namespace SD.Client.Pages
                 {
                     Id = Guid.NewGuid().ToString();
                     otherPageModel.OtherPageId = Id;
-                    HttpResponseMessage transObj = await OtherPageService.RegisterOtherPage(otherPageModel);
+                    HttpResponseMessage transObj = await ApiService.PostAsync<HttpResponseMessage>("api/OtherPage", otherPageModel);
                     Registered = true;
                     Info = $"your data for {otherPageModel.Host} saved successfully";
                 }
                 else
                 {
-                    HttpResponseMessage res = await OtherPageService.UpdateOtherPage(otherPageModel);
-                   Info = "Your data updated successfully";
+                    HttpResponseMessage res = await ApiService.PutAsync<HttpResponseMessage>("api/OtherPage", otherPageModel);
+                    Info = "Your data updated successfully";
                 }
             }
             catch (Exception ex)
@@ -112,7 +112,7 @@ namespace SD.Client.Pages
         {
             try
             {
-                await OtherPageService.RemoveOtherPage(Id);
+                await ApiService.DeleteAsync($"api/OtherPage/?id={Id}");
                 Info = $"{otherPageModel.Host} deleted successfully";
             }
             catch (Exception ex)
@@ -127,7 +127,7 @@ namespace SD.Client.Pages
         {
             try
             {
-                otherPageModel =  await OtherPageService.GetOtherPageById(Id);
+                otherPageModel =  await ApiService.GetAsync<OtherPageModel>($"api/OtherPage/{Id}");
             }
             catch
             {}

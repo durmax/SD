@@ -18,6 +18,10 @@ namespace SD.Client.Pages
         LoggingService logger { get; set; }
         [Inject]
         protected OtherPageService OtherPageService { get; set; }
+
+        [Inject]
+        protected ApiService ApiService { get; set; }
+
         protected List<OtherPageResModel> otherPageModels { get; set; }
         protected IEnumerable<OtherPageResModel> opRes { get; set; }
 
@@ -153,7 +157,7 @@ namespace SD.Client.Pages
                     }
                     else
                     {
-                        otherPageModels = await OtherPageService.GetOPResModels(FLangCode, TLangCode);
+                        otherPageModels = await ApiService.GetAsync<List<OtherPageResModel>>($"api/OtherPage/{FLangCode}/{TLangCode}");
 
                         if (FLangCode != TLangCode)
                         {

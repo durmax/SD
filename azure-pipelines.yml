@@ -11,7 +11,7 @@ stages:
   displayName: 'Build Stage'
   jobs:
   - job: BuildProjects
-    displayName: 'Build Client and Server'
+    displayName: 'Server'
     pool:
       vmImage: 'windows-latest'
 
@@ -22,19 +22,10 @@ stages:
         version: '8.0.x'
 
     - task: DotNetCoreCLI@2
-      displayName: 'Restore solution'
+      displayName: 'Restore Server'
       inputs:
         command: 'restore'
-        projects: |
-          Client/SD.Client.csproj
-          Server/SD.Api.csproj
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Build Client'
-      inputs:
-        command: 'build'
-        projects: 'Client/SD.Client.csproj'
-        arguments: '--configuration $(buildConfiguration)'
+        projects: Server/SD.Api.csproj
 
     - task: DotNetCoreCLI@2
       displayName: 'Build Server'
@@ -57,24 +48,6 @@ stages:
         pathToPublish: '$(Build.ArtifactStagingDirectory)/Server'
         artifactName: 'webapi'
         publishLocation: 'Container'
-
-# ---------- Deploy Blazor to Azure Static Web App ----------
-
-# - stage: Deploy_StaticWebApp
-#   displayName: 'Deploy Blazor WASM to Azure Static Web App'
-#   dependsOn: Build
-#   jobs:
-#   - job: DeployClient
-#     displayName: 'Deploy Blazor App'
-#     pool:
-#       vmImage: 'ubuntu-latest'
-
-#     steps:
-#     - task: AzureStaticWebApp@0
-#       inputs:
-#         app_location: 'Client'
-#         output_location: 'wwwroot'
-#         deployment_token: '$(AZURE_STATIC_WEB_APPS_DEPLOYMENT_TOKEN)'
 
 # ---------- Deploy WebAPI to Azure App Service ----------
 - stage: Deploy_WebAPI

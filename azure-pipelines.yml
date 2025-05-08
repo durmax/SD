@@ -26,8 +26,8 @@ stages:
       inputs:
         command: 'restore'
         projects: |
-          SD/Client/SD.Client.csproj
-          SD/Server/SD.Api.csproj
+          Client/SD.Client.csproj
+          Server/SD.Api.csproj
 
     - task: DotNetCoreCLI@2
       displayName: 'Build Client'
@@ -48,7 +48,7 @@ stages:
       inputs:
         command: 'publish'
         publishWebProjects: false
-        projects: 'SD/Server/SD.Api.csproj'
+        projects: 'Server/SD.Api.csproj'
         arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Server'
         zipAfterPublish: true
 
@@ -72,7 +72,7 @@ stages:
 #     steps:
 #     - task: AzureStaticWebApp@0
 #       inputs:
-#         app_location: 'SD/Client'
+#         app_location: 'Client'
 #         output_location: 'wwwroot'
 #         deployment_token: '$(AZURE_STATIC_WEB_APPS_DEPLOYMENT_TOKEN)'
 

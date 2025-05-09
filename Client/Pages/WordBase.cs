@@ -55,6 +55,13 @@ namespace SD.Client.Pages
 
         [Parameter]
         public string UserId { get; set; }
+        [Parameter]
+        public EventCallback<WordDto> OnWordSave { get; set; }
+        [Parameter]
+        public EventCallback<WordDto> OnWordFound { get; set; }
+
+        [Parameter]
+        public EventCallback<WordDto> OnWordDelete { get; set; }
 
         protected string cssClassUpdate = "d-none";
 
@@ -91,14 +98,6 @@ namespace SD.Client.Pages
             (WordDto.ToLang, WordDto.WordLang) = (WordDto.WordLang, WordDto.ToLang);
         }
 
-        [Parameter]
-        public EventCallback<WordDto> OnWordSave { get; set; }
-        [Parameter]
-        public EventCallback<WordDto> OnWordFound { get; set; }
-
-        [Parameter]
-        public EventCallback<WordDto> OnWordDelete { get; set; }
-
         protected async Task OnSelectedAsync(int selection)
         {
             WordDto.ShareWith = (ShareWith)selection;
@@ -109,48 +108,52 @@ namespace SD.Client.Pages
         protected async Task AddWord()
         {
             loading = true;
-            if (CurrentUser.IsAuthenticated)
+
+            if (!CurrentUser.IsAuthenticated)
+            {
+                NavigationManager.NavigateTo("/authentication/login");
+                loading = false;
+                return;
+            }
+
+            try
             {
                 WordDto.Explain = await QuillHtml.GetHTML();
 
-                HttpResponseMessage response = await ApiService.PostAsync<HttpResponseMessage>("api/Word", WordDto);
+                var response = await ApiService.PostAsync<HttpResponseMessage>("api/Word", WordDto);
+                var responseBody = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var json = await response.Content.ReadAsStringAsync();
-                    foundWordDtoToUpdate = JsonConvert.DeserializeObject<WordDto>(json);
+                    foundWordDtoToUpdate = JsonConvert.DeserializeObject<WordDto>(responseBody);
+
+                    note = $"{WordDto.Title} is Saved";
+                    WordDto.UserId = foundWordDtoToUpdate?.UserId;
+                    WordDto.WordId = foundWordDtoToUpdate?.WordId;
+
+                    await OnWordSave.InvokeAsync(WordDto);
                 }
                 else
                 {
-                    var error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Error {response.StatusCode}: {error}");
-                }
+                    Console.WriteLine($"Error {response.StatusCode}: {responseBody}");
 
-                if (!response.IsSuccessStatusCode)
-                {
                     if ((int)response.StatusCode == 302)
                     {
                         cssClassUpdate = null;
                     }
-                    //note = await respons.Content.ReadAsStringAsync();
-                }
-                else
-                {
-                    if ((int)response.StatusCode == 200)
-                    {
-                        note = $"{WordDto.Title} is Saved";
-                        WordDto.UserId = foundWordDtoToUpdate.UserId;
-                        WordDto.WordId = foundWordDtoToUpdate?.WordId;
-                        await OnWordSave.InvokeAsync(WordDto);
-                    }
+                    note = responseBody;
                 }
             }
-            else //note = "please Login to save word to your account";
+            catch (Exception ex)
             {
-                NavigationManager.NavigateTo("/authentication/login");
+                Console.WriteLine($"Exception occurred while adding word: {ex.Message}");
+                note = "An error occurred while saving the word.";
             }
-            SameWords = null;
-            loading = false;
+            finally
+            {
+                SameWords = null;
+                loading = false;
+            }
         }
 
         protected async Task UpdateWord()
@@ -168,8 +171,8 @@ namespace SD.Client.Pages
                     HttpResponseMessage respons = await ApiService.PutAsync<HttpResponseMessage>($"api/Word", WordDto);
                     if (!respons.IsSuccessStatusCode)
                     {
-                        //note = $"Sorry, {wordModel.Title} did not updated!";
-                        note = await respons.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Exception occurred while updating word: {respons.Content.ReadAsStringAsync()}");
+                        note = "An error occurred while updating the word.";
                     }
                     else
                     {
@@ -180,7 +183,7 @@ namespace SD.Client.Pages
                 }
                 loading = false;
             }
-            else //note = "please Login to save word to your account";
+            else
             {
                 NavigationManager.NavigateTo("/authentication/login");
             }
@@ -376,11 +379,6 @@ namespace SD.Client.Pages
                 NavigationManager.NavigateTo("authentication/login");
             }
         }
-
-        /// <summary>
-        /// Like end
-        /// </summary>
-        /// <returns></returns>
 
         protected async void OnCollapsed()
         {

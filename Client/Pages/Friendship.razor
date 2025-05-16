@@ -14,7 +14,7 @@
 
                 //    break;
 
-                case SD.Shared.Relation.Friend:
+                case sd.Shared.Relation.Friend:
 
                     <button type="button" class="btn btn-link"
                             @onclick="@(async () => { await RemoveFriend(FriendId); })">
@@ -22,14 +22,14 @@
                     </button>
                     break;
 
-                case SD.Shared.Relation.FriendRequestTo:
+                case sd.Shared.Relation.FriendRequestTo:
 
                     <div class="btn btn-link">
                         <img width="20" height="20" src="/icons/paper-plane-solid.svg" asp-append-version="true" />
                     </div>
                     break;
 
-                case SD.Shared.Relation.FriendRequestFrom:
+                case sd.Shared.Relation.FriendRequestFrom:
 
                     <div class="input-group">
                         <div class="input-group-prepend">

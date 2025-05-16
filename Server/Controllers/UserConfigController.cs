@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using sd.Api.Application.Services;
-using SD.Shared;
+using sd.Shared;
 
 namespace sd.Api.Controllers
 {

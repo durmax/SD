@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using SD.Client.Services;
-using SD.Shared;
+using sd.Shared;
 using System.Threading.Tasks;
 
 namespace SD.Client.Pages

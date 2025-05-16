@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace SD.Shared
+namespace sd.Shared
 {
     public class WordModel
     {

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SD.Shared;
+using sd.Shared;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using sd.Api.Application.Services;

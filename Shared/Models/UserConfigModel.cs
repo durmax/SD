@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization.Attributes;
 using System.Collections.Generic;
 
-namespace SD.Shared
+namespace sd.Shared
 {
     public class UserConfigModel
     {

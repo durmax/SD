@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using SD.Shared;
+using sd.Shared;
 using sd.Api.Models;
 using MongoDB.Driver;
 using System;

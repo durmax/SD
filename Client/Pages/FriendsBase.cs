@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SD.Shared;
+using sd.Shared;
 using System.Net.Http.Json;
 using SD.Client.Services;
 

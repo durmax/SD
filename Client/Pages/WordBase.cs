@@ -6,7 +6,7 @@ using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using SD.Client.Models;
 using SD.Client.Services;
-using SD.Shared;
+using sd.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;

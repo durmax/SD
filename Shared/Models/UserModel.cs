@@ -4,7 +4,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace SD.Shared
+namespace sd.Shared
 {
     [Serializable]
     public class UserModel

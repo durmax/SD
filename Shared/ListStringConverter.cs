@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SD.Shared
+namespace sd.Shared
 {
     static public class ListStringConverter
     {

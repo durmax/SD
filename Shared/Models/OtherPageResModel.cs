@@ -1,5 +1,5 @@
 ﻿
-namespace SD.Shared
+namespace sd.Shared
 {
     public class OtherPageResModel
     {

@@ -4,7 +4,7 @@ using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using SD.Client.Models;
 using SD.Client.Services;
-using SD.Shared;
+using sd.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SD.Shared;
+using sd.Shared;
 using SD.Client.Services;
 using System.Net.Http.Json;
 using System.Net.Http;

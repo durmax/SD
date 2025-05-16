@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using sd.Api.Models;
-using SD.Shared;
+using sd.Shared;
 
 namespace sd.Api.Infrastructure.Repositories
 {

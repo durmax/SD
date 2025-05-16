@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SD.Client.Services;
-using SD.Shared;
+using sd.Shared;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

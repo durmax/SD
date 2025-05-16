@@ -2,7 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace SD.Shared
+namespace sd.Shared
 {
     public class RelationshipModel
     {

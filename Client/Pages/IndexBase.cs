@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using SD.Client.Services;
 using System.Threading.Tasks;
-using SD.Shared;
+using sd.Shared;
 using System.Collections.Generic;
 using AKSoftware.Localization.MultiLanguages;
 using System.Net.Http.Json;

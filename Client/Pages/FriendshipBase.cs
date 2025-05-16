@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SD.Client.Services;
-using SD.Shared;
+using sd.Shared;
 using System;
 using System.Net.Http;
 using System.Net.Http.Json;

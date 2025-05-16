@@ -1,5 +1,5 @@
 ﻿using MongoDB.Driver;
-using SD.Shared;
+using sd.Shared;
 
 namespace sd.Api.Models
 {

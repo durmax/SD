@@ -1,5 +1,5 @@
 ﻿using SD.Client.Models;
-using SD.Shared;
+using sd.Shared;
 using System.Collections.Generic;
 
 namespace SD.Client.Services

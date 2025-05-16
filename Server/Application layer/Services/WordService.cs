@@ -108,7 +108,7 @@ namespace sd.Api.Application.Services
                  (x.UserId1 == wordDto.UserId && x.UserId2 == userId))
                 );
 
-            if (!string.IsNullOrEmpty(rs.FirstOrDefault().RelationshipId))
+            if (!string.IsNullOrEmpty(rs.FirstOrDefault()?.RelationshipId))
             {
                 return wordDto.ShareWith == ShareWith.Friends || wordDto.ShareWith == ShareWith.Public;
             }

@@ -15,23 +15,50 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
-      - name: Build And Deploy
-        id: builddeploy
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies (Client)
+        run: dotnet restore ./Client/sd.Client.csproj
+
+      - name: Restore dependencies (API)
+        run: dotnet restore ./Api/Api.csproj
+
+      - name: Clean (Client)
+        run: dotnet clean ./Client/sd.Client.csproj --configuration Release
+
+      - name: Clean (API)
+        run: dotnet clean ./Api/Api.csproj --configuration Release
+
+      - name: Build (Client)
+        run: dotnet build ./Client/sd.Client.csproj --configuration Release --no-restore
+
+      - name: Build (API)
+        run: dotnet build ./Api/Api.csproj --configuration Release --no-restore
+
+      - name: Publish Client
+        run: dotnet publish ./Client/sd.Client.csproj --configuration Release --output ./output/wwwroot --no-build
+
+      - name: Publish API
+        run: dotnet publish ./Api/Api.csproj --configuration Release --output ./output/api --no-build
+
+      - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_RED_POND_0CCF1D603 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # For PR comments
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "Client" # App source code path
-          api_location: "Api" # Api source code path
-          output_location: "wwwroot" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+          app_location: "./output/wwwroot"       # Published client app
+          api_location: "./output/api"           # Published API
+          output_location: ""                    # Not needed when manually publishing
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -39,7 +66,6 @@ jobs:
     name: Close Pull Request Job
     steps:
       - name: Close Pull Request
-        id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_RED_POND_0CCF1D603 }}

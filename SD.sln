@@ -7,9 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
 		.github\workflows\azure-static-web-apps-red-pond-0ccf1d603.yml = .github\workflows\azure-static-web-apps-red-pond-0ccf1d603.yml
+		Readme.md = Readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SD.Shared", "Shared\SD.Shared.csproj", "{1E5635E4-0868-FF92-5ACE-054A62C787DF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sd.Shared", "Shared\sd.Shared.csproj", "{1E5635E4-0868-FF92-5ACE-054A62C787DF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sd.Api", "Server\sd.Api.csproj", "{3471568B-ACDF-7245-CC15-78DA4ECE67DC}"
 EndProject

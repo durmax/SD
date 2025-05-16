@@ -106,7 +106,8 @@ namespace sd.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
+            app.UseRouting();
 
             app.UseCors(builder =>
             {
@@ -115,12 +116,13 @@ namespace sd.Api
                     "https://lingoclub.netlify.app",
                     "https://www.lingoclub.net")
                        .AllowAnyMethod()
-                       .AllowAnyHeader();
+                       .AllowAnyHeader()
+                       .AllowCredentials();
             });
 
             app.UseAuthentication();
             app.UseMiddleware<ExceptionHandlingMiddleware>();
-            app.UseRouting();
+            
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -128,12 +130,8 @@ namespace sd.Api
                 endpoints.MapControllers();
             });
 
-            // Swagger
-            if (env.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
     }
 }

@@ -30,25 +30,25 @@ jobs:
         run: dotnet restore ./Client/sd.Client.csproj
 
       - name: Restore dependencies (API)
-        run: dotnet restore ./Api/Api.csproj
+        run: dotnet restore ./Server/sd.Api.csproj
 
       - name: Clean (Client)
         run: dotnet clean ./Client/sd.Client.csproj --configuration Release
 
       - name: Clean (API)
-        run: dotnet clean ./Api/Api.csproj --configuration Release
+        run: dotnet clean ./Server/sd.Api.csproj --configuration Release
 
       - name: Build (Client)
         run: dotnet build ./Client/sd.Client.csproj --configuration Release --no-restore
 
       - name: Build (API)
-        run: dotnet build ./Api/Api.csproj --configuration Release --no-restore
+        run: dotnet build ./Server/sd.Api.csproj --configuration Release --no-restore
 
       - name: Publish Client
         run: dotnet publish ./Client/sd.Client.csproj --configuration Release --output ./output/wwwroot --no-build
 
       - name: Publish API
-        run: dotnet publish ./Api/Api.csproj --configuration Release --output ./output/api --no-build
+        run: dotnet publish ./Server/sd.Api.csproj --configuration Release --output ./output/api --no-build
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1

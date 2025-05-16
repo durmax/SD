@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace SD.Client.Services
+namespace sd.Client.Services
 {
     public class CurrentUserService
     {

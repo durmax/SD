@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
-using SD.Client.Models;
-using SD.Client.Services;
+using sd.Client.Models;
+using sd.Client.Services;
 using sd.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SD.Client.Pages
+namespace sd.Client.Pages
 {
     public class LanguagesBase : ComponentBase
     {

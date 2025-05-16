@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "SD.Client": {
+    "sd.Client": {
       "commandName": "Project",
       "launchBrowser": true,
       "dotnetRunMessages": true,

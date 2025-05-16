@@ -1,8 +1,8 @@
-﻿using SD.Client.Models;
+﻿using sd.Client.Models;
 using sd.Shared;
 using System.Collections.Generic;
 
-namespace SD.Client.Services
+namespace sd.Client.Services
 {
     public class OtherPageService
     {

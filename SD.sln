@@ -14,7 +14,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sd.Shared", "Shared\sd.Shar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sd.Api", "Server\sd.Api.csproj", "{3471568B-ACDF-7245-CC15-78DA4ECE67DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SD.Client", "Client\SD.Client.csproj", "{C6F69004-4471-D320-0921-78DC3E9F0F62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sd.Client", "Client\sd.Client.csproj", "{C6F69004-4471-D320-0921-78DC3E9F0F62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

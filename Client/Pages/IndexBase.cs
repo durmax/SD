@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Components;
-using SD.Client.Services;
+using sd.Client.Services;
 using System.Threading.Tasks;
 using sd.Shared;
 using System.Collections.Generic;
 using AKSoftware.Localization.MultiLanguages;
 using System.Net.Http.Json;
 
-namespace SD.Client.Pages
+namespace sd.Client.Pages
 {
     public class IndexBase : ComponentBase
     {

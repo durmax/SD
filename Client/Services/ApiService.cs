@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System;
 using System.Net.Http.Json;
 
-namespace SD.Client.Services
+namespace sd.Client.Services
 {
     public class ApiService
     {

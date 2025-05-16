@@ -1,11 +1,11 @@
 using System;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using SD.Client.Services;
-using SD.Client.Models;
+using sd.Client.Services;
+using sd.Client.Models;
 using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
-using SD.Client;
+using sd.Client;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.FluentUI.AspNetCore.Components;

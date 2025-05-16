@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SD.Client.Services
+namespace sd.Client.Services
 {
     public class LoggingService
     {

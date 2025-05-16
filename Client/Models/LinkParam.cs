@@ -1,5 +1,5 @@
 ﻿
-namespace SD.Client.Models
+namespace sd.Client.Models
 {
     public class LinkParam
     {

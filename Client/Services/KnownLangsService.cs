@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using sd.Shared;
 
-namespace SD.Client.Services
+namespace sd.Client.Services
 {
     public class KnownLangsService
     {

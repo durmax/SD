@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using SD.Client.Services;
+using sd.Client.Services;
 using sd.Shared;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace SD.Client.Pages
+namespace sd.Client.Pages
 {
     public class OtherPageManagerBase : ComponentBase
     {

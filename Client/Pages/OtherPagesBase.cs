@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SD.Client.Services;
+using sd.Client.Services;
 using sd.Shared;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SD.Client.Pages
+namespace sd.Client.Pages
 {
     public class OtherPagesBase : ComponentBase
     {

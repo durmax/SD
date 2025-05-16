@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using sd.Shared;
 using System.Net.Http.Json;
-using SD.Client.Services;
+using sd.Client.Services;
 
-namespace SD.Client.Pages
+namespace sd.Client.Pages
 {
     public class FriendsBase : ComponentBase
     {

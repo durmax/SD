@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
-using SD.Client.Models;
-using SD.Client.Services;
+using sd.Client.Models;
+using sd.Client.Services;
 using sd.Shared;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace SD.Client.Pages
+namespace sd.Client.Pages
 {
     public class WordBase : ComponentBase
     {

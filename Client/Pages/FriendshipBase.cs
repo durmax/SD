@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using SD.Client.Services;
+using sd.Client.Services;
 using sd.Shared;
 using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace SD.Client.Pages
+namespace sd.Client.Pages
 {
     public class FriendshipBase : ComponentBase
     {

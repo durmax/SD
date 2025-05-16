@@ -1,7 +1,7 @@
-﻿using SD.Client.Models;
+﻿using sd.Client.Models;
 using System.Collections.Generic;
 
-namespace SD.Client.Services
+namespace sd.Client.Services
 {
     public class UriService
     {

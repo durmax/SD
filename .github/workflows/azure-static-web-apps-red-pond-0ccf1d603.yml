@@ -28,13 +28,13 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies (Solution)
-        run: dotnet restore ./SD.sln
+        run: dotnet restore SD.sln
 
       - name: Clean Solution
-        run: dotnet clean ./SD.sln --configuration Release
+        run: dotnet clean SD.sln --configuration Release
 
       - name: Build Solution
-        run: dotnet build ./SD.sln --configuration Release --no-restore
+        run: dotnet build SD.sln --configuration Release --no-restore
 
       - name: Publish Client
         run: dotnet publish ./Client/sd.Client.csproj --configuration Release --output ./output/wwwroot --no-build

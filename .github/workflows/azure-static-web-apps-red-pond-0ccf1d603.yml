@@ -20,11 +20,9 @@ jobs:
         with:
           submodules: true
           lfs: false
-          path: SD
-
+      # temporal: Print Directory Structure
       - name: Debug folder structure
         run: ls -R
-        working-directory: ./SD
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
@@ -33,15 +31,12 @@ jobs:
 
       - name: Restore dependencies (Solution)
         run: dotnet restore SD.sln
-        working-directory: ./SD
 
       - name: Clean Solution
         run: dotnet clean SD.sln --configuration Release
-        working-directory: ./SD
 
       - name: Build Solution
         run: dotnet build SD.sln --configuration Release --no-restore
-        working-directory: ./SD
 
       - name: Publish Client
         run: dotnet publish ./Client/sd.Client.csproj --configuration Release --output ./output/wwwroot --no-build

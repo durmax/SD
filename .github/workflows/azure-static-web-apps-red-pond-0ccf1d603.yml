@@ -20,29 +20,21 @@ jobs:
         with:
           submodules: true
           lfs: false
+          path: SD
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore dependencies (Client)
-        run: dotnet restore ./Client/sd.Client.csproj
+      - name: Restore dependencies (Solution)
+        run: dotnet restore ./SD.sln
 
-      - name: Restore dependencies (API)
-        run: dotnet restore ./Server/sd.Api.csproj
+      - name: Clean Solution
+        run: dotnet clean ./SD.sln --configuration Release
 
-      - name: Clean (Client)
-        run: dotnet clean ./Client/sd.Client.csproj --configuration Release
-
-      - name: Clean (API)
-        run: dotnet clean ./Server/sd.Api.csproj --configuration Release
-
-      - name: Build (Client)
-        run: dotnet build ./Client/sd.Client.csproj --configuration Release --no-restore
-
-      - name: Build (API)
-        run: dotnet build ./Server/sd.Api.csproj --configuration Release --no-restore
+      - name: Build Solution
+        run: dotnet build ./SD.sln --configuration Release --no-restore
 
       - name: Publish Client
         run: dotnet publish ./Client/sd.Client.csproj --configuration Release --output ./output/wwwroot --no-build

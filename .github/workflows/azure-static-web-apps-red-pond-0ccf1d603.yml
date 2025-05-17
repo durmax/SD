@@ -29,12 +29,15 @@ jobs:
 
       - name: Restore dependencies (Solution)
         run: dotnet restore SD.sln
+        working-directory: ./SD
 
       - name: Clean Solution
         run: dotnet clean SD.sln --configuration Release
+        working-directory: ./SD
 
       - name: Build Solution
         run: dotnet build SD.sln --configuration Release --no-restore
+        working-directory: ./SD
 
       - name: Publish Client
         run: dotnet publish ./Client/sd.Client.csproj --configuration Release --output ./output/wwwroot --no-build

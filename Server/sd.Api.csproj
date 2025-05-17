@@ -17,7 +17,7 @@
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.5" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Shared\temp.Shared.csproj" />
+	  <ProjectReference Include="..\Shared\sd.Shared.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Update="Properties\Resources.resx">

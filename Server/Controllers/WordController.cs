@@ -148,5 +148,13 @@ namespace sd.Api.Controllers
             if (result == null) return NotFound();
             return Ok(result);
         }
+
+        [Authorize]
+        [HttpGet("GetAI/{wordTitle}")]
+        public async Task<ActionResult<string>> GetAI(string wordTitle)
+        {
+            var result = await _wordService.GetAI(wordTitle);
+            return Ok(new TransObj { BoolVar = true, SetringVar = result });
+        }
     }
 }

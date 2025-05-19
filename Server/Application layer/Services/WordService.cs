@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Linq;
 using System.Threading.Tasks;
+using sd.Api.Infrastructure;
 
 namespace sd.Api.Application.Services
 {
@@ -22,6 +23,7 @@ namespace sd.Api.Application.Services
         Task<bool> SaveComment(string wordId, CommentModel newComment);
         Task<int> LikeComment(string userId, string wordId, string commentId);
         Task<bool> DeleteComment(string currUsr, string wordId, string commentId);
+        Task <string> GetAI(string wordTitle);
     }
 
     public class WordService : IWordService
@@ -30,13 +32,15 @@ namespace sd.Api.Application.Services
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepo;
         private readonly IRelationshipRepository _relationshipRepo;
+        private readonly GeminiService _geminiService;
 
-        public WordService(IWordRepository wordRepo, IMapper mapper, IUserRepository userRepo, IRelationshipRepository relationshipRepo)
+        public WordService(IWordRepository wordRepo, IMapper mapper, IUserRepository userRepo, IRelationshipRepository relationshipRepo, GeminiService geminiService)
         {
             _wordRepo = wordRepo;
             _mapper = mapper;
             _userRepo = userRepo;
             _relationshipRepo = relationshipRepo;
+            _geminiService = geminiService;
         }
 
         public async Task<List<WordDto>> GetPageWords(string? currentUserId, string userId, string lang, int pageSize, int currentPage)
@@ -278,6 +282,12 @@ namespace sd.Api.Application.Services
                 return wordModel.Likes.Count();
             }
             else return -1;
+        }
+
+        public async Task<string> GetAI(string wordTitle)
+        {
+            var result = await _geminiService.ProcessStringAsync($"Schreibe mir Beispiele auf Niveau B1, die mir die Bedeutungen von '{wordTitle}' zu versehen hilft.");
+            return result;
         }
     }
 }

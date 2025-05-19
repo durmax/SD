@@ -14,6 +14,7 @@ using sd.Api.Infrastructure.Repositories;
 using sd.Api.Repositories;
 using sd.Api.Application.Services;
 using sd.Api.Helper;
+using sd.Api.Infrastructure;
 
 namespace sd.Api
 {
@@ -46,6 +47,7 @@ namespace sd.Api
 
             services.AddSingleton<MongodbContext>();
             services.AddSingleton(typeof(CachingHelper));
+            services.AddSingleton<GeminiService>();
 
             services.AddScoped<IOtherPageRepository, OtherPageRepository>();
             services.AddScoped<IUserRepository, UserRepository>();

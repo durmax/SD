@@ -70,6 +70,10 @@
                     @languageContainer.Keys["Delete"]
                     <img width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" />
                 </button>
+                <button type="button" class="bg-transparent border-0 pl-3 pr-3" @onclick="async () => { await GetAi(); }">
+                    AI Help
+                    
+                </button>
 
                 <input class="position-absolute text-center border-0 mt-1 w-25" style="right:20px" @bind="@WordDto.Score" />
             </div>

@@ -332,21 +332,18 @@ namespace sd.Client.Pages
             {
                 if (CurrentUser.IsAuthenticated)
                 {
-                    if (CurrentUser.IsAuthenticated)
+                    bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete '" + WordDto.Title + "', are you sure?");
+                    if (confirmed)
                     {
-                        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete '" + WordDto.Title + "', are you sure?");
-                        if (confirmed)
+                        var response = await ApiService.DeleteAsync($"api/Word/{WordDto.WordId}");
+                        if (response.IsSuccessStatusCode)
                         {
-                            var response = await ApiService.DeleteAsync($"api/Word/{WordDto.WordId}");
-                            if (response.IsSuccessStatusCode)
-                            {
-                                await OnWordDelete.InvokeAsync(WordDto);
-                            }
-                            else
-                            {
-                                //note = $"You can NOT delete {wordModel.Title}";
-                                await JsRuntime.InvokeVoidAsync("alert", $"You do NOT have a promising to delete '{WordDto.Title}'");
-                            }
+                            await OnWordDelete.InvokeAsync(WordDto);
+                        }
+                        else
+                        {
+                            //note = $"You can NOT delete {wordModel.Title}";
+                            await JsRuntime.InvokeVoidAsync("alert", $"You do NOT have a promising to delete '{WordDto.Title}'");
                         }
                     }
                 }
@@ -358,6 +355,17 @@ namespace sd.Client.Pages
             loading = false;
         }
 
+        protected async Task GetAi()
+        {
+            loading = true;
+            if (CurrentUser.IsAuthenticated)
+            {
+                var response = await ApiService.GetAsync<TransObj>($"api/Word/GetAI/{WordDto.Title}");
+                WordDto.Explain += response.SetringVar;
+                await LoadHtmlExplain();
+            }
+            loading = false;
+        }
         protected async Task GetLikedUsers(int? likesCount)
         {
             CollapsedLike = !CollapsedLike;

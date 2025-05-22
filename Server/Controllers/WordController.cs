@@ -71,8 +71,7 @@ namespace sd.Api.Controllers
 
             word.UserId = (await _userService.GetCurrentUser(User))?.UserId;
 
-            var wordMs = await _wordService.GetByCondation(w => w.WordId == word.WordId);
-            var wordM = wordMs.FirstOrDefault();
+            var wordM = await _wordService.GetById(word.WordId);
 
             if (Guid.TryParse(word?.WordId, out Guid result) && wordM != null)
             {
@@ -119,8 +118,7 @@ namespace sd.Api.Controllers
         public async Task<ActionResult> DeleteWord(string id)
         {
             var currentUser = (await _userService.GetCurrentUser(User))?.UserId;
-            var ws = await _wordService.GetByCondation(w => w.WordId == id);
-            var w = ws.First();
+            var w = await _wordService.GetById(id);
 
             if (w?.UserId != currentUser) return StatusCode(StatusCodes.Status401Unauthorized);
 
@@ -139,8 +137,7 @@ namespace sd.Api.Controllers
         [HttpGet("GetLikedUsers/{wordId}")]
         public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetLikes(string wordId)
         {
-            var ws = await _wordService.GetByCondation(w => w.WordId == wordId);
-            var word = ws.First();
+            var word = await _wordService.GetById(wordId);
 
             var foundUsers = await _userService.GetByCondation(u => word.Likes.Contains(u.UserId));
             var result = await _relationshipService.GetRelationships((await _userService.GetCurrentUser(User))?.UserId, foundUsers.ToList());

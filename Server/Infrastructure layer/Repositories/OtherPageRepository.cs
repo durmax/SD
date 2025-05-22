@@ -10,8 +10,13 @@ using System;
 
 namespace sd.Api.Infrastructure.Repositories
 {
-    public interface IOtherPageRepository : ICrudBase<OtherPageModel>
+    public interface IOtherPageRepository
     {
+        Task<IEnumerable<OtherPageModel>> GetByCondation(Expression<Func<OtherPageModel, bool>> expression);
+        Task<OtherPageModel> GetById(string id);
+        Task<bool> Create(OtherPageModel otherPage);
+        Task<bool> Update(OtherPageModel newOtherPage);
+        Task<bool> Delete(string id);
     }
 
     public class OtherPageRepository : IOtherPageRepository
@@ -51,6 +56,13 @@ namespace sd.Api.Infrastructure.Repositories
         public async Task<IEnumerable<OtherPageModel>> GetByCondation(Expression<Func<OtherPageModel, bool>> expression)
         {
             return await _context.OtherPages.AsQueryable().Where(expression).ToListAsync();
+        }
+
+        public async Task<OtherPageModel?> GetById(string id)
+        {
+            var cursor = _context.OtherPages.Find(u => u.OtherPageId == id);
+            var res = await cursor.FirstOrDefaultAsync();
+            return res;
         }
     }
 }

@@ -1,15 +1,15 @@
 ﻿using sd.Api.Infrastructure.Repositories;
 using sd.Shared;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace sd.Api.Application.Services
 {
-    public interface IUserConfigService : ICrudBase<UserConfigModel>
+    public interface IUserConfigService
     {
+        Task<UserConfigModel> GetById(string id);
+        Task<bool> Update(UserConfigModel entity);
+
         Task<bool> AddUserLabel(string userId, string label);
         Task<bool> RemoveUserLabel(string userId, string label);
 
@@ -30,10 +30,9 @@ namespace sd.Api.Application.Services
 
         public async Task<bool> AddUserLabel(string userId, string label)
         {
-            var userConfigs = await _userConfigRepository.GetByCondation(u => u.UserId == userId);
-            if (!userConfigs.Any()) return false;
+            var userConfig = await _userConfigRepository.GetById(userId);
+            if (userConfig == null) return false;
 
-            var userConfig = userConfigs.First();
             var labels = ListStringConverter.ToList(userConfig.Labels);
 
             if (!labels.Contains(label))
@@ -48,10 +47,9 @@ namespace sd.Api.Application.Services
 
         public async Task<bool> RemoveUserLabel(string userId, string label)
         {
-            var userConfigs = await _userConfigRepository.GetByCondation(u => u.UserId == userId);
-            if (!userConfigs.Any()) return false;
+            var userConfig = await _userConfigRepository.GetById(userId);
+            if (userConfig is null) return false;
 
-            var userConfig = userConfigs.First();
             var labels = ListStringConverter.ToList(userConfig.Labels);
 
             if (labels.Contains(label))
@@ -64,19 +62,9 @@ namespace sd.Api.Application.Services
             return false; // Label was not found
         }
 
-        public Task<IEnumerable<UserConfigModel>> GetByCondation(Expression<Func<UserConfigModel, bool>> expression)
+        public async Task<UserConfigModel> GetById(string id)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> Create(UserConfigModel entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> Delete(string id)
-        {
-            throw new NotImplementedException();
+            return await _userConfigRepository.GetById(id);
         }
     }
 }

@@ -10,8 +10,14 @@ using System.Threading.Tasks;
 
 namespace sd.Api.Application.Services
 {
-    public interface IUserService : ICrudBase<UserModel>
+    public interface IUserService
     {
+        Task<IEnumerable<UserModel>> GetByCondation(Expression<Func<UserModel, bool>> expression);
+        Task<UserModel> GetById(string id);
+        Task<bool> Create(UserModel entity);
+        Task<bool> Update(UserModel entity);
+        Task<bool> Delete(string id);
+
         Task<UserModel?> Create(string userEmail);
         Task<UserModel?> GetCurrentUser(ClaimsPrincipal user);
     }
@@ -60,13 +66,13 @@ namespace sd.Api.Application.Services
 
         public async Task<bool> Update(UserModel newVer)
         {
-            var oldVer = await _userRepository.GetByCondation(u => u.UserId == newVer.UserId);
-            if (oldVer.Count() == 0 || newVer == null)
+            var oldVer = await _userRepository.GetById(newVer.UserId);
+            if (oldVer is null || newVer == null)
             {
                 return false;
             }
 
-            if (oldVer.First().Email != newVer.Email)
+            if (oldVer.Email != newVer.Email)
             {
                 var res = await _userRepository.GetByCondation(u => u.Email == newVer.Email);
                 if (res?.First() != null)
@@ -102,6 +108,11 @@ namespace sd.Api.Application.Services
                 userModel = await Create(email);
 
             return _cacheHelper.SetValue<UserModel>(cacheKey, userModel);
+        }
+
+        public async Task<UserModel> GetById(string id)
+        {
+            return await _userRepository.GetById(id);
         }
     }
 }

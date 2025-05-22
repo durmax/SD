@@ -8,8 +8,14 @@ using System.Threading.Tasks;
 
 namespace sd.Api.Application.Services
 {
-    public interface IOtherPageService : ICrudBase<OtherPageModel>
+    public interface IOtherPageService
     {
+        Task<OtherPageModel?> GetById(string id);
+        Task<IEnumerable<OtherPageModel>> GetByCondation(Expression<Func<OtherPageModel, bool>> expression);
+        Task<bool> Create(OtherPageModel entity);
+        Task<bool> Update(OtherPageModel entity);
+        Task<bool> Delete(string id);
+
         Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang);
     }
 
@@ -73,6 +79,11 @@ namespace sd.Api.Application.Services
         public Task<bool> Delete(string id)
         {
             return _otherPageRepository.Delete(id);
+        }
+
+        public Task<OtherPageModel?> GetById(string id)
+        {
+            return _otherPageRepository.GetById(id);
         }
     }
 }

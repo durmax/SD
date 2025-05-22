@@ -23,8 +23,8 @@ namespace sd.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<string>> GetUserLables(string userId)
         {
-            var userConfigs = await _userConfigService.GetByCondation(u => u.UserId == userId);
-            return userConfigs.Any() ? ListStringConverter.ToList(userConfigs.First().Labels) : Enumerable.Empty<string>();
+            var userConfig = await _userConfigService.GetById(userId);
+            return userConfig is null ? ListStringConverter.ToList(userConfig?.Labels) : Enumerable.Empty<string>();
         }
 
         [HttpPost]

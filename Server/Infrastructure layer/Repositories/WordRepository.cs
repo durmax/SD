@@ -12,11 +12,16 @@ using System.Threading.Tasks;
 
 namespace sd.Api.Infrastructure.Repositories
 {
-    public interface IWordRepository : ICrudBase<WordModel>
+    public interface IWordRepository
     {
+        Task<IEnumerable<WordModel>> GetByCondation(Expression<Func<WordModel, bool>> expression);
+        Task<WordModel> GetById(string id);
+        Task<bool> Create(WordModel entity);
+        Task<bool> Update(WordModel entity);
+        Task<bool> Delete(string id);
+
         Task<long> GetDocCount(string userId, string lang);
         Task<WordModel?> GetWord(string userId, string lang, int currentPage, int limit);
-
     }
     public class WordRepository : IWordRepository
     {
@@ -105,6 +110,13 @@ namespace sd.Api.Infrastructure.Repositories
             if (lang != null) filter &= Builders<WordModel>.Filter.Eq(x => x.ToLang, lang);
 
             return filter;
+        }
+
+        public async Task<WordModel> GetById(string id)
+        {
+            var cursor = _context.Words.Find(x => x.WordId  == id);
+            var res = await cursor.FirstOrDefaultAsync();
+            return res;
         }
     }
 }

@@ -49,9 +49,9 @@ namespace sd.Api.Controllers
         {
             var cu =await _userService.GetCurrentUser(User);
 
-            var result = await _userService.GetByCondation(u => u.UserId == cu.UserId);
+            var result = await _userService.GetById(cu.UserId);
             if (result == null) return NotFound();
-            return result.FirstOrDefault();
+            return result;
         }
 
         // GET: api/User/GetUserById/5

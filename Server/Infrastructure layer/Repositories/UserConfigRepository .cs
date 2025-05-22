@@ -8,8 +8,11 @@ using sd.Shared;
 
 namespace sd.Api.Infrastructure.Repositories
 {
-    public interface IUserConfigRepository: ICrudBase<UserConfigModel>
+    public interface IUserConfigRepository
     {
+        Task<UserConfigModel> GetById(string id);
+        Task<bool> Update(UserConfigModel userConfigModel);
+        Task<IEnumerable<UserConfigModel>> GetByCondation(Expression<Func<UserConfigModel, bool>> expression);
     }
     public class UserConfigRepository : IUserConfigRepository
     {
@@ -31,14 +34,11 @@ namespace sd.Api.Infrastructure.Repositories
             return await _context.UsersConfigs.Find(expression).ToListAsync();
         }
 
-        public Task<bool> Create(UserConfigModel entity)
+        public async Task<UserConfigModel> GetById(string id)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> Delete(string id)
-        {
-            throw new NotImplementedException();
+            var cursor = _context.UsersConfigs.Find(x => x.UserId == id);
+            var res = await cursor.FirstOrDefaultAsync();
+            return res;
         }
     }
 }

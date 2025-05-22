@@ -38,8 +38,7 @@ namespace sd.Api.Controllers
         {
             if ((await _userService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
-            var results = await _otherPageService.GetByCondation(u => u.OtherPageId == id);
-            var result = results?.FirstOrDefault();
+            var result = await _otherPageService.GetById(id);
             if (result == null) return NotFound();
             return result;
         }
@@ -86,8 +85,7 @@ namespace sd.Api.Controllers
         {
             if ((await _userService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
 
-            var pagesToDelete = await _otherPageService.GetByCondation(u => u.OtherPageId == id);
-            var pageToDelete = pagesToDelete?.FirstOrDefault();
+            var pageToDelete = await _otherPageService.GetById(id);
 
             if (pageToDelete == null)
             {

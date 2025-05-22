@@ -9,8 +9,13 @@ using System.Threading.Tasks;
 
 namespace sd.Api.Application.Services
 {
-    public interface IRelationshipService : ICrudBase<RelationshipModel>
+    public interface IRelationshipService
     {
+        Task<IEnumerable<RelationshipModel>> GetByCondation(Expression<Func<RelationshipModel, bool>> expression);
+        Task<bool> Create(RelationshipModel entity);
+        Task<bool> Update(RelationshipModel entity);
+        Task<bool> Delete(string id);
+
         Task<RelationshipModel> GetRelationship(string UserId1, Relation reletion, string UserId2);
         Task<bool> AddRelationship(RelationshipModel relationship);
         Task<Dictionary<string, string>> GetAllFriends(string userId);

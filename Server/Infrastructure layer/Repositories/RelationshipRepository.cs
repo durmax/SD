@@ -4,13 +4,17 @@ using sd.Shared;
 using sd.Api.Models;
 using MongoDB.Driver;
 using System;
-using sd.Api.Infrastructure.Repositories;
 using System.Linq.Expressions;
 
 namespace sd.Api.Repositories
 {
-    public interface IRelationshipRepository : ICrudBase<RelationshipModel>
+    public interface IRelationshipRepository
     {
+        Task<RelationshipModel> GetById(string id);
+        Task<IEnumerable<RelationshipModel>> GetByCondation(Expression<Func<RelationshipModel, bool>> expression);
+        Task<bool> Create(RelationshipModel entity);
+        Task<bool> Update(RelationshipModel entity);
+        Task<bool> Delete(string id);
     }
 
     public class RelationshipRepository : IRelationshipRepository
@@ -41,6 +45,13 @@ namespace sd.Api.Repositories
         public async Task<IEnumerable<RelationshipModel>> GetByCondation(Expression<Func<RelationshipModel, bool>> expression)
         {
             return await _context.Relationships.Find(expression).ToListAsync();
+        }
+
+        public async Task<RelationshipModel> GetById(string id)
+        {
+            var cursor = _context.Relationships.Find(x => x.RelationshipId == id);
+            var res = await cursor.FirstOrDefaultAsync();
+            return res;
         }
     }
 }

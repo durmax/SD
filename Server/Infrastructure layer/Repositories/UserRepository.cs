@@ -8,8 +8,13 @@ using sd.Shared;
 
 namespace sd.Api.Infrastructure.Repositories
 {
-    public interface IUserRepository: ICrudBase<UserModel>
+    public interface IUserRepository
     {
+        Task<IEnumerable<UserModel>> GetByCondation(Expression<Func<UserModel, bool>> expression);
+        Task<UserModel> GetById(string id);
+        Task<bool> Create(UserModel user);
+        Task<bool> Update(UserModel newVer);
+        Task<bool> Delete(string id);
     }
     public class UserRepository : IUserRepository
     {
@@ -42,6 +47,13 @@ namespace sd.Api.Infrastructure.Repositories
         {
             return await _context.Users
                     .Find(expression).ToListAsync();
+        }
+
+        public async Task<UserModel> GetById(string id)
+        {
+            var cursor = _context.Users.Find(x => x.UserId == id);
+            var res = await cursor.FirstOrDefaultAsync();
+            return res;
         }
     }
 }

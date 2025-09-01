@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using sd.Shared;
 using System.Collections.Generic;
 using AKSoftware.Localization.MultiLanguages;
-using System.Net.Http.Json;
+using System.Linq;
 
 namespace sd.Client.Pages
 {
@@ -40,6 +40,12 @@ namespace sd.Client.Pages
             Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang, ShareWith = ShareWith.Public });
         }
 
+        protected void AddNewWord(WordDto word, int index)
+        {
+            NewWords++;
+            Words.Insert(index, word);
+        }
+
         protected async Task GetNextPage()
         {
             loading = true;
@@ -50,23 +56,14 @@ namespace sd.Client.Pages
         }
         protected void NewWordHandler(WordDto word)
         {
-            var ws = Words.FindAll(w => w.WordId == word.WordId);
-            if (ws.Count > 1) // by update, it will be 2
+            int index = -1; // Initialize with an invalid index
+
+            if (Words.Any(w => w.WordId == word.WordId))
             {
-                int maxIndex = -1; // Initialize with an invalid index
-
-                foreach (var item in ws)
-                {
-                    int index = Words.FindLastIndex(w => w.WordId == item.WordId); // Find the last index of matching item
-                    if (index > maxIndex)
-                    {
-                        maxIndex = index; // Update maxIndex if a higher index is found
-                    }
-                }
-
-                Words.RemoveAt(maxIndex); // Remove the old word by update
+                index = Words.FindLastIndex(w => w.WordId == word.WordId);
+                Words.RemoveAt(index); // Remove the old word
             }
-            AddNewWord();
+            AddNewWord(word, index);
             currentPage++;
         }
         protected void OldWordHandler(WordDto oldWord)

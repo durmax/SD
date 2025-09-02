@@ -9,12 +9,12 @@ namespace sd.Client.Services
     public class ApiService
     {
         private readonly HttpClient _httpClient;
-        private readonly LoggingService _logger;
+        private readonly ILogger<ApiService> _log;
 
-        public ApiService(CurrentUserService currentUser, LoggingService logger)
+        public ApiService(CurrentUserService currentUser, ILogger<ApiService> log)
         {
             _httpClient = currentUser.HttpClient;
-            _logger = logger;
+            _log = log;
         }
         public async Task<T> GetAsync<T>(string url)
         {
@@ -25,7 +25,7 @@ namespace sd.Client.Services
             }
             catch (Exception ex)
             {
-                _logger.Log("ApiService", LogLevel.Error, $"GET request failed: {url}, Error: {ex}");
+                _log.LogError($"GET request failed: {url}, Error: {ex}");
                 throw;
             }
         }
@@ -39,7 +39,7 @@ namespace sd.Client.Services
             }
             catch (Exception ex)
             {
-                _logger.Log("ApiService", LogLevel.Error, $"POST request failed: {url}, Error: {ex}");
+                _log.LogError($"POST request failed: {url}, Error: {ex}");
                 throw;
             }
         }
@@ -53,7 +53,7 @@ namespace sd.Client.Services
             }
             catch (Exception ex)
             {
-                _logger.Log("ApiService", LogLevel.Error, $"PUT request failed: {url}, Error: {ex}");
+                _log.LogError($"PUT request failed: {url}, Error: {ex}");
                 throw;
             }
         }
@@ -66,13 +66,13 @@ namespace sd.Client.Services
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
-                    _logger.Log("ApiService", LogLevel.Error, $"DELETE API Error: {errorMessage}");
+                    _log.LogError($"DELETE API Error: {errorMessage}");
                 }
                 return response;
             }
             catch (Exception ex)
             {
-                _logger.Log("ApiService", LogLevel.Error, $"DELETE request failed: {url}, Error: {ex}");
+                _log.LogError($"DELETE request failed: {url}, Error: {ex}");
                 throw;
             }
         }
@@ -91,7 +91,7 @@ namespace sd.Client.Services
             else
             {
                 var errorMessage = await response.Content.ReadAsStringAsync();
-                _logger.Log("ApiService", LogLevel.Error, $"API Error: {errorMessage}");
+                _log.LogError($"API Error: {errorMessage}");
                 throw new Exception($"API Error: {errorMessage}");
             }
         }

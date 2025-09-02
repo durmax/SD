@@ -15,7 +15,7 @@ namespace sd.Client.Pages
         [Inject]
         LocalStorageAccessor LocalStorageAccessor { get; set; }
         [Inject]
-        LoggingService logger { get; set; }
+        ILogger<OtherPagesBase> log { get; set; }
         [Inject]
         protected OtherPageService OtherPageService { get; set; }
 
@@ -168,7 +168,7 @@ namespace sd.Client.Pages
                             }
                             catch (Exception ex)
                             {
-                                logger.Log(this.ToString(), LogLevel.Error, ex.ToString());
+                                log.LogError(ex.ToString());
                                 throw;
                             }
                         }
@@ -199,7 +199,7 @@ namespace sd.Client.Pages
                 }
                 catch (Exception ex)
                 {
-                    logger.Log(this.ToString(), LogLevel.Error, $"LocalStorageAccessor.GetValueAsync<string>(fav-{FLangCode}{TLangCode}) " + ex.Message);
+                    log.LogError($"LocalStorageAccessor.GetValueAsync<string>(fav-{FLangCode}{TLangCode}) " + ex.Message);
                     //throw;
                 }
             }

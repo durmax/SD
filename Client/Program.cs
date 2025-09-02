@@ -1,19 +1,26 @@
-using System;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using sd.Client.Services;
-using sd.Client.Models;
 using AKSoftware.Localization.MultiLanguages;
-using System.Reflection;
-using sd.Client;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
+using sd.Client;
+using sd.Client.LoggerProvider;
+using sd.Client.Models;
+using sd.Client.Services;
+using System;
+using System.Reflection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("app");
 
-builder.Services.AddSingleton<LoggingService>();
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+
+builder.Services.AddSingleton(new InMemoryLogStore(capacity: 1000));
+builder.Logging.AddProvider(new InMemoryLoggerProvider(
+    builder.Services.BuildServiceProvider().GetRequiredService<InMemoryLogStore>()));
+
 builder.Services.AddScoped<LocalStorageAccessor>();
 
 // Add configured HttpClient with AuthorizationMessageHandler

@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using AKSoftware.Localization.MultiLanguages;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using sd.Client.Services;
-using System.Threading.Tasks;
 using sd.Shared;
 using System.Collections.Generic;
-using AKSoftware.Localization.MultiLanguages;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace sd.Client.Pages
 {
@@ -22,6 +23,9 @@ namespace sd.Client.Pages
         protected ApiService ApiService { get; set; }
         [Inject]
         public DefaultLangsService DefaultLangsService { get; set; }
+
+        [Inject]
+        public ILogger<IndexBase> Log { get; set; }
 
         protected bool CollapsedFriend { get; set; } = true;    // hide by default
 
@@ -99,7 +103,9 @@ namespace sd.Client.Pages
                 {
                     LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(uiLang));
                 }
-                catch { }
+                catch {
+                    Log.LogError($"SetLanguage for uiLang: {uiLang}");
+                }
             }
         }
 
@@ -107,13 +113,7 @@ namespace sd.Client.Pages
         {
             if (firstRender && CurrentUser.IsAuthenticated)
             {
-                try
-                {
                     FriendRequestsDictionary = await ApiService.GetAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequests");
-                }
-                catch
-                {
-                }
             }
         }
     }

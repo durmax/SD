@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using sd.Client.Models;
@@ -12,11 +13,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace sd.Client.Pages
 {
     public class WordBase : ComponentBase
     {
+        [Inject]
+        ILogger<WordBase> Log { get; set; }
+
         [Inject]
         LocalStorageAccessor LocalStorageAccessor { get; set; }
         [Inject]
@@ -148,12 +153,16 @@ namespace sd.Client.Pages
             {
                 Console.WriteLine($"Exception occurred while adding word: {ex.Message}");
                 note = "An error occurred while saving the word.";
+
+                Log.LogError(ex.Message);
             }
             finally
             {
                 SameWords = null;
                 loading = false;
             }
+
+            Log.LogInformation(note);
         }
 
         protected async Task UpdateWord()
@@ -270,10 +279,13 @@ namespace sd.Client.Pages
                     wDto.Score++;
                     await ApiService.PutAsync<HttpResponseMessage>($"api/Word", wDto);
                     await OnWordFound.InvokeAsync(wDto);
+                    note = $"{wDto.Title} is found! The new score is {wDto.Score}";
+                    Log.LogInformation(note);
                 }
                 else
                 {
                     note = "The Word is not found!";
+                    Log.LogInformation(note);
                 }
             }
         }
@@ -351,6 +363,7 @@ namespace sd.Client.Pages
             {
                 await OnWordDelete.InvokeAsync(WordDto);
             }
+            Log.LogInformation($"DeleteWord: {WordDto.Title}");
             loading = false;
         }
 
@@ -422,7 +435,10 @@ namespace sd.Client.Pages
                         WordComments = string.IsNullOrEmpty(WordDto?.WordId) ? null : (List<CommentModel>)await ApiService.GetAsync<IEnumerable<CommentModel>>($"api/Comment/GetWordComments/{WordDto?.WordId}");
                         WordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        Log.LogError(ex.Message);
+                    }
                 }
             }
         }
@@ -434,7 +450,10 @@ namespace sd.Client.Pages
             {
                 FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{fl}{tl}");
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Log.LogError(ex.Message);
+            }
         }
 
         protected override async Task OnInitializedAsync()
@@ -445,9 +464,9 @@ namespace sd.Client.Pages
                 {
                     WordDto = await ApiService.GetAsync<WordDto>($"api/Word/{WordId}");
                 }
-                catch (Exception x)
+                catch (Exception ex)
                 {
-                    note = x.Message;
+                    Log.LogError(ex.Message);
                 }
             }
 
@@ -475,7 +494,10 @@ namespace sd.Client.Pages
                 {
                     await JsRuntime.InvokeVoidAsync("Utility.setFocus", ReferenceToInputControl);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Log.LogError(ex.Message);
+                }
 
                 await LoadHtmlExplain();
             }
@@ -494,8 +516,10 @@ namespace sd.Client.Pages
                         await QuillHtml.LoadHTMLContent(WordDto?.Explain);
                         counter = 11;
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Log.LogError(ex.Message);
+
                         await Task.Delay(100);
                         counter++;
                     }

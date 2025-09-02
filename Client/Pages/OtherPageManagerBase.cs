@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using sd.Client.Services;
 using sd.Shared;
 using System;
@@ -12,6 +13,9 @@ namespace sd.Client.Pages
     public class OtherPageManagerBase : ComponentBase
     {
         public OtherPageModel otherPageModel = new OtherPageModel();
+
+        [Inject]
+        public ILogger<OtherPageManagerBase> Log { get; set; }
 
         [Inject]
         protected ApiService ApiService { get; set; }
@@ -105,6 +109,8 @@ namespace sd.Client.Pages
                 Info = "Check if your data saved successfully please! ";
                 // Error
                 Info += ex.Message;
+
+                Log.LogError(ex.Message);
             }
             InfoShowClass = "";
         }
@@ -120,17 +126,13 @@ namespace sd.Client.Pages
                 Info = "Check if your data deleted successfully please! ";
                 // Error
                 Info += ex.Message;
+                Log.LogError(ex.Message);
             }
             InfoShowClass = "";
         }
         protected async override Task OnInitializedAsync()
         {
-            try
-            {
-                otherPageModel =  await ApiService.GetAsync<OtherPageModel>($"api/OtherPage/{Id}");
-            }
-            catch
-            {}
+            otherPageModel = await ApiService.GetAsync<OtherPageModel>($"api/OtherPage/{Id}");
 
             if (otherPageModel.OtherPageId == null)
             {

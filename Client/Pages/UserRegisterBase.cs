@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
+using sd.Client.Services;
+using sd.Shared;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using sd.Shared;
-using sd.Client.Services;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace sd.Client.Pages
 {
@@ -12,6 +13,9 @@ namespace sd.Client.Pages
     {
         public UserModel userModel = new();
         public Dictionary<string, string> foundUsers;
+
+        [Inject]
+        public ILogger<UserRegisterBase> Log { get; set; }
 
         [Inject]
         public CurrentUserService CurrentUser { set; get; }
@@ -63,7 +67,10 @@ namespace sd.Client.Pages
                         Info = "Check if your data saved successfully please! ";
                         // Error
                         Info += ex.Message;
+
+                        Log.LogError(ex.Message);
                     }
+                    Log.LogInformation(Info);
                     InfoDisplayClass = "";
                 }
             }
@@ -71,7 +78,6 @@ namespace sd.Client.Pages
 
         protected async override Task OnInitializedAsync()
         {
-
             if (!CurrentUser.IsAuthenticated)
             {
                 CssDisplayNotCurrentUser = null;
@@ -86,6 +92,7 @@ namespace sd.Client.Pages
                 {
                     Registered = false;
                     await SaveUserData();
+                    Log.LogError("Error in getting current user data");
                 }
             }
         }

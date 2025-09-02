@@ -1,5 +1,6 @@
 ﻿using AKSoftware.Localization.MultiLanguages;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using sd.Client.Models;
@@ -13,6 +14,9 @@ namespace sd.Client.Pages
 {
     public class LanguagesBase : ComponentBase
     {
+        [Inject]
+        public ILogger<LanguagesBase> Log { get; set; }
+
         [Inject]
         LocalStorageAccessor LocalStorageAccessor { get; set; }
         [Inject]
@@ -147,6 +151,8 @@ namespace sd.Client.Pages
             {
                 LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
                 LocalStorageAccessor.SetValueAsync("UILang", "en-US");
+
+                Log.LogError($"SetUILang: {langCode} not found, set to en-US");
             }
         }
 
@@ -170,7 +176,6 @@ namespace sd.Client.Pages
                         KnownLangsService.LangsStr += "," + item.Key;
                     }
                 BuildKnownLangs();
-
             }
         }
 

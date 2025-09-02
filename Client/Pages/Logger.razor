@@ -1,36 +1,59 @@
-﻿@page "/Logger"
-@using sd.Client.Services
-<h3>Logger</h3>
+﻿@page "/logger"
+@using sd.Client.LoggerProvider
+@inject InMemoryLogStore Store
 
+<h3>Logs</h3>
 
-<table class="table table-sm" style="font-size: 11px;">
+<button class="btn btn-sm btn-outline-secondary" @onclick="Refresh">Refresh</button>
+
+<table class="table table-sm" style="font-size:11px">
     <thead>
-        <tr>
-            <th scope="col">Timestamp</th>
-            <th scope="col">Name</th>
-            <th scope="col">Level</th>
-        </tr>
+    <tr>
+        <th>Time (local)</th>
+        <th>Category</th>
+        <th>Level</th>
+        <th>Message</th>
+    </tr>
     </thead>
     <tbody>
-
-        @foreach (var logEntry in logger.logEntries)
-        {
-            <tr>
-                <th scope="row">@logEntry.Timestamp</th>
-                <td>@logEntry.Provider</td>
-                <td>@logEntry.Level</td>
-            </tr> 
-            @logEntry.Message
-        }
+    @foreach (var e in _entries.Reverse<LogEntry>())
+    {
+        <tr>
+            <td>@e.TimestampUtc.ToLocalTime().ToString("HH:mm:ss.fff")</td>
+            <td>@e.Category</td>
+            <td>@e.Level</td>
+            <td>
+                <div>@e.Message</div>
+                @if (e.Exception is not null)
+                {
+                    <pre style="white-space:pre-wrap">@e.Exception</pre>
+                }
+                @if (!string.IsNullOrWhiteSpace(e.Scope))
+                {
+                    <div class="text-muted"><small>@e.Scope</small></div>
+                }
+            </td>
+        </tr>
+    }
     </tbody>
 </table>
 
-
 @code {
-@inject LoggingService logger
+    private IReadOnlyCollection<LogEntry> _entries = Array.Empty<LogEntry>();
 
     protected override void OnInitialized()
     {
-        logger.logEntries.Reverse();
+        _entries = Store.Snapshot();
+        Store.Changed += OnStoreChanged; // live updates
     }
+
+    private void OnStoreChanged()
+    {
+        _entries = Store.Snapshot();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void Refresh() => _entries = Store.Snapshot();
+
+    public void Dispose() => Store.Changed -= OnStoreChanged;
 }

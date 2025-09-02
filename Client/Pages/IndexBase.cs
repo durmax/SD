@@ -40,12 +40,6 @@ namespace sd.Client.Pages
             Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang, ShareWith = ShareWith.Public });
         }
 
-        protected void AddNewWord(WordDto word, int index)
-        {
-            NewWords++;
-            Words.Insert(index, word);
-        }
-
         protected async Task GetNextPage()
         {
             loading = true;
@@ -54,6 +48,7 @@ namespace sd.Client.Pages
             currentPage += Words.Count - wordsCountBefor;
             loading = false;
         }
+
         protected void NewWordHandler(WordDto word)
         {
             int index = -1; // Initialize with an invalid index
@@ -63,9 +58,11 @@ namespace sd.Client.Pages
                 index = Words.FindLastIndex(w => w.WordId == word.WordId);
                 Words.RemoveAt(index); // Remove the old word
             }
-            AddNewWord(word, index);
+            NewWords++;
+            Words.Insert(index, word);
             currentPage++;
         }
+
         protected void OldWordHandler(WordDto oldWord)
         {
             if (!Words.Exists(w => w.WordId == oldWord.WordId))
@@ -73,6 +70,7 @@ namespace sd.Client.Pages
                 Words.Insert(Words.Count, oldWord);
             }
         }
+
         protected void DeleteWordHandler(WordDto word)
         {
             int index = Words.FindIndex(w => w.Equals(word));
@@ -92,7 +90,6 @@ namespace sd.Client.Pages
             await DefaultLangsService.SetDefLangsAsync();
 
             Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang, ShareWith= ShareWith.Public });
-
 
             string uiLang = await LocalStorageAccessor.GetValueAsync<string>("UILang");
 

@@ -280,7 +280,6 @@ namespace sd.Client.Pages
 
         private async Task BuildKnownLangsAsync()
         {
-
             KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>("Langs");
             KnownLangsService.AddKnownLang(WordDto.WordLang);
             KnownLangsService.AddKnownLang(WordDto.ToLang);

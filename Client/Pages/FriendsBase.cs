@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using sd.Shared;
-using System.Net.Http.Json;
 using sd.Client.Services;
 
 namespace sd.Client.Pages

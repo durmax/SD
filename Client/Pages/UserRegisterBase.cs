@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using sd.Shared;
 using sd.Client.Services;
-using System.Net.Http.Json;
 using System.Net.Http;
 
 namespace sd.Client.Pages

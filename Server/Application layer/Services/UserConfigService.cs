@@ -1,6 +1,5 @@
 ﻿using sd.Api.Infrastructure.Repositories;
 using sd.Shared;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace sd.Api.Application.Services

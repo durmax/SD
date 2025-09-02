@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-
-namespace sd.Shared
+﻿namespace sd.Shared
 {
     public class WordDto
     {

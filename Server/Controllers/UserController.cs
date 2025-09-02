@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using sd.Api.Application.Services;
-using sd.Api.Repositories;
 using sd.Shared;
 
 namespace sd.Api.Controllers

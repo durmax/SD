@@ -1,6 +1,7 @@
 ﻿using AKSoftware.Localization.MultiLanguages;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
+using sd.Client.Models;
 using sd.Client.Services;
 using sd.Shared;
 using System.Collections.Generic;
@@ -27,11 +28,14 @@ namespace sd.Client.Pages
         [Inject]
         public ILogger<IndexBase> Log { get; set; }
 
+        [Inject]
+        public WordDtosState WordDtosState { get; set; }
+
         protected bool CollapsedFriend { get; set; } = true;    // hide by default
 
         protected Dictionary<string, string> FriendRequestsDictionary = new();
 
-        protected List<WordDto> Words { get; set; } = new List<WordDto>();
+        //protected List<WordDto> AppState.Model { get; set; } = new List<WordDto>();
         protected int NewWords { get; set; }
 
 
@@ -41,15 +45,15 @@ namespace sd.Client.Pages
         protected void AddNewWord()
         {
             NewWords++;
-            Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang, ShareWith = ShareWith.Public });
+            WordDtosState.Model.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang, ShareWith = ShareWith.Public });
         }
 
         protected async Task GetNextPage()
         {
             loading = true;
-            var wordsCountBefor = Words.Count;
-            Words.AddRange(await ApiService.GetAsync<List<WordDto>>($"api/Word/GetPageWords/0/10/{currentPage}"));
-            currentPage += Words.Count - wordsCountBefor;
+            var wordsCountBefor = WordDtosState.Model.Count;
+            WordDtosState.Model.AddRange(await ApiService.GetAsync<List<WordDto>>($"api/Word/GetPageWords/0/10/{currentPage}"));
+            currentPage += WordDtosState.Model.Count - wordsCountBefor;
             loading = false;
         }
 
@@ -57,30 +61,30 @@ namespace sd.Client.Pages
         {
             int index = -1; // Initialize with an invalid index
 
-            if (Words.Any(w => w.WordId == word.WordId))
+            if (WordDtosState.Model.Any(w => w.WordId == word.WordId))
             {
-                index = Words.FindLastIndex(w => w.WordId == word.WordId);
-                Words.RemoveAt(index); // Remove the old word
+                index = WordDtosState.Model.FindLastIndex(w => w.WordId == word.WordId);
+                WordDtosState.Model.RemoveAt(index); // Remove the old word
             }
             NewWords++;
-            Words.Insert(index, word);
+            WordDtosState.Model.Insert(index, word);
             currentPage++;
         }
 
         protected void OldWordHandler(WordDto oldWord)
         {
-            if (!Words.Exists(w => w.WordId == oldWord.WordId))
+            if (!WordDtosState.Model.Exists(w => w.WordId == oldWord.WordId))
             {
-                Words.Insert(Words.Count, oldWord);
+                WordDtosState.Model.Insert(WordDtosState.Model.Count, oldWord);
             }
         }
 
         protected void DeleteWordHandler(WordDto word)
         {
-            int index = Words.FindIndex(w => w.Equals(word));
+            int index = WordDtosState.Model.FindIndex(w => w.Equals(word));
             if (index != -1)
             {
-                Words.RemoveAt(index);
+                WordDtosState.Model.RemoveAt(index);
             }
             currentPage--;
         }
@@ -93,7 +97,8 @@ namespace sd.Client.Pages
             }
             await DefaultLangsService.SetDefLangsAsync();
 
-            Words.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang, ShareWith= ShareWith.Public });
+            if (WordDtosState.Model.Count == 0)
+                WordDtosState.Model.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang, ShareWith = ShareWith.Public });
 
             string uiLang = await LocalStorageAccessor.GetValueAsync<string>("UILang");
 
@@ -103,7 +108,8 @@ namespace sd.Client.Pages
                 {
                     LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(uiLang));
                 }
-                catch {
+                catch
+                {
                     Log.LogError($"SetLanguage for uiLang: {uiLang}");
                 }
             }
@@ -113,7 +119,7 @@ namespace sd.Client.Pages
         {
             if (firstRender && CurrentUser.IsAuthenticated)
             {
-                    FriendRequestsDictionary = await ApiService.GetAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequests");
+                FriendRequestsDictionary = await ApiService.GetAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequests");
             }
         }
     }

@@ -23,9 +23,9 @@
 
 <img @onclick="@AddNewWord" width="20" height="20" src="/icons/form-new-24-regular.svg" />
 
-@if (Words != null)
+@if (WordDtosState.Model != null)
 {
-    @foreach (var word in Words)
+    @foreach (var word in WordDtosState.Model)
     {
         <Word WordDto="word" Collapsed="Guid.TryParse(word?.WordId, out Guid result)" OnWordSave="@NewWordHandler" OnWordFound="@OldWordHandler" OnWordDelete="DeleteWordHandler"></Word>
     }

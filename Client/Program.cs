@@ -62,6 +62,8 @@ builder.Services.AddScoped<LinkModel>();
 builder.Services.AddScoped<LinkParam>();
 builder.Services.AddScoped<OtherPageService>();
 
+builder.Services.AddSingleton<WordDtosState>();
+
 builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
 
 await builder.Build().RunAsync();

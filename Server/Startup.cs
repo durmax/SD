@@ -13,7 +13,7 @@ using sd.Api.Midlleware;
 using sd.Api.Infrastructure.Repositories;
 using sd.Api.Repositories;
 using sd.Api.Application.Services;
-using sd.Api.Helper;
+using sd.Api.Application_layer.Helper;
 using sd.Api.Infrastructure;
 using sd.Api.Application_layer.Interfaces.Repositories;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System;
 
-namespace sd.Api.Helper
+namespace sd.Api.Application_layer.Helper
 {
     public class CachingHelper
     {

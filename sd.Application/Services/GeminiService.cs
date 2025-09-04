@@ -1,11 +1,7 @@
-﻿
-using System;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Newtonsoft.Json; // Use Newtonsoft.Json
 
-namespace sd.Api.Infrastructure;
+namespace sd.Api.Application.Services;
     /// <summary>
     /// A service that uses the Gemini API to process text.
     /// </summary>

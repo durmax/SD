@@ -1,13 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using sd.Api.Application_layer.Interfaces.Repositories;
-using sd.Api.Models;
+using sd.Api.Infrastructure.Models;
+using sd.Application.Interfaces.Repositories;
 using sd.Shared;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace sd.Api.Infrastructure.Repositories
 {

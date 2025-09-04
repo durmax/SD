@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using MongoDB.Driver;
-using sd.Api.Application_layer.Interfaces.Repositories;
-using sd.Api.Models;
+using sd.Api.Infrastructure.Models;
+using sd.Application.Interfaces.Repositories;
 using sd.Shared;
 
 namespace sd.Api.Infrastructure.Repositories

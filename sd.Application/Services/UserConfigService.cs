@@ -1,6 +1,5 @@
-﻿using sd.Api.Application_layer.Interfaces.Repositories;
+﻿using sd.Application.Interfaces.Repositories;
 using sd.Shared;
-using System.Threading.Tasks;
 
 namespace sd.Api.Application.Services
 {

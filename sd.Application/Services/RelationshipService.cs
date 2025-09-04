@@ -1,10 +1,6 @@
-﻿using sd.Api.Application_layer.Interfaces.Repositories;
+﻿using sd.Application.Interfaces.Repositories;
 using sd.Shared;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace sd.Api.Application.Services
 {

@@ -1,0 +1,21 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using sd.Api.Application.Services;
+using sd.Application.Helper;
+
+namespace sd.Application
+{
+    public static class DependencyInjection
+    {
+        public static IServiceCollection AddApplication(this IServiceCollection services)
+        {
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRelationshipService, RelationshipService>();
+            services.AddScoped<IOtherPageService, OtherPageService>();
+            services.AddScoped<IWordService, WordService>();
+            services.AddSingleton<GeminiService>();
+            services.AddSingleton(typeof(CachingHelper));
+
+            return services;
+        }
+    }
+}

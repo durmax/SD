@@ -1,12 +1,7 @@
 ﻿using AutoMapper;
 using sd.Shared;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Linq;
-using System.Threading.Tasks;
-using sd.Api.Infrastructure;
-using sd.Api.Application_layer.Interfaces.Repositories;
+using sd.Application.Interfaces.Repositories;
 
 namespace sd.Api.Application.Services
 {

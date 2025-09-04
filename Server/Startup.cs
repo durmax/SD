@@ -1,21 +1,15 @@
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using sd.Api.Models;
 using Microsoft.Identity.Web;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
 using sd.Api.Midlleware;
-using sd.Api.Infrastructure.Repositories;
-using sd.Api.Repositories;
-using sd.Api.Application.Services;
-using sd.Api.Application_layer.Helper;
-using sd.Api.Infrastructure;
-using sd.Api.Application_layer.Interfaces.Repositories;
+using sd.Application;
+using sd.Infrastructure;
+using System.Collections.Generic;
 
 namespace sd.Api
 {
@@ -31,6 +25,9 @@ namespace sd.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // 🏁 Services
+            services.AddApplication();
+            services.AddInfrastructure(Configuration);
 
             services.Configure<JwtBearerOptions>(
                 JwtBearerDefaults.AuthenticationScheme, options =>
@@ -40,26 +37,6 @@ namespace sd.Api
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
-
-            services.Configure<MongodbSettings>(Configuration.GetSection(nameof(MongodbSettings)));
-
-            services.AddSingleton<IMongodbSettings>(sp =>
-                                    sp.GetRequiredService<IOptions<MongodbSettings>>().Value);
-
-            services.AddSingleton<MongodbContext>();
-            services.AddSingleton(typeof(CachingHelper));
-            services.AddSingleton<GeminiService>();
-
-            services.AddScoped<IOtherPageRepository, OtherPageRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IWordRepository, WordRepository>();
-            services.AddScoped<IRelationshipRepository, RelationshipRepository>();
-
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IUserConfigRepository, UserConfigRepository>();
-            services.AddScoped<IRelationshipService, RelationshipService>();
-            services.AddScoped<IOtherPageService, OtherPageService>();
-            services.AddScoped<IWordService, WordService>();
 
             services.AddDataProtection();
 

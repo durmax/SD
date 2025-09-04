@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using sd.Api.Application_layer.Interfaces.Repositories;
@@ -15,16 +14,10 @@ namespace sd.Api.Infrastructure.Repositories
     public class WordRepository : IWordRepository
     {
         private readonly MongodbContext _context;
-        private readonly IMapper _mapper;
-        private readonly IUserRepository _userRepo;
-        private readonly IRelationshipRepository _relationshipRepo;
 
-        public WordRepository(MongodbContext mongodbContext, IMapper mapper, ILogger<WordRepository> logger, IUserRepository userRepos, IRelationshipRepository relationshipRepo)
+        public WordRepository(MongodbContext mongodbContext, ILogger<WordRepository> logger)
         {
             _context = mongodbContext;
-            _mapper = mapper;
-            _userRepo = userRepos;
-            _relationshipRepo = relationshipRepo;
         }
 
         public async Task<long> GetDocCount(string userId, string lang)

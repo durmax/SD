@@ -3,17 +3,12 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using sd.Api.Application_layer.Interfaces.Repositories;
 using sd.Api.Models;
 using sd.Shared;
 
 namespace sd.Api.Infrastructure.Repositories
 {
-    public interface IUserConfigRepository
-    {
-        Task<UserConfigModel> GetById(string id);
-        Task<bool> Update(UserConfigModel userConfigModel);
-        Task<IEnumerable<UserConfigModel>> GetByCondation(Expression<Func<UserConfigModel, bool>> expression);
-    }
     public class UserConfigRepository : IUserConfigRepository
     {
         private readonly MongodbContext _context = null;

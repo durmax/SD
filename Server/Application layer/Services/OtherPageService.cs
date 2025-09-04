@@ -1,4 +1,4 @@
-﻿using sd.Api.Infrastructure.Repositories;
+﻿using sd.Api.Application_layer.Interfaces.Repositories;
 using sd.Shared;
 using System;
 using System.Collections.Generic;

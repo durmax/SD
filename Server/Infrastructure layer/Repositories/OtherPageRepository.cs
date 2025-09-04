@@ -7,18 +7,10 @@ using MongoDB.Driver.Linq;
 using System.Linq;
 using System.Linq.Expressions;
 using System;
+using sd.Api.Application_layer.Interfaces.Repositories;
 
 namespace sd.Api.Infrastructure.Repositories
 {
-    public interface IOtherPageRepository
-    {
-        Task<IEnumerable<OtherPageModel>> GetByCondation(Expression<Func<OtherPageModel, bool>> expression);
-        Task<OtherPageModel> GetById(string id);
-        Task<bool> Create(OtherPageModel otherPage);
-        Task<bool> Update(OtherPageModel newOtherPage);
-        Task<bool> Delete(string id);
-    }
-
     public class OtherPageRepository : IOtherPageRepository
     {
         private readonly MongodbContext _context = null;

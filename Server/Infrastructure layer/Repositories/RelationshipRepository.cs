@@ -5,18 +5,10 @@ using sd.Api.Models;
 using MongoDB.Driver;
 using System;
 using System.Linq.Expressions;
+using sd.Api.Application_layer.Interfaces.Repositories;
 
 namespace sd.Api.Repositories
 {
-    public interface IRelationshipRepository
-    {
-        Task<RelationshipModel> GetById(string id);
-        Task<IEnumerable<RelationshipModel>> GetByCondation(Expression<Func<RelationshipModel, bool>> expression);
-        Task<bool> Create(RelationshipModel entity);
-        Task<bool> Update(RelationshipModel entity);
-        Task<bool> Delete(string id);
-    }
-
     public class RelationshipRepository : IRelationshipRepository
     {
         private readonly MongodbContext _context;

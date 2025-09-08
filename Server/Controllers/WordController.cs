@@ -151,7 +151,7 @@ namespace sd.Api.Controllers
         public async Task<ActionResult<string>> GetAI(string wordTitle)
         {
             var result = await _wordService.GetAI(wordTitle);
-            return Ok(new TransObj { BoolVar = true, SetringVar = result });
+            return Ok(new TransObj { BoolVar = true, StringVar = result });
         }
     }
 }

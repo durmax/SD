@@ -82,7 +82,7 @@ namespace sd.Api.Controllers
         {
             if (id != updatedUser.UserId)
             {
-                return NotFound(new TransObj { BoolVar = false, SetringVar = $"Sorry, update error." });
+                return NotFound(new TransObj { BoolVar = false, StringVar = $"Sorry, update error." });
             }
             return Ok(await _userService.Update(updatedUser));
         }

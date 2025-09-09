@@ -15,6 +15,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\sd.Application\sd.Application.csproj" />
-	  <ProjectReference Include="..\Shared\sd.Shared.csproj" />
+	  <ProjectReference Include="..\sd.Shared\sd.Shared.csproj" />
 	</ItemGroup>
 </Project>

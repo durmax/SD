@@ -29,6 +29,7 @@
 		<PackageReference Include="Blazored.TextEditor" Version="1.1.0" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\sd.Shared\sd.Shared.csproj" />
 	  <ProjectReference Include="..\Shared\sd.Shared.csproj" />
 	</ItemGroup>
 </Project>

@@ -16,7 +16,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\sd.Application\sd.Application.csproj" />
 	  <ProjectReference Include="..\sd.Infrastructure\sd.Infrastructure.csproj" />
-	  <ProjectReference Include="..\Shared\sd.Shared.csproj" />
+	  <ProjectReference Include="..\sd.Shared\sd.Shared.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Update="Properties\Resources.resx">

@@ -30,6 +30,5 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\sd.Shared\sd.Shared.csproj" />
-	  <ProjectReference Include="..\Shared\sd.Shared.csproj" />
 	</ItemGroup>
 </Project>

@@ -77,9 +77,8 @@ app.UseRouting();
 app.UseCors(builder =>
 {
     builder.WithOrigins(
-        "https://localhost:32771",
+        "http://localhost:8085", // Docker
         "https://localhost:44301",
-        "https://localhost:51473",
         "https://lingoclub.netlify.app",
         "https://www.lingoclub.net")
            .AllowAnyMethod()

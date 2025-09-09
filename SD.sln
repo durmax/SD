@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
 		.github\workflows\azure-static-web-apps-red-pond-0ccf1d603.yml = .github\workflows\azure-static-web-apps-red-pond-0ccf1d603.yml
+		docker-compose.yml = docker-compose.yml
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
@@ -19,6 +20,15 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sd.Api", "sd.Api\sd.Api.csproj", "{4FE8B95C-F155-FA89-56B7-3FF3990758EC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sd.Client", "sd.Client\sd.Client.csproj", "{8E16CBC3-8254-6566-6494-84CC3EF1E247}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4FE8B95C-F155-FA89-56B7-3FF3990758EC} = {4FE8B95C-F155-FA89-56B7-3FF3990758EC}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "env", "env", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		.env.development = .env.development
+		.env.production = .env.production
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +59,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {F4A732AF-7D13-41AE-A2DF-D08A81B409EA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CDACC6DA-6539-4B3B-96FC-5E52CE4017A7}

@@ -2,10 +2,14 @@
 
 in SD folder:
 
-- to build the image:\
- docker build -f Server/Dockerfile -t sdapi .
+Alte Container stoppen (ohne DB zu löschen):
 
-- to run the image:\
-docker run --name sdapi-container -p 4444:8080 sdapi
+docker compose --env-file env/.env.production down --remove-orphans
 
-------------------------
+-------------------------
+
+Container neu bauen und starten:
+
+docker compose --env-file env/.env.development up --build -d
+
+docker compose --env-file env/.env.production up --build -d

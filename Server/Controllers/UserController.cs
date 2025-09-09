@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using Amazon.Runtime.Internal.Util;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using sd.Api.Application.Services;
+using sd.Shared;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using sd.Api.Application.Services;
-using sd.Shared;
 
 namespace sd.Api.Controllers
 {
@@ -17,11 +19,13 @@ namespace sd.Api.Controllers
 
         private readonly IUserService _userService;
         private readonly IRelationshipService relationshipService;
+        private readonly ILogger<UserController> log;
 
-        public UserController(IUserService userService, IRelationshipService relationshipService)
+        public UserController(IUserService userService, IRelationshipService relationshipService, ILogger<UserController> log)
         {
             _userService = userService;
             this.relationshipService = relationshipService;
+            this.log = log;
         }
 
         [HttpGet]
@@ -78,11 +82,12 @@ namespace sd.Api.Controllers
         }
 
         [HttpPut("UpdateUser/{id}")]
-        public async Task<ActionResult<bool>> UpdateUser(string id, UserModel updatedUser)
+        public async Task<IActionResult> UpdateUser(string id, UserModel updatedUser)
         {
             if (id != updatedUser.UserId)
             {
-                return NotFound(new TransObj { BoolVar = false, StringVar = $"Sorry, update error." });
+                log.LogError($"User id: {id} doesn't match with the updated user id: {updatedUser.UserId}");
+                return NotFound(false);
             }
             return Ok(await _userService.Update(updatedUser));
         }

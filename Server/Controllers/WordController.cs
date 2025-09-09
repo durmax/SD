@@ -148,10 +148,10 @@ namespace sd.Api.Controllers
 
         [Authorize]
         [HttpGet("GetAI/{wordTitle}")]
-        public async Task<ActionResult<string>> GetAI(string wordTitle)
+        public async Task<IActionResult> GetAI(string wordTitle)
         {
             var result = await _wordService.GetAI(wordTitle);
-            return Ok(new TransObj { BoolVar = true, StringVar = result });
+            return Ok(result);
         }
     }
 }

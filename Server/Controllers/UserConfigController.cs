@@ -28,7 +28,7 @@ namespace sd.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<TransObj>> Create(UserConfigModel userConfigModel)
+        public async Task<IActionResult> Create(UserConfigModel userConfigModel)
         {
             if (userConfigModel == null)
                 return BadRequest();
@@ -40,7 +40,7 @@ namespace sd.Api.Controllers
 
         [HttpGet]
         [Route("{userId}/{label}")]
-        public async Task<ActionResult<TransObj>> SetUserLabels(string userId, string label)
+        public async Task<IActionResult> SetUserLabels(string userId, string label)
         {
             if (string.IsNullOrWhiteSpace(label) || string.IsNullOrWhiteSpace(userId))
                 return BadRequest();

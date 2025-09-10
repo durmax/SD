@@ -25,13 +25,13 @@ stages:
       displayName: 'Restore Server'
       inputs:
         command: 'restore'
-        projects: Server/sd.Api.csproj
+        projects: sd.Api/sd.Api.csproj
 
     - task: DotNetCoreCLI@2
       displayName: 'Build Server'
       inputs:
         command: 'build'
-        projects: 'Server/sd.Api.csproj'
+        projects: 'sd.Api/sd.Api.csproj'
         arguments: '--configuration $(buildConfiguration)'
 
     - task: DotNetCoreCLI@2
@@ -39,7 +39,7 @@ stages:
       inputs:
         command: 'publish'
         publishWebProjects: false
-        projects: 'Server/sd.Api.csproj'
+        projects: 'sd.Api/sd.Api.csproj'
         arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Server'
         zipAfterPublish: true
 

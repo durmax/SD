@@ -6,7 +6,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  azureSubscription: 'sd'
+  azureSubscription: 'sdServiceConnection'
   webAppName: 'sdApi20200529140234'
   buildConfiguration: 'Release'
 

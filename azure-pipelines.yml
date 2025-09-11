@@ -6,7 +6,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  azureSubscription: 'sdApi20200529140234'
+  azureSubscription: 'sd'
   webAppName: 'sdApi20200529140234'
   buildConfiguration: 'Release'
 

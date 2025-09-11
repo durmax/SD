@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
+using sd.Application.Interfaces.Repositories;
 using sd.Shared;
 using System.Linq.Expressions;
-using sd.Application.Interfaces.Repositories;
 
 namespace sd.Api.Application.Services
 {
@@ -23,7 +23,7 @@ namespace sd.Api.Application.Services
         Task<bool> SaveComment(string wordId, CommentModel newComment);
         Task<int> LikeComment(string userId, string wordId, string commentId);
         Task<bool> DeleteComment(string currUsr, string wordId, string commentId);
-        Task <string> GetAI(string wordTitle);
+        Task<string> GetAI(string wordTitle);
     }
 
     public class WordService : IWordService
@@ -43,7 +43,8 @@ namespace sd.Api.Application.Services
             _geminiService = geminiService;
         }
 
-        public async Task<List<WordDto>> GetPageWords(string? currentUserId, string userId, string lang, int pageSize, int currentPage)
+        public async Task<List<WordDto>> GetPageWords(
+            string? currentUserId, string userId, string lang, int pageSize, int currentPage)
         {
             List<WordDto> wordDtos = new();
             WordModel word;
@@ -106,12 +107,12 @@ namespace sd.Api.Application.Services
             }
 
             var rs = await _relationshipRepo.GetByCondation(x =>
-                ( x.Reletion == Relation.Friend) &&
+                (x.Reletion == Relation.Friend) &&
                 ((x.UserId1 == userId && x.UserId2 == wordDto.UserId) ||
                  (x.UserId1 == wordDto.UserId && x.UserId2 == userId))
                 );
 
-            if (!string.IsNullOrEmpty(rs.FirstOrDefault()?.RelationshipId))
+            if (rs.Any())
             {
                 return wordDto.ShareWith == ShareWith.Friends || wordDto.ShareWith == ShareWith.Public;
             }
@@ -148,22 +149,25 @@ namespace sd.Api.Application.Services
 
         public async Task<string> AddWord(WordDto wordDto)
         {
+            if (string.IsNullOrWhiteSpace(wordDto.Title) || string.IsNullOrWhiteSpace(wordDto.UserId))
+                return null;
+
             var word = _mapper.Map<WordModel>(wordDto);
             word.WordId = Guid.NewGuid().ToString();
             word.CreatedAt = DateTime.Now;
-            if (await _wordRepo.Create(word)) return word.WordId;
-            else return null;
+
+            return await _wordRepo.Create(word) ? word.WordId : null;
         }
 
         public async Task<bool> Update(WordModel word)
         {
-            var oldWord = await _wordRepo.GetById(word.WordId);
+            var existing = await _wordRepo.GetById(word.WordId);
+            if (existing == null) return false;
 
-            if (oldWord == null) return false;
+            word.Comments = existing.Comments;
+            word.Likes = existing.Likes;
+            word.CreatedAt = DateTime.Now; // DateTimeOffset.UtcNow; toDo
 
-            word.Comments = oldWord.Comments;
-            word.Likes = oldWord.Likes;
-            word.CreatedAt = DateTime.Now;
             return await _wordRepo.Update(word);
         }
 
@@ -178,27 +182,24 @@ namespace sd.Api.Application.Services
             try
             {
                 var word = await _wordRepo.GetById(wordId);
-                if (word != null)
+                if (word == null) return false;
+                if (word.Comments != null)
                 {
-                    if (word.Comments != null)
+                    var comment = word.Comments.SingleOrDefault(x => x.CommentId == newComment.CommentId);
+                    if (comment != null)
                     {
-                        CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == newComment.CommentId);
-                        if (comment != null)
-                        {
-                            word.Comments.Remove(comment);
-                            newComment.UpdatedAt = DateTime.Now;
-                        }
+                        word.Comments.Remove(comment);
+                        newComment.UpdatedAt = DateTime.Now;
                     }
-                    else
-                    {
-                        word.Comments = new List<CommentModel>();
-                    }
-
-                    word.Comments.Add(newComment);
-                    await _wordRepo.Update(word);
-                    return true;
                 }
-                else return false;
+                else
+                {
+                    word.Comments = new List<CommentModel>();
+                }
+
+                word.Comments.Add(newComment);
+                await _wordRepo.Update(word);
+                return true;
             }
             catch
             {
@@ -209,37 +210,33 @@ namespace sd.Api.Application.Services
         public async Task<int> LikeComment(string userId, string wordId, string commentId)
         {
             var word = await _wordRepo.GetById(wordId);
-            CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
-            if (comment == null) return 0;
-            if (comment == null) comment.Likes = new List<string>();
+            if (word?.Comments == null) return 0;
 
+            var comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
+            if (comment == null) return 0;
+
+            comment.Likes ??= new List<string>();
             if (!comment.Likes.Contains(userId))
-            {
                 comment.Likes.Add(userId);
-            }
             else
-            {
                 comment.Likes.Remove(userId);
-            }
-            await SaveComment(wordId, comment);
-            return comment.Likes.Count();
+
+            var ok = await _wordRepo.Update(word);
+            return ok ? comment.Likes.Count : 0;
         }
 
         public async Task<bool> DeleteComment(string currUsr, string wordId, string commentId)
         {
             var word = await _wordRepo.GetById(wordId);
+            if (word?.Comments == null) return false;
 
-            CommentModel comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
+            var comment = word.Comments.SingleOrDefault(x => x.CommentId == commentId);
             if (comment == null) return false;
-            if (comment.UserId != currUsr) return false;
 
-            if (word.Comments.Contains(comment))
-            {
-                word.Comments.Remove(comment);
-                await _wordRepo.Update(word);
-                return true;
-            }
-            return false;
+            if (comment.UserId != currUsr /* && !IsModerator(currUsr) */) return false;
+
+            word.Comments.Remove(comment);
+            return await _wordRepo.Update(word);
         }
 
         public async Task<IEnumerable<WordModel>> GetByCondation(Expression<Func<WordModel, bool>> expression)
@@ -279,8 +276,9 @@ namespace sd.Api.Application.Services
 
         public async Task<string> GetAI(string wordTitle)
         {
-            var result = await _geminiService.ProcessStringAsync($"Schreibe mir Beispiele auf Niveau B1, die mir die Bedeutungen von '{wordTitle}' zu versehen hilft.");
-            return result;
+            if (string.IsNullOrWhiteSpace(wordTitle)) return string.Empty;
+            var prompt = $"Schreibe Beispiele auf Niveau B1, die mir helfen, die Bedeutungen von „{wordTitle}“ zu verstehen.";
+            return await _geminiService.ProcessStringAsync(prompt);
         }
 
         public async Task<WordModel> GetById(string id)

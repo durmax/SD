@@ -12,7 +12,6 @@ namespace sd.Application.Services
         Task<bool> Create(WordModel entity);
         Task<bool> Update(WordModel entity);
         Task<bool> Delete(string id);
-
         Task<int> Like(string userId, string wordId);
         Task<List<WordDto>> GetPageWords(string? currentUserId, string userId, string lang, int pageSize, int currentPage);
         Task<WordDto> GetWordDtoById(string id, string? currentUserId);
@@ -51,10 +50,6 @@ namespace sd.Application.Services
 
             var result = new List<WordDto>(capacity: pageSize);
 
-            HashSet<string> friendIds = currentUserId is null
-                ? new HashSet<string>()
-                : await GetFriendIdsForViewer(currentUserId);
-
             // 2) Pull words in batches until we collect pageSize visible items or run out
             const int fetchBatch = 50; // tune as needed
             int cursor = offset;
@@ -70,7 +65,7 @@ namespace sd.Application.Services
                     var dto = _mapper.Map<WordDto>(word);
 
                     // Visibility check (inlined logic from IsWordSharedWithUser, but O(1) with friendIds)
-                    if (!IsVisibleToViewer(dto, currentUserId, friendIds)) continue;
+                    if (!await IsVisibleToViewerAsync(dto, currentUserId)) continue;
 
                     if (currentUserId != null && word.Likes != null && word.Likes.Contains(currentUserId))
                         dto.IsILiked = true;
@@ -96,13 +91,17 @@ namespace sd.Application.Services
             return result;
         }
 
-        private static bool IsVisibleToViewer(WordDto word, string? viewerId, HashSet<string> viewerFriends)
+        private async Task<bool> IsVisibleToViewerAsync(WordDto word, string? viewerId)
         {
             // Owner always sees it
             if (viewerId == word.UserId) return true;
 
             // Public visible to anyone
             if (word.ShareWith == ShareWith.Public) return true;
+
+            HashSet<string> viewerFriends = viewerId is null
+                            ? new HashSet<string>()
+                            : await GetFriendIdsForViewer(viewerId);
 
             // Friends visibility if viewer is a friend of the author
             if (word.ShareWith == ShareWith.Friends && viewerId != null)
@@ -126,46 +125,22 @@ namespace sd.Application.Services
             return set;
         }
 
-
         public async Task<WordDto> GetWordDtoById(string id, string? currentUserId)
         {
             var word = await _wordRepo.GetById(id);
             var wordDto = _mapper.Map<WordDto>(word);
 
-            if (await IsWordSharedWithUser(wordDto, currentUserId))
-            {
-                if (word?.Likes != null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
-                if (currentUserId != wordDto?.UserId)
-                {
-                    var user = await _userRepo.GetById(wordDto.UserId);
-                    wordDto.UserName = user?.Name;
-                }
-                return wordDto;
-            }
-            else return null;
-        }
+            if (!await IsVisibleToViewerAsync(wordDto, currentUserId)) return null;
 
-        private async Task<bool> IsWordSharedWithUser(WordDto wordDto, string? userId)
-        {
-            if (userId == wordDto?.UserId)
-            {
-                return true;
-            }
+            if (currentUserId != null && word.Likes != null && word.Likes.Contains(currentUserId))
+                wordDto.IsILiked = true;
 
-            var rs = await _relationshipRepo.GetByCondation(x =>
-                (x.Reletion == Relation.Friend) &&
-                ((x.UserId1 == userId && x.UserId2 == wordDto.UserId) ||
-                 (x.UserId1 == wordDto.UserId && x.UserId2 == userId))
-                );
-
-            if (rs.Any())
+            if (currentUserId != wordDto?.UserId)
             {
-                return wordDto.ShareWith == ShareWith.Friends || wordDto.ShareWith == ShareWith.Public;
+                var user = await _userRepo.GetById(wordDto.UserId);
+                wordDto.UserName = user?.Name;
             }
-            else
-            {
-                return wordDto?.ShareWith == ShareWith.Public;
-            }
+            return wordDto;
         }
 
         public async Task<WordDto> GetWordByText(string userId, string text)

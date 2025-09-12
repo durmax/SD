@@ -2,7 +2,7 @@
 using sd.Shared;
 using System.Linq.Expressions;
 
-namespace sd.Api.Application.Services
+namespace sd.Application.Services
 {
     public interface IRelationshipService
     {

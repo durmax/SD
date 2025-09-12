@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using sd.Shared;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
-using sd.Api.Application.Services;
+using sd.Application.Services;
 
 
 namespace sd.Api.Controllers

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using sd.Api.Application.Services;
+using sd.Application.Services;
 using sd.Shared;
 using System.Collections.Generic;
 using System.Linq;

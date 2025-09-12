@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using sd.Api.Application.Services;
+using sd.Application.Services;
 using sd.Application.Helper;
 
 namespace sd.Application

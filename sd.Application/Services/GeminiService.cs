@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Newtonsoft.Json; // Use Newtonsoft.Json
 
-namespace sd.Api.Application.Services;
+namespace sd.Application.Services;
     /// <summary>
     /// A service that uses the Gemini API to process text.
     /// </summary>

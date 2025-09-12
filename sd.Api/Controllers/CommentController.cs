@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using sd.Api.Application.Services;
+using sd.Application.Services;
 using sd.Shared;
 
 namespace sd.Api.Controllers

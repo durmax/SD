@@ -4,7 +4,7 @@ using sd.Shared;
 using System.Linq.Expressions;
 using System.Security.Claims;
 
-namespace sd.Api.Application.Services
+namespace sd.Application.Services
 {
     public interface IUserService
     {

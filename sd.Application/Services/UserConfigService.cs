@@ -1,7 +1,7 @@
 ﻿using sd.Application.Interfaces.Repositories;
 using sd.Shared;
 
-namespace sd.Api.Application.Services
+namespace sd.Application.Services
 {
     public interface IUserConfigService
     {

@@ -33,7 +33,7 @@ namespace sd.Infrastructure.Repositories
             return DeleteRecored.DeletedCount > 0;
         }
 
-        public async Task<IEnumerable<UserModel>> GetByCondation(Expression<Func<UserModel, bool>> expression)
+        public async Task<IEnumerable<UserModel>> GetByCondition(Expression<Func<UserModel, bool>> expression)
         {
             return await _context.Users
                     .Find(expression).ToListAsync();

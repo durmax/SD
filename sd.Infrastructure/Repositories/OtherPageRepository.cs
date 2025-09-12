@@ -41,7 +41,7 @@ namespace sd.Infrastructure.Repositories
             return DeleteRecored.DeletedCount > 0;
         }
 
-        public async Task<IEnumerable<OtherPageModel>> GetByCondation(Expression<Func<OtherPageModel, bool>> expression)
+        public async Task<IEnumerable<OtherPageModel>> GetByCondition(Expression<Func<OtherPageModel, bool>> expression)
         {
             return await _context.OtherPages.AsQueryable().Where(expression).ToListAsync();
         }

@@ -76,7 +76,7 @@ namespace sd.Infrastructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<WordModel>> GetByCondation(Expression<Func<WordModel, bool>> expression)
+        public async Task<IEnumerable<WordModel>> GetByCondition(Expression<Func<WordModel, bool>> expression)
         {
             return await _context.Words.Find(expression).ToListAsync();
         }

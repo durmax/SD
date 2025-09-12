@@ -26,7 +26,7 @@ namespace sd.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<RelationshipModel>> GetRelationshipById(string id)
         {
-            var rs = await _relationshipService.GetByCondation(r => r.RelationshipId == id);
+            var rs = await _relationshipService.GetByCondition(r => r.RelationshipId == id);
             var result = rs?.FirstOrDefault();
 
             if (result == null) return NotFound();
@@ -55,10 +55,10 @@ namespace sd.Api.Controllers
         }
 
         [Authorize]
-        [HttpDelete("{UserId}/{reletion}/{friendId}")]
-        public async Task<ActionResult> RemoveFriendship(Relation reletion, string friendId)
+        [HttpDelete("{UserId}/{relation}/{friendId}")]
+        public async Task<ActionResult> RemoveFriendship(Relation relation, string friendId)
         {
-            var r = await _relationshipService.GetRelationship((await _userService.GetCurrentUser(User))?.UserId, reletion, friendId);
+            var r = await _relationshipService.GetRelationship((await _userService.GetCurrentUser(User))?.UserId, relation, friendId);
             await _relationshipService.Delete(r.RelationshipId);
             return StatusCode(StatusCodes.Status200OK);
         }

@@ -21,7 +21,7 @@ namespace sd.Infrastructure.Repositories
             return userConfigs != null ? true : false;
         }
 
-        public async Task<IEnumerable<UserConfigModel>> GetByCondation(Expression<Func<UserConfigModel, bool>> expression)
+        public async Task<IEnumerable<UserConfigModel>> GetByCondition(Expression<Func<UserConfigModel, bool>> expression)
         {
             return await _context.UsersConfigs.Find(expression).ToListAsync();
         }

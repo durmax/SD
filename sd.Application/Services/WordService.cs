@@ -7,17 +7,17 @@ namespace sd.Application.Services
 {
     public interface IWordService
     {
-        Task<IEnumerable<WordModel>> GetByCondation(Expression<Func<WordModel, bool>> expression);
+        Task<IEnumerable<WordModel>> GetByCondition(Expression<Func<WordModel, bool>> expression);
         Task<WordModel> GetById(string id);
         Task<bool> Create(WordModel entity);
         Task<bool> Update(WordModel entity);
         Task<bool> Delete(string id);
         Task<int> Like(string userId, string wordId);
         Task<List<WordDto>> GetPageWords(string? currentUserId, string userId, string lang, int pageSize, int currentPage, CancellationToken ct);
-        Task<WordDto> GetWordDtoById(string id, string? currentUserId);
+        Task<WordDto?> GetWordDtoById(string id, string? currentUserId);
         Task<WordDto> GetWordByText(string userId, string text);
         Task<IEnumerable<string>> GetWordsContainText(string userId, string text);
-        Task<string> AddWord(WordDto wordDto);
+        Task<string?> AddWord(WordDto wordDto);
         Task<IEnumerable<CommentModel?>> GetWordComments(string wordId);
         Task<bool> SaveComment(string wordId, CommentModel newComment);
         Task<int> LikeComment(string userId, string wordId, string commentId);
@@ -124,8 +124,8 @@ namespace sd.Application.Services
 
         private async Task<HashSet<string>> GetFriendIdsForViewer(string viewerId)
         {
-            var relations = await _relationshipRepo.GetByCondation(x =>
-                x.Reletion == Relation.Friend &&
+            var relations = await _relationshipRepo.GetByCondition(x =>
+                x.Relation == Relation.Friend &&
                 (x.UserId1 == viewerId || x.UserId2 == viewerId));
 
             var set = new HashSet<string>();
@@ -137,7 +137,7 @@ namespace sd.Application.Services
             return set;
         }
 
-        public async Task<WordDto> GetWordDtoById(string id, string? currentUserId)
+        public async Task<WordDto?> GetWordDtoById(string id, string? currentUserId)
         {
             var word = await _wordRepo.GetById(id);
 
@@ -162,7 +162,7 @@ namespace sd.Application.Services
 
         public async Task<WordDto> GetWordByText(string userId, string text)
         {
-            var words = await _wordRepo.GetByCondation(u => string.Equals(u.Title, text, StringComparison.OrdinalIgnoreCase) && u.UserId == userId);
+            var words = await _wordRepo.GetByCondition(u => string.Equals(u.Title, text, StringComparison.OrdinalIgnoreCase) && u.UserId == userId);
             var word = words.FirstOrDefault();
 
             if (word != null)
@@ -176,7 +176,7 @@ namespace sd.Application.Services
         public async Task<IEnumerable<string>> GetWordsContainText(string userId, string text)
         {
             List<string> res = new();
-            var words = await _wordRepo.GetByCondation(u => u.Title.ToUpperInvariant().StartsWith(text.ToUpperInvariant()) && u.UserId == userId);
+            var words = await _wordRepo.GetByCondition(u => u.Title.ToUpperInvariant().StartsWith(text.ToUpperInvariant()) && u.UserId == userId);
 
             foreach (var w in words)
             {
@@ -185,7 +185,7 @@ namespace sd.Application.Services
             return res;
         }
 
-        public async Task<string> AddWord(WordDto wordDto)
+        public async Task<string?> AddWord(WordDto wordDto)
         {
             if (string.IsNullOrWhiteSpace(wordDto.Title) || string.IsNullOrWhiteSpace(wordDto.UserId))
                 return null;
@@ -277,9 +277,9 @@ namespace sd.Application.Services
             return await _wordRepo.Update(word);
         }
 
-        public async Task<IEnumerable<WordModel>> GetByCondation(Expression<Func<WordModel, bool>> expression)
+        public async Task<IEnumerable<WordModel>> GetByCondition(Expression<Func<WordModel, bool>> expression)
         {
-            return await _wordRepo.GetByCondation(expression);
+            return await _wordRepo.GetByCondition(expression);
         }
 
         public async Task<bool> Create(WordModel entity)

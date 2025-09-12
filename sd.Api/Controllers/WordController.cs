@@ -140,7 +140,7 @@ namespace sd.Api.Controllers
         {
             var word = await _wordService.GetById(wordId);
 
-            var foundUsers = await _userService.GetByCondation(u => word.Likes.Contains(u.UserId));
+            var foundUsers = await _userService.GetByCondition(u => word.Likes.Contains(u.UserId));
             var result = await _relationshipService.GetRelationships((await _userService.GetCurrentUser(User))?.UserId, foundUsers.ToList());
 
             if (result == null) return NotFound();

@@ -8,7 +8,7 @@ namespace sd.Application.Services
 {
     public interface IUserService
     {
-        Task<IEnumerable<UserModel>> GetByCondation(Expression<Func<UserModel, bool>> expression);
+        Task<IEnumerable<UserModel>> GetByCondition(Expression<Func<UserModel, bool>> expression);
         Task<UserModel> GetById(string id);
         Task<bool> Create(UserModel entity);
         Task<bool> Update(UserModel entity);
@@ -29,9 +29,9 @@ namespace sd.Application.Services
             _userRepository = userRepository;
         }
 
-        public async Task<IEnumerable<UserModel>> GetByCondation(Expression<Func<UserModel, bool>> expression)
+        public async Task<IEnumerable<UserModel>> GetByCondition(Expression<Func<UserModel, bool>> expression)
         {
-            return await _userRepository.GetByCondation(expression);
+            return await _userRepository.GetByCondition(expression);
         }
         public async Task<bool> Create(UserModel entity)
         {
@@ -44,7 +44,7 @@ namespace sd.Application.Services
 
         public async Task<UserModel?> Create(string email)
         {
-            var result = await _userRepository.GetByCondation(u => u.Email == email);
+            var result = await _userRepository.GetByCondition(u => u.Email == email);
 
             if (result?.First() != null)
                 return result.First();
@@ -55,7 +55,7 @@ namespace sd.Application.Services
                 userModel.CreatedAt = DateTime.Now;
 
                 await _userRepository.Create(userModel);
-                var res = await GetByCondation(u => u.Email == userModel.Email);
+                var res = await GetByCondition(u => u.Email == userModel.Email);
                 return res.First();
             }
         }
@@ -70,7 +70,7 @@ namespace sd.Application.Services
 
             if (oldVer.Email != newVer.Email)
             {
-                var res = await _userRepository.GetByCondation(u => u.Email == newVer.Email);
+                var res = await _userRepository.GetByCondition(u => u.Email == newVer.Email);
                 if (res?.First() != null)
                     return false; // {newVer.Email}  is already in use
                 else newVer.IsEmailReg = false;

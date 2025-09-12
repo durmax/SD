@@ -12,7 +12,7 @@ namespace sd.Shared
         public string UserId1 { get; set; }
 
         [Required]
-        public Relation Reletion { get; set; }
+        public Relation Relation { get; set; }
 
         public bool Follow { get; set; }
         public bool Block { get; set; }

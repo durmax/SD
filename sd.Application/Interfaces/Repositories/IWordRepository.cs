@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 namespace sd.Application.Interfaces.Repositories;
 public interface IWordRepository
 {
-    Task<IEnumerable<WordModel>> GetByCondation(Expression<Func<WordModel, bool>> expression);
+    Task<IEnumerable<WordModel>> GetByCondition(Expression<Func<WordModel, bool>> expression);
     Task<WordModel> GetById(string id);
     Task<bool> Create(WordModel entity);
     Task<bool> Update(WordModel entity);

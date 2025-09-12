@@ -31,14 +31,14 @@ namespace sd.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserModel>>> Get()
         {
-            return Ok(await _userService.GetByCondation(u => true));
+            return Ok(await _userService.GetByCondition(u => true));
         }
 
         // GET: api/User/GetUsersByText/Dured
         [HttpGet("GetUsersByText/{searchText}")]
         public async Task<ActionResult<IEnumerable<UserRelationshipsWithOneUserDto>>> GetUsersByText(string searchText)
         {
-            var res = await _userService.GetByCondation(u => u.Name.ToLower().Contains(searchText.ToLower()));
+            var res = await _userService.GetByCondition(u => u.Name.ToLower().Contains(searchText.ToLower()));
             List<UserModel> foundUsers = res.ToList();
 
             IEnumerable<UserRelationshipsWithOneUserDto> result = await relationshipService.GetRelationships((await _userService.GetCurrentUser(User))?.UserId, foundUsers);
@@ -61,7 +61,7 @@ namespace sd.Api.Controllers
         [HttpGet("GetUserByEmail/{email}")]
         public async Task<ActionResult<UserModel>> GetUserByEmail(string email)
         {
-            var result = await _userService.GetByCondation(u => u.Email == email);
+            var result = await _userService.GetByCondition(u => u.Email == email);
             if (result.First() == null) return NotFound();
             return result.First();
         }

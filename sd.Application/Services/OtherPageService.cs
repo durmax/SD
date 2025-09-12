@@ -7,7 +7,7 @@ namespace sd.Application.Services
     public interface IOtherPageService
     {
         Task<OtherPageModel?> GetById(string id);
-        Task<IEnumerable<OtherPageModel>> GetByCondation(Expression<Func<OtherPageModel, bool>> expression);
+        Task<IEnumerable<OtherPageModel>> GetByCondition(Expression<Func<OtherPageModel, bool>> expression);
         Task<bool> Create(OtherPageModel entity);
         Task<bool> Update(OtherPageModel entity);
         Task<bool> Delete(string id);
@@ -29,7 +29,7 @@ namespace sd.Application.Services
             List<OtherPageResModel> res = new List<OtherPageResModel>();
 
 
-            var otherPages = await _otherPageRepository.GetByCondation(o =>
+            var otherPages = await _otherPageRepository.GetByCondition(o =>
                   (o.PrimLangs == "All" && o.SecLangs == "All")
                || (o.PrimLangs.Contains(fromLang) && (o.SecLangs.Contains(toLang) || o.SecLangs == "All"))
                || (o.PrimLangs.Contains(toLang) && o.SecLangs.Contains(fromLang))
@@ -57,9 +57,9 @@ namespace sd.Application.Services
             return res.OrderBy(o => o.Eval).ToList();
         }
 
-        public async Task<IEnumerable<OtherPageModel>> GetByCondation(Expression<Func<OtherPageModel, bool>> expression)
+        public async Task<IEnumerable<OtherPageModel>> GetByCondition(Expression<Func<OtherPageModel, bool>> expression)
         {
-            return await _otherPageRepository.GetByCondation(expression);
+            return await _otherPageRepository.GetByCondition(expression);
         }
 
         public Task<bool> Create(OtherPageModel entity)

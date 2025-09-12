@@ -37,7 +37,7 @@ namespace sd.Client.Pages
                 RelationshipModel relationship = new()
                 {
                     RelationshipId = Guid.NewGuid().ToString(),
-                    Reletion = Relation.FriendRequestTo,
+                    Relation = Relation.FriendRequestTo,
                     UserId1 = null, // Set in Server
                     UserId2 = ToUserId
                 };
@@ -77,7 +77,7 @@ namespace sd.Client.Pages
                 RelationshipModel relationship = new()
                 {
                     RelationshipId = Guid.NewGuid().ToString(),
-                    Reletion = Relation.Friend,
+                    Relation = Relation.Friend,
                     UserId1 = null,  // Set in Server
                     UserId2 = FriendId
                 };

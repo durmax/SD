@@ -31,7 +31,7 @@ namespace sd.Infrastructure.Repositories
             return true;
         }
 
-        public async Task<IEnumerable<RelationshipModel>> GetByCondation(Expression<Func<RelationshipModel, bool>> expression)
+        public async Task<IEnumerable<RelationshipModel>> GetByCondition(Expression<Func<RelationshipModel, bool>> expression)
         {
             return await _context.Relationships.Find(expression).ToListAsync();
         }

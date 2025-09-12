@@ -1,11 +1,11 @@
 ﻿using MongoDB.Driver;
-using sd.Api.Infrastructure.Models;
+using sd.Infrastructure.Models;
 using sd.Shared;
 using MongoDB.Driver.Linq;
 using System.Linq.Expressions;
 using sd.Application.Interfaces.Repositories;
 
-namespace sd.Api.Infrastructure.Repositories
+namespace sd.Infrastructure.Repositories
 {
     public class OtherPageRepository : IOtherPageRepository
     {

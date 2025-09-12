@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
 using MongoDB.Driver;
-using sd.Api.Infrastructure.Models;
+using sd.Infrastructure.Models;
 using sd.Application.Interfaces.Repositories;
 using sd.Shared;
 
-namespace sd.Api.Infrastructure.Repositories
+namespace sd.Infrastructure.Repositories
 {
     public class UserRepository : IUserRepository
     {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using sd.Api.Infrastructure.Models;
-using sd.Api.Infrastructure.Repositories;
+using sd.Infrastructure.Models;
+using sd.Infrastructure.Repositories;
 using sd.Application.Interfaces.Repositories;
 
 namespace sd.Infrastructure

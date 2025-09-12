@@ -1,10 +1,10 @@
 ﻿using sd.Shared;
-using sd.Api.Infrastructure.Models;
+using sd.Infrastructure.Models;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 using sd.Application.Interfaces.Repositories;
 
-namespace sd.Api.Infrastructure.Repositories
+namespace sd.Infrastructure.Repositories
 {
     public class RelationshipRepository : IRelationshipRepository
     {

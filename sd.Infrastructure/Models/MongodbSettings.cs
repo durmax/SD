@@ -1,4 +1,4 @@
-﻿namespace sd.Api.Infrastructure.Models
+﻿namespace sd.Infrastructure.Models
 {
     public class MongodbSettings : IMongodbSettings
     {

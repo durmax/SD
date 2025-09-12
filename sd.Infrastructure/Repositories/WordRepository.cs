@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using sd.Api.Infrastructure.Models;
+using sd.Infrastructure.Models;
 using sd.Application.Interfaces.Repositories;
 using sd.Shared;
 using System.Linq.Expressions;
 
-namespace sd.Api.Infrastructure.Repositories
+namespace sd.Infrastructure.Repositories
 {
     public class WordRepository : IWordRepository
     {

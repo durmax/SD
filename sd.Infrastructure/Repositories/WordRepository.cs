@@ -97,5 +97,17 @@ namespace sd.Infrastructure.Repositories
             var res = await cursor.FirstOrDefaultAsync();
             return res;
         }
+
+        public async Task<List<WordModel>> GetWords(string userId, string lang, int skip, int limit)
+        {
+            var filter = GetFilter(null, userId, lang);
+            var sort = Builders<WordModel>.Sort.Descending("Score").Descending("CreatedAt");
+            return await _context.Words
+                .Find(filter)
+                .Sort(sort)
+                .Skip(skip)
+                .Limit(limit)
+                .ToListAsync();
+        }
     }
 }

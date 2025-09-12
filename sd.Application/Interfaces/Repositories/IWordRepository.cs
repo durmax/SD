@@ -12,4 +12,6 @@ public interface IWordRepository
 
     Task<long> GetDocCount(string userId, string lang);
     Task<WordModel?> GetWord(string userId, string lang, int currentPage, int limit);
+    Task<List<WordModel>> GetWords(string userId, string lang, int skip, int limit);
+
 }

@@ -44,42 +44,88 @@ namespace sd.Application.Services
         }
 
         public async Task<List<WordDto>> GetPageWords(
-            string? currentUserId, string userId, string lang, int pageSize, int currentPage)
+            string? currentUserId, string userId, string lang, int pageSize, int offset)
         {
-            List<WordDto> wordDtos = new();
-            WordModel word;
-            WordDto wordDto;
-            int newCurrentPage = currentPage;
-            Tuple<int, List<WordDto>> Res;
+            if (pageSize <= 0) return new List<WordDto>();
+            if (offset < 0) offset = 0;
 
-            long wordsCount = await _wordRepo.GetDocCount(userId, lang);
+            var result = new List<WordDto>(capacity: pageSize);
 
-            while (wordDtos?.Count < pageSize)
+            HashSet<string> friendIds = currentUserId is null
+                ? new HashSet<string>()
+                : await GetFriendIdsForViewer(currentUserId);
+
+            // 2) Pull words in batches until we collect pageSize visible items or run out
+            const int fetchBatch = 50; // tune as needed
+            int cursor = offset;
+            var authorCache = new Dictionary<string, UserModel?>();
+
+            while (result.Count < pageSize)
             {
-                if (wordsCount < newCurrentPage)
+                var batch = await _wordRepo.GetWords(userId, lang, cursor, fetchBatch);
+                if (batch.Count == 0) break;
+
+                foreach (var word in batch)
                 {
-                    break;
-                }
-                word = await _wordRepo.GetWord(userId, lang, newCurrentPage, 1);
-                if (word != null)
-                {
-                    wordDto = _mapper.Map<WordDto>(word);
-                    if (await IsWordSharedWithUser(wordDto, currentUserId))
+                    var dto = _mapper.Map<WordDto>(word);
+
+                    // Visibility check (inlined logic from IsWordSharedWithUser, but O(1) with friendIds)
+                    if (!IsVisibleToViewer(dto, currentUserId, friendIds)) continue;
+
+                    if (currentUserId != null && word.Likes != null && word.Likes.Contains(currentUserId))
+                        dto.IsILiked = true;
+
+                    if (!string.Equals(currentUserId, dto.UserId, StringComparison.Ordinal))
                     {
-                        if (word.Likes != null && word.Likes.Contains(currentUserId)) wordDto.IsILiked = true;
-                        if (currentUserId != wordDto?.UserId)
+                        if (!authorCache.TryGetValue(dto.UserId, out var author))
                         {
-                            var user = await _userRepo.GetById(wordDto.UserId);
-                            wordDto.UserName = user?.Name;
+                            author = await _userRepo.GetById(dto.UserId);
+                            authorCache[dto.UserId] = author;
                         }
-                        wordDtos.Add(wordDto);
+                        dto.UserName = author?.Name;
                     }
+
+                    result.Add(dto);
+                    if (result.Count == pageSize) break;
                 }
-                newCurrentPage++;
+
+                // Advance cursor by how many we *scanned*, not how many we *kept*
+                cursor += batch.Count;
             }
 
-            return wordDtos;
+            return result;
         }
+
+        private static bool IsVisibleToViewer(WordDto word, string? viewerId, HashSet<string> viewerFriends)
+        {
+            // Owner always sees it
+            if (viewerId == word.UserId) return true;
+
+            // Public visible to anyone
+            if (word.ShareWith == ShareWith.Public) return true;
+
+            // Friends visibility if viewer is a friend of the author
+            if (word.ShareWith == ShareWith.Friends && viewerId != null)
+                return viewerFriends.Contains(word.UserId);
+
+            return false;
+        }
+
+        private async Task<HashSet<string>> GetFriendIdsForViewer(string viewerId)
+        {
+            var relations = await _relationshipRepo.GetByCondation(x =>
+                x.Reletion == Relation.Friend &&
+                (x.UserId1 == viewerId || x.UserId2 == viewerId));
+
+            var set = new HashSet<string>();
+            foreach (var r in relations)
+            {
+                if (r.UserId1 == viewerId) set.Add(r.UserId2);
+                else if (r.UserId2 == viewerId) set.Add(r.UserId1);
+            }
+            return set;
+        }
+
 
         public async Task<WordDto> GetWordDtoById(string id, string? currentUserId)
         {

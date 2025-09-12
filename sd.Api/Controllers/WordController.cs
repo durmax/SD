@@ -7,6 +7,7 @@ using sd.Shared;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using sd.Application.Services;
+using System.Threading;
 
 
 namespace sd.Api.Controllers
@@ -58,7 +59,7 @@ namespace sd.Api.Controllers
         [HttpGet("GetPageWords/{userId}/{pageSize}/{currentPage}")]
         public async Task<ActionResult<List<WordDto>>> GetPageWords(string userId, int pageSize, int currentPage)
         {
-            var res = await _wordService.GetPageWords((await _userService.GetCurrentUser(User))?.UserId, userId, null, pageSize, currentPage);
+            var res = await _wordService.GetPageWords((await _userService.GetCurrentUser(User))?.UserId, userId, null, pageSize, currentPage, CancellationToken.None);
             return Ok(res);
         }
 

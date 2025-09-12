@@ -13,7 +13,7 @@ namespace sd.Application.Services
         Task<bool> Update(WordModel entity);
         Task<bool> Delete(string id);
         Task<int> Like(string userId, string wordId);
-        Task<List<WordDto>> GetPageWords(string? currentUserId, string userId, string lang, int pageSize, int currentPage);
+        Task<List<WordDto>> GetPageWords(string? currentUserId, string userId, string lang, int pageSize, int currentPage, CancellationToken ct);
         Task<WordDto> GetWordDtoById(string id, string? currentUserId);
         Task<WordDto> GetWordByText(string userId, string text);
         Task<IEnumerable<string>> GetWordsContainText(string userId, string text);
@@ -43,29 +43,43 @@ namespace sd.Application.Services
         }
 
         public async Task<List<WordDto>> GetPageWords(
-            string? currentUserId, string userId, string lang, int pageSize, int offset)
+             string? currentUserId,
+             string userId,
+             string lang,
+             int pageSize,
+             int offset,
+             CancellationToken ct = default)
         {
             if (pageSize <= 0) return new List<WordDto>();
             if (offset < 0) offset = 0;
 
             var result = new List<WordDto>(capacity: pageSize);
 
-            // 2) Pull words in batches until we collect pageSize visible items or run out
-            const int fetchBatch = 50; // tune as needed
+            const int fetchBatch = 50; // tune
+            const int scanCapMultiplier = 10; // don’t scan forever
             int cursor = offset;
+            int scanned = 0;
+            int scanCap = Math.Max(pageSize * scanCapMultiplier, fetchBatch);
+
             var authorCache = new Dictionary<string, UserModel?>();
+
+            HashSet<string> viewerFriends = currentUserId is null
+                ? new HashSet<string>()
+                : await GetFriendIdsForViewer(currentUserId);
 
             while (result.Count < pageSize)
             {
+                ct.ThrowIfCancellationRequested();
+
                 var batch = await _wordRepo.GetWords(userId, lang, cursor, fetchBatch);
                 if (batch.Count == 0) break;
 
                 foreach (var word in batch)
                 {
-                    var dto = _mapper.Map<WordDto>(word);
-
                     // Visibility check (inlined logic from IsWordSharedWithUser, but O(1) with friendIds)
-                    if (!await IsVisibleToViewerAsync(dto, currentUserId)) continue;
+                    if (!IsVisibleToViewerAsync(word, currentUserId, viewerFriends)) continue;
+
+                    var dto = _mapper.Map<WordDto>(word);
 
                     if (currentUserId != null && word.Likes != null && word.Likes.Contains(currentUserId))
                         dto.IsILiked = true;
@@ -86,25 +100,23 @@ namespace sd.Application.Services
 
                 // Advance cursor by how many we *scanned*, not how many we *kept*
                 cursor += batch.Count;
+
+                if (scanned >= scanCap) break; // safety stop
             }
 
             return result;
         }
 
-        private async Task<bool> IsVisibleToViewerAsync(WordDto word, string? viewerId)
+        private static bool IsVisibleToViewerAsync(WordModel word, string? viewerId, HashSet<string> viewerFriends)
         {
             // Owner always sees it
             if (viewerId == word.UserId) return true;
 
             // Public visible to anyone
-            if (word.ShareWith == ShareWith.Public) return true;
-
-            HashSet<string> viewerFriends = viewerId is null
-                            ? new HashSet<string>()
-                            : await GetFriendIdsForViewer(viewerId);
+            if (word.ShareWith == (int) ShareWith.Public) return true;
 
             // Friends visibility if viewer is a friend of the author
-            if (word.ShareWith == ShareWith.Friends && viewerId != null)
+            if (word.ShareWith == (int) ShareWith.Friends && viewerId != null)
                 return viewerFriends.Contains(word.UserId);
 
             return false;
@@ -128,9 +140,14 @@ namespace sd.Application.Services
         public async Task<WordDto> GetWordDtoById(string id, string? currentUserId)
         {
             var word = await _wordRepo.GetById(id);
-            var wordDto = _mapper.Map<WordDto>(word);
 
-            if (!await IsVisibleToViewerAsync(wordDto, currentUserId)) return null;
+            HashSet<string> viewerFriends = currentUserId is null
+                            ? new HashSet<string>()
+                            : await GetFriendIdsForViewer(currentUserId);
+
+            if (!IsVisibleToViewerAsync(word, currentUserId, viewerFriends)) return null;
+
+            var wordDto = _mapper.Map<WordDto>(word);
 
             if (currentUserId != null && word.Likes != null && word.Likes.Contains(currentUserId))
                 wordDto.IsILiked = true;

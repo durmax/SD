@@ -9,7 +9,6 @@ namespace sd.Application.Services
     {
         Task<IEnumerable<WordModel>> GetByCondition(Expression<Func<WordModel, bool>> expression);
         Task<WordModel> GetById(string id);
-        Task<bool> Create(WordModel entity);
         Task<bool> Update(WordModel entity);
         Task<bool> Delete(string id);
         Task<int> Like(string userId, string wordId);
@@ -18,7 +17,7 @@ namespace sd.Application.Services
         Task<WordDto> GetWordByText(string userId, string text);
         Task<IEnumerable<string>> GetWordsContainText(string userId, string text);
         Task<string?> AddWord(WordDto wordDto);
-        Task<IEnumerable<CommentModel?>> GetWordComments(string wordId);
+        Task<IEnumerable<CommentModel>> GetWordComments(string wordId);
         Task<bool> SaveComment(string wordId, CommentModel newComment);
         Task<int> LikeComment(string userId, string wordId, string commentId);
         Task<bool> DeleteComment(string currUsr, string wordId, string commentId);
@@ -209,7 +208,7 @@ namespace sd.Application.Services
             return await _wordRepo.Update(word);
         }
 
-        public async Task<IEnumerable<CommentModel?>> GetWordComments(string wordId)
+        public async Task<IEnumerable<CommentModel>> GetWordComments(string wordId)
         {
             var word = await _wordRepo.GetById(wordId);
             return word?.Comments;
@@ -280,11 +279,6 @@ namespace sd.Application.Services
         public async Task<IEnumerable<WordModel>> GetByCondition(Expression<Func<WordModel, bool>> expression)
         {
             return await _wordRepo.GetByCondition(expression);
-        }
-
-        public async Task<bool> Create(WordModel entity)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<bool> Delete(string id)

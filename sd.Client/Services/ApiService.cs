@@ -16,6 +16,23 @@ namespace sd.Client.Services
             _httpClient = currentUser.HttpClient;
             _log = log;
         }
+
+        public async Task<string> GetStringAsync(string url)
+        {
+            try
+            {
+                var httpResponse = await _httpClient.GetAsync(url);
+                httpResponse.EnsureSuccessStatusCode();
+                return await httpResponse.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"GET string request failed: {url}, Error: {ex}");
+                throw;
+            }
+
+        }
+
         public async Task<T> GetAsync<T>(string url)
         {
             try

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using sd.Application.Interfaces.Repositories;
+using sd.Application.Services.Gemini;
 using sd.Shared;
 using System.Linq.Expressions;
 

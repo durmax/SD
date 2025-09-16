@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using sd.Infrastructure.Models;
 using sd.Infrastructure.Repositories;
@@ -9,10 +8,8 @@ namespace sd.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-
-            services.Configure<MongodbSettings>(configuration.GetSection(nameof(MongodbSettings)));
 
             services.AddSingleton<IMongodbSettings>(sp =>
                                     sp.GetRequiredService<IOptions<MongodbSettings>>().Value);

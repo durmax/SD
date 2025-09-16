@@ -371,7 +371,7 @@ namespace sd.Client.Pages
             loading = true;
             if (CurrentUser.IsAuthenticated)
             {
-                var response = await ApiService.GetAsync<string>($"api/Word/GetAI/{WordDto.Title}");
+                var response = await ApiService.GetStringAsync($"api/Word/GetAI/{WordDto.Title}");
                 WordDto.Explain += response;
                 await LoadHtmlExplain();
             }

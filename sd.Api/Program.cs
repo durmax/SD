@@ -7,15 +7,21 @@ using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using sd.Api.Midlleware;
 using sd.Application;
+using sd.Application.Services.Gemini;
 using sd.Infrastructure;
+using sd.Infrastructure.Models;
 using System.Collections.Generic;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHealthChecks();
 
+builder.Services.Configure<GeminiSettings>(builder.Configuration.GetSection(nameof(GeminiSettings)));
+builder.Services.Configure<MongodbSettings>(builder.Configuration.GetSection(nameof(MongodbSettings)));
+
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure();
 
 builder.Services.Configure<JwtBearerOptions>(
     JwtBearerDefaults.AuthenticationScheme, options =>

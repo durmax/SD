@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using sd.Application.Services;
 using sd.Application.Helper;
+using sd.Application.Services.Gemini;
 
 namespace sd.Application
 {

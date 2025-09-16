@@ -22,7 +22,7 @@ namespace sd.Application.Services
         Task<bool> SaveComment(string wordId, CommentModel newComment);
         Task<int> LikeComment(string userId, string wordId, string commentId);
         Task<bool> DeleteComment(string currUsr, string wordId, string commentId);
-        Task<string> GetAI(string wordTitle);
+        Task<string> GetWordMeaningAI(string wordTitle);
     }
 
     public class WordService : IWordService
@@ -307,7 +307,7 @@ namespace sd.Application.Services
             else return -1;
         }
 
-        public async Task<string> GetAI(string wordTitle)
+        public async Task<string> GetWordMeaningAI(string wordTitle)
         {
             if (string.IsNullOrWhiteSpace(wordTitle)) return string.Empty;
             var prompt = $"Ich lerne Deutsch als Fremdsprache auf dem Niveau B1. Erkläre mir die Bedeutung von „{wordTitle}” und schreibe Beispiele, die mir helfen es zu verstehen. Beginne die Antwort direkt mit den Beispielen, ohne einen einleitenden Satz oder eine Begrüßung.";

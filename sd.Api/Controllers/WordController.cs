@@ -151,7 +151,7 @@ namespace sd.Api.Controllers
         [HttpGet("GetAI/{wordTitle}")]
         public async Task<IActionResult> GetAI(string wordTitle)
         {
-            var result = await _wordService.GetAI(wordTitle);
+            var result = await _wordService.GetWordMeaningAI(wordTitle);
             return Ok(result);
         }
     }

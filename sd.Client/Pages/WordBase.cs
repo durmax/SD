@@ -372,9 +372,11 @@ namespace sd.Client.Pages
             if (CurrentUser.IsAuthenticated)
             {
                 var response = await ApiService.GetStringAsync($"api/Word/GetAI/{WordDto.Title}");
-                WordDto.Explain += response;
+
+                WordDto.Explain = string.IsNullOrEmpty(WordDto.Explain) ? response : WordDto.Explain += "<br>" + response.Replace("**", "");
                 await LoadHtmlExplain();
             }
+            await AddWord();
             loading = false;
         }
         protected async Task GetLikedUsers(int? likesCount)

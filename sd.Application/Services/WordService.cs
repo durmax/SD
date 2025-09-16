@@ -310,8 +310,9 @@ namespace sd.Application.Services
         public async Task<string> GetAI(string wordTitle)
         {
             if (string.IsNullOrWhiteSpace(wordTitle)) return string.Empty;
-            var prompt = $"Schreibe Beispiele auf Niveau B1, die mir helfen, die Bedeutungen von „{wordTitle}“ zu verstehen.";
-            return await _geminiService.ProcessStringAsync(prompt);
+            var prompt = $"Ich lerne Deutsch als Fremdsprache auf dem Niveau B1. Erkläre mir die Bedeutung von „{wordTitle}” und schreibe Beispiele, die mir helfen es zu verstehen. Beginne die Antwort direkt mit den Beispielen, ohne einen einleitenden Satz oder eine Begrüßung.";
+            var res = await _geminiService.ProcessStringAsync(prompt);
+            return "------------------------- KI Erklärung ------------------------- </br><h3>" + res + "</h3></br> ------------------------- Ende KI Erklärung -------------------------";
         }
 
         public async Task<WordModel> GetById(string id)

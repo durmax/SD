@@ -109,7 +109,8 @@ namespace sd.Client.Services
             {
                 var errorMessage = await response.Content.ReadAsStringAsync();
                 _log.LogError($"API Error: {errorMessage}");
-                throw new Exception($"API Error: {errorMessage}");
+                // throw new Exception($"API Error: {errorMessage}");
+                return default;
             }
         }
     }

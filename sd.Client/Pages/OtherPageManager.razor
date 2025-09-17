@@ -1,11 +1,25 @@
 ﻿@page "/OtherPageManager/{id}"
+@page "/OtherPageManager/Host/{host}"
 @using System.Security.Claims
 @inherits OtherPageManagerBase
 
 <h3>OtherPage</h3>
 
-<AuthorizeView>
+<AuthorizeView Context="auth">
     <Authorized>
+        1. Enter Example URL to get the pattern automatically (Test the result before saving):
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <InputText id="ExampleURL" class="form-control" placeholder="ExampleURL" @bind-Value="@ExampleURL" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <button class="btn btn-outline-primary" @onclick="GetModelByAi"><i class="fa fa-save"></i>Try get data</button>
+            </div>
+        </div>
+
+        2. Or enter the data manually:
         <EditForm Model="@otherPageModel" OnValidSubmit="SaveData" Context="op">
             <DataAnnotationsValidator />
             <ValidationSummary />
@@ -113,6 +127,21 @@
                 </div>
             </div>
 
+            @if (otherPageModel.Notes != null)
+            {
+                <p>Notes for this page:</p>
+                <div>
+                    <ul>
+                        @foreach (var item in otherPageModel.Notes)
+                        {
+                            <li>
+                                @item
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
             <div class="form-group row">
                 <div class="col-sm-10">
                     <div class="alert alert-primary @InfoShowClass" role="alert">
@@ -120,12 +149,15 @@
                     </div>
                 </div>
             </div>
-
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <p>ID: @otherPageModel.OtherPageId</p>
+                </div>
+            </div>
             <div class="form-group row">
                 <div class="col-sm-10">
                     <button type="submit" class="btn btn-outline-primary"><i class="fa fa-save"></i> Save</button>
                 </div>
-
             </div>
         </EditForm>
         <div class="col-sm-10">
@@ -163,4 +195,4 @@ URL: https://www.deepl.com/translator#de/en/Test
 
 </pre>
 
-v: 18.03.2024 13:51
+v: 17.09.2025 17:51

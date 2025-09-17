@@ -12,7 +12,7 @@ namespace sd.Client.Pages
 {
     public class OtherPageManagerBase : ComponentBase
     {
-        public OtherPageModel otherPageModel = new OtherPageModel();
+        protected OtherPageModel otherPageModel { get; set; } = new();
 
         [Inject]
         public ILogger<OtherPageManagerBase> Log { get; set; }
@@ -25,8 +25,11 @@ namespace sd.Client.Pages
 
         [Parameter]
         public string Id { get; set; }
+        [Parameter]
+        public string Host { get; set; }
         protected bool Registered { get; set; } = true;
         protected string Info { get; set; }
+        protected string ExampleURL { get; set; }
         protected string InfoShowClass { get; set; } = "d-none";
         public List<string> PrimLangs { get; set; }
         public List<string> SecLangs { get; set; }
@@ -114,6 +117,17 @@ namespace sd.Client.Pages
             }
             InfoShowClass = "";
         }
+
+        public async Task GetModelByAi()
+        {
+            if (string.IsNullOrWhiteSpace(ExampleURL))
+                return;
+
+            otherPageModel = await ApiService.PostAsync<OtherPageModel>($"api/OtherPage/GetAI/", $"""{ExampleURL}""");
+
+            PrimLangs = ParseLanguages(otherPageModel.PrimLangs);
+            SecLangs = ParseLanguages(otherPageModel.SecLangs);
+        }
         public async Task RemoveOtherPage()
         {
             try
@@ -130,25 +144,46 @@ namespace sd.Client.Pages
             }
             InfoShowClass = "";
         }
-        protected async override Task OnInitializedAsync()
-        {
-            otherPageModel = await ApiService.GetAsync<OtherPageModel>($"api/OtherPage/{Id}");
 
-            if (otherPageModel.OtherPageId == null)
-            {
-                Registered = false;
-            }
-            else
-            {
-                if (otherPageModel.PrimLangs != null)
-                {
-                    PrimLangs = otherPageModel?.PrimLangs.Split(",").ToList();
-                }
-                if (otherPageModel.SecLangs != null)
-                {
-                    SecLangs = otherPageModel?.SecLangs.Split(",").ToList();
-                }
-            }
+        private static List<string> ParseLanguages(string? langs)
+        {
+            return string.IsNullOrWhiteSpace(langs)
+                ? new List<string>()
+                : langs.Split(',')
+                       .Select(s => s.Trim())
+                       .Where(s => s.Length > 0)
+                       .ToList();
         }
+
+        protected override async Task OnInitializedAsync()
+        {
+            otherPageModel ??= new OtherPageModel();
+
+            OtherPageModel? apiModel = null;
+
+            if (!string.IsNullOrWhiteSpace(Id))
+                apiModel = await ApiService.GetAsync<OtherPageModel>($"api/OtherPage/{Id}");
+            else if (!string.IsNullOrWhiteSpace(Host))
+                apiModel = await ApiService.GetAsync<OtherPageModel>($"api/OtherPage/Host/{Host}");
+
+            if (apiModel is not null)
+            {
+                otherPageModel.OtherPageId = apiModel.OtherPageId;
+                otherPageModel.PrimLangs = apiModel.PrimLangs;
+                otherPageModel.SecLangs = apiModel.SecLangs;
+                otherPageModel.Host = apiModel.Host;
+                otherPageModel.PageType = apiModel.PageType;
+                otherPageModel.Eval = apiModel.Eval;
+                otherPageModel.ApiPath = apiModel.ApiPath;
+                otherPageModel.Notes = apiModel.Notes;
+                otherPageModel.Pattern = apiModel.Pattern;
+            }
+
+            Registered = !string.IsNullOrWhiteSpace(otherPageModel.OtherPageId);
+
+            PrimLangs = ParseLanguages(otherPageModel.PrimLangs);
+            SecLangs = ParseLanguages(otherPageModel.SecLangs);
+        }
+
     }
 }

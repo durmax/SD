@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -39,6 +40,20 @@ namespace sd.Api.Controllers
             var result = await _otherPageService.GetById(id);
             if (result == null) return NotFound();
             return result;
+        }
+
+        [HttpGet]
+        [Route("Host/{host}")]
+        public async Task<IActionResult> GetByHost(string host)
+        {
+            if ((await _userService.GetCurrentUser(User))?.Role != Role.Owner) return StatusCode(StatusCodes.Status401Unauthorized);
+
+            var cursor = await _otherPageService.GetByCondition(u => u.Host.Contains(host));
+            var res = cursor.FirstOrDefault();
+            
+            if (res == null) return NotFound();
+            
+            return Ok(res);
         }
 
         [HttpPost]
@@ -91,6 +106,19 @@ namespace sd.Api.Controllers
             }
 
             return Ok(await _otherPageService.Delete(id));
+        }
+
+
+        [Authorize]
+        [HttpPost("GetAI/")]
+        public async Task<IActionResult> GetAI([FromBody] string ExampleURL)
+        {
+            var result = await _otherPageService.GetModelByAI(ExampleURL);
+            if (!string.IsNullOrEmpty(result.Pattern))
+            return Ok(result);
+            else
+                return StatusCode(StatusCodes.Status302Found,
+                "The same Pattern is found");
         }
     }
 }

@@ -20,6 +20,9 @@ namespace sd.Client.Pages
         [Inject]
         protected ApiService ApiService { get; set; }
 
+        [Inject]
+        protected OtherPageService OtherPageService { get; set; }
+
         //protected LangCodeService LangCodeService { get; set; }
 
         [Parameter]
@@ -126,6 +129,12 @@ namespace sd.Client.Pages
 
             PrimLangs = ParseLanguages(otherPageModel.PrimLangs);
             SecLangs = ParseLanguages(otherPageModel.SecLangs);
+
+           var link = OtherPageService.BuildLink(otherPageModel.Pattern, 
+               "Word", PrimLangs.First(), SecLangs.First());
+
+            Info = $"Example link for 'Word' from {PrimLangs.First()} to {SecLangs.First()} is: {link}";
+            InfoShowClass = "";
         }
         public async Task RemoveOtherPage()
         {

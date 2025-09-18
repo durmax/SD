@@ -18,7 +18,17 @@ namespace sd.Infrastructure.Repositories
 
         public async Task<bool> Create(OtherPageModel otherPage)
         {
-            return await _context.OtherPages.Find<OtherPageModel>(u => u.Host == otherPage.Host).AnyAsync();
+            var op = await _context.OtherPages.Find<OtherPageModel>(u => u.Host == otherPage.Host).AnyAsync();
+            if (op) return false;
+            try
+            {
+                await _context.OtherPages.InsertOneAsync(otherPage);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task<bool> Update(OtherPageModel newOtherPage)

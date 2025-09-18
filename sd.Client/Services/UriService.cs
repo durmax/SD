@@ -1,4 +1,5 @@
-﻿using sd.Client.Models;
+﻿using sd.Client.Helpers;
+using sd.Client.Models;
 using System.Collections.Generic;
 
 namespace sd.Client.Services
@@ -6,12 +7,10 @@ namespace sd.Client.Services
     public class UriService
     {
         private readonly LinkModel _linkModel;
-        private readonly LangCodeService _langCodeService;
 
-        public UriService(LinkModel linkModel, LangCodeService langCodeService)
+        public UriService(LinkModel linkModel)
         {
             _linkModel = linkModel;
-            _langCodeService = langCodeService;
         }
 
         public string UriBuild(LinkParam linkParam)
@@ -26,8 +25,8 @@ namespace sd.Client.Services
             _linkModel.FLangCode = linkParam.FLangCode;
             _linkModel.TLangCode = linkParam.TLangCode;
 
-            _linkModel.FLangName = _langCodeService.Langs[linkParam.FLangCode]; // Get LangName from dictionery names
-            _linkModel.TLangName = _langCodeService.Langs[linkParam.TLangCode]; // GetLangName
+            _linkModel.FLangName = LangCodesHelper.GetLanguage(linkParam.FLangCode); // Get LangName from dictionery names
+            _linkModel.TLangName = LangCodesHelper.GetLanguage(linkParam.TLangCode); // GetLangName
 
 
             _linkModel.Word = linkParam.Word;
@@ -56,7 +55,7 @@ namespace sd.Client.Services
                 {
                     if (_linkModel.FLangCode == "ar")
                     {
-                        _linkModel.FLangName = _langCodeService.Langs[_linkModel.TLangCode];
+                        _linkModel.FLangName = LangCodesHelper.GetLanguage(_linkModel.TLangCode);
                         _linkModel.TLangName = "arabic";
                     }
                     if (_linkModel.FLangCode == "de" || _linkModel.TLangCode == "de")

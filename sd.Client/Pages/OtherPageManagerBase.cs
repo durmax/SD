@@ -20,8 +20,7 @@ namespace sd.Client.Pages
         [Inject]
         protected ApiService ApiService { get; set; }
 
-        [Inject]
-        protected LangCodeService LangCodeService { get; set; }
+        //protected LangCodeService LangCodeService { get; set; }
 
         [Parameter]
         public string Id { get; set; }

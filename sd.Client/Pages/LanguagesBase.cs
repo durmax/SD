@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
+using sd.Client.Helpers;
 using sd.Client.Models;
 using sd.Client.Services;
 using System;
@@ -21,8 +22,6 @@ namespace sd.Client.Pages
         LocalStorageAccessor LocalStorageAccessor { get; set; }
         [Inject]
         IJSRuntime JsRuntime { set; get; }
-        [Inject]
-        protected LangCodeService LangCodeService { get; set; }
 
         [Inject]
         protected DefaultLangsService DefaultLangsService { get; set; }
@@ -253,20 +252,20 @@ namespace sd.Client.Pages
             SelectedFL = new LangCode
             {
                 Key = Fl,
-                Value = LangCodeService.Langs[Fl]
+                Value = Helpers.LangCodesHelper.GetLanguage(Fl)
             };
 
             SelectedTL = new LangCode
             {
                 Key = Tl,
-                Value = LangCodeService.Langs[Tl]
+                Value = Helpers.LangCodesHelper.GetLanguage(Tl)
             };
 
             KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>("Langs");
 
             await BuildKnownLangs();
 
-            LangCodes = LangCodeService.Langs
+            LangCodes = LangCodesHelper.Langs
                 .Select(item => new LangCode
                 {
                     Key = item.Key,

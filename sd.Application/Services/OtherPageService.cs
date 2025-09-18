@@ -90,6 +90,8 @@ public class OtherPageService : IOtherPageService
 
     public async Task<OtherPageModel> GetModelByAI(string exampleURL)
     {
+        if (string.IsNullOrWhiteSpace(exampleURL)) return null;
+
         string url = exampleURL;
         if (!url.StartsWith("http://") && !url.StartsWith("https://"))
         {
@@ -104,8 +106,6 @@ public class OtherPageService : IOtherPageService
         {
             return model.FirstOrDefault();
         }
-
-        if (string.IsNullOrWhiteSpace(exampleURL)) return null;
 
         var prompt =
            $" example1 with LangName: " +
@@ -139,6 +139,9 @@ public class OtherPageService : IOtherPageService
         {
             return model.FirstOrDefault();
         }
+
+
+
 
         res.PageType = "Dict";
         res.Eval = 0;

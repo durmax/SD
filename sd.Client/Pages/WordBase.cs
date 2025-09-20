@@ -489,17 +489,17 @@ namespace sd.Client.Pages
         public ElementReference ReferenceToInputControl;
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            try
+            {
+                if (Guid.TryParse(WordDto?.WordId, out Guid result) == false)
+                    await JsRuntime.InvokeVoidAsync("Utility.setFocus", ReferenceToInputControl);
+            }
+            catch (Exception ex)
+            {
+                Log.LogError(ex.Message);
+            }
             if (firstRender)
             {
-                try
-                {
-                    await JsRuntime.InvokeVoidAsync("Utility.setFocus", ReferenceToInputControl);
-                }
-                catch (Exception ex)
-                {
-                    Log.LogError(ex.Message);
-                }
-
                 await LoadHtmlExplain();
             }
         }

@@ -69,6 +69,9 @@ namespace sd.Client.Pages
             NewWords++;
             WordDtosState.Model.Insert(index, word);
             currentPage++;
+
+            AddNewWord();
+
         }
 
         protected void OldWordHandler(WordDto oldWord)

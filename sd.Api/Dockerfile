@@ -10,15 +10,12 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # These paths are relative to the **build context** (repo root), not the Dockerfile
-COPY sd.Api/sd.Api.csproj sd.Api/
-COPY sd.Application/sd.Application.csproj sd.Application/
-COPY sd.Infrastructure/sd.Infrastructure.csproj sd.Infrastructure/
-COPY sd.Shared/sd.Shared.csproj sd.Shared/
+COPY . .
 
 RUN dotnet restore sd.Api/sd.Api.csproj
 
 # Now copy the rest of the source (entire repo)
-COPY . .
+
 
 WORKDIR /src/sd.Api
 RUN dotnet build sd.Api.csproj -c $BUILD_CONFIGURATION -o /app/build --no-restore

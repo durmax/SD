@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Text;
+using System.Threading;
 
 namespace sd.Application.Services.Gemini;
 /// <summary>
@@ -27,7 +28,7 @@ public class GeminiService
     /// </summary>
     /// <param name="input">The input string.</param>
     /// <returns>The response from the Gemini API.</returns>
-    public async Task<string> ProcessStringAsync(string input)
+    public async Task<string> ProcessStringAsync(string input, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(input))
         {
@@ -61,7 +62,11 @@ public class GeminiService
             string url = $"{_geminiSettings.Value.ApiUrl}?key={_geminiSettings.Value.ApiKey}";
 
             // Send the request.
-            var response = await _httpClient.PostAsync(url, content);
+            var response = await _httpClient.PostAsync(url, content, cancellationToken);
+
+            // Ensure the operation was not canceled during processing
+            cancellationToken.ThrowIfCancellationRequested();
+
             response.EnsureSuccessStatusCode(); // Ensure a successful response.
 
             // Deserialize the response.
@@ -89,6 +94,12 @@ public class GeminiService
         {
             // Handle JSON serialization/deserialization errors.
             return $"Error processing Gemini API response: {ex.Message}";
+        }
+        catch (OperationCanceledException)
+        {
+            // This exception is thrown if the client disconnects.
+            // You can log this event if needed.
+            return "Request canceled by the client: {ex.Message}"; // 499 is a common status code for Client Closed Request
         }
         catch (Exception ex)
         {

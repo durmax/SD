@@ -149,9 +149,9 @@ namespace sd.Api.Controllers
 
         [Authorize]
         [HttpGet("GetAI/{wordTitle}")]
-        public async Task<IActionResult> GetAI(string wordTitle)
+        public async Task<IActionResult> GetAI(string wordTitle, CancellationToken cancellationToken)
         {
-            var result = await _wordService.GetWordMeaningAI(wordTitle);
+            var result = await _wordService.GetWordMeaningAI(wordTitle, cancellationToken);
             return Ok(result);
         }
     }

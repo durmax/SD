@@ -4,6 +4,7 @@ using sd.Shared;
 using System;
 using System.Linq.Expressions;
 using System.Text.Json;
+using System.Threading;
 
 namespace sd.Application.Services;
 
@@ -16,7 +17,7 @@ public interface IOtherPageService
     Task<bool> Delete(string id);
 
     Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang);
-    Task<OtherPageModel> GetModelByAI(string exampleURL);
+    Task<OtherPageModel> GetModelByAI(string exampleURL, CancellationToken cancellationToken);
 }
 
 public class OtherPageService : IOtherPageService
@@ -88,7 +89,7 @@ public class OtherPageService : IOtherPageService
         return await _otherPageRepository.GetById(id);
     }
 
-    public async Task<OtherPageModel> GetModelByAI(string exampleURL)
+    public async Task<OtherPageModel> GetModelByAI(string exampleURL, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(exampleURL)) return null;
 
@@ -126,7 +127,7 @@ The return value must be without any char extra in this form:
 {{Host: stringValue, PrimLangs: stringValue, SecLangs: stringValue, Pattern: stringValue}}
 ";
 
-        var aiRes = await _geminiService.ProcessStringAsync(prompt);
+        var aiRes = await _geminiService.ProcessStringAsync(prompt, cancellationToken);
         aiRes = aiRes.Replace("json", string.Empty);
         aiRes = aiRes.Replace("```", string.Empty);
 

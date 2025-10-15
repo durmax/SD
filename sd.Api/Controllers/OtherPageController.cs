@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sd.Application.Services;
 using sd.Shared;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace sd.Api.Controllers
 {
@@ -111,9 +112,9 @@ namespace sd.Api.Controllers
 
         [Authorize]
         [HttpPost("GetAI/")]
-        public async Task<IActionResult> GetAI([FromBody] string ExampleURL)
+        public async Task<IActionResult> GetAI([FromBody] string ExampleURL, CancellationToken cancellationToken)
         {
-            var result = await _otherPageService.GetModelByAI(ExampleURL);
+            var result = await _otherPageService.GetModelByAI(ExampleURL, cancellationToken);
             if (!string.IsNullOrEmpty(result.Pattern))
             return Ok(result);
             else

@@ -3,6 +3,7 @@ using sd.Application.Interfaces.Repositories;
 using sd.Application.Services.Gemini;
 using sd.Shared;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace sd.Application.Services
 {
@@ -22,7 +23,7 @@ namespace sd.Application.Services
         Task<bool> SaveComment(string wordId, CommentModel newComment);
         Task<int> LikeComment(string userId, string wordId, string commentId);
         Task<bool> DeleteComment(string currUsr, string wordId, string commentId);
-        Task<string> GetWordMeaningAI(string wordTitle);
+        Task<string> GetWordMeaningAI(string wordTitle, CancellationToken cancellationToken);
     }
 
     public class WordService : IWordService
@@ -307,12 +308,53 @@ namespace sd.Application.Services
             else return -1;
         }
 
-        public async Task<string> GetWordMeaningAI(string wordTitle)
+        public async Task<string> GetWordMeaningAI(string wordTitle, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(wordTitle)) return string.Empty;
             var prompt = $"Ich lerne Deutsch als Fremdsprache auf dem Niveau B1. Erkläre mir die Bedeutung von „{wordTitle}” und schreibe Beispiele, die mir helfen es zu verstehen. Beginne die Antwort direkt mit den Beispielen, ohne einen einleitenden Satz oder eine Begrüßung.";
-            var res = await _geminiService.ProcessStringAsync(prompt);
+            var res = await _geminiService.ProcessStringAsync(prompt, cancellationToken);
+
+            res = ConvertFormattingToHtml(res);
+
             return "------------------------- KI Erklärung ------------------------- </br><h3>" + res + "</h3></br> ------------------------- Ende KI Erklärung -------------------------";
+        }
+
+        /// <summary>
+        /// Konvertiert gängige Markdown-Symbole (** und *) in entsprechende HTML-Tags (strong und em).
+        /// Die Konvertierung von ** (fett) muss vor * (kursiv) erfolgen, um Fehler zu vermeiden.
+        /// </summary>
+        /// <param name="markdownText">Der Eingabetext, der Markdown-Symbole enthält (z.B. von der Gemini API). Das ist der Text, den du mir als Beispiel gegeben hast.</param>
+        /// <returns>Ein String mit HTML-Tags anstelle der Markdown-Symbole.</returns>
+        public static string ConvertFormattingToHtml(string markdownText)
+        {
+            if (string.IsNullOrEmpty(markdownText))
+            {
+                return markdownText;
+            }
+
+            string htmlText = markdownText;
+
+            // 1. **Fette (Strong) Formatierung konvertieren**
+            // Suchmuster: \*\*([^\*]+)\*\*
+            // Erklärung: Sucht nach Text, der von doppelten Sternchen (**) umschlossen ist.
+            // [^\*]+ stellt sicher, dass alles *außer* einem Sternchen erfasst wird, 
+            // bis die schließenden ** gefunden werden (nicht-gierig).
+            // $1 ist die erfasste Gruppe (der Text zwischen den Symbolen).
+            htmlText = Regex.Replace(htmlText, @"\*\*([^\*]+)\*\*", "<strong>$1</strong>");
+
+
+            // 2. *Kursive (Emphasis) Formatierung konvertieren*
+            // Suchmuster: \*([^\*]+)\*
+            // Erklärung: Sucht nach Text, der von einzelnen Sternchen (*) umschlossen ist.
+            // Wichtig: Da wir ** bereits in Schritt 1 behandelt haben, stellt dieses Muster sicher, 
+            // dass nur die einfachen * erfasst werden.
+            htmlText = Regex.Replace(htmlText, @"\*([^\*]+)\*", "<em>$1</em>");
+
+            // Hinweis: Listenpunkte (*) und Zeilenumbrüche werden hier nicht in HTML-Listen (<ul>, <li>) 
+            // umgewandelt. Dafür wäre eine komplexere Logik oder eine dedizierte Markdown-Bibliothek nötig.
+            // Der Einfachheit halber belassen wir die Listenelemente als Klartext.
+
+            return htmlText;
         }
 
         public async Task<WordModel> GetById(string id)

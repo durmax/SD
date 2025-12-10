@@ -110,6 +110,8 @@ namespace sd.Application.Services
 
         private static bool IsVisibleToViewerAsync(WordModel word, string? viewerId, HashSet<string> viewerFriends)
         {
+            if (word == null) return false;
+
             // Owner always sees it
             if (viewerId == word.UserId) return true;
 

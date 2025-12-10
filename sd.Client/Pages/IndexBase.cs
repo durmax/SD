@@ -59,20 +59,24 @@ namespace sd.Client.Pages
 
         protected void NewWordHandler(WordDto word)
         {
-            int index = -1; // Initialize with an invalid index
+            if (word == null || string.IsNullOrWhiteSpace(word.WordId))
+                return;
 
-            if (WordDtosState.Model.Any(w => w.WordId == word.WordId))
+            var existingWord = WordDtosState.Model
+                .FirstOrDefault(w => w.WordId == word.WordId);
+
+            if (existingWord != null)
             {
-                index = WordDtosState.Model.FindLastIndex(w => w.WordId == word.WordId);
-                WordDtosState.Model.RemoveAt(index); // Remove the old word
+                var index = WordDtosState.Model.IndexOf(existingWord);
+                WordDtosState.Model[index] = word;
             }
-            NewWords++;
-            WordDtosState.Model.Insert(index, word);
-            currentPage++;
-
-            AddNewWord();
-
+            else
+            {
+                WordDtosState.Model.Add(word);
+            }
+                AddNewWord();
         }
+
 
         protected void OldWordHandler(WordDto oldWord)
         {

@@ -135,7 +135,10 @@ namespace sd.Client.Pages
                     WordDto.UserId = foundWordDtoToUpdate?.UserId;
                     WordDto.WordId = foundWordDtoToUpdate?.WordId;
 
-                    await OnWordSave.InvokeAsync(WordDto);
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        await OnWordSave.InvokeAsync(WordDto);
+                    }
                 }
                 else
                 {

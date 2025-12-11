@@ -18,14 +18,14 @@
 
                     <button type="button" class="btn btn-link"
                             @onclick="@(async () => { await RemoveFriend(FriendId); })">
-                        <img width="20" height="20" src="/icons/user-minus-solid.svg" asp-append-version="true" />
+                        <FluentIcon Value="@(new Icons.Regular.Size24.Delete())" />
                     </button>
                     break;
 
                 case sd.Shared.Relation.FriendRequestTo:
 
                     <div class="btn btn-link">
-                        <img width="20" height="20" src="/icons/paper-plane-solid.svg" asp-append-version="true" />
+                        <FluentIcon Value="@(new Icons.Regular.Size24.SendPerson())" />
                     </div>
                     break;
 
@@ -35,12 +35,12 @@
                         <div class="input-group-prepend">
                             <button type="button" class="btn btn-link"
                                     @onclick="@(async () => { await AddFriend(); })">
-                                <img width="20" height="20" src="/icons/user-check-solid.svg" asp-append-version="true" />
+                                <FluentIcon Value="@(new Icons.Regular.Size24.PersonAdd())" />
                             </button>
 
                             <button type="button" class="btn btn-link"
                                     @onclick="@(async () => { await RemoveFriendRequest(); })">
-                                <img width="20" height="20" src="/icons/user-times-solid.svg" asp-append-version="true" />
+                                <FluentIcon Value="@(new Icons.Regular.Size24.PersonDelete())" />
                             </button>
                         </div>
                     </div>
@@ -50,7 +50,7 @@
 
                     <button type="button" class="btn btn-link"
                             @onclick="@(async () => { await SendFriendRequest(FriendId); })">
-                        <img width="20" height="20" src="/icons/user-plus-solid.svg" asp-append-version="true" />
+                        <FluentIcon Value="@(new Icons.Regular.Size24.PersonAdd())" />
                     </button>
                     break;
             }

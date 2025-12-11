@@ -24,6 +24,7 @@
 		<PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="8.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
 		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.10.0" />
+		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.10.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
 		<PackageReference Include="Blazored.TextEditor" Version="1.1.0" />

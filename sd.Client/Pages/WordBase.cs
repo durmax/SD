@@ -54,7 +54,6 @@ namespace sd.Client.Pages
 
         protected List<string> KnownLangs { get; set; }
 
-        protected string ShareWithImageSRC { get; set; }
         protected string cssClassDelete;// = "d-none";
 
         [Parameter]
@@ -105,7 +104,6 @@ namespace sd.Client.Pages
         protected async Task OnSelectedAsync(int selection)
         {
             WordDto.ShareWith = (ShareWith)selection;
-            ShareWithImageSRC = $"/icons/Save{WordDto.ShareWith.ToString()}.svg";
             await AddWord();
         }
 
@@ -484,7 +482,6 @@ namespace sd.Client.Pages
 
         protected override async Task OnParametersSetAsync()
         {
-            ShareWithImageSRC = $"/icons/Save{WordDto.ShareWith.ToString()}.svg";
             note = null;
             await GetFavLinkAsync();
         }

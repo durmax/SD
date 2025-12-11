@@ -1,5 +1,7 @@
 ﻿@page "/Word/{WordId}"
 @inject ILanguageContainerService languageContainer
+@using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
+
 @inherits WordBase
 
 
@@ -10,7 +12,7 @@
 
 @if (WordDto != null)
 {
-    <div class="card mt-1 position-relative @(!Guid.TryParse(WordDto?.WordId, out Guid result)? "border-primary": "border-dark")">
+    <div class="card mt-1 position-relative @(!Guid.TryParse(WordDto?.WordId, out Guid result) ? "border-primary" : "border-dark")">
         @if (!string.IsNullOrEmpty(WordDto.UserName))
         {
             <div class="card-header p-0">
@@ -23,7 +25,7 @@
                    id="wordId"
                    value="@WordDto.Title"
                    @onkeyup="KeyupAsync"
-                   @oninput="@(async (ui) => {await WordChangedAsync(ui.Value.ToString()); })" />
+                   @oninput="@(async (ui) => { await WordChangedAsync(ui.Value.ToString()); })" />
 
             <div class="input-group-append">
                 <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="OnCollapsed">
@@ -42,37 +44,47 @@
 
                 <Dropdown TItem="int" OnSelected="@OnSelectedAsync">
                     <InitialTip>
-                        <img width="20" height="20" src="@ShareWithImageSRC" />
+                        @switch (WordDto.ShareWith)
+                        {
+                            case sd.Shared.ShareWith.OnlyMe:
+                                <FluentIcon Value="@(new Icons.Regular.Size24.GlobeOff())" />
+                                break;
+                            case sd.Shared.ShareWith.Friends:
+                                <FluentIcon Value="@(new Icons.Regular.Size24.ShareScreenPersonOverlay())" />
+                                break;
+                            case sd.Shared.ShareWith.Public:
+                                <FluentIcon Value="@(new Icons.Regular.Size24.Globe())" />
+                                break;
+                        }
                     </InitialTip>
+
                     <ChildContent>
                         <div class="d-block p-2">
-                            <DropdownListItem Item=0>
-                                <img width="20" height="20" src="/icons/SaveOnlyMe.svg" />   @list[0]
+                            <DropdownListItem Item="0">
+                                <FluentIcon Value="@(new Icons.Regular.Size24.GlobeOff())" /> @list[0]
                             </DropdownListItem>
                         </div>
                         <div class="d-block p-2">
-                            <DropdownListItem Item=1>
-                                <img width="20" height="20" src="/icons/SaveFriends.svg" />  @list[1]
+                            <DropdownListItem Item="1">
+                                <FluentIcon Value="@(new Icons.Regular.Size24.ShareScreenPersonOverlay())" /> @list[1]
                             </DropdownListItem>
                         </div>
                         <div class="d-block p-2">
-                            <DropdownListItem Item=2>
-                                <img width="20" height="20" src="/icons/SavePublic.svg" />  @list[2]
+                            <DropdownListItem Item="2">
+                                <FluentIcon Value="@(new Icons.Regular.Size24.Globe())" /> @list[2]
                             </DropdownListItem>
                         </div>
                     </ChildContent>
                 </Dropdown>
+
                 <button type="button" class="bg-transparent border-0" @onclick="async () => { await AddWord(); }">
-                    @languageContainer.Keys["Save"]
-                    <img width="20" height="20" src="/icons/SaveSave.svg" asp-append-version="true" />
+                    <FluentIcon Value="@(new Icons.Regular.Size24.CloudAdd())" />
                 </button>
                 <button type="button" class="@cssClassDelete bg-transparent border-0 pl-3 pr-3" @onclick="async () => { await DeleteWord(); }">
-                    @languageContainer.Keys["Delete"]
-                    <img width="20" height="20" src="/icons/trash-alt-solid.svg" asp-append-version="true" />
+                    <FluentIcon Value="@(new Icons.Regular.Size24.Delete())" />
                 </button>
                 <button type="button" class="bg-transparent border-0 pl-3 pr-3" @onclick="async () => { await GetAi(); }">
-                    AI Help
-                    
+                    <FluentIcon Value="@(new Icons.Regular.Size24.FlashSparkle())" />
                 </button>
 
                 <input class="position-absolute text-center border-0 mt-1 w-25" style="right:20px" @bind="@WordDto.Score" />
@@ -91,7 +103,7 @@
                 {
                     @foreach (var w in SameWords)
                     {
-                        <a href="" class="m-1" @onclick="async ()  => { await SetWord(w.Split(':')[1]); }">
+                        <a href="" class="m-1" @onclick="async () => { await SetWord(w.Split(':')[1]); }">
                             <u class="text-primary"> @w.Split(':')[0] </u>
                         </a>
                     }
@@ -101,7 +113,7 @@
                 {
                     @foreach (var w in LanguageToolWords)
                     {
-                        <a @onclick="()=> WordDto.Title= w">@w</a>
+                        <a @onclick="() => WordDto.Title = w">@w</a>
                     }
                 }
             </div>
@@ -116,7 +128,7 @@
                         <button type="button" class="btn btn-outline-secondary" @onclick="UpdateWord">
                             Update <i class="fas fa-question-circle"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-secondary" @onclick="@(()=> {foundWordDtoToUpdate=null; cssClassUpdate = "d-none";})">
+                        <button type="button" class="btn btn-outline-secondary" @onclick="@(() => { foundWordDtoToUpdate = null; cssClassUpdate = "d-none"; })">
                             Cancel <i class="fas fa-window-close"></i>
                         </button>
                     </div>
@@ -134,21 +146,21 @@
                                 <option value="5"></option>
                             </select>
                             @* <span class="ql-formats"> *@
-                                <select class="ql-color"></select>
-                                <select class="ql-background"></select>
+                            <select class="ql-color"></select>
+                            <select class="ql-background"></select>
                             @* </span> *@
                             @* <span class="ql-formats"> *@
-                                <button class="ql-bold"></button>
-                                <button class="ql-italic"></button>
-                                <button class="ql-underline"></button>
-                                <button class="ql-strike"></button>
+                            <button class="ql-bold"></button>
+                            <button class="ql-italic"></button>
+                            <button class="ql-underline"></button>
+                            <button class="ql-strike"></button>
                             @* </span> *@
                             @* <span class="ql-formats"> *@
-                                <button class="ql-list" value="ordered"></button>
-                                <button class="ql-list" value="bullet"></button>
+                            <button class="ql-list" value="ordered"></button>
+                            <button class="ql-list" value="bullet"></button>
                             @* </span> *@
                             @* <span class="ql-formats"> *@
-                                <button class="ql-link"></button>
+                            <button class="ql-link"></button>
                             @* </span> *@
                         </ToolbarContent>
                         <EditorContent></EditorContent>
@@ -160,23 +172,23 @@
                     bool IsEqual(string str1, string str2) => str1 == str2;
 
                     <div class="pl-3">
-                    <select class="bg-transparent rounded-0 border-0" @bind="@WordDto.WordLang">
-                        @foreach (var item in KnownLangs)
-                        {
-                            <option value="@item" selected="@IsEqual(item,WordDto.WordLang)">@item</option>
-                        }
-                    </select>
+                        <select class="bg-transparent rounded-0 border-0" @bind="@WordDto.WordLang">
+                            @foreach (var item in KnownLangs)
+                            {
+                                <option value="@item" selected="@IsEqual(item, WordDto.WordLang)">@item</option>
+                            }
+                        </select>
 
-                    <button type="button" class="bg-transparent border-0" @onclick="Reverse">
-                        <i class="oi oi-loop"></i>
-                    </button>
+                        <button type="button" class="bg-transparent border-0" @onclick="Reverse">
+                            <i class="oi oi-loop"></i>
+                        </button>
 
-                    <select class="bg-transparent rounded-0 border-0" @bind="@WordDto.ToLang">
-                        @foreach (var item in KnownLangs)
-                        {
-                            <option value="@item" selected="@IsEqual(item, WordDto.ToLang)">@item</option>
-                        }
-                    </select>
+                        <select class="bg-transparent rounded-0 border-0" @bind="@WordDto.ToLang">
+                            @foreach (var item in KnownLangs)
+                            {
+                                <option value="@item" selected="@IsEqual(item, WordDto.ToLang)">@item</option>
+                            }
+                        </select>
                     </div>
                 }
 
@@ -194,10 +206,15 @@
                     <div class="row  fs-6">
                         <div class="col-3">
                             <button type="button" style="float:left" class="btn btn-light bg-transparent" @onclick="async () => { await LikeAsync(); }">
-                                <img width="20" height="20" src=@(CULiked ? "/icons/thumbs-up-solid.svg" : "/icons/thumbs-up-regular.svg") asp-append-version="true" />
-
+                                @if (CULiked)
+                                {
+                                    <FluentIcon Value="@(new Icons.Filled.Size24.ThumbLike())" />
+                                }
+                                else
+                                {
+                                    <FluentIcon Value="@(new Icons.Regular.Size24.ThumbLike())" />
+                                }
                             </button>
-
                             @if (LikesCount != null && (CULiked ? LikesCount > 1 : LikesCount > 0))
                             {
                                 <button type="button" class="btn btn-light bg-transparent" @onclick="async () => { await GetLikedUsers(LikesCount); }">
@@ -221,7 +238,7 @@
                                     @WordDto.CommentsCount
                                 }
 
-                                <img width="20" height="20" src="/icons/comment-dots-solid.svg" asp-append-version="true" />
+                                <FluentIcon Value="@(new Icons.Regular.Size24.Comment())" />
                             </button>
                         </div>
 
@@ -253,7 +270,8 @@
                             }
 
                             <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
-                                <span>Add Comment </span> <img style="margin-left:5px;" width="20" height="20" src="/icons/comment-medical-solid.svg" asp-append-version="true" />
+                                <span>Add Comment </span> 
+                                <FluentIcon Value="@(new Icons.Regular.Size24.CommentAdd())" />
                             </button>
                         </div>
                     }

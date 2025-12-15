@@ -167,6 +167,22 @@
                     </BlazoredTextEditor>
                 </div>
 
+
+<FluentTextArea
+    @bind-Value="@WordDto.Explain"
+    Rows="4"
+    Style="width:100%" />
+
+<FluentButton Appearance="Appearance.Accent" OnClick="Speak">
+    🔊 Read aloud
+</FluentButton>
+
+<FluentButton Appearance="Appearance.Outline" OnClick="Stop">
+    ⏹ Stop
+</FluentButton>
+
+
+
                 @if (KnownLangs != null)
                 {
                     bool IsEqual(string str1, string str2) => str1 == str2;

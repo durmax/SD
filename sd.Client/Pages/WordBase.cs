@@ -86,6 +86,13 @@ namespace sd.Client.Pages
 
         public BlazoredTextEditor QuillHtml { get; set; }
 
+        string Explain;
+        protected Task Speak()
+          => JsRuntime.InvokeVoidAsync("tts.speak", Explain, "de-DE", 1.0, 1.0, 1.0).AsTask();
+
+        protected Task Stop()
+          => JsRuntime.InvokeVoidAsync("tts.stop").AsTask();
+
         protected async Task KeyupAsync(KeyboardEventArgs e)
         {
             if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(FavSite) && WordDto != null)
@@ -515,6 +522,7 @@ namespace sd.Client.Pages
                     try
                     {
                         await QuillHtml.LoadHTMLContent(WordDto?.Explain);
+                        Explain = await QuillHtml.GetText();
                         counter = 11;
                     }
                     catch (Exception ex)

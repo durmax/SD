@@ -167,21 +167,13 @@
                     </BlazoredTextEditor>
                 </div>
 
-
-<FluentTextArea
-    @bind-Value="@WordDto.Explain"
-    Rows="4"
-    Style="width:100%" />
-
-<FluentButton Appearance="Appearance.Accent" OnClick="Speak">
-    🔊 Read aloud
-</FluentButton>
-
-<FluentButton Appearance="Appearance.Outline" OnClick="Stop">
-    ⏹ Stop
-</FluentButton>
-
-
+    <FluentButton Appearance="Appearance.Accent" OnClick="Speak">
+        🔊 Read aloud
+    </FluentButton>
+    
+    <FluentButton Appearance="Appearance.Outline" OnClick="Stop">
+        ⏹ Stop
+    </FluentButton>
 
                 @if (KnownLangs != null)
                 {

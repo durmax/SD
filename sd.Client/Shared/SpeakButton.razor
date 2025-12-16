@@ -1,0 +1,53 @@
+﻿@inject IJSRuntime JsRuntime
+
+<button type="button"
+        class="bg-transparent border-0 pl-3 pr-3"
+        @onclick="SpeakStop"
+        disabled="@ExplainReady">
+    @SpeakIcon
+</button>
+
+@code {
+    [Parameter] public string Explain { get; set; } = string.Empty;
+    public bool ExplainReady => string.IsNullOrWhiteSpace(Explain);
+
+    [Parameter] public EventCallback<bool> IsSpeakingChanged { get; set; }
+
+    private string SpeakIcon { get; set; } = "🔊";
+    private bool IsSpeaking { get; set; }
+
+    private async Task SpeakStop()
+    {
+        if (IsSpeaking)
+        {
+            await Stop();
+            IsSpeaking = false;
+            SpeakIcon = "🔊";
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(Explain))
+                return;
+
+            await Speak();
+            IsSpeaking = true;
+            SpeakIcon = "⏹ Stop";
+        }
+
+        if (IsSpeakingChanged.HasDelegate)
+            await IsSpeakingChanged.InvokeAsync(IsSpeaking);
+    }
+
+    private Task Speak()
+        => JsRuntime.InvokeVoidAsync("tts.speak", Explain, "de-DE", 1.0, 1.0, 1.0).AsTask();
+
+    private Task Stop()
+        => JsRuntime.InvokeVoidAsync("tts.stop").AsTask();
+
+    public async ValueTask DisposeAsync()
+    {
+        // if component disappears while speaking, stop it
+        if (IsSpeaking)
+            await Stop();
+    }
+}

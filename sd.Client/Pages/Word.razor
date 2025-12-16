@@ -47,13 +47,13 @@
                         @switch (WordDto.ShareWith)
                         {
                             case sd.Shared.ShareWith.OnlyMe:
-                                <FluentIcon Value="@(new Icons.Regular.Size24.GlobeOff())" />
+                                <FluentIcon Value="@(new Icons.Regular.Size16.GlobeOff())" />
                                 break;
                             case sd.Shared.ShareWith.Friends:
-                                <FluentIcon Value="@(new Icons.Regular.Size24.ShareScreenPersonOverlay())" />
+                                <FluentIcon Value="@(new Icons.Regular.Size16.ShareScreenPersonOverlay())" />
                                 break;
                             case sd.Shared.ShareWith.Public:
-                                <FluentIcon Value="@(new Icons.Regular.Size24.Globe())" />
+                                <FluentIcon Value="@(new Icons.Regular.Size16.Globe())" />
                                 break;
                         }
                     </InitialTip>
@@ -61,31 +61,33 @@
                     <ChildContent>
                         <div class="d-block p-2">
                             <DropdownListItem Item="0">
-                                <FluentIcon Value="@(new Icons.Regular.Size24.GlobeOff())" /> @list[0]
+                                <FluentIcon Value="@(new Icons.Regular.Size16.GlobeOff())" /> @list[0]
                             </DropdownListItem>
                         </div>
                         <div class="d-block p-2">
                             <DropdownListItem Item="1">
-                                <FluentIcon Value="@(new Icons.Regular.Size24.ShareScreenPersonOverlay())" /> @list[1]
+                                <FluentIcon Value="@(new Icons.Regular.Size16.ShareScreenPersonOverlay())" /> @list[1]
                             </DropdownListItem>
                         </div>
                         <div class="d-block p-2">
                             <DropdownListItem Item="2">
-                                <FluentIcon Value="@(new Icons.Regular.Size24.Globe())" /> @list[2]
+                                <FluentIcon Value="@(new Icons.Regular.Size16.Globe())" /> @list[2]
                             </DropdownListItem>
                         </div>
                     </ChildContent>
                 </Dropdown>
 
                 <button type="button" class="bg-transparent border-0" @onclick="async () => { await AddWord(); }">
-                    <FluentIcon Value="@(new Icons.Regular.Size24.CloudAdd())" />
+                    <FluentIcon Value="@(new Icons.Regular.Size16.CloudAdd())" />
                 </button>
                 <button type="button" class="@cssClassDelete bg-transparent border-0 pl-3 pr-3" @onclick="async () => { await DeleteWord(); }">
-                    <FluentIcon Value="@(new Icons.Regular.Size24.Delete())" />
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" />
                 </button>
                 <button type="button" class="bg-transparent border-0 pl-3 pr-3" @onclick="async () => { await GetAi(); }">
-                    <FluentIcon Value="@(new Icons.Regular.Size24.FlashSparkle())" />
+                    <FluentIcon Value="@(new Icons.Regular.Size16.FlashSparkle())" />
                 </button>
+
+                <SpeakButton Explain="@Explain" IsSpeakingChanged="OnSpeakingChanged" />
 
                 <input class="position-absolute text-center border-0 mt-1 w-25" style="right:20px" @bind="@WordDto.Score" />
             </div>
@@ -167,14 +169,6 @@
                     </BlazoredTextEditor>
                 </div>
 
-    <FluentButton Appearance="Appearance.Accent" OnClick="Speak">
-        🔊 Read aloud
-    </FluentButton>
-    
-    <FluentButton Appearance="Appearance.Outline" OnClick="Stop">
-        ⏹ Stop
-    </FluentButton>
-
                 @if (KnownLangs != null)
                 {
                     bool IsEqual(string str1, string str2) => str1 == str2;
@@ -220,7 +214,7 @@
                                 }
                                 else
                                 {
-                                    <FluentIcon Value="@(new Icons.Regular.Size24.ThumbLike())" />
+                                    <FluentIcon Value="@(new Icons.Regular.Size16.ThumbLike())" />
                                 }
                             </button>
                             @if (LikesCount != null && (CULiked ? LikesCount > 1 : LikesCount > 0))
@@ -246,7 +240,7 @@
                                     @WordDto.CommentsCount
                                 }
 
-                                <FluentIcon Value="@(new Icons.Regular.Size24.Comment())" />
+                                <FluentIcon Value="@(new Icons.Regular.Size16.Comment())" />
                             </button>
                         </div>
 
@@ -278,8 +272,8 @@
                             }
 
                             <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
-                                <span>Add Comment </span> 
-                                <FluentIcon Value="@(new Icons.Regular.Size24.CommentAdd())" />
+                                <span>Add Comment </span>
+                                <FluentIcon Value="@(new Icons.Regular.Size16.CommentAdd())" />
                             </button>
                         </div>
                     }

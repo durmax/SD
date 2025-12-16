@@ -18,14 +18,14 @@
 
                     <button type="button" class="btn btn-link"
                             @onclick="@(async () => { await RemoveFriend(FriendId); })">
-                        <FluentIcon Value="@(new Icons.Regular.Size24.Delete())" />
+                        <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" />
                     </button>
                     break;
 
                 case sd.Shared.Relation.FriendRequestTo:
 
                     <div class="btn btn-link">
-                        <FluentIcon Value="@(new Icons.Regular.Size24.SendPerson())" />
+                        <FluentIcon Value="@(new Icons.Regular.Size16.SendPerson())" />
                     </div>
                     break;
 
@@ -35,12 +35,12 @@
                         <div class="input-group-prepend">
                             <button type="button" class="btn btn-link"
                                     @onclick="@(async () => { await AddFriend(); })">
-                                <FluentIcon Value="@(new Icons.Regular.Size24.PersonAdd())" />
+                                <FluentIcon Value="@(new Icons.Regular.Size16.PersonAdd())" />
                             </button>
 
                             <button type="button" class="btn btn-link"
                                     @onclick="@(async () => { await RemoveFriendRequest(); })">
-                                <FluentIcon Value="@(new Icons.Regular.Size24.PersonDelete())" />
+                                <FluentIcon Value="@(new Icons.Regular.Size16.PersonDelete())" />
                             </button>
                         </div>
                     </div>
@@ -50,7 +50,7 @@
 
                     <button type="button" class="btn btn-link"
                             @onclick="@(async () => { await SendFriendRequest(FriendId); })">
-                        <FluentIcon Value="@(new Icons.Regular.Size24.PersonAdd())" />
+                        <FluentIcon Value="@(new Icons.Regular.Size16.PersonAdd())" />
                     </button>
                     break;
             }

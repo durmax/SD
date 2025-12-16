@@ -86,12 +86,13 @@ namespace sd.Client.Pages
 
         public BlazoredTextEditor QuillHtml { get; set; }
 
-        string Explain;
-        protected Task Speak()
-          => JsRuntime.InvokeVoidAsync("tts.speak", Explain, "de-DE", 1.0, 1.0, 1.0).AsTask();
+        protected string Explain { get; set; }
 
-        protected Task Stop()
-          => JsRuntime.InvokeVoidAsync("tts.stop").AsTask();
+        protected Task OnSpeakingChanged(bool speaking)
+        {
+            // optional hook
+            return Task.CompletedTask;
+        }
 
         protected async Task KeyupAsync(KeyboardEventArgs e)
         {
@@ -511,28 +512,26 @@ namespace sd.Client.Pages
             }
         }
 
+        private TaskCompletionSource<bool> _explainReadyTcs =
+    new(TaskCreationOptions.RunContinuationsAsynchronously);
+
         private async Task LoadHtmlExplain()
         {
-            int counter = 0;
+            if (Collapsed)
+                return;
 
-            if (!Collapsed)
+            try
             {
-                while (counter < 10)
-                {
-                    try
-                    {
-                        await QuillHtml.LoadHTMLContent(WordDto?.Explain);
-                        Explain = await QuillHtml.GetText();
-                        counter = 11;
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.LogError(ex.Message);
+                await QuillHtml.LoadHTMLContent(WordDto?.Explain);
+                Explain = await QuillHtml.GetText();
 
-                        await Task.Delay(100);
-                        counter++;
-                    }
-                }
+                _explainReadyTcs.TrySetResult(true);
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Log.LogError(ex, "Failed to load Explain");
+                _explainReadyTcs.TrySetException(ex);
             }
         }
     }

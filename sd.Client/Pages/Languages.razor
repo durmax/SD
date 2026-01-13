@@ -27,6 +27,17 @@
         </FluentGridItem>
         @if (SelectedItems != null && SelectedTL != null)
         {
+             <FluentGridItem xs="6">
+                <FluentCombobox TOption="LangCode" Items=@SelectedItems
+                                Width="75%"
+                                Label="UI Language"
+                                OptionText="@(i => i.Value)"
+                                OptionValue="@(i => i.Key)"
+                                @bind-Value=@UILang
+                                Autocomplete="ComboboxAutocomplete.Inline"
+                                SelectedOptionChanged="SetUILang" />
+            </FluentGridItem>
+
             <FluentGridItem xs="6">
                 <FluentCombobox TOption="LangCode" Items=@SelectedItems
                                 Width="75%"

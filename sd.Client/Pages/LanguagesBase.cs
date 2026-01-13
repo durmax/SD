@@ -66,6 +66,8 @@ namespace sd.Client.Pages
             }
         }
 
+        protected string UILang;
+
         protected LangCode SelectedTL
         {
             get { return STL; }
@@ -75,7 +77,6 @@ namespace sd.Client.Pages
                 {
                     STL = value;
                     LocalStorageAccessor.SetValueAsync("TLang", SelectedTL.Key);
-                    SetUILang(SelectedTL.Key);
                     KnownLangsService.AddKnownLang(SelectedTL.Key);
                     DefaultLangsService.DefaultToLang = SelectedTL.Key;
                     LangToAdd = value;
@@ -98,45 +99,45 @@ namespace sd.Client.Pages
             }
         }
 
-        private void SetUILang(string langCode)
+        protected void SetUILang()
         {
             try
             {
-                switch (langCode)
+                switch (UILang)
                 {
-                    case "ar":
+                    case "arabic":
                         LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("ar-SY"));
                         LocalStorageAccessor.SetValueAsync("UILang", "ar-SY");
                         break;
-                    case "de":
+                    case "german":
                         LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("de-DE"));
                         LocalStorageAccessor.SetValueAsync("UILang", "de-DE");
                         break;
-                    case "fr":
+                    case "french":
                         LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("fr-FR"));
                         LocalStorageAccessor.SetValueAsync("UILang", "fr-FR");
                         break;
-                    case "es":
+                    case "spanish":
                         LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("es-ES"));
                         LocalStorageAccessor.SetValueAsync("UILang", "es-ES");
                         break;
-                    case "fa":
+                    case "persian":
                         LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("fa-IR"));
                         LocalStorageAccessor.SetValueAsync("UILang", "fa-IR");
                         break;
-                    case "it":
+                    case "italian":
                         LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("it-IT"));
                         LocalStorageAccessor.SetValueAsync("UILang", "it-IT");
                         break;
-                    case "pt":
+                    case "portuguese":
                         LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("pt-PT"));
                         LocalStorageAccessor.SetValueAsync("UILang", "pt-PT");
                         break;
-                    case "ru":
+                    case "russian":
                         LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("ru-RU"));
                         LocalStorageAccessor.SetValueAsync("UILang", "ru-RU");
                         break;
-                    case "tr":
+                    case "turkish":
                         LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("tr-TR"));
                         LocalStorageAccessor.SetValueAsync("UILang", "tr-TR");
                         break;
@@ -151,7 +152,7 @@ namespace sd.Client.Pages
                 LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
                 LocalStorageAccessor.SetValueAsync("UILang", "en-US");
 
-                Log.LogError($"SetUILang: {langCode} not found, set to en-US");
+                Log.LogError($"SetUILang: {UILang} not found, set to en-US");
             }
         }
 

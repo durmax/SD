@@ -184,6 +184,43 @@ public static class LangCodesHelper
         {"zu", "zulu"},
     };
 
+    public static readonly Dictionary<string, string> UILangs = new()
+    {
+        {"arabic", "ar-SY"},
+        {"brazilian", "pt-BR"},
+        {"bulgarian", "bg-BG"},
+        {"catalan", "ca-ES"},
+        {"chinese", "zh-CN"},
+        {"croatian", "hr-HR"},
+        {"czech", "cs-CZ"},
+        {"danish", "da-DK"},
+        {"dutch", "nl-NL"},
+        {"english", "en-US"},
+        {"estonian", "et-EE"},
+        {"finnish", "fi-FI"},
+        {"french", "fr-FR"},
+        {"german", "de-DE"},
+        {"greek", "el-GR"},
+        {"hungarian", "hu-HU"},
+        {"indonesian", "id-ID"},
+        {"italian", "it-IT"},
+        {"japanese", "ja-JP"},
+        {"korean", "ko-KR"},
+        {"latvian", "lv-LV"},
+        {"lithuanian", "lt-LT"},
+        {"norwegian", "nb-NO"},
+        {"polish", "pl-PL"},
+        {"portuguese", "pt-PT"},
+        {"romanian", "ro-RO"},
+        {"russian", "ru-RU"},
+        {"slovak", "sk-SK"},
+        {"slovenian", "sl-SI"},
+        {"spanish", "es-ES"},
+        {"swedish", "sv-SE"},
+        {"turkish", "tr-TR"},
+        {"ukrainian", "uk-UA"},
+    };
+
     public static string GetLanguage(string code) =>
         Langs.TryGetValue(code, out var name) ? name : null;
 }

@@ -12,24 +12,23 @@
 
     <FluentGrid Spacing="1" AdaptiveRendering="true" Justify=JustifyContent.Center Style="padding: 2px; ">
         <FluentGridItem xs="12">
-
             <FluentAutocomplete TOption="LangCode"
                                 Label="@LanguageContainer.Keys["AddLang"]"
                                 dir="rtl"
                                 AutoComplete="off"
-                                Autofocus="true"
-                                Width="250px"
+                                Width="100%"
                                 Placeholder="@LanguageContainer.Keys["AddLang"]"
                                 OnOptionsSearch="@OnSearchAsync"
                                 OptionText="@(item => item.Value)"
                                 @bind-SelectedOptions="@SelectedItems" />
-
         </FluentGridItem>
+
+
         @if (SelectedItems != null && SelectedTL != null)
         {
-             <FluentGridItem xs="6">
+            <FluentGridItem xs="12">
                 <FluentCombobox TOption="LangCode" Items=@SelectedItems
-                                Width="75%"
+                                Width="35%"
                                 Label="UI Language"
                                 OptionText="@(i => i.Value)"
                                 OptionValue="@(i => i.Key)"
@@ -37,10 +36,9 @@
                                 Autocomplete="ComboboxAutocomplete.Inline"
                                 SelectedOptionChanged="SetUILang" />
             </FluentGridItem>
-
             <FluentGridItem xs="6">
                 <FluentCombobox TOption="LangCode" Items=@SelectedItems
-                                Width="75%"
+                                Width="70%"
                                 Label="@LanguageContainer.Keys["Motherlanguage"]"
                                 OptionText="@(i => i.Value)"
                                 OptionValue="@(i => i.Key)"
@@ -50,7 +48,7 @@
             </FluentGridItem>
             <FluentGridItem xs="6">
                 <FluentCombobox TOption="LangCode" Items=@SelectedItems
-                                Width="75%"
+                                Width="70%"
                                 Label="@LanguageContainer.Keys["Secondlanguage"]"
                                 OptionText="@(i => i.Value)"
                                 OptionValue="@(i => i.Key)"

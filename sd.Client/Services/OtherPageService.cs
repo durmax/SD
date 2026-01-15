@@ -15,7 +15,7 @@ public class OtherPageService
         _reqLinkP = reqLinkP;
     }
 
-    public IEnumerable<OtherPageResModel> MakeLinks(IEnumerable<OtherPageResModel> OtherPageModels, 
+    public List<OtherPageResModel> MakeLinks(List<OtherPageResModel> OtherPageModels, 
         string word, string fromLang, string toLang)
     {
         List<OtherPageResModel> res = new();

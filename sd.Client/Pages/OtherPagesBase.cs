@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
+using Microsoft.FluentUI.AspNetCore.Components;
 using Newtonsoft.Json;
 using sd.Client.Services;
 using sd.Shared;
@@ -21,11 +21,40 @@ namespace sd.Client.Pages
         [Parameter] public string Word { get; set; }
         [Parameter] public string MaxHeight { get; set; }
 
-        protected List<OtherPageResModel> otherPageModels { get; set; }
-        protected IEnumerable<OtherPageResModel> opRes { get; set; }
+        protected List<OtherPageResModel> opRes { get; set; }
         protected string FavSite { get; private set; }
+        public bool langChanged { get; set; } = false;
+        public string Info { get; private set; }
         private string fLang;
         private string tLang;
+
+        protected async Task SortListAsync(FluentSortableListEventArgs args)
+        {
+            if (args is null || args.OldIndex == args.NewIndex)
+            {
+                return;
+            }
+
+            var oldIndex = args.OldIndex;
+            var newIndex = args.NewIndex;
+
+            var itemToMove = opRes[oldIndex];
+            opRes.RemoveAt(oldIndex);
+
+            if (newIndex < opRes.Count)
+            {
+                opRes[newIndex].Eval = newIndex;
+                opRes.Insert(newIndex, itemToMove);
+            }
+            else
+            {
+                opRes[oldIndex].Eval = oldIndex;
+                opRes.Add(itemToMove);
+            }
+            var serializedOtherPageModels = JsonConvert.SerializeObject(opRes);
+
+            await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", serializedOtherPageModels);
+        }
 
         [Parameter] public string FLangCode
         {
@@ -52,125 +81,36 @@ namespace sd.Client.Pages
             }
         }
 
-        public bool langChanged { get; set; } = false;
-        public string Info { get; private set; }
-
-        double oldScreenY = 0;
-        OtherPageResModel dragedOtherPage;
-        protected async Task HandleDragStart(DragEventArgs e)
+        protected async Task GetOpRes()
         {
-            oldScreenY = e.ScreenY;
-            dragedOtherPage = otherPageModels.Find(p => p.Eval == e.Button);
-        }
+            if (Collapsed || opRes != null)
+                return;
 
-        protected async Task Drop(DragEventArgs e)
-        {
-            await OtherPagesChangeEval(dragedOtherPage, e.ScreenY);
-        }
-        protected async Task OtherPagesChangeEval(OtherPageResModel otherPage, double newScreenY)
-        {
-            var x = (int)(oldScreenY - newScreenY) / 25;
-            otherPageModels.Find(p => p.Host == otherPage.Host).Eval = otherPage.Eval - x;
+            var key = $"{FLangCode}{TLangCode}";
 
-            await OtherPagesSort();
-        }
+            string opStr = await LocalStorageAccessor.GetValueAsync<string>(key);
 
-        protected async Task OtherPagesSort()
-        {
-            otherPageModels.Sort((x, y) => x.Eval.CompareTo(y.Eval));
-
-            int i = 0;
-            foreach (var oPage in otherPageModels)
+            List<OtherPageResModel> raw;
+            if (!string.IsNullOrWhiteSpace(opStr) && opStr != "null")
             {
-                i++;
-                oPage.Eval = i;
-            }
-
-            var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
-
-            await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", serializedOtherPageModels);
-
-            opRes = null;
-            opRes = OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
-        }
-
-        protected async Task SetEvalAsync(ChangeEventArgs e, OtherPageResModel otherPage)
-        {
-            var oldEVal = otherPage.Eval;
-            var newEVal = Int32.Parse(e.Value.ToString());
-
-            if (oldEVal > newEVal)
-            {
-                foreach (var p in otherPageModels)
-                {
-                    if (p.Eval >= newEVal)
-                    {
-                        p.Eval++;
-                    }
-                }
+                raw = JsonConvert.DeserializeObject<List<OtherPageResModel>>(opStr) ?? new List<OtherPageResModel>();
             }
             else
             {
-                foreach (var p in otherPageModels)
+                raw = await ApiService.GetAsync<List<OtherPageResModel>>($"api/OtherPage/{FLangCode}/{TLangCode}")
+                      ?? new List<OtherPageResModel>();
+
+                if (FLangCode != TLangCode)
                 {
-                    if (p.Eval >= oldEVal)
-                    {
-                        p.Eval--;
-                    }
+                    var serialized = JsonConvert.SerializeObject(raw);
+                    await LocalStorageAccessor.SetValueAsync(key, serialized);
                 }
             }
-            otherPageModels.Find(p => p.Host == otherPage.Host).Eval = newEVal;
 
-            await OtherPagesSort();
+            opRes = OtherPageService.MakeLinks(raw, Word, FLangCode, TLangCode) ?? new List<OtherPageResModel>();
+            langChanged = false;
         }
 
-        protected async Task GetOpRes()
-        {
-            if (!Collapsed && opRes == null)
-            {
-                if (langChanged || otherPageModels == null)
-                {
-                    otherPageModels = null;
-                    opRes = null;
-
-                    string OPStr = await LocalStorageAccessor.GetValueAsync<string>($"{FLangCode}{TLangCode}");
-
-                    if (!string.IsNullOrEmpty(OPStr) && OPStr != "null")
-                    {
-                        otherPageModels = JsonConvert.DeserializeObject<List<OtherPageResModel>>(OPStr);
-                    }
-                    else
-                    {
-                        otherPageModels = await ApiService.GetAsync<List<OtherPageResModel>>($"api/OtherPage/{FLangCode}/{TLangCode}");
-
-                        if (FLangCode != TLangCode)
-                        {
-                            try
-                            {
-                                var serializedOtherPageModels = JsonConvert.SerializeObject(otherPageModels);
-                                await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", serializedOtherPageModels);
-                            }
-                            catch (Exception ex)
-                            {
-                                log.LogError(ex.ToString());
-                                throw;
-                            }
-                        }
-                    }
-
-                    opRes = OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
-                    langChanged = false;
-                }
-                else
-                {
-                    if (otherPageModels != null)
-                    {
-                        opRes = null;
-                        opRes = OtherPageService.MakeLinks(otherPageModels, Word, FLangCode, TLangCode);
-                    }
-                }
-            }
-        }
         protected override async Task OnParametersSetAsync()
         {
             if (!Collapsed)

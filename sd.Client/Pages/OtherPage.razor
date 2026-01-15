@@ -15,7 +15,9 @@
         {
             if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
             {
-                <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage); })" style="opacity: 0.3;"><FluentIcon Value="@(new Icons.Regular.Size16.Crown())" /></button>
+                <div class="btn btn-light bg-transparent" style="opacity: 0.3;" @onclick="@(async () => { await Favorite(otherPage); })">
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Crown())" />
+                </div>
             }
         }
     </div>

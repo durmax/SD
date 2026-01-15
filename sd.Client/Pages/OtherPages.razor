@@ -13,32 +13,20 @@ else
 {
     <div class="card m-0 border-left-0 border-right-0 overflow-auto" style="max-height:@MaxHeight">
 
-        <div class="@(Collapsed? "collapse" : "")">
+        <div class="@(Collapsed ? "collapse" : "")">
 
-            <div class="card-body p-0 d-flex flex-column" dropzone="move" ondragover="event.preventDefault();" @ondrop="Drop">
-
-                @if (opRes != null)
-                {
-                    @foreach (var otherPage in opRes)
-                    {
-                        <div class="container">
-                            @if (CanSetFavSite)
-                            {
-                                <input class="float-left border-0" style="max-width:30px" value="@otherPage.Eval"
-                                @onchange="@((ChangeEventArgs e) => SetEvalAsync(e, otherPage))" />
-                            }
-
-                            <OtherPage otherPage=@otherPage FavSite="@FavSite" CanSetFavSite="@CanSetFavSite" FLangCode="@FLangCode" TLangCode="@TLangCode" OnDragStart="HandleDragStart" />
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrWhiteSpace(Info))
-                    {
-                        <a class="btn-light float-right" href="@Info"> to set favorite site go to @languageContainer.Keys["LangConfig"] </a>
-                    }
-                }
-            </div>
+            @if (opRes != null)
+            {
+                <FluentGrid Justify="JustifyContent.FlexStart" Spacing="3">
+                    <FluentGridItem xs="12" sm="12">
+                        <FluentSortableList Items="opRes" OnUpdate="@SortListAsync">
+                            <ItemTemplate>
+                                <OtherPage otherPage=@context FavSite="@FavSite" CanSetFavSite="@CanSetFavSite" FLangCode="@FLangCode" TLangCode="@TLangCode" />
+                            </ItemTemplate>
+                        </FluentSortableList>
+                    </FluentGridItem>
+                </FluentGrid>
+            }
         </div>
     </div>
-
 }

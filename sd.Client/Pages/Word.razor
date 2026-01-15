@@ -20,19 +20,10 @@
             </div>
         }
 
-        <div class="input-group">
-            <input @ref=ReferenceToInputControl type="search" class="form-control font-weight-bold" placeholder=@languageContainer.Keys["NewWord"]
-                   id="wordId"
-                   value="@WordDto.Title"
-                   @onkeyup="KeyupAsync"
-                   @oninput="@(async (ui) => { await WordChangedAsync(ui.Value.ToString()); })" />
-
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary bg-white text-dark" type="button" @onclick="OnCollapsed">
-                    <i class="float-right @(Collapsed ? "oi oi-collapse-down" : "oi oi-collapse-up")"></i>
-                </button>
-            </div>
-        </div>
+        <FluentTextField Id="wordId" Value=@WordDto.Title AriaLabel="No label" style="width: 100%;" @ref=wordTitleRef
+                         @onkeyup="KeyupAsync" @oninput="@(async (ui) => { await WordChangedAsync(ui.Value.ToString()); })">
+            <FluentIcon Value="@(new Icons.Regular.Size16.ArrowExpand())" Slot="end" Color="Color.Neutral" OnClick="OnCollapsed" />
+        </FluentTextField>
 
         @if (!Collapsed)
         {

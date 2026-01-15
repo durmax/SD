@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
+using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using sd.Client.Models;
@@ -10,9 +11,11 @@ using sd.Client.Services;
 using sd.Shared;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace sd.Client.Pages
 {
@@ -48,6 +51,7 @@ namespace sd.Client.Pages
         protected List<CommentModel> WordComments { get; set; }
         public BlazoredTextEditor QuillHtml { get; set; }
         protected string Explain { get; set; }
+        protected FluentTextField? wordTitleRef;
 
         protected string cssClassDelete;// = "d-none";
         protected string cssClassUpdate = "d-none";
@@ -435,6 +439,28 @@ namespace sd.Client.Pages
             }
         }
 
+        private TaskCompletionSource<bool> _explainReadyTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        private async Task LoadHtmlExplain()
+        {
+            if (Collapsed || string.IsNullOrEmpty(WordDto?.Explain))
+                return;
+
+            try
+            {
+                await QuillHtml.LoadHTMLContent(WordDto?.Explain);
+                Explain = await QuillHtml.GetText();
+
+                _explainReadyTcs.TrySetResult(true);
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Log.LogError(ex, "Failed to load Explain");
+                _explainReadyTcs.TrySetException(ex);
+            }
+        }
+
         protected override async Task OnInitializedAsync()
         {
             if (Guid.TryParse(WordId, out Guid result))
@@ -463,13 +489,12 @@ namespace sd.Client.Pages
             await GetFavLinkAsync();
         }
 
-        public ElementReference ReferenceToInputControl;
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             try
             {
                 if (Guid.TryParse(WordDto?.WordId, out Guid result) == false)
-                    await JsRuntime.InvokeVoidAsync("Utility.setFocus", ReferenceToInputControl);
+                    wordTitleRef!.FocusAsync();
             }
             catch (Exception ex)
             {
@@ -478,29 +503,6 @@ namespace sd.Client.Pages
             if (firstRender)
             {
                 await LoadHtmlExplain();
-            }
-        }
-
-        private TaskCompletionSource<bool> _explainReadyTcs =
-    new(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        private async Task LoadHtmlExplain()
-        {
-            if (Collapsed)
-                return;
-
-            try
-            {
-                await QuillHtml.LoadHTMLContent(WordDto?.Explain);
-                Explain = await QuillHtml.GetText();
-
-                _explainReadyTcs.TrySetResult(true);
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                Log.LogError(ex, "Failed to load Explain");
-                _explainReadyTcs.TrySetException(ex);
             }
         }
     }

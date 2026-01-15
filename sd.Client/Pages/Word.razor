@@ -20,10 +20,24 @@
             </div>
         }
 
-        <FluentTextField Id="wordId" Value=@WordDto.Title AriaLabel="No label" style="width: 100%;" @ref=wordTitleRef
-                         @onkeyup="KeyupAsync" @oninput="@(async (ui) => { await WordChangedAsync(ui.Value.ToString()); })">
-            <FluentIcon Value="@(new Icons.Regular.Size16.ArrowExpand())" Slot="end" Color="Color.Neutral" OnClick="OnCollapsed" />
-        </FluentTextField>
+        <FluentTextField Id="wordId"
+                 Value="@WordDto.Title"
+                 InputMode="InputMode.Search"
+                 AriaLabel="No label"
+                 style="width: 100%;"
+                 @ref="wordTitleRef"
+                 @onkeydown="KeydownAsync"
+                 @oninput="@(async (ui) => await WordChangedAsync(ui.Value?.ToString() ?? ""))">
+
+    <FluentButton slot="end"
+                  Appearance="Appearance.Stealth"
+                  aria-label="Expand"
+                  @onclick="OnCollapsed">
+        <FluentIcon Value="@(new Icons.Regular.Size16.ArrowExpand())" />
+    </FluentButton>
+
+</FluentTextField>
+
 
         @if (!Collapsed)
         {

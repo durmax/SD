@@ -17,6 +17,7 @@ namespace sd.Client.Pages
         [Inject] protected OtherPageService OtherPageService { get; set; }
         [Inject] protected ApiService ApiService { get; set; }
         [Parameter] public bool Collapsed { get; set; } = true;    // hide by default
+        [Parameter] public bool Sortable { get; set; } = false;
         [Parameter] public bool CanSetFavSite { get; set; }
         [Parameter] public string Word { get; set; }
         [Parameter] public string MaxHeight { get; set; }

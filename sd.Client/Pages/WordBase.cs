@@ -67,12 +67,20 @@ namespace sd.Client.Pages
             return Task.CompletedTask;
         }
 
-        protected async Task KeyupAsync(KeyboardEventArgs e)
+        protected async Task KeydownAsync(KeyboardEventArgs e)
         {
-            if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(FavSite) && WordDto != null)
-            {
-                string url = OtherPageService.BuildLink(FavSite, WordDto.Title, WordDto.WordLang, WordDto.ToLang);
+            // Mobile keyboards may send different keys for the "action" button
+            var key = e.Key?.ToLowerInvariant();
 
+            var isSubmit =
+                key == "enter" ||
+                key == "go" ||
+                key == "search" ||
+                key == "done";
+
+            if (isSubmit && !string.IsNullOrWhiteSpace(FavSite) && WordDto is not null)
+            {
+                var url = OtherPageService.BuildLink(FavSite, WordDto.Title, WordDto.WordLang, WordDto.ToLang);
                 await JsRuntime.InvokeVoidAsync("window.open", url, "popup");
             }
         }

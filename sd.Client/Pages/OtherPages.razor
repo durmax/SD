@@ -17,15 +17,11 @@ else
 
             @if (opRes != null)
             {
-                <FluentGrid Justify="JustifyContent.FlexStart" Spacing="3">
-                    <FluentGridItem xs="12" sm="12">
-                        <FluentSortableList Items="opRes" OnUpdate="@SortListAsync">
+                        <FluentSortableList Items="opRes" OnUpdate="@SortListAsync" Sort="@Sortable">
                             <ItemTemplate>
                                 <OtherPage otherPage=@context FavSite="@FavSite" CanSetFavSite="@CanSetFavSite" FLangCode="@FLangCode" TLangCode="@TLangCode" />
                             </ItemTemplate>
                         </FluentSortableList>
-                    </FluentGridItem>
-                </FluentGrid>
             }
         </div>
     </div>

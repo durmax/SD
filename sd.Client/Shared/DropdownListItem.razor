@@ -6,8 +6,6 @@
     [CascadingParameter(Name = "Dropdown")]
     public Dropdown<TItem> Dropdown { get; set; }
 
-    [Parameter]
-    public TItem Item { get; set; }
-    [Parameter]
-    public RenderFragment<TItem> ChildContent { get; set; }
+    [Parameter] public TItem Item { get; set; }
+    [Parameter] public RenderFragment<TItem> ChildContent { get; set; }
 }

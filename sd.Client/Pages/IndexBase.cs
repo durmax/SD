@@ -12,33 +12,18 @@ namespace sd.Client.Pages
 {
     public class IndexBase : ComponentBase
     {
-        [Inject]
-        NavigationManager NavigationManager { get; set; }
-        [Inject]
-        LocalStorageAccessor LocalStorageAccessor { get; set; }
-        [Inject]
-        public ILanguageContainerService LanguageContainer { set; get; }
-        [Inject]
-        public CurrentUserService CurrentUser { set; get; }
-        [Inject]
-        protected ApiService ApiService { get; set; }
-        [Inject]
-        public DefaultLangsService DefaultLangsService { get; set; }
-
-        [Inject]
-        public ILogger<IndexBase> Log { get; set; }
-
-        [Inject]
-        public WordDtosState WordDtosState { get; set; }
-
+        [Inject] NavigationManager NavigationManager { get; set; }
+        [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
+        [Inject] public ILanguageContainerService LanguageContainer { set; get; }
+        [Inject] public CurrentUserService CurrentUser { set; get; }
+        [Inject] protected ApiService ApiService { get; set; }
+        [Inject] public DefaultLangsService DefaultLangsService { get; set; }
+        [Inject] public ILogger<IndexBase> Log { get; set; }
+        [Inject] public WordDtosState WordDtosState { get; set; }
         protected bool CollapsedFriend { get; set; } = true;    // hide by default
-
         protected Dictionary<string, string> FriendRequestsDictionary = new();
-
         //protected List<WordDto> AppState.Model { get; set; } = new List<WordDto>();
         protected int NewWords { get; set; }
-
-
         protected bool loading;
         protected int currentPage = 1;
 

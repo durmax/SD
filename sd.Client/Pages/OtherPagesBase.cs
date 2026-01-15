@@ -12,37 +12,22 @@ namespace sd.Client.Pages
 {
     public class OtherPagesBase : ComponentBase
     {
-        [Inject]
-        LocalStorageAccessor LocalStorageAccessor { get; set; }
-        [Inject]
-        ILogger<OtherPagesBase> log { get; set; }
-        [Inject]
-        protected OtherPageService OtherPageService { get; set; }
-
-        [Inject]
-        protected ApiService ApiService { get; set; }
+        [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
+        [Inject] ILogger<OtherPagesBase> log { get; set; }
+        [Inject] protected OtherPageService OtherPageService { get; set; }
+        [Inject] protected ApiService ApiService { get; set; }
+        [Parameter] public bool Collapsed { get; set; } = true;    // hide by default
+        [Parameter] public bool CanSetFavSite { get; set; }
+        [Parameter] public string Word { get; set; }
+        [Parameter] public string MaxHeight { get; set; }
 
         protected List<OtherPageResModel> otherPageModels { get; set; }
         protected IEnumerable<OtherPageResModel> opRes { get; set; }
-
         protected string FavSite { get; private set; }
-
-        [Parameter]
-        public bool Collapsed { get; set; } = true;    // hide by default
-        [Parameter]
-        public bool CanSetFavSite { get; set; }
-
-        [Parameter]
-        public string Word { get; set; }
-
-        [Parameter]
-        public string MaxHeight { get; set; }
-
         private string fLang;
         private string tLang;
 
-        [Parameter]
-        public string FLangCode
+        [Parameter] public string FLangCode
         {
             get { return fLang; }
             set
@@ -54,8 +39,7 @@ namespace sd.Client.Pages
                 }
             }
         }
-        [Parameter]
-        public string TLangCode
+        [Parameter] public string TLangCode
         {
             get { return tLang; }
             set

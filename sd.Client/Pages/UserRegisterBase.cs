@@ -14,23 +14,17 @@ namespace sd.Client.Pages
         public UserModel userModel = new();
         public Dictionary<string, string> foundUsers;
 
-        [Inject]
-        public ILogger<UserRegisterBase> Log { get; set; }
-
-        [Inject]
-        public CurrentUserService CurrentUser { set; get; }
-        [Inject]
-        protected ApiService ApiService { get; set; }
-        [Parameter]
-        public string UserId { get; set; }
+        [Inject] public ILogger<UserRegisterBase> Log { get; set; }
+        [Inject] public CurrentUserService CurrentUser { set; get; }
+        [Inject] protected ApiService ApiService { get; set; }
+        [Parameter] public string UserId { get; set; }
         //protected string Email { get; set; }
 
         protected string CurrUserId { get; set; }
-        protected string CssDisplayNotCurrentUser = "d-none";
-
         protected string Info { get; set; }
         protected string InfoDisplayClass { get; set; } = "d-none";
         protected bool Registered { get; set; } = true;
+        protected string CssDisplayNotCurrentUser = "d-none";
 
         public async Task SaveUserData()
         {

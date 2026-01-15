@@ -15,28 +15,15 @@ namespace sd.Client.Pages
 {
     public class LanguagesBase : ComponentBase
     {
-        [Inject]
-        public ILogger<LanguagesBase> Log { get; set; }
-
-        [Inject]
-        LocalStorageAccessor LocalStorageAccessor { get; set; }
-        [Inject]
-        IJSRuntime JsRuntime { set; get; }
-
-        [Inject]
-        protected DefaultLangsService DefaultLangsService { get; set; }
-
-        [Inject]
-        KnownLangsService KnownLangsService { get; set; }
-
-        [Inject]
-        public ILanguageContainerService LanguageContainer { get; set; }
-
-        [Inject]
-        NavigationManager NavigationManager { get; set; }
-
+        [Inject] public ILogger<LanguagesBase> Log { get; set; }
+        [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
+        [Inject] IJSRuntime JsRuntime { set; get; }
+        [Inject] protected DefaultLangsService DefaultLangsService { get; set; }
+        [Inject] KnownLangsService KnownLangsService { get; set; }
+        [Inject] public ILanguageContainerService LanguageContainer { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+        [Parameter] public IEnumerable<LangCode> LangCodes { get; set; }
         protected List<string> KnownLangs { get; set; }
-
         private LangCode SFL;
         private LangCode STL;
         private LangCode LToAdd;
@@ -115,25 +102,24 @@ namespace sd.Client.Pages
             }
         }
 
-
-        [Parameter] public IEnumerable<LangCode> LangCodes { get; set; }
         protected async Task<IEnumerable<LangCode>> SearchLangs(string searchText)
         {
             return await Task.FromResult(LangCodes.Where(x => x.Value.ToLower().Contains(searchText.ToLower())).ToList());
         }
 
         protected IEnumerable<LangCode> SelectedItemsT { get; set; }  //new List<LangCode>();
-        public IEnumerable<LangCode> SelectedItems {
+        public IEnumerable<LangCode> SelectedItems
+        {
             get { return SelectedItemsT; }
             set
             {
 
-                    SelectedItemsT = value;
-                    KnownLangsService.LangsStr = string.Empty;
-                    foreach (var item in SelectedItemsT)
-                    {
-                        KnownLangsService.LangsStr += "," + item.Key;
-                    }
+                SelectedItemsT = value;
+                KnownLangsService.LangsStr = string.Empty;
+                foreach (var item in SelectedItemsT)
+                {
+                    KnownLangsService.LangsStr += "," + item.Key;
+                }
                 BuildKnownLangs();
             }
         }
@@ -154,7 +140,7 @@ namespace sd.Client.Pages
         protected async Task OnSearchAsync(OptionsSearchEventArgs<LangCode> e)
         {
             e.Items = LangCodes.Where(i => i.Value.Contains(e.Text, StringComparison.OrdinalIgnoreCase)).ToArray();
-        }     
+        }
 
         protected async Task ResetOPAsync()
         {
@@ -187,7 +173,7 @@ namespace sd.Client.Pages
             KnownLangs = new List<string>();
             KnownLangs = KnownLangsService.KnownLangs;
 
-           await SetLangsStr();
+            await SetLangsStr();
         }
 
         private async Task SetLangsStr()
@@ -199,7 +185,7 @@ namespace sd.Client.Pages
             {
                 KnownLangsService.LangsStr += "," + item;
             }
-           await LocalStorageAccessor.SetValueAsync("Langs", KnownLangsService.LangsStr);
+            await LocalStorageAccessor.SetValueAsync("Langs", KnownLangsService.LangsStr);
         }
 
         protected override async Task OnInitializedAsync()
@@ -234,9 +220,9 @@ namespace sd.Client.Pages
                 .ToList();
 
             var lang = await LocalStorageAccessor.GetValueAsync<string>("UILang");
-            UILang = LangCodesHelper.UILangs.FirstOrDefault(x => x.Value== lang).Key;
+            UILang = LangCodesHelper.UILangs.FirstOrDefault(x => x.Value == lang).Key;
 
-            SelectedItemsT  = LangCodes.Where(l => KnownLangs.Contains(l.Key)); //new List<LangCode>();
-    }
+            SelectedItemsT = LangCodes.Where(l => KnownLangs.Contains(l.Key)); //new List<LangCode>();
+        }
     }
 }

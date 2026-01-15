@@ -11,40 +11,21 @@ namespace sd.Client.Pages
 {
     public class CommentBase : ComponentBase
     {
-        [Inject]
-        IJSRuntime JsRuntime { set; get; }
-        [Inject]
-        NavigationManager NavigationManager { get; set; }
-        [Inject]
-        protected CurrentUserService CurrentUser { get; set; }    
-        [Inject]
-        protected ApiService ApiService { get; set; }
-        [Inject]
-        protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
-
-        [Parameter]
-        public string WordId { get; set; }
-        [Parameter]
-        public string WordUserId { get; set; }
-
-        [Parameter]
-        public string CurrentUserName { get; set; }
-
+        [Inject] IJSRuntime JsRuntime { set; get; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+        [Inject] protected CurrentUserService CurrentUser { get; set; }
+        [Inject] protected ApiService ApiService { get; set; }
+        [Inject] protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
+        [Parameter] public string WordId { get; set; }
+        [Parameter] public string WordUserId { get; set; }
+        [Parameter] public string CurrentUserName { get; set; }
+        [Parameter] public CommentModel CommentModel { get; set; }
+        [Parameter] public EventCallback<CommentModel> OnCommentDelete { get; set; }
         protected bool IsChanged { get; set; } = false;
-
-        [Parameter]
-        public CommentModel CommentModel { get; set; }
-
-        [Parameter]
-        public EventCallback<CommentModel> OnCommentDelete { get; set; }
-
         protected string note;
         protected bool loading;
-
         protected int Rows = 1;
-
         string _myText;
-
         protected string MyText
         {
             get => _myText;

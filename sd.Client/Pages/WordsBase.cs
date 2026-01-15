@@ -9,16 +9,13 @@ namespace sd.Client.Pages
 {
     public class WordsBase : ComponentBase
     {
-        [Inject]
-        protected ApiService ApiService { get; set; }
-        [Parameter]
-        public string UserId { get; set; }
+        [Inject] protected ApiService ApiService { get; set; }
+        [Parameter] public string UserId { get; set; }
         public string PageHeader { get; set; }
-
+        protected List<WordDto> Words { get; set; }
         //protected bool Collapsed { set; get; } = true;    // hide by default
         protected bool loading = true;
         protected int currentPage = 1;
-        protected List<WordDto> Words { get; set; }
 
         protected void NewWordHandler(WordDto wordDto)
         {

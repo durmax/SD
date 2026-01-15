@@ -8,22 +8,15 @@ namespace sd.Client.Pages
 {
     public class FriendsBase : ComponentBase
     {
+        [Inject] public CurrentUserService CurrentUser { set; get; }
+        [Inject] protected ApiService ApiService { get; set; }
         public IEnumerable<UserRelationshipsWithOneUserDto> FoundUsers { set; get; }
-
         protected int? FriendsCount { set; get; }
-
         protected Dictionary<string, string> FriendsDictionary;
-
-        [Inject]
-        public CurrentUserService CurrentUser { set; get; }
-        [Inject]
-        protected ApiService ApiService { get; set; }
-
-        protected bool SendFriendReqWait = false;
-
         protected string Info { get; set; }
         protected string InfoDisplayClass { get; set; } = "d-none";
         protected string SearchDisplayClass { get; set; } = "d-none";
+        protected bool SendFriendReqWait = false;
 
         public async Task SearchUser(string SearchText)
         {

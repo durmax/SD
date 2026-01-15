@@ -18,75 +18,44 @@ namespace sd.Client.Pages
 {
     public class WordBase : ComponentBase
     {
-        [Inject]
-        ILogger<WordBase> Log { get; set; }
+        [Inject] ILogger<WordBase> Log { get; set; }
+        [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
+        [Inject] IJSRuntime JsRuntime { set; get; }
+        [Inject] OtherPageService OtherPageService { set; get; }
+        [Inject] protected CurrentUserService CurrentUser { set; get; }
+        [Inject] protected ApiService ApiService { get; set; }
+        [Inject] protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
+        [Inject] NavigationManager NavigationManager { get; set; }
+        [Inject] public DefaultLangsService DefaultLangsService { get; set; }
+        [Inject] KnownLangsService KnownLangsService { get; set; }
 
-        [Inject]
-        LocalStorageAccessor LocalStorageAccessor { get; set; }
-        [Inject]
-        IJSRuntime JsRuntime { set; get; }
-        [Inject]
-        OtherPageService OtherPageService { set; get; }
-        [Inject]
-        protected CurrentUserService CurrentUser { set; get; }
-        [Inject]
-        protected ApiService ApiService { get; set; }
-        [Inject]
-        protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
-        [Inject]
-        NavigationManager NavigationManager { get; set; }
+        [Parameter] public bool Collapsed { set; get; } //= true;    // hide by default
+        [Parameter] public string WordId { get; set; }
+        [Parameter] public WordDto WordDto { get; set; }
+        [Parameter] public string UserId { get; set; }
+        [Parameter] public EventCallback<WordDto> OnWordSave { get; set; }
+        [Parameter] public EventCallback<WordDto> OnWordFound { get; set; }
+        [Parameter] public EventCallback<WordDto> OnWordDelete { get; set; }
 
-        [Inject]
-        KnownLangsService KnownLangsService { get; set; }
-        [Parameter]
-        public bool Collapsed { set; get; } //= true;    // hide by default
         public bool CollapsedComm { set; get; } = true;
         public bool CollapsedLike { set; get; } = true;
-
-        [Parameter]
-        public string WordId { get; set; }
-
-        [Inject]
-        public DefaultLangsService DefaultLangsService { get; set; }
-
-        [Parameter]
-        public WordDto WordDto { get; set; }
-
-        protected List<string> KnownLangs { get; set; }
-
-        protected string cssClassDelete;// = "d-none";
-
-        [Parameter]
-        public string UserId { get; set; }
-        [Parameter]
-        public EventCallback<WordDto> OnWordSave { get; set; }
-        [Parameter]
-        public EventCallback<WordDto> OnWordFound { get; set; }
-
-        [Parameter]
-        public EventCallback<WordDto> OnWordDelete { get; set; }
-
-        protected string cssClassUpdate = "d-none";
-
-        protected bool loading;
-        protected string note;
         public int? LikesCount { get; set; }
         protected bool CULiked { get; set; } = false;
-        protected IEnumerable<UserRelationshipsWithOneUserDto> likedUsers;
-
+        protected List<string> KnownLangs { get; set; }
         protected IEnumerable<string> SameWords { get; set; }
         protected IEnumerable<string> LanguageToolWords { get; set; }
         private string FavSite { get; set; }
-
         protected List<CommentModel> WordComments { get; set; }
-
-        protected WordDto foundWordDtoToUpdate;
-
-        protected int Rows = 2;
-
         public BlazoredTextEditor QuillHtml { get; set; }
-
         protected string Explain { get; set; }
+
+        protected string cssClassDelete;// = "d-none";
+        protected string cssClassUpdate = "d-none";
+        protected bool loading;
+        protected string note;
+        protected IEnumerable<UserRelationshipsWithOneUserDto> likedUsers;
+        protected WordDto foundWordDtoToUpdate;
+        protected int Rows = 2;
 
         protected Task OnSpeakingChanged(bool speaking)
         {

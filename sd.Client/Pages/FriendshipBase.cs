@@ -10,24 +10,15 @@ namespace sd.Client.Pages
 {
     public class FriendshipBase : ComponentBase
     {
+        [Inject] protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
+        [Inject] NavigationManager NavigationManager { set; get; }
+        [Inject] protected CurrentUserService CurrentUser { set; get; }
+        [Inject] protected ApiService ApiService { get; set; }
+        [Parameter] public string FriendId { get; set; }
+        [Parameter] public string FriendName { get; set; }
+        [Parameter] public Relation Relationship { get; set; }
         protected bool waitBool = false;
 
-        [Parameter]
-        public string FriendId { get; set; }
-        [Parameter]
-        public string FriendName { get; set; }
-
-        [Parameter]
-        public Relation Relationship { get; set; }
-        [Inject]
-        protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
-        [Inject]
-        NavigationManager NavigationManager { set; get; }
-
-        [Inject]
-        protected CurrentUserService CurrentUser { set; get; }
-        [Inject]
-        protected ApiService ApiService { get; set; }
         public async Task SendFriendRequest(string ToUserId)
         {
             waitBool = true;

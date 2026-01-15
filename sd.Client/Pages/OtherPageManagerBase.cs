@@ -12,23 +12,13 @@ namespace sd.Client.Pages
 {
     public class OtherPageManagerBase : ComponentBase
     {
+        
+        [Inject] public ILogger<OtherPageManagerBase> Log { get; set; }
+        [Inject] protected ApiService ApiService { get; set; }
+        [Inject] protected OtherPageService OtherPageService { get; set; }
+        [Parameter] public string Id { get; set; }
+        [Parameter] public string Host { get; set; }
         protected OtherPageModel otherPageModel { get; set; } = new();
-
-        [Inject]
-        public ILogger<OtherPageManagerBase> Log { get; set; }
-
-        [Inject]
-        protected ApiService ApiService { get; set; }
-
-        [Inject]
-        protected OtherPageService OtherPageService { get; set; }
-
-        //protected LangCodeService LangCodeService { get; set; }
-
-        [Parameter]
-        public string Id { get; set; }
-        [Parameter]
-        public string Host { get; set; }
         protected bool Registered { get; set; } = true;
         protected string Info { get; set; }
         protected string ExampleURL { get; set; }

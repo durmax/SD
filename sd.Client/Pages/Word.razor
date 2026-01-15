@@ -21,22 +21,19 @@
         }
 
         <FluentTextField Id="wordId"
-                 Value="@WordDto.Title"
-                 InputMode="InputMode.Search"
-                 AriaLabel="No label"
-                 style="width: 100%;"
-                 @ref="wordTitleRef"
-                 @onkeydown="KeydownAsync"
-                 @oninput="@(async (ui) => await WordChangedAsync(ui.Value?.ToString() ?? ""))">
+                         Value="@WordDto.Title"
+                         InputMode="InputMode.Search"
+                         style="width: 100%;"
+                         @ref="wordTitleRef"
+                         @onkeydown="KeydownAsync"
+                         @oninput="@(async (ui) => await WordChangedAsync(ui.Value?.ToString() ?? ""))">
 
-    <FluentButton slot="end"
-                  Appearance="Appearance.Stealth"
-                  aria-label="Expand"
-                  @onclick="OnCollapsed">
-        <FluentIcon Value="@(new Icons.Regular.Size16.ArrowExpand())" />
-    </FluentButton>
-
-</FluentTextField>
+            <FluentButton slot="end"
+                          Appearance="Appearance.Stealth"
+                          @onclick="OnCollapsed"
+                          IconEnd="@(new Icons.Regular.Size16.ArrowExpand())">
+            </FluentButton>
+        </FluentTextField>
 
 
         @if (!Collapsed)

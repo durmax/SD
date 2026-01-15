@@ -17,11 +17,18 @@ else
 
             @if (opRes != null)
             {
-                        <FluentSortableList Items="opRes" OnUpdate="@SortListAsync" Sort="@Sortable">
-                            <ItemTemplate>
-                                <OtherPage otherPage=@context FavSite="@FavSite" CanSetFavSite="@CanSetFavSite" FLangCode="@FLangCode" TLangCode="@TLangCode" />
-                            </ItemTemplate>
-                        </FluentSortableList>
+                <FluentSortableList Items="opRes" OnUpdate="@SortListAsync" Sort="@Sortable" Handle="true">
+                    <ItemTemplate>
+                        @* Show handle only when sortable *@
+                        @if (Sortable)
+                        {
+                            <span class="sortable-grab" title="Drag to reorder">≡</span>
+                        }
+                        <div class="sortable-item-content">
+                        <OtherPage otherPage=@context FavSite="@FavSite" CanSetFavSite="@CanSetFavSite" FLangCode="@FLangCode" TLangCode="@TLangCode" />
+                        </div>
+                    </ItemTemplate>
+                </FluentSortableList>
             }
         </div>
     </div>

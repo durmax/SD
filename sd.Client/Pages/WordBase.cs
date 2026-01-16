@@ -11,11 +11,9 @@ using sd.Client.Services;
 using sd.Shared;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace sd.Client.Pages
 {
@@ -440,7 +438,7 @@ namespace sd.Client.Pages
             string tl = WordDto?.ToLang ?? DefaultLangsService.DefaultToLang;
             try
             {
-                opRes = await OtherPageService.GetOpRes(fl, tl, string.Empty);
+                opRes = await OtherPageService.GetOpRes(fl, tl, WordDto.Title);
                 FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{fl}{tl}");
             }
             catch (Exception ex)

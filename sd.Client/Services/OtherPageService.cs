@@ -20,6 +20,31 @@ public class OtherPageService
         _apiService = ApiService;
         localStorageAccessor = LocalStorageAccessor;
     }
+    public async Task<List<OtherPageResModel>> GetOpRes(string FLangCode, string TLangCode, string word)
+    {
+        var key = $"{FLangCode}{TLangCode}";
+
+        string opStr = await localStorageAccessor.GetValueAsync<string>(key);
+
+        List<OtherPageResModel> raw;
+        if (!string.IsNullOrWhiteSpace(opStr) && opStr != "null")
+        {
+            raw = JsonConvert.DeserializeObject<List<OtherPageResModel>>(opStr) ?? new List<OtherPageResModel>();
+        }
+        else
+        {
+            raw = await _apiService.GetAsync<List<OtherPageResModel>>($"api/OtherPage/{FLangCode}/{TLangCode}")
+                  ?? new List<OtherPageResModel>();
+
+            if (FLangCode != TLangCode)
+            {
+                var serialized = JsonConvert.SerializeObject(raw);
+                await localStorageAccessor.SetValueAsync(key, serialized);
+            }
+        }
+
+        return MakeLinks(raw, word, FLangCode, TLangCode) ?? new List<OtherPageResModel>();
+    }
 
     public List<OtherPageResModel> MakeLinks(List<OtherPageResModel> OtherPageModels, 
         string word, string fromLang, string toLang)
@@ -49,31 +74,5 @@ public class OtherPageService
         _reqLinkP.TLangCode = toLang;
 
         return _uriService.UriBuild(_reqLinkP);
-    }
-
-    public async Task<List<OtherPageResModel>> GetOpRes(string FLangCode, string TLangCode, string word)
-    {
-        var key = $"{FLangCode}{TLangCode}";
-
-        string opStr = await localStorageAccessor.GetValueAsync<string>(key);
-
-        List<OtherPageResModel> raw;
-        if (!string.IsNullOrWhiteSpace(opStr) && opStr != "null")
-        {
-            raw = JsonConvert.DeserializeObject<List<OtherPageResModel>>(opStr) ?? new List<OtherPageResModel>();
-        }
-        else
-        {
-            raw = await _apiService.GetAsync<List<OtherPageResModel>>($"api/OtherPage/{FLangCode}/{TLangCode}")
-                  ?? new List<OtherPageResModel>();
-
-            if (FLangCode != TLangCode)
-            {
-                var serialized = JsonConvert.SerializeObject(raw);
-                await localStorageAccessor.SetValueAsync(key, serialized);
-            }
-        }
-
-        return MakeLinks(raw, word, FLangCode, TLangCode) ?? new List<OtherPageResModel>();
     }
 }

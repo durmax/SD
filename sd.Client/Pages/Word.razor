@@ -31,7 +31,7 @@
             <FluentButton slot="end"
                           Appearance="Appearance.Stealth"
                           @onclick="OnCollapsed"
-                          IconEnd="@(new Icons.Regular.Size16.ArrowExpand())">
+                          IconEnd="@(new Icons.Regular.Size16.ArrowBidirectionalUpDown())">
             </FluentButton>
         </FluentTextField>
 
@@ -215,7 +215,7 @@
                             <button type="button" style="float:left" class="btn btn-light bg-transparent" @onclick="async () => { await LikeAsync(); }">
                                 @if (CULiked)
                                 {
-                                    <FluentIcon Value="@(new Icons.Filled.Size24.ThumbLike())" />
+                                    <FluentIcon Value="@(new Icons.Filled.Size16.ThumbLike())" />
                                 }
                                 else
                                 {
@@ -229,13 +229,14 @@
                                 </button>
                             }
                         </div>
+
                         <div class="col-3">
-                            <div type="button" style="float:right" class="col-2 btn btn-light bg-transparent" @onclick="OnCollapsed">
+                            <button type="button" style="float:right" class="btn btn-light bg-transparent" @onclick="OnCollapsed">
                                 @if (!Collapsed)
                                 {
-                                    <i class="oi oi-collapse-up"></i>
+                                    <FluentIcon Value="@(new Icons.Regular.Size16.ArrowBidirectionalUpDown())" />
                                 }
-                            </div>
+                            </button>
                         </div>
 
                         <div class="col-3">

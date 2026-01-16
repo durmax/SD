@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Newtonsoft.Json;
 using sd.Client.Helpers;
 using sd.Client.Models;
 using sd.Client.Services;
+using sd.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,11 +24,16 @@ namespace sd.Client.Pages
         [Inject] KnownLangsService KnownLangsService { get; set; }
         [Inject] public ILanguageContainerService LanguageContainer { get; set; }
         [Inject] NavigationManager NavigationManager { get; set; }
+        [Inject] protected OtherPageService OtherPageService { get; set; }
+        [Inject] ILogger<LanguagesBase> log { get; set; }
         [Parameter] public IEnumerable<LangCode> LangCodes { get; set; }
+
+        protected List<OtherPageResModel> opRes { get; set; }
         protected List<string> KnownLangs { get; set; }
         private LangCode SFL;
         private LangCode STL;
         private LangCode LToAdd;
+        protected string FavSite { get; private set; }
 
         protected string Fl { get; set; }
         protected string Tl { get; set; }
@@ -84,6 +91,34 @@ namespace sd.Client.Pages
                     BuildKnownLangs();
                 }
             }
+        }
+
+        protected async Task SortListAsync(FluentSortableListEventArgs args)
+        {
+            if (args is null || args.OldIndex == args.NewIndex)
+            {
+                return;
+            }
+
+            var oldIndex = args.OldIndex;
+            var newIndex = args.NewIndex;
+
+            var itemToMove = opRes[oldIndex];
+            opRes.RemoveAt(oldIndex);
+
+            if (newIndex < opRes.Count)
+            {
+                opRes[newIndex].Eval = newIndex;
+                opRes.Insert(newIndex, itemToMove);
+            }
+            else
+            {
+                opRes[oldIndex].Eval = oldIndex;
+                opRes.Add(itemToMove);
+            }
+            var serializedOtherPageModels = JsonConvert.SerializeObject(opRes);
+
+            await LocalStorageAccessor.SetValueAsync($"{Fl}{Tl}", serializedOtherPageModels);
         }
 
         protected void SetUILang()
@@ -188,12 +223,27 @@ namespace sd.Client.Pages
             await LocalStorageAccessor.SetValueAsync("Langs", KnownLangsService.LangsStr);
         }
 
+        protected override async Task OnParametersSetAsync()
+        {
+            try
+            {
+                opRes = await OtherPageService.GetOpRes(Fl, Tl, string.Empty); // ToDo Cash opRes
+                FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{Fl}{Tl}");
+            }
+            catch (Exception ex)
+            {
+                log.LogError($"LocalStorageAccessor.GetValueAsync<string>(fav-{Fl}{Tl}) " + ex.Message);
+                //throw;
+            }
+        }
+
         protected override async Task OnInitializedAsync()
         {
             await DefaultLangsService.SetDefLangsAsync();
 
             Fl = DefaultLangsService.DefaultWordLang;
             Tl = DefaultLangsService.DefaultToLang;
+            FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{Fl}{Tl}");
 
             SelectedFL = new LangCode
             {

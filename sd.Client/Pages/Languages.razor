@@ -94,7 +94,17 @@
                 </select>
             </div>
 
-            <OtherPages Sortable="@true" FLangCode="@Fl" TLangCode="@Tl" Collapsed="false" CanSetFavSite="true"></OtherPages>
+            @if (opRes != null)
+            {
+                <FluentSortableList Items="opRes" OnUpdate="@SortListAsync" Sort="@true" Handle="true">
+                    <ItemTemplate>
+                        <span class="sortable-grab" title="Drag to reorder">≡</span>
+                        <div class="sortable-item-content">
+                            <OtherPage otherPage=@context FavSite="@FavSite" CanSetFavSite="@true" FLangCode="@Fl" TLangCode="@Tl" />
+                        </div>
+                    </ItemTemplate>
+                </FluentSortableList>
+            }
         </div>
 
         @*     <AuthorizeView>

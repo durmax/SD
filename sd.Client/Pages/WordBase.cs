@@ -47,12 +47,13 @@ namespace sd.Client.Pages
         protected List<string> KnownLangs { get; set; }
         protected IEnumerable<string> SameWords { get; set; }
         protected IEnumerable<string> LanguageToolWords { get; set; }
-        private string FavSite { get; set; }
+        protected string FavSite { get; set; }
         protected List<CommentModel> WordComments { get; set; }
         public BlazoredTextEditor QuillHtml { get; set; }
         protected string Explain { get; set; }
-        protected FluentTextField? wordTitleRef;
+        protected List<OtherPageResModel> opRes { get; set; }
 
+        protected FluentTextField? wordTitleRef;
         protected string cssClassDelete;// = "d-none";
         protected string cssClassUpdate = "d-none";
         protected bool loading;
@@ -439,6 +440,7 @@ namespace sd.Client.Pages
             string tl = WordDto?.ToLang ?? DefaultLangsService.DefaultToLang;
             try
             {
+                opRes = await OtherPageService.GetOpRes(fl, tl, string.Empty);
                 FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{fl}{tl}");
             }
             catch (Exception ex)

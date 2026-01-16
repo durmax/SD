@@ -30,13 +30,5 @@ namespace sd.Client.Pages
                 Info = "/Languages";
             }
         }
-
-        protected async Task DragStart(DragEventArgs e)
-        {
-            Info = otherPage.Eval.ToString();
-            e.Button = otherPage.Eval;
-            
-            await OnDragStart.InvokeAsync(e);
-        }
     }
 }

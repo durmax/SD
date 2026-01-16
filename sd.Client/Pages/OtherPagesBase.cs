@@ -15,7 +15,6 @@ namespace sd.Client.Pages
         [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
         [Inject] ILogger<OtherPagesBase> log { get; set; }
         [Inject] protected OtherPageService OtherPageService { get; set; }
-        [Inject] protected ApiService ApiService { get; set; }
         [Parameter] public bool Collapsed { get; set; } = true;    // hide by default
         [Parameter] public bool Sortable { get; set; } = false;
         [Parameter] public bool CanSetFavSite { get; set; }
@@ -57,7 +56,8 @@ namespace sd.Client.Pages
             await LocalStorageAccessor.SetValueAsync($"{FLangCode}{TLangCode}", serializedOtherPageModels);
         }
 
-        [Parameter] public string FLangCode
+        [Parameter]
+        public string FLangCode
         {
             get { return fLang; }
             set
@@ -69,7 +69,8 @@ namespace sd.Client.Pages
                 }
             }
         }
-        [Parameter] public string TLangCode
+        [Parameter]
+        public string TLangCode
         {
             get { return tLang; }
             set
@@ -82,44 +83,13 @@ namespace sd.Client.Pages
             }
         }
 
-        protected async Task GetOpRes()
-        {
-            if (Collapsed || opRes != null)
-                return;
-
-            var key = $"{FLangCode}{TLangCode}";
-
-            string opStr = await LocalStorageAccessor.GetValueAsync<string>(key);
-
-            List<OtherPageResModel> raw;
-            if (!string.IsNullOrWhiteSpace(opStr) && opStr != "null")
-            {
-                raw = JsonConvert.DeserializeObject<List<OtherPageResModel>>(opStr) ?? new List<OtherPageResModel>();
-            }
-            else
-            {
-                raw = await ApiService.GetAsync<List<OtherPageResModel>>($"api/OtherPage/{FLangCode}/{TLangCode}")
-                      ?? new List<OtherPageResModel>();
-
-                if (FLangCode != TLangCode)
-                {
-                    var serialized = JsonConvert.SerializeObject(raw);
-                    await LocalStorageAccessor.SetValueAsync(key, serialized);
-                }
-            }
-
-            opRes = OtherPageService.MakeLinks(raw, Word, FLangCode, TLangCode) ?? new List<OtherPageResModel>();
-            langChanged = false;
-        }
-
         protected override async Task OnParametersSetAsync()
         {
             if (!Collapsed)
             {
-                opRes = null;
-                await GetOpRes();
                 try
                 {
+                    opRes = await OtherPageService.GetOpRes(FLangCode, TLangCode, Word); // ToDo Cash opRes
                     FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{FLangCode}{TLangCode}");
                 }
                 catch (Exception ex)

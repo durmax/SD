@@ -499,17 +499,9 @@ namespace sd.Client.Pages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            try
-            {
-                if (Guid.TryParse(WordDto?.WordId, out Guid result) == false)
-                    wordTitleRef!.FocusAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.LogError(ex.Message);
-            }
             if (firstRender)
             {
+                if (Guid.TryParse(WordDto?.WordId, out Guid result) == false) wordTitleRef!.FocusAsync();
                 await LoadHtmlExplain();
             }
         }

@@ -109,10 +109,10 @@ namespace sd.Client.Pages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender && CurrentUser.IsAuthenticated)
-            {
-                FriendRequestsDictionary = await ApiService.GetAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequests");
-            }
+            //if (firstRender && CurrentUser.IsAuthenticated)
+            //{
+            //    FriendRequestsDictionary = await ApiService.GetAsync<Dictionary<string, string>>($"api/Relationship/GetFriendRequests");
+            //}
         }
     }
 }

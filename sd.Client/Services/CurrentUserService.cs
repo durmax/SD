@@ -14,6 +14,8 @@ namespace sd.Client.Services
         private readonly ILogger<CurrentUserService> _log;
         private readonly TaskCompletionSource _initializationTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
         private bool _disposed;
+        private Exception? _initException;
+        private bool _initialized;
 
         public bool IsAuthenticated { get; private set; }
         public HttpClient HttpClient { get; private set; } = default!;
@@ -42,11 +44,15 @@ namespace sd.Client.Services
         {
             try
             {
-                await ProcessAuthStateAsync(_authenticationStateProvider.GetAuthenticationStateAsync());
+                await ProcessAuthStateAsync(_authenticationStateProvider.GetAuthenticationStateAsync())
+                        .ConfigureAwait(false);
+                _initialized = true;
+                _initializationTcs.TrySetResult();
             }
-            finally
+            catch (Exception ex)
             {
-                _initializationTcs.TrySetResult(); // let GetClientAsync() continue
+                _initException = ex;
+                _initializationTcs.TrySetException(ex);
             }
         }
 
@@ -57,7 +63,6 @@ namespace sd.Client.Services
             // Dispose the previous instance to avoid leaks
             var old = HttpClient;
             HttpClient = _httpClientFactory.CreateClient(name);
-            old?.Dispose();
         }
 
         private async void HandleAuthenticationStateChanged(Task<AuthenticationState> task)
@@ -67,9 +72,9 @@ namespace sd.Client.Services
                 await ProcessAuthStateAsync(task); // delegate to Task-returning method
             }
             catch (ObjectDisposedException) { /* ignore during dispose */ }
-            catch (Exception)
+            catch (Exception ex)
             {
-                _log.LogError("Error processing authentication state change");
+                _log.LogError(ex, "Error processing authentication state change");
             }
         }
 
@@ -79,7 +84,7 @@ namespace sd.Client.Services
             var authState = await task.ConfigureAwait(false);
             var newIsAuthenticated = authState.User.Identity?.IsAuthenticated == true;
 
-            var shouldSwap = HttpClient == null || newIsAuthenticated != IsAuthenticated;
+            var shouldSwap = !_initialized || newIsAuthenticated != IsAuthenticated;
 
             IsAuthenticated = newIsAuthenticated;
 
@@ -95,9 +100,9 @@ namespace sd.Client.Services
         /// </summary>
         public async ValueTask<HttpClient> GetClientAsync(CancellationToken cancellationToken = default)
         {
-            // If initialization already finished, this is a fast path.
-            if (!_initializationTcs.Task.IsCompleted)
-                await _initializationTcs.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
+            await _initializationTcs.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+            if (_initException is not null) throw _initException;
 
             return HttpClient;
         }
@@ -109,7 +114,6 @@ namespace sd.Client.Services
             _disposed = true;
 
             _authenticationStateProvider.AuthenticationStateChanged -= HandleAuthenticationStateChanged;
-            HttpClient?.Dispose();
         }
     }
 }

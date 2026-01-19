@@ -14,7 +14,6 @@ namespace sd.Client.Pages
         [Parameter] public bool CanSetFavSite { get; set; }
         [Parameter] public string FLangCode { get; set; }
         [Parameter] public string TLangCode { get; set; }
-        [Parameter] public EventCallback<DragEventArgs> OnDragStart { get; set; }
 
         public string Info { get; private set; }
 

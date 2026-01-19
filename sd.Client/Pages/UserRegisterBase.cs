@@ -17,8 +17,6 @@ namespace sd.Client.Pages
         [Inject] public ILogger<UserRegisterBase> Log { get; set; }
         [Inject] public CurrentUserService CurrentUser { set; get; }
         [Inject] protected ApiService ApiService { get; set; }
-        [Parameter] public string UserId { get; set; }
-        //protected string Email { get; set; }
 
         protected string CurrUserId { get; set; }
         protected string Info { get; set; }

@@ -15,7 +15,6 @@ namespace sd.Client.Pages
         [Inject] NavigationManager NavigationManager { get; set; }
         [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
         [Inject] public ILanguageContainerService LanguageContainer { set; get; }
-        [Inject] public CurrentUserService CurrentUser { set; get; }
         [Inject] protected ApiService ApiService { get; set; }
         [Inject] public DefaultLangsService DefaultLangsService { get; set; }
         [Inject] public ILogger<IndexBase> Log { get; set; }

@@ -33,7 +33,6 @@ namespace sd.Client.Pages
         [Parameter] public bool Collapsed { set; get; } //= true;    // hide by default
         [Parameter] public string WordId { get; set; }
         [Parameter] public WordDto WordDto { get; set; }
-        [Parameter] public string UserId { get; set; }
         [Parameter] public EventCallback<WordDto> OnWordSave { get; set; }
         [Parameter] public EventCallback<WordDto> OnWordFound { get; set; }
         [Parameter] public EventCallback<WordDto> OnWordDelete { get; set; }

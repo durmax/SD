@@ -18,7 +18,6 @@ namespace sd.Client.Pages
         [Inject] protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
         [Parameter] public string WordId { get; set; }
         [Parameter] public string WordUserId { get; set; }
-        [Parameter] public string CurrentUserName { get; set; }
         [Parameter] public CommentModel CommentModel { get; set; }
         [Parameter] public EventCallback<CommentModel> OnCommentDelete { get; set; }
         protected bool IsChanged { get; set; } = false;

@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace sd.Client.Pages
+namespace sd.Client.Features.Language.Pages
 {
     public class LanguagesBase : ComponentBase
     {

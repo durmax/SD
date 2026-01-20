@@ -6,14 +6,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using sd.Client;
+using sd.Client.Features.Vocab.Api;
+using sd.Client.Features.Vocab.State;
 using sd.Client.LoggerProvider;
 using sd.Client.Models;
 using sd.Client.Services;
 using System;
 using System.Reflection;
-
-using sd.Client.Features.Vocab.Api;
-using sd.Client.Features.Vocab.State;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("app");

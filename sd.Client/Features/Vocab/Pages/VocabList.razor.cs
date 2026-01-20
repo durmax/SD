@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using sd.Client.Features.Vocab.State;
+using sd.Client.Helpers;
 using sd.Client.Services;
 using sd.Shared;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ public class VocabListBase : ComponentBase
 
         Store.EnsureDraftRow();
 
-        var uiLang = await LocalStorageAccessor.GetValueAsync<string>("UILang");
+        var uiLang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
         if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
         {
             try

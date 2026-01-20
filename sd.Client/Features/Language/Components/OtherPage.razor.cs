@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using sd.Client.Features.Language.Domain;
+using sd.Client.Helpers;
 using sd.Client.Services;
 using sd.Shared;
 using System.Threading.Tasks;
@@ -21,8 +23,8 @@ public class OtherPageBase : ComponentBase
     {
         if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
         {
-            await LocalStorageAccessor.SetValueAsync($"fav-{FLangCode}{TLangCode}", otherPage.Pattern);
-            FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{FLangCode}{TLangCode}");
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.FavoriteSite(FLangCode,TLangCode), otherPage.Pattern);
+            FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(FLangCode, TLangCode));
         }
         else
         {

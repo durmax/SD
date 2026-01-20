@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
+using sd.Client.Features.Language.Domain;
+using sd.Client.Helpers;
 using sd.Client.Models;
 using sd.Client.Services;
 using sd.Shared;
@@ -278,7 +280,7 @@ namespace sd.Client.Features.Vocab.Components;
 
         private async Task BuildKnownLangsAsync()
         {
-            KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>("Langs");
+            KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.KnownLangs);
             KnownLangsService.AddKnownLang(WordDto.WordLang);
             KnownLangsService.AddKnownLang(WordDto.ToLang);
 
@@ -437,7 +439,7 @@ namespace sd.Client.Features.Vocab.Components;
             try
             {
                 opRes = await OtherPageService.GetOpRes(fl, tl, WordDto.Title);
-                FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{fl}{tl}");
+                FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(fl, tl));
             }
             catch (Exception ex)
             {

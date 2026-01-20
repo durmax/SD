@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using sd.Client.Helpers;
+using System.Threading.Tasks;
 
 namespace sd.Client.Services
 {
@@ -14,10 +15,10 @@ namespace sd.Client.Services
         }
         public async Task SetDefLangsAsync()
         {
-            string fl = await LocalStorageAccessor.GetValueAsync<string>("FLang");
+            string fl = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FromLang);
             DefaultWordLang = (string.IsNullOrEmpty(fl) || fl == "null") ? "en" : fl;
 
-            string tl = await LocalStorageAccessor.GetValueAsync<string>("TLang");
+            string tl = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.ToLang);
             DefaultToLang = (string.IsNullOrEmpty(tl) || tl == "null") ? "de" : tl;
         }
     }

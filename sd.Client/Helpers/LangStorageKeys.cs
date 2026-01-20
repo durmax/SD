@@ -1,6 +1,6 @@
-﻿namespace sd.Client.Features.Language.Domain;
+﻿namespace sd.Client.Helpers;
 
-public static class LanguageStorageKeys
+public static class LangStorageKeys
 {
     public const string FromLang = "FLang";   // mother
     public const string ToLang = "TLang";     // learn

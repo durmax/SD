@@ -34,7 +34,7 @@
 	  <ProjectReference Include="..\sd.Shared\sd.Shared.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Features\Language\Services\" />
+	  <Folder Include="Features\Language\State\" />
 	  <Folder Include="Features\Vocab\Contracts\" />
 	  <Folder Include="Features\Vocab\Mapping\" />
 	</ItemGroup>

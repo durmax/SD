@@ -1,6 +1,7 @@
 ﻿using AKSoftware.Localization.MultiLanguages;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
+using sd.Client.Helpers;
 using sd.Client.Models;
 using sd.Client.Services;
 using sd.Shared;
@@ -91,7 +92,7 @@ namespace sd.Client.Pages
             if (WordDtosState.Model.Count == 0)
                 WordDtosState.Model.Insert(0, new WordDto { WordId = NewWords.ToString(), WordLang = DefaultLangsService.DefaultWordLang, ToLang = DefaultLangsService.DefaultToLang, ShareWith = ShareWith.Public });
 
-            string uiLang = await LocalStorageAccessor.GetValueAsync<string>("UILang");
+            string uiLang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
 
             if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
             {

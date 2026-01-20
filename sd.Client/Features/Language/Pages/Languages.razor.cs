@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
+using sd.Client.Features.Language.Domain;
 using sd.Client.Helpers;
 using sd.Client.Models;
 using sd.Client.Services;
@@ -30,6 +31,8 @@ namespace sd.Client.Features.Language.Pages
 
         protected List<DictionaryProviderDto> opRes { get; set; }
         protected List<string> KnownLangs { get; set; }
+        protected string UILang;
+
         private LangCode SFL;
         private LangCode STL;
         private LangCode LToAdd;
@@ -51,7 +54,7 @@ namespace sd.Client.Features.Language.Pages
                 if (value != null)
                 {
                     SFL = value;
-                    LocalStorageAccessor.SetValueAsync("FLang", SelectedFL.Key);
+                    LocalStorageAccessor.SetValueAsync(LangStorageKeys.FromLang, SelectedFL.Key);
                     KnownLangsService.AddKnownLang(SelectedFL.Key);
                     DefaultLangsService.DefaultWordLang = SelectedFL.Key;
                     LangToAdd = value;
@@ -59,8 +62,6 @@ namespace sd.Client.Features.Language.Pages
                 }
             }
         }
-
-        protected string UILang;
 
         protected LangCode SelectedTL
         {
@@ -70,7 +71,7 @@ namespace sd.Client.Features.Language.Pages
                 if (value != null)
                 {
                     STL = value;
-                    LocalStorageAccessor.SetValueAsync("TLang", SelectedTL.Key);
+                    LocalStorageAccessor.SetValueAsync(LangStorageKeys.ToLang, SelectedTL.Key);
                     KnownLangsService.AddKnownLang(SelectedTL.Key);
                     DefaultLangsService.DefaultToLang = SelectedTL.Key;
                     LangToAdd = value;
@@ -79,7 +80,7 @@ namespace sd.Client.Features.Language.Pages
             }
         }
 
-        protected LangCode LangToAdd
+        private LangCode LangToAdd
         {
             get { return LToAdd; }
             set
@@ -118,7 +119,7 @@ namespace sd.Client.Features.Language.Pages
             }
             var serializedOtherPageModels = JsonConvert.SerializeObject(opRes);
 
-            await LocalStorageAccessor.SetValueAsync($"{Fl}{Tl}", serializedOtherPageModels);
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(Fl,Tl), serializedOtherPageModels);
         }
 
         protected void SetUILang()
@@ -126,20 +127,15 @@ namespace sd.Client.Features.Language.Pages
             try
             {
                 LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(LangCodesHelper.UILangs[UILang]));
-                LocalStorageAccessor.SetValueAsync("UILang", LangCodesHelper.UILangs[UILang]);
+                LocalStorageAccessor.SetValueAsync(LangStorageKeys.UiLang, LangCodesHelper.UILangs[UILang]);
             }
             catch
             {
                 LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
-                LocalStorageAccessor.SetValueAsync("UILang", "en-US");
+                LocalStorageAccessor.SetValueAsync(LangStorageKeys.UiLang, "en-US");
 
                 Log.LogError($"SetUILang: {UILang} not found, set to en-US");
             }
-        }
-
-        protected async Task<IEnumerable<LangCode>> SearchLangs(string searchText)
-        {
-            return await Task.FromResult(LangCodes.Where(x => x.Value.ToLower().Contains(searchText.ToLower())).ToList());
         }
 
         protected IEnumerable<LangCode> SelectedItemsT { get; set; }  //new List<LangCode>();
@@ -182,7 +178,7 @@ namespace sd.Client.Features.Language.Pages
             bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"You try to reset {Fl}-{Tl}, are you sure?");
             if (confirmed)
             {
-                await LocalStorageAccessor.RemoveAsync($"{Fl}{Tl}");
+                await LocalStorageAccessor.RemoveAsync(LangStorageKeys.DictionaryOrder(Fl,Tl));
                 SetLangsStr();
                 NavigationManager.NavigateTo(NavigationManager.Uri, true);
             }
@@ -220,7 +216,7 @@ namespace sd.Client.Features.Language.Pages
             {
                 KnownLangsService.LangsStr += "," + item;
             }
-            await LocalStorageAccessor.SetValueAsync("Langs", KnownLangsService.LangsStr);
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.KnownLangs, KnownLangsService.LangsStr);
         }
 
         protected override async Task OnParametersSetAsync()
@@ -228,11 +224,11 @@ namespace sd.Client.Features.Language.Pages
             try
             {
                 opRes = await OtherPageService.GetOpRes(Fl, Tl, string.Empty); // ToDo Cash opRes
-                FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{Fl}{Tl}");
+                FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(Fl, Tl));
             }
             catch (Exception ex)
             {
-                log.LogError($"LocalStorageAccessor.GetValueAsync<string>(fav-{Fl}{Tl}) " + ex.Message);
+                log.LogError($"LocalStorageAccessor.GetValueAsync<string>({LangStorageKeys.FavoriteSite(Fl, Tl)}) " + ex.Message);
                 //throw;
             }
         }
@@ -243,7 +239,7 @@ namespace sd.Client.Features.Language.Pages
 
             Fl = DefaultLangsService.DefaultWordLang;
             Tl = DefaultLangsService.DefaultToLang;
-            FavSite = await LocalStorageAccessor.GetValueAsync<string>($"fav-{Fl}{Tl}");
+            FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(Fl, Tl));
 
             SelectedFL = new LangCode
             {
@@ -257,7 +253,7 @@ namespace sd.Client.Features.Language.Pages
                 Value = Helpers.LangCodesHelper.GetLanguage(Tl)
             };
 
-            KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>("Langs");
+            KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.KnownLangs);
 
             await BuildKnownLangs();
 
@@ -269,7 +265,7 @@ namespace sd.Client.Features.Language.Pages
                 })
                 .ToList();
 
-            var lang = await LocalStorageAccessor.GetValueAsync<string>("UILang");
+            var lang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
             UILang = LangCodesHelper.UILangs.FirstOrDefault(x => x.Value == lang).Key;
 
             SelectedItemsT = LangCodes.Where(l => KnownLangs.Contains(l.Key)); //new List<LangCode>();

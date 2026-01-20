@@ -15,7 +15,7 @@ namespace sd.Client.Pages
         
         [Inject] public ILogger<OtherPageManagerBase> Log { get; set; }
         [Inject] protected ApiService ApiService { get; set; }
-        [Inject] protected OtherPageService OtherPageService { get; set; }
+        [Inject] protected DictionaryLinksService OtherPageService { get; set; }
         [Parameter] public string Id { get; set; }
         [Parameter] public string Host { get; set; }
         protected OtherPageModel otherPageModel { get; set; } = new();

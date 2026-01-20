@@ -22,7 +22,7 @@ namespace sd.Api.Controllers
         }
 
         [HttpGet("{wordId}")]
-        public async Task<ActionResult<OtherPageResModel>> GetWordComments(string wordId)
+        public async Task<ActionResult<DictionaryProviderDto>> GetWordComments(string wordId)
         {
             return Ok(await _wordService.GetWordComments(wordId));
         }

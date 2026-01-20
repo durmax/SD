@@ -9,7 +9,7 @@ namespace sd.Client.Pages
     public class OtherPageBase : ComponentBase
     {
         [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
-        [Parameter] public OtherPageResModel otherPage { get; set; }        
+        [Parameter] public DictionaryProviderDto otherPage { get; set; }        
         [Parameter] public string FavSite { get; set; }
         [Parameter] public bool CanSetFavSite { get; set; }
         [Parameter] public string FLangCode { get; set; }
@@ -17,7 +17,7 @@ namespace sd.Client.Pages
 
         public string Info { get; private set; }
 
-        protected async Task Favorite(OtherPageResModel otherPage)
+        protected async Task Favorite(DictionaryProviderDto otherPage)
         {
             if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
             {

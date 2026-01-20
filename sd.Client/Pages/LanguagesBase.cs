@@ -24,11 +24,11 @@ namespace sd.Client.Pages
         [Inject] KnownLangsService KnownLangsService { get; set; }
         [Inject] public ILanguageContainerService LanguageContainer { get; set; }
         [Inject] NavigationManager NavigationManager { get; set; }
-        [Inject] protected OtherPageService OtherPageService { get; set; }
+        [Inject] protected DictionaryLinksService OtherPageService { get; set; }
         [Inject] ILogger<LanguagesBase> log { get; set; }
         [Parameter] public IEnumerable<LangCode> LangCodes { get; set; }
 
-        protected List<OtherPageResModel> opRes { get; set; }
+        protected List<DictionaryProviderDto> opRes { get; set; }
         protected List<string> KnownLangs { get; set; }
         private LangCode SFL;
         private LangCode STL;

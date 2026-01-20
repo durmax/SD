@@ -12,6 +12,9 @@ using sd.Client.Services;
 using System;
 using System.Reflection;
 
+using sd.Client.Features.Vocab.Api;
+using sd.Client.Features.Vocab.State;
+
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("app");
 
@@ -59,10 +62,13 @@ builder.Services.AddScoped<DefaultLangsService>();
 builder.Services.AddScoped<UriService>();
 builder.Services.AddScoped<LinkModel>();
 builder.Services.AddScoped<LinkParam>();
-builder.Services.AddScoped<OtherPageService>();
+builder.Services.AddScoped<DictionaryLinksService>();
 
 builder.Services.AddSingleton<WordDtosState>();
 
 builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
+
+builder.Services.AddScoped<VocabApiClient>();
+builder.Services.AddScoped<VocabStore>();
 
 await builder.Build().RunAsync();

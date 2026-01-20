@@ -15,14 +15,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace sd.Client.Pages
-{
+namespace sd.Client.Features.Vocab.Components;
     public class WordBase : ComponentBase
     {
         [Inject] ILogger<WordBase> Log { get; set; }
         [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
         [Inject] IJSRuntime JsRuntime { set; get; }
-        [Inject] OtherPageService OtherPageService { set; get; }
+        [Inject] DictionaryLinksService OtherPageService { set; get; }
         [Inject] protected CurrentUserService CurrentUser { set; get; }
         [Inject] protected ApiService ApiService { get; set; }
         [Inject] protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
@@ -48,7 +47,7 @@ namespace sd.Client.Pages
         protected List<CommentModel> WordComments { get; set; }
         public BlazoredTextEditor QuillHtml { get; set; }
         protected string Explain { get; set; }
-        protected List<OtherPageResModel> opRes { get; set; }
+        protected List<DictionaryProviderDto> opRes { get; set; }
 
         protected FluentTextField? wordTitleRef;
         protected string cssClassDelete;// = "d-none";
@@ -482,7 +481,7 @@ namespace sd.Client.Pages
                 }
             }
 
-            if (WordDto != null && !Guid.TryParse(WordDto.WordId, out Guid res))
+            if (WordDto != null && Guid.TryParse(WordDto.WordId, out Guid res))
             {
                 CULiked = WordDto.IsILiked;
                 LikesCount = WordDto.LikesCount;
@@ -505,4 +504,3 @@ namespace sd.Client.Pages
             }
         }
     }
-}

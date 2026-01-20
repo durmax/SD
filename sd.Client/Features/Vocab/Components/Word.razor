@@ -1,5 +1,6 @@
 ﻿@page "/Word/{WordId}"
 @inject ILanguageContainerService languageContainer
+@using sd.Client.SharedUI.DictionaryLinks
 @using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
 
 @inherits WordBase
@@ -201,7 +202,8 @@
                     <div class="card m-0 border-left-0 border-right-0 overflow-auto" style="max-height:200px">
                     @foreach (var op in opRes)
                     {
-                        <OtherPage otherPage="@op" FavSite="@FavSite" CanSetFavSite="@false" FLangCode="@WordDto.WordLang" TLangCode="@WordDto.ToLang" />
+                        @* <OtherPage otherPage="@op" FavSite="@FavSite" CanSetFavSite="@false" FLangCode="@WordDto.WordLang" TLangCode="@WordDto.ToLang" /> *@
+                            <OtherPage Href="@op.Link" Text="@op.Host" />
                     }
                     </div>
                 }

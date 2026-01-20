@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/old"
 @inherits IndexBase
 
 @if (FriendRequestsDictionary.Count > 0)
@@ -7,18 +7,6 @@
         Friend Requests <span class="badge badge-light">@FriendRequestsDictionary.Count</span>
         <span class="sr-only">Friend Requests</span>
     </button>
-
-@*     <div class="card @(CollapsedFriend ? "collapse" : "")">
-        <div class="card-body">
-            <div class="container">
-                @foreach (var item in FriendRequestsDictionary)
-                {
-                    <Friendship FriendId="@item.Key" FriendName="@item.Value"></Friendship>
-                }
-
-            </div>
-        </div>
-    </div> *@
 }
 
 <FluentIcon OnClick="@AddNewWord" Value="@(new Icons.Regular.Size24.FormNew())" />

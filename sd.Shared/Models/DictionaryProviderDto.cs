@@ -1,7 +1,7 @@
 ﻿
 namespace sd.Shared
 {
-    public class OtherPageResModel
+    public class DictionaryProviderDto
     {
         public string Type { get; set; }
         public string Host { get; set; }

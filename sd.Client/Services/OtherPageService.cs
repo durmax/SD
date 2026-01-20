@@ -6,35 +6,35 @@ using System.Threading.Tasks;
 
 namespace sd.Client.Services;
 
-public class OtherPageService
+public class DictionaryLinksService
 {
     private readonly UriService _uriService;
     private readonly LinkParam _reqLinkP;
     private readonly ApiService _apiService;
     private readonly LocalStorageAccessor localStorageAccessor;
 
-    public OtherPageService(UriService uriService, LinkParam reqLinkP, ApiService ApiService, LocalStorageAccessor LocalStorageAccessor)
+    public DictionaryLinksService(UriService uriService, LinkParam reqLinkP, ApiService ApiService, LocalStorageAccessor LocalStorageAccessor)
     {
         _uriService = uriService;
         _reqLinkP = reqLinkP;
         _apiService = ApiService;
         localStorageAccessor = LocalStorageAccessor;
     }
-    public async Task<List<OtherPageResModel>> GetOpRes(string FLangCode, string TLangCode, string word)
+    public async Task<List<DictionaryProviderDto>> GetOpRes(string FLangCode, string TLangCode, string word)
     {
         var key = $"{FLangCode}{TLangCode}";
 
         string opStr = await localStorageAccessor.GetValueAsync<string>(key);
 
-        List<OtherPageResModel> raw;
+        List<DictionaryProviderDto> raw;
         if (!string.IsNullOrWhiteSpace(opStr) && opStr != "null")
         {
-            raw = JsonConvert.DeserializeObject<List<OtherPageResModel>>(opStr) ?? new List<OtherPageResModel>();
+            raw = JsonConvert.DeserializeObject<List<DictionaryProviderDto>>(opStr) ?? new List<DictionaryProviderDto>();
         }
         else
         {
-            raw = await _apiService.GetAsync<List<OtherPageResModel>>($"api/OtherPage/{FLangCode}/{TLangCode}")
-                  ?? new List<OtherPageResModel>();
+            raw = await _apiService.GetAsync<List<DictionaryProviderDto>>($"api/OtherPage/{FLangCode}/{TLangCode}")
+                  ?? new List<DictionaryProviderDto>();
 
             if (FLangCode != TLangCode)
             {
@@ -43,13 +43,13 @@ public class OtherPageService
             }
         }
 
-        return MakeLinks(raw, word, FLangCode, TLangCode) ?? new List<OtherPageResModel>();
+        return MakeLinks(raw, word, FLangCode, TLangCode) ?? new List<DictionaryProviderDto>();
     }
 
-    public List<OtherPageResModel> MakeLinks(List<OtherPageResModel> OtherPageModels, 
+    public List<DictionaryProviderDto> MakeLinks(List<DictionaryProviderDto> OtherPageModels, 
         string word, string fromLang, string toLang)
     {
-        List<OtherPageResModel> res = new();
+        List<DictionaryProviderDto> res = new();
         if (OtherPageModels != null)
         {
             foreach (var otherPage in OtherPageModels)
@@ -57,7 +57,7 @@ public class OtherPageService
                 if (!string.IsNullOrEmpty(otherPage.Pattern))
                 {
                     string newLink = BuildLink(otherPage.Pattern, word, fromLang, toLang);
-                    OtherPageResModel otherPageResModel = otherPage;
+                    DictionaryProviderDto otherPageResModel = otherPage;
                     otherPageResModel.Link = newLink;
                     res.Add(otherPageResModel);
                 }

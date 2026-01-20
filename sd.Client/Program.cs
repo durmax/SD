@@ -58,7 +58,6 @@ builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<KnownLangsService>();
 builder.Services.AddScoped<DefaultLangsService>();
 
-builder.Services.AddScoped<UriService>();
 builder.Services.AddScoped<LinkModel>();
 builder.Services.AddScoped<LinkParam>();
 builder.Services.AddScoped<DictionaryLinksService>();

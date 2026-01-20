@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using sd.Client.Helpers;
 using sd.Client.Models;
 using sd.Shared;
 using System.Collections.Generic;
@@ -8,15 +9,13 @@ namespace sd.Client.Services;
 
 public class DictionaryLinksService
 {
-    private readonly UriService _uriService;
-    private readonly LinkParam _reqLinkP;
+    private readonly LinkModel _linkModel;
     private readonly ApiService _apiService;
     private readonly LocalStorageAccessor localStorageAccessor;
 
-    public DictionaryLinksService(UriService uriService, LinkParam reqLinkP, ApiService ApiService, LocalStorageAccessor LocalStorageAccessor)
+    public DictionaryLinksService(LinkModel linkModel, ApiService ApiService, LocalStorageAccessor LocalStorageAccessor)
     {
-        _uriService = uriService;
-        _reqLinkP = reqLinkP;
+        _linkModel = linkModel;
         _apiService = ApiService;
         localStorageAccessor = LocalStorageAccessor;
     }
@@ -68,11 +67,58 @@ public class DictionaryLinksService
 
     public string BuildLink(string pattern, string word, string fromLang, string toLang)
     {
-        _reqLinkP.Pattern = pattern;
-        _reqLinkP.Word = word;
-        _reqLinkP.FLangCode = fromLang;
-        _reqLinkP.TLangCode = toLang;
+        string link = "http://";
+        string[] patternParts = pattern.Split(':');
 
-        return _uriService.UriBuild(_reqLinkP);
+        List<string> properties = new() { "FLangCode", "TLangCode", "FLangName", "TLangName", "Word" };
+
+        _linkModel.FLangName = LangCodesHelper.GetLanguage(fromLang); // Get LangName from dictionery names
+        _linkModel.TLangName = LangCodesHelper.GetLanguage(toLang); // GetLangName
+
+        _linkModel.Word = word;
+
+        IrregularLink(pattern);
+
+        foreach (var part in patternParts)
+        {
+            if (properties.Contains(part))
+            {
+                link += (string)_linkModel[part];
+            }
+            else
+            {
+                link += part;
+            }
+        }
+        return link;
+    }
+
+    private void IrregularLink(string pattern)
+    {
+        if (_linkModel.FLangCode == "ar" || _linkModel.TLangCode == "ar")
+        {
+            if (pattern.Contains("arabdict.com"))
+            {
+                if (_linkModel.FLangCode == "ar")
+                {
+                    _linkModel.FLangName = LangCodesHelper.GetLanguage(_linkModel.TLangCode);
+                    _linkModel.TLangName = "arabic";
+                }
+                if (_linkModel.FLangCode == "de" || _linkModel.TLangCode == "de")
+                {
+                    _linkModel.FLangName = "deutsch";
+                    _linkModel.TLangName = "arabisch";
+                }
+            }
+
+            if (pattern.Contains("almaany.com"))
+            {
+                if (_linkModel.FLangCode != "ar")
+                {
+                    _linkModel.TLangCode = _linkModel.FLangCode;
+                }
+
+            }
+        }
     }
 }

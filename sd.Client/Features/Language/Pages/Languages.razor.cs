@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
-using sd.Client.Features.Language.Domain;
 using sd.Client.Helpers;
 using sd.Client.Models;
 using sd.Client.Services;
@@ -18,15 +17,14 @@ namespace sd.Client.Features.Language.Pages
 {
     public class LanguagesBase : ComponentBase
     {
-        [Inject] public ILogger<LanguagesBase> Log { get; set; }
+        [Inject] ILogger<LanguagesBase> Log { get; set; }
         [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
         [Inject] IJSRuntime JsRuntime { set; get; }
         [Inject] protected DefaultLangsService DefaultLangsService { get; set; }
         [Inject] KnownLangsService KnownLangsService { get; set; }
-        [Inject] public ILanguageContainerService LanguageContainer { get; set; }
+        [Inject] protected ILanguageContainerService LanguageContainer { get; set; }
         [Inject] NavigationManager NavigationManager { get; set; }
         [Inject] protected DictionaryLinksService OtherPageService { get; set; }
-        [Inject] ILogger<LanguagesBase> log { get; set; }
         [Parameter] public IEnumerable<LangCode> LangCodes { get; set; }
 
         protected List<DictionaryProviderDto> opRes { get; set; }
@@ -40,7 +38,7 @@ namespace sd.Client.Features.Language.Pages
 
         protected string Fl { get; set; }
         protected string Tl { get; set; }
-        //protected string TlT { get; set; }
+
         protected void Reverse()
         {
             (Tl, Fl) = (Fl, Tl);
@@ -228,7 +226,7 @@ namespace sd.Client.Features.Language.Pages
             }
             catch (Exception ex)
             {
-                log.LogError($"LocalStorageAccessor.GetValueAsync<string>({LangStorageKeys.FavoriteSite(Fl, Tl)}) " + ex.Message);
+                Log.LogError($"LocalStorageAccessor.GetValueAsync<string>({LangStorageKeys.FavoriteSite(Fl, Tl)}) " + ex.Message);
                 //throw;
             }
         }

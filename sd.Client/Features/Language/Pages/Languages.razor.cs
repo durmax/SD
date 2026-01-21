@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
+using sd.Client.Features.Language.State;
 using sd.Client.Helpers;
 using sd.Client.Models;
 using sd.Client.Services;
@@ -21,10 +22,10 @@ namespace sd.Client.Features.Language.Pages
         [Inject] protected LocalStorageAccessor LocalStorageAccessor { get; set; } = default!;
         [Inject] protected IJSRuntime JsRuntime { get; set; } = default!;
         [Inject] protected DefaultLangsService DefaultLangsService { get; set; } = default!;
-        [Inject] protected KnownLangsService KnownLangsService { get; set; } = default!;
         [Inject] protected ILanguageContainerService LanguageContainer { get; set; } = default!;
         [Inject] protected NavigationManager NavigationManager { get; set; } = default!;
         [Inject] protected DictionaryLinksService OtherPageService { get; set; } = default!;
+        [Inject] protected IKnownLanguagesStore KnownLanguagesStore { get; set; } = default!;
 
         // All languages list (dropdown source)
         [Parameter] public IEnumerable<LangCode>? LangCodes { get; set; }
@@ -43,15 +44,6 @@ namespace sd.Client.Features.Language.Pages
         // Mother / Second language selection
         protected LangCode? SelectedFL { get; set; } // Second language (learn)
         protected LangCode? SelectedTL { get; set; } // Mother language
-
-        // Selected items for known langs picker
-        private List<LangCode> _selectedItems = new();
-        protected List<LangCode> SelectedItemsT
-        {
-            get => _selectedItems;
-            set => _selectedItems = value ?? new List<LangCode>();
-        }
-
 
         private bool _selectedItemsInitialized;
 
@@ -72,10 +64,9 @@ namespace sd.Client.Features.Language.Pages
                 SelectedItems = options?.ToList() ?? new List<LangCode>();
 
                 KnownLangs = SelectedItems.Select(x => x.Key).Distinct().ToList();
-                EnsureKnownLang(Fl);
-                EnsureKnownLang(Tl);
+                KnownLanguagesStore.EnsureContains(KnownLangs, Fl, Tl);
 
-                await PersistKnownLangsAsync();
+                await KnownLanguagesStore.SaveAsync(KnownLangs);
             }
             finally
             {
@@ -112,14 +103,13 @@ namespace sd.Client.Features.Language.Pages
             SelectedFL = new LangCode { Key = Fl, Value = LangCodesHelper.GetLanguage(Fl) };
             SelectedTL = new LangCode { Key = Tl, Value = LangCodesHelper.GetLanguage(Tl) };
 
-            // Load known langs from storage
-            KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.KnownLangs);
-            KnownLangs = ParseLangsStr(KnownLangsService.LangsStr);
+            // Load known langs from storage (via store)
+            KnownLangs = await KnownLanguagesStore.GetAsync();
 
-            // Ensure current FL/TL are included
-            EnsureKnownLang(Fl);
-            EnsureKnownLang(Tl);
-            await PersistKnownLangsAsync();
+            // Ensure current FL/TL are included + persist back
+            KnownLanguagesStore.EnsureContains(KnownLangs, Fl, Tl);
+            await KnownLanguagesStore.SaveAsync(KnownLangs);
+
 
             UiLangItems = LangCodesHelper.UILangs
                 .Select(x => new LangCode { Key = x.Key, Value = x.Key })
@@ -140,12 +130,6 @@ namespace sd.Client.Features.Language.Pages
                     (LangCodes ?? Array.Empty<LangCode>())
                         .Where(l => KnownLangs.Contains(l.Key))
                 );
-                //                SelectedItems.AddRange(new[]
-                //{
-                //    new LangCode { Key="en", Value="English" },
-                //    new LangCode { Key="de", Value="German" }
-                //});
-
 
                 _suppressSelectedItemsChanged = false;
                 _selectedItemsInitialized = true;
@@ -190,10 +174,13 @@ namespace sd.Client.Features.Language.Pages
             Tl = selectedOption.Key;
 
             DefaultLangsService.DefaultToLang = Tl;
-            EnsureKnownLang(Tl);
+
+            // ensure TL is in known langs + persist
+            KnownLanguagesStore.EnsureContains(KnownLangs, Tl);
 
             await LocalStorageAccessor.SetValueAsync(LangStorageKeys.ToLang, Tl);
-            await PersistKnownLangsAsync();
+            await KnownLanguagesStore.SaveAsync(KnownLangs);
+
             await ReloadProvidersAsync();
         }
 
@@ -206,18 +193,19 @@ namespace sd.Client.Features.Language.Pages
             Fl = selectedOption.Key;
 
             DefaultLangsService.DefaultWordLang = Fl;
-            EnsureKnownLang(Fl);
+
+            // ensure FL is in known langs + persist
+            KnownLanguagesStore.EnsureContains(KnownLangs, Fl);
 
             await LocalStorageAccessor.SetValueAsync(LangStorageKeys.FromLang, Fl);
-            await PersistKnownLangsAsync();
+            await KnownLanguagesStore.SaveAsync(KnownLangs);
+
             await ReloadProvidersAsync();
         }
 
         protected async Task OnMotherlanguageKeyChanged(string? key)
         {
             if (string.IsNullOrWhiteSpace(key)) return;
-
-            Tl = key;
 
             key = LangCodesHelper.GetLanguageCode(key);
             // keep Tl in sync for UI immediately
@@ -231,8 +219,6 @@ namespace sd.Client.Features.Language.Pages
         protected async Task OnSecondlanguageKeyChanged(string? key)
         {
             if (string.IsNullOrWhiteSpace(key)) return;
-
-            Fl = key;
 
             key = LangCodesHelper.GetLanguageCode(key);
 
@@ -269,42 +255,6 @@ namespace sd.Client.Features.Language.Pages
                 Log.LogError(ex, $"SetUILangAsync: '{UILang}' not found, set to {fallbackCulture}");
             }
         }
-
-        // --------------------------
-        // Known languages
-        // --------------------------
-
-        private void EnsureKnownLang(string? code)
-        {
-            if (string.IsNullOrWhiteSpace(code)) return;
-            if (!KnownLangs.Contains(code))
-                KnownLangs.Add(code);
-        }
-
-        private async Task PersistKnownLangsAsync()
-        {
-            KnownLangs = KnownLangs.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-
-            // Store as ",en,de,ar" (keeps your existing format)
-            KnownLangsService.LangsStr = string.Join("", KnownLangs.Select(x => "," + x));
-            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.KnownLangs, KnownLangsService.LangsStr);
-        }
-
-        private static List<string> ParseLangsStr(string? langsStr)
-        {
-            if (string.IsNullOrWhiteSpace(langsStr) || langsStr == "null")
-                return new List<string>();
-
-            // Existing format begins with commas
-            return langsStr
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Distinct()
-                .ToList();
-        }
-
-        // --------------------------
-        // DictionaryLinks sorting
-        // --------------------------
 
         protected async Task SortListAsync(FluentSortableListEventArgs args)
         {

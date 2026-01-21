@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using sd.Client;
+using sd.Client.Features.Language.State;
 using sd.Client.Features.Vocab.Api;
 using sd.Client.Features.Vocab.State;
 using sd.Client.LoggerProvider;
@@ -68,5 +69,8 @@ builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
 
 builder.Services.AddScoped<VocabApiClient>();
 builder.Services.AddScoped<VocabStore>();
+
+builder.Services.AddScoped<IKnownLanguagesStore, KnownLanguagesStore>();
+
 
 await builder.Build().RunAsync();

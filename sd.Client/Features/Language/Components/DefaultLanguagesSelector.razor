@@ -1,0 +1,59 @@
+﻿@using Microsoft.FluentUI.AspNetCore.Components
+@using sd.Client.Models
+
+<FluentGridItem xs="6">
+    <FluentCombobox TOption="LangCode"
+                    Items="@ItemsSafe"
+                    Width="70%"
+                    Label="@MotherLanguageLabel"
+                    OptionText="@(i => i.Value)"
+                    OptionValue="@(i => i.Key)"
+                    Value="@Tl"
+                    ValueChanged="OnTlValueChanged"
+                    Autocomplete="ComboboxAutocomplete.Inline" />
+</FluentGridItem>
+
+<FluentGridItem xs="6">
+    <FluentCombobox TOption="LangCode"
+                    Items="@ItemsSafe"
+                    Width="70%"
+                    Label="@SecondLanguageLabel"
+                    OptionText="@(i => i.Value)"
+                    OptionValue="@(i => i.Key)"
+                    Value="@Fl"
+                    ValueChanged="OnFlValueChanged"
+                    Autocomplete="ComboboxAutocomplete.Inline" />
+</FluentGridItem>
+
+@code {
+    // Source for combobox items (you currently use SelectedItems)
+    [Parameter] public IEnumerable<LangCode>? Items { get; set; }
+
+    // Current values
+    [Parameter] public string? Tl { get; set; }
+    [Parameter] public string? Fl { get; set; }
+
+    // Localized labels from the page
+    [Parameter] public string MotherLanguageLabel { get; set; } = "Mother language";
+    [Parameter] public string SecondLanguageLabel { get; set; } = "Second language";
+
+    // Events (your page already has OnMotherlanguageKeyChanged / OnSecondlanguageKeyChanged)
+    [Parameter] public EventCallback<string?> TlChanged { get; set; }
+    [Parameter] public EventCallback<string?> FlChanged { get; set; }
+
+    private IEnumerable<LangCode> ItemsSafe => Items ?? Array.Empty<LangCode>();
+
+    private async Task OnTlValueChanged(string? key)
+    {
+        Tl = key;
+        if (TlChanged.HasDelegate)
+            await TlChanged.InvokeAsync(key);
+    }
+
+    private async Task OnFlValueChanged(string? key)
+    {
+        Fl = key;
+        if (FlChanged.HasDelegate)
+            await FlChanged.InvokeAsync(key);
+    }
+}

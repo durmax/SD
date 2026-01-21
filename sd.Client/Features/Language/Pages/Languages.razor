@@ -36,30 +36,13 @@
                                 ValueChanged="OnUILangChanged"
                                 Autocomplete="ComboboxAutocomplete.Inline" />
             </FluentGridItem>
-            <FluentGridItem xs="6">
-                <FluentCombobox TOption="LangCode"
-                                Items="@SelectedItems"
-                                Width="70%"
-                                Label="@LanguageContainer.Keys["Motherlanguage"]"
-                                OptionText="@(i => i.Value)"
-                                OptionValue="@(i => i.Key)"
-                                Value="@Tl"
-                                ValueChanged="OnMotherlanguageKeyChanged"
-                                Autocomplete="ComboboxAutocomplete.Inline" />
-            </FluentGridItem>
-
-            <FluentGridItem xs="6">
-                <FluentCombobox TOption="LangCode"
-                                Items="@SelectedItems"
-                                Width="70%"
-                                Label="@LanguageContainer.Keys["Secondlanguage"]"
-                                OptionText="@(i => i.Value)"
-                                OptionValue="@(i => i.Key)"
-                                Value="@Fl"
-                                ValueChanged="OnSecondlanguageKeyChanged"
-                                Autocomplete="ComboboxAutocomplete.Inline" />
-            </FluentGridItem>
-
+            <DefaultLanguagesSelector Items="SelectedItems"
+                                      Tl="@Tl"
+                                      Fl="@Fl"
+                                      TlChanged="OnMotherlanguageKeyChanged"
+                                      FlChanged="OnSecondlanguageKeyChanged"
+                                      MotherLanguageLabel="@LanguageContainer.Keys["Motherlanguage"]"
+                                      SecondLanguageLabel="@LanguageContainer.Keys["Secondlanguage"]" />
         } 
     </FluentGrid>
 

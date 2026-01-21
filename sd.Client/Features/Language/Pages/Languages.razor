@@ -15,7 +15,7 @@
                               SelectedOptions="SelectedItems"
                               SelectedOptionsChanged="OnSelectedOptionsChanged" />
 
-         @if (SelectedItems != null && SelectedTL != null)
+         @if (SelectedItems != null)
         {
             <UiLanguageSelector Items="UiLangItems"
                                 Value="@UILang"
@@ -25,8 +25,8 @@
             <DefaultLanguagesSelector Items="SelectedItems"
                                       Tl="@Tl"
                                       Fl="@Fl"
-                                      TlChanged="OnMotherlanguageKeyChanged"
-                                      FlChanged="OnSecondlanguageKeyChanged"
+                                      TlChanged="OnMotherlanguageChanged"
+                                      FlChanged="OnSecondlanguageChanged"
                                       Reverse="Reverse"
                                       MotherLanguageLabel="@LanguageContainer.Keys["Motherlanguage"]"
                                       SecondLanguageLabel="@LanguageContainer.Keys["Secondlanguage"]" />

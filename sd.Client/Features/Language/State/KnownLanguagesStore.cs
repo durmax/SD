@@ -30,7 +30,7 @@ public sealed class KnownLanguagesStore : IKnownLanguagesStore
     {
         var normalized = Normalize(codes);
 
-        // Store as ",en,de,ar" (same as your current PersistKnownLangsAsync) :contentReference[oaicite:1]{index=1}
+        // Store as ",en,de,ar"
         var langsStr = string.Join("", normalized.Select(x => "," + x));
 
         _knownLangsService.LangsStr = langsStr;
@@ -41,7 +41,6 @@ public sealed class KnownLanguagesStore : IKnownLanguagesStore
     {
         if (string.IsNullOrWhiteSpace(code)) return false;
 
-        // keep same semantics as your EnsureKnownLang() :contentReference[oaicite:2]{index=2}
         if (!codes.Contains(code))
         {
             codes.Add(code);
@@ -66,7 +65,6 @@ public sealed class KnownLanguagesStore : IKnownLanguagesStore
 
     private static List<string> ParseLangsStr(string? langsStr)
     {
-        // mirrors your ParseLangsStr() :contentReference[oaicite:3]{index=3}
         if (string.IsNullOrWhiteSpace(langsStr) || langsStr == "null")
             return new List<string>();
 

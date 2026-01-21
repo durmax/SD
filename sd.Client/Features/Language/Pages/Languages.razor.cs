@@ -28,7 +28,7 @@ namespace sd.Client.Features.Language.Pages
         [Inject] protected IKnownLanguagesStore KnownLanguagesStore { get; set; } = default!;
 
         // All languages list (dropdown source)
-        [Parameter] public IEnumerable<LangCode>? LangCodes { get; set; }
+        public IEnumerable<LangCode>? LangCodes { get; set; }
 
         protected List<LangCode> UiLangItems { get; set; } = new();
 
@@ -40,10 +40,6 @@ namespace sd.Client.Features.Language.Pages
 
         // UI language key (your UILangs dictionary key, not culture string)
         protected string? UILang { get; set; }
-
-        // Mother / Second language selection
-        protected LangCode? SelectedFL { get; set; } // Second language (learn)
-        protected LangCode? SelectedTL { get; set; } // Mother language
 
         private bool _selectedItemsInitialized;
 
@@ -87,25 +83,16 @@ namespace sd.Client.Features.Language.Pages
            await ReloadProvidersAsync();
         }
 
-        // --------------------------
-        // Initialization / lifecycle
-        // --------------------------
-
         protected override async Task OnInitializedAsync()
         {
-            await DefaultLangsService.SetDefLangsAsync(); // :contentReference[oaicite:1]{index=1}
+            await DefaultLangsService.SetDefLangsAsync();
 
             Fl = DefaultLangsService.DefaultWordLang ?? "en";
             Tl = DefaultLangsService.DefaultToLang ?? "de";
 
-            // Build LangCodes list if not provided as parameter
             LangCodes ??= LangCodesHelper.Langs
                 .Select(x => new LangCode { Key = x.Key, Value = x.Value })
                 .ToList();
-
-            // Set initial selections
-            SelectedFL = new LangCode { Key = Fl, Value = LangCodesHelper.GetLanguage(Fl) };
-            SelectedTL = new LangCode { Key = Tl, Value = LangCodesHelper.GetLanguage(Tl) };
 
             // Load known langs from storage (via store)
             KnownLangs = await KnownLanguagesStore.GetAsync();
@@ -165,82 +152,33 @@ namespace sd.Client.Features.Language.Pages
             }
         }
 
-        // --------------------------
-        // Mother / Second language
-        // --------------------------
+        protected Task OnMotherlanguageChanged(string? langName)
+            => OnLanguageChanged(langName, code => Tl = code);
 
-        // Mother language (TL)
-        protected async Task OnMotherlanguageChanged(LangCode selectedOption)
+        protected Task OnSecondlanguageChanged(string? langName)
+            => OnLanguageChanged(langName, code => Fl = code);
+
+        protected async Task OnLanguageChanged(string? langName, Action<string> setLang)
         {
-            if (selectedOption is null) return;
+            if (string.IsNullOrWhiteSpace(langName))
+                return;
 
-            SelectedTL = selectedOption;
-            Tl = selectedOption.Key;
+            var langCode = LangCodesHelper.GetLanguageCode(langName);
 
-            DefaultLangsService.DefaultToLang = Tl;
+            setLang(langCode);
 
-            // ensure TL is in known langs + persist
-            KnownLanguagesStore.EnsureContains(KnownLangs, Tl);
+            DefaultLangsService.DefaultWordLang = langCode;
 
-            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.ToLang, Tl);
+            KnownLanguagesStore.EnsureContains(KnownLangs, langCode);
+
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.FromLang, langCode);
             await KnownLanguagesStore.SaveAsync(KnownLangs);
 
             await ReloadProvidersAsync();
         }
-
-        // Second language (FL)
-        protected async Task OnSecondlanguageChanged(LangCode selectedOption)
-        {
-            if (selectedOption is null) return;
-
-            SelectedFL = selectedOption;
-            Fl = selectedOption.Key;
-
-            DefaultLangsService.DefaultWordLang = Fl;
-
-            // ensure FL is in known langs + persist
-            KnownLanguagesStore.EnsureContains(KnownLangs, Fl);
-
-            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.FromLang, Fl);
-            await KnownLanguagesStore.SaveAsync(KnownLangs);
-
-            await ReloadProvidersAsync();
-        }
-
-        protected async Task OnMotherlanguageKeyChanged(string? key)
-        {
-            if (string.IsNullOrWhiteSpace(key)) return;
-
-            key = LangCodesHelper.GetLanguageCode(key);
-
-            // keep Tl in sync for UI immediately
-            // find the LangCode instance from the Items list (safe even if null)
-            var opt = SelectedItems.FirstOrDefault(x => x.Key == key)
-                      ?? new LangCode { Key = key, Value = LangCodesHelper.GetLanguage(key) };
-
-            await OnMotherlanguageChanged(opt);
-        }
-
-        protected async Task OnSecondlanguageKeyChanged(string? key)
-        {
-            if (string.IsNullOrWhiteSpace(key)) return;
-
-            key = LangCodesHelper.GetLanguageCode(key);
-
-            var opt = SelectedItems.FirstOrDefault(x => x.Key == key)
-                      ?? new LangCode { Key = key, Value = LangCodesHelper.GetLanguage(key) };
-
-            await OnSecondlanguageChanged(opt);
-        }
-
-        // --------------------------
-        // UI language
-        // --------------------------
 
         protected async Task SetUILangAsync()
         {
-            // UILang is the key in LangCodesHelper.UILangs (like "English", "Deutsch", etc.)
-            // Value is the culture string like "en-US"
             var fallbackCulture = "en-US";
 
             try
@@ -274,17 +212,12 @@ namespace sd.Client.Features.Language.Pages
             var insertIndex = Math.Min(args.NewIndex, opRes.Count);
             opRes.Insert(insertIndex, item);
 
-            // Optional: normalize Eval to match order
             for (int i = 0; i < opRes.Count; i++)
                 opRes[i].Eval = i;
 
             var serialized = JsonConvert.SerializeObject(opRes);
             await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(Fl, Tl), serialized);
         }
-
-        // --------------------------
-        // UI helpers
-        // --------------------------
 
         protected async Task OnSearchAsync(OptionsSearchEventArgs<LangCode> e)
         {

@@ -15,10 +15,8 @@
                               SelectedOptions="SelectedItems"
                               SelectedOptionsChanged="OnSelectedOptionsChanged" />
 
-
          @if (SelectedItems != null && SelectedTL != null)
         {
-            <!-- UI language: use the UILangs list (not SelectedItems) -->
             <UiLanguageSelector Items="UiLangItems"
                                 Value="@UILang"
                                 ValueChanged="OnUILangChanged"
@@ -29,6 +27,7 @@
                                       Fl="@Fl"
                                       TlChanged="OnMotherlanguageKeyChanged"
                                       FlChanged="OnSecondlanguageKeyChanged"
+                                      Reverse="Reverse"
                                       MotherLanguageLabel="@LanguageContainer.Keys["Motherlanguage"]"
                                       SecondLanguageLabel="@LanguageContainer.Keys["Secondlanguage"]" />
         } 
@@ -36,27 +35,6 @@
 
     @if (KnownLangs != null)
     {
-        <div class="card mt-2 mb-2">
-            <div class="input-group">
-                <select class="bg-transparent rounded-0 border-0" @bind="Fl">
-                    @foreach (var item in KnownLangs)
-                    {
-                        <option value="@item">@item</option>
-                    }
-                </select>
-
-                <button type="button" class="btn btn-light bg-transparent" @onclick="Reverse">
-                    <i class="oi oi-loop"></i>
-                </button>
-
-                <select class="bg-transparent rounded-0 border-0" @bind="Tl">
-                    @foreach (var item in KnownLangs)
-                    {
-                        <option value="@item">@item</option>
-                    }
-                </select>
-            </div>
-
             @if (opRes != null)
             {
                 <FluentSortableList Items="opRes" OnUpdate="@SortListAsync" Sort="true" Handle="true">
@@ -72,8 +50,6 @@
                     </ItemTemplate>
                 </FluentSortableList>
             }
-        </div>
-
         <div class="mb-2">
             <button type="reset" class="btn btn-light" @onclick="ResetOPAsync"> Reset for @Fl-@Tl </button>
             <button type="reset" class="btn btn-danger float-right" @onclick="RemoveAllDataAsync">Remove all stored data</button>

@@ -81,7 +81,11 @@ namespace sd.Client.Features.Language.Pages
 
         protected string FavSite { get; private set; } = string.Empty;
 
-        protected void Reverse() => (Tl, Fl) = (Fl, Tl);
+        protected async Task Reverse()
+        {
+            (Tl, Fl) = (Fl, Tl);
+           await ReloadProvidersAsync();
+        }
 
         // --------------------------
         // Initialization / lifecycle

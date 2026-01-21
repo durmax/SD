@@ -1,7 +1,7 @@
 ﻿@using Microsoft.FluentUI.AspNetCore.Components
 @using sd.Client.Models
 
-<FluentGridItem xs="6">
+<FluentGridItem xs="5">
     <FluentCombobox TOption="LangCode"
                     Items="@ItemsSafe"
                     Width="70%"
@@ -13,7 +13,12 @@
                     Autocomplete="ComboboxAutocomplete.Inline" />
 </FluentGridItem>
 
-<FluentGridItem xs="6">
+<FluentGridItem xs="2">
+    <FluentLabel>Reverse</FluentLabel>
+    <FluentButton OnClick="OnReverse" IconEnd="@(new Icons.Regular.Size16.ArrowBidirectionalLeftRight())" />
+</FluentGridItem>
+
+<FluentGridItem xs="5">
     <FluentCombobox TOption="LangCode"
                     Items="@ItemsSafe"
                     Width="70%"
@@ -40,6 +45,7 @@
     // Events (your page already has OnMotherlanguageKeyChanged / OnSecondlanguageKeyChanged)
     [Parameter] public EventCallback<string?> TlChanged { get; set; }
     [Parameter] public EventCallback<string?> FlChanged { get; set; }
+    [Parameter] public EventCallback<string?> Reverse { get; set; }
 
     private IEnumerable<LangCode> ItemsSafe => Items ?? Array.Empty<LangCode>();
 
@@ -55,5 +61,11 @@
         Fl = key;
         if (FlChanged.HasDelegate)
             await FlChanged.InvokeAsync(key);
+    }
+
+    private async Task OnReverse()
+    {
+        if (Reverse.HasDelegate)
+            await Reverse.InvokeAsync();
     }
 }

@@ -145,7 +145,7 @@ namespace sd.Client.Features.Language.Pages
             await SetUILangAsync();
         }
 
-        private async Task ReloadProvidersAsync()
+        protected async Task ReloadProvidersAsync()
         {
             try
             {
@@ -208,6 +208,7 @@ namespace sd.Client.Features.Language.Pages
             if (string.IsNullOrWhiteSpace(key)) return;
 
             key = LangCodesHelper.GetLanguageCode(key);
+
             // keep Tl in sync for UI immediately
             // find the LangCode instance from the Items list (safe even if null)
             var opt = SelectedItems.FirstOrDefault(x => x.Key == key)

@@ -8,19 +8,13 @@
     <div class="card-header"><b>@LanguageContainer.Keys["LangConfig"]</b></div>
 
     <FluentGrid Spacing="1" AdaptiveRendering="true" Justify="JustifyContent.Center" Style="padding: 2px;">
-        <FluentGridItem xs="12">
-            <FluentAutocomplete TOption="LangCode"
-                                Label="@LanguageContainer.Keys["AddLang"]"
-                                dir="rtl"
-                                AutoComplete="off"
-                                Width="100%"
-                                Placeholder="@LanguageContainer.Keys["AddLang"]"
-                                OnOptionsSearch="@OnSearchAsync"
-                                OptionText="@(item => item.Value)"
-                                SelectedOptions="@SelectedItems"
-                                SelectedOptionsChanged="@OnSelectedOptionsChanged" />
+        <KnownLanguagesPicker Label="@LanguageContainer.Keys["AddLang"]"
+                              Placeholder="@LanguageContainer.Keys["AddLang"]"
+                              Width="100%"
+                              OnOptionsSearch="OnSearchAsync"
+                              SelectedOptions="SelectedItems"
+                              SelectedOptionsChanged="OnSelectedOptionsChanged" />
 
-        </FluentGridItem>
 
          @if (SelectedItems != null && SelectedTL != null)
         {

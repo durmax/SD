@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace sd.Client.Helpers;
 
@@ -223,4 +224,7 @@ public static class LangCodesHelper
 
     public static string GetLanguage(string code) =>
         Langs.TryGetValue(code, out var name) ? name : null;
+
+    public static string GetLanguageCode(string name) =>
+        Langs.FirstOrDefault(c => c.Value.ToLower() == name.ToLower()).Key;
 }

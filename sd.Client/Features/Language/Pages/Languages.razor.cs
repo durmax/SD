@@ -17,256 +17,353 @@ namespace sd.Client.Features.Language.Pages
 {
     public class LanguagesBase : ComponentBase
     {
-        [Inject] ILogger<LanguagesBase> Log { get; set; }
-        [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
-        [Inject] IJSRuntime JsRuntime { set; get; }
-        [Inject] protected DefaultLangsService DefaultLangsService { get; set; }
-        [Inject] KnownLangsService KnownLangsService { get; set; }
-        [Inject] protected ILanguageContainerService LanguageContainer { get; set; }
-        [Inject] NavigationManager NavigationManager { get; set; }
-        [Inject] protected DictionaryLinksService OtherPageService { get; set; }
-        [Parameter] public IEnumerable<LangCode> LangCodes { get; set; }
+        [Inject] protected ILogger<LanguagesBase> Log { get; set; } = default!;
+        [Inject] protected LocalStorageAccessor LocalStorageAccessor { get; set; } = default!;
+        [Inject] protected IJSRuntime JsRuntime { get; set; } = default!;
+        [Inject] protected DefaultLangsService DefaultLangsService { get; set; } = default!;
+        [Inject] protected KnownLangsService KnownLangsService { get; set; } = default!;
+        [Inject] protected ILanguageContainerService LanguageContainer { get; set; } = default!;
+        [Inject] protected NavigationManager NavigationManager { get; set; } = default!;
+        [Inject] protected DictionaryLinksService OtherPageService { get; set; } = default!;
 
-        protected List<DictionaryProviderDto> opRes { get; set; }
-        protected List<string> KnownLangs { get; set; }
-        protected string UILang;
+        // All languages list (dropdown source)
+        [Parameter] public IEnumerable<LangCode>? LangCodes { get; set; }
 
-        private LangCode SFL;
-        private LangCode STL;
-        private LangCode LToAdd;
-        protected string FavSite { get; private set; }
+        protected List<LangCode> UiLangItems { get; set; } = new();
 
-        protected string Fl { get; set; }
-        protected string Tl { get; set; }
+        // Current dictionary providers (sortable)
+        protected List<DictionaryProviderDto> opRes { get; set; } = new();
 
-        protected void Reverse()
+        // Known languages (for multi-select / tags / etc.)
+        protected List<string> KnownLangs { get; set; } = new();
+
+        // UI language key (your UILangs dictionary key, not culture string)
+        protected string? UILang { get; set; }
+
+        // Mother / Second language selection
+        protected LangCode? SelectedFL { get; set; } // Second language (learn)
+        protected LangCode? SelectedTL { get; set; } // Mother language
+
+        // Selected items for known langs picker
+        private List<LangCode> _selectedItems = new();
+        protected List<LangCode> SelectedItemsT
         {
-            (Tl, Fl) = (Fl, Tl);
+            get => _selectedItems;
+            set => _selectedItems = value ?? new List<LangCode>();
         }
 
-        protected LangCode SelectedFL
+
+        private bool _selectedItemsInitialized;
+
+        protected List<LangCode> SelectedItems { get; set; } = new();
+
+        private bool _suppressSelectedItemsChanged = true;
+        private bool _isPersistingSelectedItems;
+
+        protected async Task OnSelectedOptionsChanged(IEnumerable<LangCode> options)
         {
-            get { return SFL; }
-            set
+            if (_suppressSelectedItemsChanged) return;
+            if (_isPersistingSelectedItems) return;
+
+            try
             {
-                if (value != null)
-                {
-                    SFL = value;
-                    LocalStorageAccessor.SetValueAsync(LangStorageKeys.FromLang, SelectedFL.Key);
-                    KnownLangsService.AddKnownLang(SelectedFL.Key);
-                    DefaultLangsService.DefaultWordLang = SelectedFL.Key;
-                    LangToAdd = value;
-                    Fl = value.Key;
-                }
+                _isPersistingSelectedItems = true;
+
+                SelectedItems = options?.ToList() ?? new List<LangCode>();
+
+                KnownLangs = SelectedItems.Select(x => x.Key).Distinct().ToList();
+                EnsureKnownLang(Fl);
+                EnsureKnownLang(Tl);
+
+                await PersistKnownLangsAsync();
             }
-        }
-
-        protected LangCode SelectedTL
-        {
-            get { return STL; }
-            set
+            finally
             {
-                if (value != null)
-                {
-                    STL = value;
-                    LocalStorageAccessor.SetValueAsync(LangStorageKeys.ToLang, SelectedTL.Key);
-                    KnownLangsService.AddKnownLang(SelectedTL.Key);
-                    DefaultLangsService.DefaultToLang = SelectedTL.Key;
-                    LangToAdd = value;
-                    Tl = value.Key;
-                }
-            }
-        }
-
-        private LangCode LangToAdd
-        {
-            get { return LToAdd; }
-            set
-            {
-                if (value != null)
-                {
-                    LToAdd = value;
-                    KnownLangsService.LangsStr += "," + LToAdd.Key;
-                    BuildKnownLangs();
-                }
+                _isPersistingSelectedItems = false;
             }
         }
 
-        protected async Task SortListAsync(FluentSortableListEventArgs args)
+
+        // Active lang codes used for dictionary links ordering keys etc.
+        protected string Fl { get; set; } = "en";
+        protected string Tl { get; set; } = "de";
+
+        protected string FavSite { get; private set; } = string.Empty;
+
+        protected void Reverse() => (Tl, Fl) = (Fl, Tl);
+
+        // --------------------------
+        // Initialization / lifecycle
+        // --------------------------
+
+        protected override async Task OnInitializedAsync()
         {
-            if (args is null || args.OldIndex == args.NewIndex)
+            await DefaultLangsService.SetDefLangsAsync(); // :contentReference[oaicite:1]{index=1}
+
+            Fl = DefaultLangsService.DefaultWordLang ?? "en";
+            Tl = DefaultLangsService.DefaultToLang ?? "de";
+
+            // Build LangCodes list if not provided as parameter
+            LangCodes ??= LangCodesHelper.Langs
+                .Select(x => new LangCode { Key = x.Key, Value = x.Value })
+                .ToList();
+
+            // Set initial selections
+            SelectedFL = new LangCode { Key = Fl, Value = LangCodesHelper.GetLanguage(Fl) };
+            SelectedTL = new LangCode { Key = Tl, Value = LangCodesHelper.GetLanguage(Tl) };
+
+            // Load known langs from storage
+            KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.KnownLangs);
+            KnownLangs = ParseLangsStr(KnownLangsService.LangsStr);
+
+            // Ensure current FL/TL are included
+            EnsureKnownLang(Fl);
+            EnsureKnownLang(Tl);
+            await PersistKnownLangsAsync();
+
+            UiLangItems = LangCodesHelper.UILangs
+                .Select(x => new LangCode { Key = x.Key, Value = x.Key })
+                .ToList();
+
+            // UI language initial selection
+            var culture = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
+            UILang = LangCodesHelper.UILangs.FirstOrDefault(x => x.Value == culture).Key;
+
+            if (!_selectedItemsInitialized)
             {
-                return;
+                // Preselect known langs in UI
+                var known = new HashSet<string>(KnownLangs);
+            _suppressSelectedItemsChanged = true;
+
+                SelectedItems.Clear();
+                SelectedItems.AddRange(
+                    (LangCodes ?? Array.Empty<LangCode>())
+                        .Where(l => KnownLangs.Contains(l.Key))
+                );
+                //                SelectedItems.AddRange(new[]
+                //{
+                //    new LangCode { Key="en", Value="English" },
+                //    new LangCode { Key="de", Value="German" }
+                //});
+
+
+                _suppressSelectedItemsChanged = false;
+                _selectedItemsInitialized = true;
             }
 
-            var oldIndex = args.OldIndex;
-            var newIndex = args.NewIndex;
-
-            var itemToMove = opRes[oldIndex];
-            opRes.RemoveAt(oldIndex);
-
-            if (newIndex < opRes.Count)
-            {
-                opRes[newIndex].Eval = newIndex;
-                opRes.Insert(newIndex, itemToMove);
-            }
-            else
-            {
-                opRes[oldIndex].Eval = oldIndex;
-                opRes.Add(itemToMove);
-            }
-            var serializedOtherPageModels = JsonConvert.SerializeObject(opRes);
-
-            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(Fl,Tl), serializedOtherPageModels);
+            // Load dictionary providers + favorite site
+            await ReloadProvidersAsync();
         }
 
-        protected void SetUILang()
+        protected async Task OnUILangChanged(string? value)
+        {
+            UILang = value;
+            await SetUILangAsync();
+        }
+
+        private async Task ReloadProvidersAsync()
         {
             try
             {
-                LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(LangCodesHelper.UILangs[UILang]));
-                LocalStorageAccessor.SetValueAsync(LangStorageKeys.UiLang, LangCodesHelper.UILangs[UILang]);
-            }
-            catch
-            {
-                LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
-                LocalStorageAccessor.SetValueAsync(LangStorageKeys.UiLang, "en-US");
+                if (!string.IsNullOrWhiteSpace(Fl) && Fl.Length > 2) Fl = LangCodesHelper.GetLanguageCode(Fl);
+                if (!string.IsNullOrWhiteSpace(Tl) && Tl.Length > 2) Tl = LangCodesHelper.GetLanguageCode(Tl);
 
-                Log.LogError($"SetUILang: {UILang} not found, set to en-US");
+                opRes = await OtherPageService.GetOpRes(Fl, Tl, string.Empty) ?? new List<DictionaryProviderDto>(); // :contentReference[oaicite:2]{index=2}
+                FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(Fl, Tl)) ?? string.Empty;
+            }
+            catch (Exception ex)
+            {
+                Log.LogError(ex, $"ReloadProvidersAsync failed for {Fl}-{Tl}");
             }
         }
 
-        protected IEnumerable<LangCode> SelectedItemsT { get; set; }  //new List<LangCode>();
-        public IEnumerable<LangCode> SelectedItems
-        {
-            get { return SelectedItemsT; }
-            set
-            {
+        // --------------------------
+        // Mother / Second language
+        // --------------------------
 
-                SelectedItemsT = value;
-                KnownLangsService.LangsStr = string.Empty;
-                foreach (var item in SelectedItemsT)
-                {
-                    KnownLangsService.LangsStr += "," + item.Key;
-                }
-                BuildKnownLangs();
-            }
-        }
-
+        // Mother language (TL)
         protected async Task OnMotherlanguageChanged(LangCode selectedOption)
         {
+            if (selectedOption is null) return;
+
             SelectedTL = selectedOption;
-            // Handle the selected option change
-            await Task.CompletedTask;
+            Tl = selectedOption.Key;
+
+            DefaultLangsService.DefaultToLang = Tl;
+            EnsureKnownLang(Tl);
+
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.ToLang, Tl);
+            await PersistKnownLangsAsync();
+            await ReloadProvidersAsync();
         }
+
+        // Second language (FL)
         protected async Task OnSecondlanguageChanged(LangCode selectedOption)
         {
+            if (selectedOption is null) return;
+
             SelectedFL = selectedOption;
-            // Handle the selected option change
-            await Task.CompletedTask;
+            Fl = selectedOption.Key;
+
+            DefaultLangsService.DefaultWordLang = Fl;
+            EnsureKnownLang(Fl);
+
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.FromLang, Fl);
+            await PersistKnownLangsAsync();
+            await ReloadProvidersAsync();
         }
+
+        protected async Task OnMotherlanguageKeyChanged(string? key)
+        {
+            if (string.IsNullOrWhiteSpace(key)) return;
+
+            Tl = key;
+
+            key = LangCodesHelper.GetLanguageCode(key);
+            // keep Tl in sync for UI immediately
+            // find the LangCode instance from the Items list (safe even if null)
+            var opt = SelectedItems.FirstOrDefault(x => x.Key == key)
+                      ?? new LangCode { Key = key, Value = LangCodesHelper.GetLanguage(key) };
+
+            await OnMotherlanguageChanged(opt);
+        }
+
+        protected async Task OnSecondlanguageKeyChanged(string? key)
+        {
+            if (string.IsNullOrWhiteSpace(key)) return;
+
+            Fl = key;
+
+            key = LangCodesHelper.GetLanguageCode(key);
+
+            var opt = SelectedItems.FirstOrDefault(x => x.Key == key)
+                      ?? new LangCode { Key = key, Value = LangCodesHelper.GetLanguage(key) };
+
+            await OnSecondlanguageChanged(opt);
+        }
+
+        // --------------------------
+        // UI language
+        // --------------------------
+
+        protected async Task SetUILangAsync()
+        {
+            // UILang is the key in LangCodesHelper.UILangs (like "English", "Deutsch", etc.)
+            // Value is the culture string like "en-US"
+            var fallbackCulture = "en-US";
+
+            try
+            {
+                var culture = (UILang != null && LangCodesHelper.UILangs.TryGetValue(UILang, out var c))
+                    ? c
+                    : fallbackCulture;
+
+                LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(culture));
+                await LocalStorageAccessor.SetValueAsync(LangStorageKeys.UiLang, culture);
+            }
+            catch (Exception ex)
+            {
+                LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(fallbackCulture));
+                await LocalStorageAccessor.SetValueAsync(LangStorageKeys.UiLang, fallbackCulture);
+
+                Log.LogError(ex, $"SetUILangAsync: '{UILang}' not found, set to {fallbackCulture}");
+            }
+        }
+
+        // --------------------------
+        // Known languages
+        // --------------------------
+
+        private void EnsureKnownLang(string? code)
+        {
+            if (string.IsNullOrWhiteSpace(code)) return;
+            if (!KnownLangs.Contains(code))
+                KnownLangs.Add(code);
+        }
+
+        private async Task PersistKnownLangsAsync()
+        {
+            KnownLangs = KnownLangs.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+
+            // Store as ",en,de,ar" (keeps your existing format)
+            KnownLangsService.LangsStr = string.Join("", KnownLangs.Select(x => "," + x));
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.KnownLangs, KnownLangsService.LangsStr);
+        }
+
+        private static List<string> ParseLangsStr(string? langsStr)
+        {
+            if (string.IsNullOrWhiteSpace(langsStr) || langsStr == "null")
+                return new List<string>();
+
+            // Existing format begins with commas
+            return langsStr
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Distinct()
+                .ToList();
+        }
+
+        // --------------------------
+        // DictionaryLinks sorting
+        // --------------------------
+
+        protected async Task SortListAsync(FluentSortableListEventArgs args)
+        {
+            if (args is null || args.OldIndex == args.NewIndex) return;
+            if (opRes is null || opRes.Count == 0) return;
+            if (args.OldIndex < 0 || args.OldIndex >= opRes.Count) return;
+            if (args.NewIndex < 0) return;
+
+            var item = opRes[args.OldIndex];
+            opRes.RemoveAt(args.OldIndex);
+
+            var insertIndex = Math.Min(args.NewIndex, opRes.Count);
+            opRes.Insert(insertIndex, item);
+
+            // Optional: normalize Eval to match order
+            for (int i = 0; i < opRes.Count; i++)
+                opRes[i].Eval = i;
+
+            var serialized = JsonConvert.SerializeObject(opRes);
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(Fl, Tl), serialized);
+        }
+
+        // --------------------------
+        // UI helpers
+        // --------------------------
 
         protected async Task OnSearchAsync(OptionsSearchEventArgs<LangCode> e)
         {
-            e.Items = LangCodes.Where(i => i.Value.Contains(e.Text, StringComparison.OrdinalIgnoreCase)).ToArray();
+            if (LangCodes is null)
+            {
+                e.Items = Array.Empty<LangCode>();
+                return;
+            }
+
+            e.Items = LangCodes
+                .Where(i => i.Value.Contains(e.Text ?? string.Empty, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
+            await Task.CompletedTask;
         }
 
         protected async Task ResetOPAsync()
         {
             bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"You try to reset {Fl}-{Tl}, are you sure?");
-            if (confirmed)
-            {
-                await LocalStorageAccessor.RemoveAsync(LangStorageKeys.DictionaryOrder(Fl,Tl));
-                SetLangsStr();
-                NavigationManager.NavigateTo(NavigationManager.Uri, true);
-            }
+            if (!confirmed) return;
+
+            await LocalStorageAccessor.RemoveAsync(LangStorageKeys.DictionaryOrder(Fl, Tl));
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
 
         protected async Task RemoveAllDataAsync()
         {
             bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete all data, are you sure?");
-            if (confirmed)
-            {
-                await LocalStorageAccessor.Clear();
-                await JsRuntime.InvokeVoidAsync("alert", $"Your data are deleted");
+            if (!confirmed) return;
 
-                NavigationManager.NavigateTo(NavigationManager.Uri, true);
-            }
-        }
+            await LocalStorageAccessor.Clear();
+            await JsRuntime.InvokeVoidAsync("alert", "Your data are deleted");
 
-        protected async Task BuildKnownLangs()
-        {
-            KnownLangsService.AddKnownLang(SelectedFL?.Key);
-            KnownLangsService.AddKnownLang(SelectedTL?.Key);
-
-            KnownLangs = new List<string>();
-            KnownLangs = KnownLangsService.KnownLangs;
-
-            await SetLangsStr();
-        }
-
-        private async Task SetLangsStr()
-        {
-            KnownLangsService.LangsStr = null;
-            KnownLangs = KnownLangs.Distinct().ToList();
-
-            foreach (var item in KnownLangs)
-            {
-                KnownLangsService.LangsStr += "," + item;
-            }
-            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.KnownLangs, KnownLangsService.LangsStr);
-        }
-
-        protected override async Task OnParametersSetAsync()
-        {
-            try
-            {
-                opRes = await OtherPageService.GetOpRes(Fl, Tl, string.Empty); // ToDo Cash opRes
-                FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(Fl, Tl));
-            }
-            catch (Exception ex)
-            {
-                Log.LogError($"LocalStorageAccessor.GetValueAsync<string>({LangStorageKeys.FavoriteSite(Fl, Tl)}) " + ex.Message);
-                //throw;
-            }
-        }
-
-        protected override async Task OnInitializedAsync()
-        {
-            await DefaultLangsService.SetDefLangsAsync();
-
-            Fl = DefaultLangsService.DefaultWordLang;
-            Tl = DefaultLangsService.DefaultToLang;
-            FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(Fl, Tl));
-
-            SelectedFL = new LangCode
-            {
-                Key = Fl,
-                Value = Helpers.LangCodesHelper.GetLanguage(Fl)
-            };
-
-            SelectedTL = new LangCode
-            {
-                Key = Tl,
-                Value = Helpers.LangCodesHelper.GetLanguage(Tl)
-            };
-
-            KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.KnownLangs);
-
-            await BuildKnownLangs();
-
-            LangCodes = LangCodesHelper.Langs
-                .Select(item => new LangCode
-                {
-                    Key = item.Key,
-                    Value = item.Value
-                })
-                .ToList();
-
-            var lang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
-            UILang = LangCodesHelper.UILangs.FirstOrDefault(x => x.Value == lang).Key;
-
-            SelectedItemsT = LangCodes.Where(l => KnownLangs.Contains(l.Key)); //new List<LangCode>();
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
     }
 }

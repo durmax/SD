@@ -1,0 +1,36 @@
+﻿@using Microsoft.FluentUI.AspNetCore.Components
+@using sd.Client.Models
+
+<FluentGridItem xs="12">
+    <FluentCombobox TOption="LangCode"
+                    Items="@ItemsSafe"
+                    Width="35%"
+                    Label="@Label"
+                    OptionText="@(i => i.Value)"
+                    OptionValue="@(i => i.Key)"
+                    Value="@Value"
+                    ValueChanged="OnValueChanged"
+                    Autocomplete="ComboboxAutocomplete.Inline" />
+</FluentGridItem>
+
+@code {
+    [Parameter] public IEnumerable<LangCode>? Items { get; set; }
+
+    // current selected UI language key (e.g. "Deutsch", "English" depending on your UILangs keys)
+    [Parameter] public string? Value { get; set; }
+
+    // label text
+    [Parameter] public string Label { get; set; } = "UI Language";
+
+    // event to page
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+
+    private IEnumerable<LangCode> ItemsSafe => Items ?? Array.Empty<LangCode>();
+
+    private async Task OnValueChanged(string? key)
+    {
+        Value = key;
+        if (ValueChanged.HasDelegate)
+            await ValueChanged.InvokeAsync(key);
+    }
+}

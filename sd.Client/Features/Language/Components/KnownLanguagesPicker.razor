@@ -2,29 +2,28 @@
 @using sd.Client.Models
 
 <FluentGridItem xs="12">
-    <FluentAutocomplete TOption="LangCode"
+    <FluentAutocomplete TOption="LanguageOption"
                         Label="@Label"
                         AutoComplete="off"
                         Width="@Width"
                         Placeholder="@Placeholder"
                         OnOptionsSearch="@OnOptionsSearch"
-                        OptionText="@(item => item.Value)"
+                        OptionText="@(item => item.Name)"
                         SelectedOptions="@SelectedOptionsSafe"
                         SelectedOptionsChanged="@SelectedOptionsChanged" />
 </FluentGridItem>
 
 @code {
-    // Text / style
     [Parameter] public string Label { get; set; } = "Add language";
     [Parameter] public string Placeholder { get; set; } = "Add language";
     [Parameter] public string Width { get; set; } = "100%";
 
     // Data binding
-    [Parameter] public IEnumerable<LangCode>? SelectedOptions { get; set; }
-    [Parameter] public EventCallback<IEnumerable<LangCode>> SelectedOptionsChanged { get; set; }
+    [Parameter] public IEnumerable<LanguageOption>? SelectedOptions { get; set; }
+    [Parameter] public EventCallback<IEnumerable<LanguageOption>> SelectedOptionsChanged { get; set; }
 
     // Search callback from page
-    [Parameter] public EventCallback<OptionsSearchEventArgs<LangCode>> OnOptionsSearch { get; set; }
+    [Parameter] public EventCallback<OptionsSearchEventArgs<LanguageOption>> OnOptionsSearch { get; set; }
 
-    private IEnumerable<LangCode> SelectedOptionsSafe => SelectedOptions ?? Array.Empty<LangCode>();
+    private IEnumerable<LanguageOption> SelectedOptionsSafe => SelectedOptions ?? Array.Empty<LanguageOption>();
 }

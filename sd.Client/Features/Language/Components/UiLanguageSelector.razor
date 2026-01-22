@@ -2,19 +2,19 @@
 @using sd.Client.Models
 
 <FluentGridItem xs="12">
-    <FluentCombobox TOption="LangCode"
+    <FluentCombobox TOption="LanguageOption"
                     Items="@ItemsSafe"
                     Width="35%"
                     Label="@Label"
-                    OptionText="@(i => i.Value)"
-                    OptionValue="@(i => i.Key)"
+                    OptionText="@(i => i.Name)"
+                    OptionValue="@(i => i.Code)"
                     Value="@Value"
                     ValueChanged="OnValueChanged"
                     Autocomplete="ComboboxAutocomplete.Inline" />
 </FluentGridItem>
 
 @code {
-    [Parameter] public IEnumerable<LangCode>? Items { get; set; }
+    [Parameter] public IEnumerable<LanguageOption>? Items { get; set; }
 
     // current selected UI language key (e.g. "Deutsch", "English" depending on your UILangs keys)
     [Parameter] public string? Value { get; set; }
@@ -25,7 +25,7 @@
     // event to page
     [Parameter] public EventCallback<string?> ValueChanged { get; set; }
 
-    private IEnumerable<LangCode> ItemsSafe => Items ?? Array.Empty<LangCode>();
+    private IEnumerable<LanguageOption> ItemsSafe => Items ?? Array.Empty<LanguageOption>();
 
     private async Task OnValueChanged(string? key)
     {

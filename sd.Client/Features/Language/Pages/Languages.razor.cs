@@ -28,9 +28,9 @@ namespace sd.Client.Features.Language.Pages
         [Inject] protected IKnownLanguagesStore KnownLanguagesStore { get; set; } = default!;
 
         // All languages list (dropdown source)
-        public IEnumerable<LangCode>? LangCodes { get; set; }
+        public IEnumerable<LanguageOption>? LangCodes { get; set; }
 
-        protected List<LangCode> UiLangItems { get; set; } = new();
+        protected IEnumerable<LanguageOption> UiLangItems { get; set; }
 
         // Current dictionary providers (sortable)
         protected List<DictionaryProviderDto> opRes { get; set; } = new();
@@ -43,7 +43,7 @@ namespace sd.Client.Features.Language.Pages
 
         private bool _selectedItemsInitialized;
 
-        protected List<LangCode> SelectedItems { get; set; } = new();
+        protected IEnumerable<LanguageOption> SelectedItems { get; set; }
 
         private bool _suppressSelectedItemsChanged = true;
         private bool _isPersistingSelectedItems;
@@ -56,7 +56,7 @@ namespace sd.Client.Features.Language.Pages
 
         protected string FavSite { get; private set; } = string.Empty;
 
-        protected async Task OnSelectedOptionsChanged(IEnumerable<LangCode> options)
+        protected async Task OnSelectedOptionsChanged(IEnumerable<LanguageOption> options)
         {
             if (_suppressSelectedItemsChanged) return;
             if (_isPersistingSelectedItems) return;
@@ -65,9 +65,9 @@ namespace sd.Client.Features.Language.Pages
             {
                 _isPersistingSelectedItems = true;
 
-                SelectedItems = options?.ToList() ?? new List<LangCode>();
+                SelectedItems = options?? Array.Empty<LanguageOption>();
 
-                KnownLangs = SelectedItems.Select(x => x.Key).Distinct().ToList();
+                KnownLangs = SelectedItems.Select(x => x.Code).Distinct().ToList();
                 KnownLanguagesStore.EnsureContains(KnownLangs, Fl, Tl);
 
                 await KnownLanguagesStore.SaveAsync(KnownLangs);
@@ -96,8 +96,7 @@ namespace sd.Client.Features.Language.Pages
             TlangName = LangCodesHelper.GetLanguage(Tl);
 
             LangCodes ??= LangCodesHelper.Langs
-                .Select(x => new LangCode { Key = x.Key, Value = x.Value })
-                .ToList();
+                .Select(x => new LanguageOption(x.Key, x.Value));
 
             // Load known langs from storage (via store)
             KnownLangs = await KnownLanguagesStore.GetAsync();
@@ -108,8 +107,7 @@ namespace sd.Client.Features.Language.Pages
 
 
             UiLangItems = LangCodesHelper.UILangs
-                .Select(x => new LangCode { Key = x.Key, Value = x.Key })
-                .ToList();
+                .Select(x => new LanguageOption(x.Key,x.Key));
 
             // UI language initial selection
             var culture = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
@@ -117,14 +115,11 @@ namespace sd.Client.Features.Language.Pages
 
             if (!_selectedItemsInitialized)
             {
+                _suppressSelectedItemsChanged = true;
 
-            _suppressSelectedItemsChanged = true;
-
-                SelectedItems.Clear();
-                SelectedItems.AddRange(
-                    (LangCodes ?? Array.Empty<LangCode>())
-                        .Where(l => KnownLangs.Contains(l.Key))
-                );
+                SelectedItems = (LangCodes ?? Array.Empty<LanguageOption>())
+                    .Where(l => KnownLangs.Contains(l.Code))
+                    .ToList();
 
                 _suppressSelectedItemsChanged = false;
                 _selectedItemsInitialized = true;
@@ -221,16 +216,16 @@ namespace sd.Client.Features.Language.Pages
             await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(Fl, Tl), serialized);
         }
 
-        protected async Task OnSearchAsync(OptionsSearchEventArgs<LangCode> e)
+        protected async Task OnSearchAsync(OptionsSearchEventArgs<LanguageOption> e)
         {
             if (LangCodes is null)
             {
-                e.Items = Array.Empty<LangCode>();
+                e.Items = Array.Empty<LanguageOption>();
                 return;
             }
 
             e.Items = LangCodes
-                .Where(i => i.Value.Contains(e.Text ?? string.Empty, StringComparison.OrdinalIgnoreCase))
+                .Where(i => i.Name.Contains(e.Text ?? string.Empty, StringComparison.OrdinalIgnoreCase))
                 .ToArray();
 
             await Task.CompletedTask;

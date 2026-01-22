@@ -1,9 +1,6 @@
 ﻿
 namespace sd.Client.Models
 {
-    public class LangCode
-    {
-        public string Key { get; set; }
-        public string Value { get; set; }
-    }
+    public readonly record struct LanguageOption(string Code, string Name);
+
 }

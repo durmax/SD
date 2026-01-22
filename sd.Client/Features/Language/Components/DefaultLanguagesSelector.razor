@@ -2,12 +2,12 @@
 @using sd.Client.Models
 
 <FluentGridItem xs="5">
-    <FluentCombobox TOption="LangCode"
+    <FluentCombobox TOption="LanguageOption"
                     Items="@ItemsSafe"
                     Width="70%"
                     Label="@MotherLanguageLabel"
-                    OptionText="@(i => i.Value)"
-                    OptionValue="@(i => i.Key)"
+                    OptionText="@(i => i.Name)"
+                    OptionValue="@(i => i.Code)"
                     Value="@Tl"
                     ValueChanged="OnTlValueChanged"
                     Autocomplete="ComboboxAutocomplete.Inline" />
@@ -19,35 +19,32 @@
 </FluentGridItem>
 
 <FluentGridItem xs="5">
-    <FluentCombobox TOption="LangCode"
+    <FluentCombobox TOption="LanguageOption"
                     Items="@ItemsSafe"
                     Width="70%"
                     Label="@SecondLanguageLabel"
-                    OptionText="@(i => i.Value)"
-                    OptionValue="@(i => i.Key)"
+                    OptionText="@(i => i.Name)"
+                    OptionValue="@(i => i.Code)"
                     Value="@Fl"
                     ValueChanged="OnFlValueChanged"
                     Autocomplete="ComboboxAutocomplete.Inline" />
 </FluentGridItem>
 
 @code {
-    // Source for combobox items (you currently use SelectedItems)
-    [Parameter] public IEnumerable<LangCode>? Items { get; set; }
+    [Parameter] public IEnumerable<LanguageOption>? Items { get; set; }
 
     // Current values
     [Parameter] public string? Tl { get; set; }
     [Parameter] public string? Fl { get; set; }
 
-    // Localized labels from the page
     [Parameter] public string MotherLanguageLabel { get; set; } = "Mother language";
     [Parameter] public string SecondLanguageLabel { get; set; } = "Second language";
 
-    // Events (your page already has OnMotherlanguageKeyChanged / OnSecondlanguageKeyChanged)
     [Parameter] public EventCallback<string?> TlChanged { get; set; }
     [Parameter] public EventCallback<string?> FlChanged { get; set; }
     [Parameter] public EventCallback<string?> Reverse { get; set; }
 
-    private IEnumerable<LangCode> ItemsSafe => Items ?? Array.Empty<LangCode>();
+    private IEnumerable<LanguageOption> ItemsSafe => Items ?? Array.Empty<LanguageOption>();
 
     private async Task OnTlValueChanged(string? key)
     {

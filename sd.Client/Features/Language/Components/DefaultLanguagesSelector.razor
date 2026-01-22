@@ -7,15 +7,15 @@
                     Width="70%"
                     Label="@MotherLanguageLabel"
                     OptionText="@(i => i.Name)"
-                    OptionValue="@(i => i.Code)"
-                    Value="@Tl"
-                    ValueChanged="OnTlValueChanged"
+                    SelectedOption="@SelectedToOption"
+                    SelectedOptionChanged="OnToSelectedChanged"
                     Autocomplete="ComboboxAutocomplete.Inline" />
 </FluentGridItem>
 
 <FluentGridItem xs="2">
     <FluentLabel>Reverse</FluentLabel>
-    <FluentButton OnClick="OnReverse" IconEnd="@(new Icons.Regular.Size16.ArrowBidirectionalLeftRight())" />
+    <FluentButton OnClick="OnReverse"
+                  IconEnd="@(new Icons.Regular.Size16.ArrowBidirectionalLeftRight())" />
 </FluentGridItem>
 
 <FluentGridItem xs="5">
@@ -24,40 +24,51 @@
                     Width="70%"
                     Label="@SecondLanguageLabel"
                     OptionText="@(i => i.Name)"
-                    OptionValue="@(i => i.Code)"
-                    Value="@Fl"
-                    ValueChanged="OnFlValueChanged"
+                    SelectedOption="@SelectedFromOption"
+                    SelectedOptionChanged="OnFromSelectedChanged"
                     Autocomplete="ComboboxAutocomplete.Inline" />
 </FluentGridItem>
 
+
 @code {
     [Parameter] public IEnumerable<LanguageOption>? Items { get; set; }
-
-    // Current values
-    [Parameter] public string? Tl { get; set; }
-    [Parameter] public string? Fl { get; set; }
+    [Parameter] public LanguagePair Pair { get; set; }
+    [Parameter] public EventCallback<LanguagePair> PairChanged { get; set; }
+    [Parameter] public EventCallback Reverse { get; set; }
 
     [Parameter] public string MotherLanguageLabel { get; set; } = "Mother language";
     [Parameter] public string SecondLanguageLabel { get; set; } = "Second language";
 
-    [Parameter] public EventCallback<string?> TlChanged { get; set; }
-    [Parameter] public EventCallback<string?> FlChanged { get; set; }
-    [Parameter] public EventCallback<string?> Reverse { get; set; }
-
     private IEnumerable<LanguageOption> ItemsSafe => Items ?? Array.Empty<LanguageOption>();
 
-    private async Task OnTlValueChanged(string? key)
+    // IMPORTANT: must return an actual item from ItemsSafe
+    private LanguageOption SelectedToOption =>
+        ItemsSafe.FirstOrDefault(x => x.Code == Pair.To.Code);
+
+    private LanguageOption SelectedFromOption =>
+        ItemsSafe.FirstOrDefault(x => x.Code == Pair.From.Code);
+
+    private async Task OnToSelectedChanged(LanguageOption option)
     {
-        Tl = key;
-        if (TlChanged.HasDelegate)
-            await TlChanged.InvokeAsync(key);
+        // Defensive guard (struct default)
+        if (string.IsNullOrWhiteSpace(option.Code))
+            return;
+
+        Pair = Pair with { To = option };
+
+        if (PairChanged.HasDelegate)
+            await PairChanged.InvokeAsync(Pair);
     }
 
-    private async Task OnFlValueChanged(string? key)
+    private async Task OnFromSelectedChanged(LanguageOption option)
     {
-        Fl = key;
-        if (FlChanged.HasDelegate)
-            await FlChanged.InvokeAsync(key);
+        if (string.IsNullOrWhiteSpace(option.Code))
+            return;
+
+        Pair = Pair with { From = option };
+
+        if (PairChanged.HasDelegate)
+            await PairChanged.InvokeAsync(Pair);
     }
 
     private async Task OnReverse()

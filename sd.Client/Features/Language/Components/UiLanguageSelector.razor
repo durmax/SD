@@ -8,29 +8,30 @@
                     Label="@Label"
                     OptionText="@(i => i.Name)"
                     OptionValue="@(i => i.Code)"
-                    Value="@Value"
-                    ValueChanged="OnValueChanged"
+                    SelectedOption="@SelectedOption"
+                    SelectedOptionChanged="OnSelectedOptionChanged"
                     Autocomplete="ComboboxAutocomplete.Inline" />
 </FluentGridItem>
 
 @code {
     [Parameter] public IEnumerable<LanguageOption>? Items { get; set; }
-
-    // current selected UI language key (e.g. "Deutsch", "English" depending on your UILangs keys)
     [Parameter] public string? Value { get; set; }
-
-    // label text
     [Parameter] public string Label { get; set; } = "UI Language";
-
-    // event to page
     [Parameter] public EventCallback<string?> ValueChanged { get; set; }
 
     private IEnumerable<LanguageOption> ItemsSafe => Items ?? Array.Empty<LanguageOption>();
 
-    private async Task OnValueChanged(string? key)
+    private LanguageOption SelectedOption =>
+        ItemsSafe.FirstOrDefault(x => x.Code == Value);
+
+    private async Task OnSelectedOptionChanged(LanguageOption option)
     {
-        Value = key;
+        if (string.IsNullOrWhiteSpace(option.Code))
+            return;
+
+        Value = option.Code;
+
         if (ValueChanged.HasDelegate)
-            await ValueChanged.InvokeAsync(key);
+            await ValueChanged.InvokeAsync(Value);
     }
 }

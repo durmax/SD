@@ -7,12 +7,7 @@
 @using sd.Client.Services
 
 <FluentCard>
-    <FluentHeader>
-        @LanguageContainer.Keys["LangConfig"]
-    </FluentHeader>
-
-    <br />
-    <FluentGrid Spacing="1" AdaptiveRendering="true" Justify="JustifyContent.Center" Style="padding: 2px;">
+    <FluentGrid>
         <KnownLanguagesPicker Label="@LanguageContainer.Keys["AddLang"]"
                               Placeholder="@LanguageContainer.Keys["AddLang"]"
                               Width="100%"
@@ -20,51 +15,42 @@
                               SelectedOptions="SelectedItems"
                               SelectedOptionsChanged="OnSelectedOptionsChanged" />
 
-        @if (SelectedItems != null)
-        {
-            <UiLanguageSelector Items="UiLangItems"
-                                Value="@UILang"
-                                ValueChanged="OnUILangChanged"
-                                Label="UI Language" />
+        <UiLanguageSelector Items="UiLangItems"
+                            Value="@UILang"
+                            ValueChanged="OnUILangChanged"
+                            Label="UI Language" />
 
-            <DefaultLanguagesSelector Items="SelectedItems"
-                                      Pair="ActivePair"
-                                      PairChanged="OnActivePairChanged"
-                                      Reverse="Reverse"
-                                      MotherLanguageLabel="@LanguageContainer.Keys["Motherlanguage"]"
-                                      SecondLanguageLabel="@LanguageContainer.Keys["Secondlanguage"]" />
-        }
+        <DefaultLanguagesSelector Items="SelectedItems"
+                                  Pair="ActivePair"
+                                  PairChanged="OnActivePairChanged"
+                                  Reverse="Reverse"
+                                  MotherLanguageLabel="@LanguageContainer.Keys["Motherlanguage"]"
+                                  SecondLanguageLabel="@LanguageContainer.Keys["Secondlanguage"]" />
     </FluentGrid>
 
-    @if (KnownLangs != null)
-    {
-        @if (opRes != null)
-        {
-            <FluentSortableList Items="opRes" OnUpdate="@SortListAsync" Sort="true" Handle="true">
-                <ItemTemplate>
-                    <span class="sortable-grab" title="Drag to reorder">≡</span>
-                    <div class="sortable-item-content">
-                        <OtherPage otherPage="@context"
-                                   FavSite="@FavSite"
-                                   CanSetFavSite="true"
-                                   FLangCode="@ActivePair.From.Code"
-                                   TLangCode="@ActivePair.To.Code" />
-                    </div>
-                </ItemTemplate>
-            </FluentSortableList>
-        }
-        <FluentGridItem xs="12" class="m-2">
-            <FluentButton Appearance="Appearance.Accent"
-                          OnClick="ResetOPAsync">
-                Reset for @ActivePair.From.Code-@ActivePair.To.Code
-            </FluentButton>
+    <FluentSortableList Items="opRes" OnUpdate="@SortListAsync" Sort="true" Handle="true">
+        <ItemTemplate>
+            <span class="sortable-grab" title="Drag to reorder">≡</span>
+            <div class="sortable-item-content">
+                <OtherPage otherPage="@context"
+                           FavSite="@FavSite"
+                           CanSetFavSite="true"
+                           FLangCode="@ActivePair.From.Code"
+                           TLangCode="@ActivePair.To.Code" />
+            </div>
+        </ItemTemplate>
+    </FluentSortableList>
 
-            <FluentButton Appearance="Appearance.Accent"
-                          BackgroundColor="Red"
-                          Class="float-right"
-                          OnClick="RemoveAllDataAsync">
-                Remove all stored data
-            </FluentButton>
-        </FluentGridItem>
-    }
+    <FluentButton Appearance="Appearance.Accent"
+                  OnClick="ResetOPAsync">
+        Reset for @ActivePair.From.Code-@ActivePair.To.Code
+    </FluentButton>
+
+    <FluentButton Appearance="Appearance.Accent"
+                  BackgroundColor="Red"
+                  Class="float-right"
+                  OnClick="RemoveAllDataAsync">
+        Remove all stored data
+    </FluentButton>
+
 </FluentCard>

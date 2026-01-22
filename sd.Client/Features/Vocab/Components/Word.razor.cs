@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
-using sd.Client.Features.Language.Domain;
+using sd.Client.Features.Vocab.Contracts;
 using sd.Client.Helpers;
 using sd.Client.Models;
 using sd.Client.Services;

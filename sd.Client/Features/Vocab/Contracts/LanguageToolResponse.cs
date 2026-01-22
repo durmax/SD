@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace sd.Client.Models
+namespace sd.Client.Features.Vocab.Contracts
 {
     public class LanguageToolResponse
     {

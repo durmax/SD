@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using sd.Client.Features.Language.Domain;
+using sd.Client.Features.Language.Contracts;
 using sd.Client.Helpers;
 using sd.Client.Services;
 using sd.Shared;

@@ -6,7 +6,7 @@ using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using sd.Client.Features.Language.State;
 using sd.Client.Helpers;
-using sd.Client.Models;
+using sd.Client.Features.Language.Contracts;
 using sd.Client.Services;
 using sd.Shared;
 using System;

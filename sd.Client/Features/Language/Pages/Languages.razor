@@ -25,8 +25,8 @@
                                 Label="UI Language" />
 
             <DefaultLanguagesSelector Items="SelectedItems"
-                                      Tl="@TlangName"
-                                      Fl="@FlangName"
+                                      Tl="@ToLanguage.Name"
+                                      Fl="@FromLanguage.Name"
                                       TlChanged="OnMotherlanguageChanged"
                                       FlChanged="OnSecondlanguageChanged"
                                       Reverse="Reverse"
@@ -46,14 +46,14 @@
                             <OtherPage otherPage="@context"
                                        FavSite="@FavSite"
                                        CanSetFavSite="true"
-                                       FLangCode="@Fl"
-                                       TLangCode="@Tl" />
+                                   FLangCode="@FromLanguage.Code"
+                                   TLangCode="@ToLanguage.Code" />
                         </div>
                     </ItemTemplate>
                 </FluentSortableList>
             }
         <div class="mb-2">
-            <button type="reset" class="btn btn-light" @onclick="ResetOPAsync"> Reset for @Fl-@Tl </button>
+            <button type="reset" class="btn btn-light" @onclick="ResetOPAsync"> Reset for @FromLanguage.Code-@ToLanguage.Code </button>
             <button type="reset" class="btn btn-danger float-right" @onclick="RemoveAllDataAsync">Remove all stored data</button>
         </div>
     }

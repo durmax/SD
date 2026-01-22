@@ -48,11 +48,8 @@ namespace sd.Client.Features.Language.Pages
         private bool _suppressSelectedItemsChanged = true;
         private bool _isPersistingSelectedItems;
 
-        // Active lang codes used for dictionary links ordering keys etc.
-        protected string Fl { get; set; }
-        protected string Tl { get; set; }
-        protected string FlangName { get; set; }
-        protected string TlangName { get; set; }
+        protected LanguageOption FromLanguage { get; set; }
+        protected LanguageOption ToLanguage { get; set; }
 
         protected string FavSite { get; private set; } = string.Empty;
 
@@ -65,10 +62,10 @@ namespace sd.Client.Features.Language.Pages
             {
                 _isPersistingSelectedItems = true;
 
-                SelectedItems = options?? Array.Empty<LanguageOption>();
+                SelectedItems = options ?? Array.Empty<LanguageOption>();
 
                 KnownLangs = SelectedItems.Select(x => x.Code).Distinct().ToList();
-                KnownLanguagesStore.EnsureContains(KnownLangs, Fl, Tl);
+                KnownLanguagesStore.EnsureContains(KnownLangs, FromLanguage.Code, ToLanguage.Code);
 
                 await KnownLanguagesStore.SaveAsync(KnownLangs);
             }
@@ -80,20 +77,26 @@ namespace sd.Client.Features.Language.Pages
 
         protected async Task Reverse()
         {
-            (Tl, Fl) = (Fl, Tl);
-            (TlangName, FlangName) = (FlangName, TlangName);
-           await ReloadProvidersAsync();
+            (FromLanguage, ToLanguage) = (ToLanguage, FromLanguage);
+            await ReloadProvidersAsync();
         }
 
         protected override async Task OnInitializedAsync()
         {
             await DefaultLangsService.SetDefLangsAsync();
 
-            Fl = DefaultLangsService.DefaultWordLang ?? "en";
-            Tl = DefaultLangsService.DefaultToLang ?? "de";
+            var fromCode = DefaultLangsService.DefaultWordLang ?? "en";
+            var toCode = DefaultLangsService.DefaultToLang ?? "de";
 
-            FlangName = LangCodesHelper.GetLanguage(Fl);
-            TlangName = LangCodesHelper.GetLanguage(Tl);
+            FromLanguage = new LanguageOption(
+                fromCode,
+                LangCodesHelper.GetLanguage(fromCode)
+            );
+
+            ToLanguage = new LanguageOption(
+                toCode,
+                LangCodesHelper.GetLanguage(toCode)
+            );
 
             LangCodes ??= LangCodesHelper.Langs
                 .Select(x => new LanguageOption(x.Key, x.Value));
@@ -102,12 +105,12 @@ namespace sd.Client.Features.Language.Pages
             KnownLangs = await KnownLanguagesStore.GetAsync();
 
             // Ensure current FL/TL are included + persist back
-            KnownLanguagesStore.EnsureContains(KnownLangs, Fl, Tl);
+            KnownLanguagesStore.EnsureContains(KnownLangs, FromLanguage.Code, ToLanguage.Code);
             await KnownLanguagesStore.SaveAsync(KnownLangs);
 
 
             UiLangItems = LangCodesHelper.UILangs
-                .Select(x => new LanguageOption(x.Key,x.Key));
+                .Select(x => new LanguageOption(x.Key, x.Key));
 
             // UI language initial selection
             var culture = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
@@ -133,37 +136,50 @@ namespace sd.Client.Features.Language.Pages
         {
             try
             {
-                opRes = await DictionaryLinksService.GetOpRes(Fl, Tl, string.Empty) ?? new List<DictionaryProviderDto>(); // :contentReference[oaicite:2]{index=2}
-                FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(Fl, Tl)) ?? string.Empty;
+                opRes = await DictionaryLinksService.GetOpRes(FromLanguage.Code, ToLanguage.Code, string.Empty) ?? new List<DictionaryProviderDto>(); // :contentReference[oaicite:2]{index=2}
+                FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(FromLanguage.Code, ToLanguage.Code)) ?? string.Empty;
             }
             catch (Exception ex)
             {
-                Log.LogError(ex, $"ReloadProvidersAsync failed for {Fl}-{Tl}");
+                Log.LogError(ex, $"ReloadProvidersAsync failed for {FromLanguage.Code}-{ToLanguage.Code}");
             }
         }
 
         protected async Task OnMotherlanguageChanged(string? langName)
         {
-           await OnLanguageChanged(langName, LangStorageKeys.ToLang, setAsDefaultWordLang: false, code => Tl = code);
-            TlangName = langName;
+            if (string.IsNullOrWhiteSpace(langName)) return;
+
+            var code = LangCodesHelper.GetLanguageCode(langName);
+            ToLanguage = new LanguageOption(code, langName);
+
+            await PersistLanguageChange(
+                code,
+                LangStorageKeys.ToLang,
+                setAsDefaultWordLang: false
+            );
         }
 
         protected async Task OnSecondlanguageChanged(string? langName)
         {
-            await OnLanguageChanged(langName, LangStorageKeys.FromLang, setAsDefaultWordLang: true, code => Fl = code);
-            FlangName = langName;
+            if (string.IsNullOrWhiteSpace(langName)) return;
+
+            var code = LangCodesHelper.GetLanguageCode(langName);
+            FromLanguage = new LanguageOption(code, langName);
+
+            await PersistLanguageChange(
+                code,
+                LangStorageKeys.FromLang,
+                setAsDefaultWordLang: true
+            );
         }
 
-        protected async Task OnLanguageChanged(string? langName, string storageKey, bool setAsDefaultWordLang, Action<string> setLang)
+        private async Task PersistLanguageChange(
+            string langCode,
+            string storageKey,
+            bool setAsDefaultWordLang)
         {
-            if (string.IsNullOrWhiteSpace(langName))
-                return;
-
-            var langCode = LangCodesHelper.GetLanguageCode(langName);
-
-            setLang(langCode);
-
-            if (setAsDefaultWordLang) DefaultLangsService.DefaultWordLang = langCode;
+            if (setAsDefaultWordLang)
+                DefaultLangsService.DefaultWordLang = langCode;
 
             KnownLanguagesStore.EnsureContains(KnownLangs, langCode);
 
@@ -213,7 +229,7 @@ namespace sd.Client.Features.Language.Pages
                 opRes[i].Eval = i;
 
             var serialized = JsonConvert.SerializeObject(opRes);
-            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(Fl, Tl), serialized);
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(FromLanguage.Code, ToLanguage.Code), serialized);
         }
 
         protected async Task OnSearchAsync(OptionsSearchEventArgs<LanguageOption> e)
@@ -233,10 +249,10 @@ namespace sd.Client.Features.Language.Pages
 
         protected async Task ResetOPAsync()
         {
-            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"You try to reset {Fl}-{Tl}, are you sure?");
+            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"You try to reset {FromLanguage.Code}-{ToLanguage.Code}, are you sure?");
             if (!confirmed) return;
 
-            await LocalStorageAccessor.RemoveAsync(LangStorageKeys.DictionaryOrder(Fl, Tl));
+            await LocalStorageAccessor.RemoveAsync(LangStorageKeys.DictionaryOrder(FromLanguage.Code, ToLanguage.Code));
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
 

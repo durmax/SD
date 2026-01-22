@@ -23,7 +23,7 @@ namespace sd.Client.Features.Vocab.Components;
         [Inject] ILogger<WordBase> Log { get; set; }
         [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
         [Inject] IJSRuntime JsRuntime { set; get; }
-        [Inject] DictionaryLinksService OtherPageService { set; get; }
+        [Inject] DictionaryLinksService DictionaryLinksService { set; get; }
         [Inject] protected CurrentUserService CurrentUser { set; get; }
         [Inject] protected ApiService ApiService { get; set; }
         [Inject] protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
@@ -79,7 +79,7 @@ namespace sd.Client.Features.Vocab.Components;
 
             if (isSubmit && !string.IsNullOrWhiteSpace(FavSite) && WordDto is not null)
             {
-                var url = OtherPageService.BuildLink(FavSite, WordDto.Title, WordDto.WordLang, WordDto.ToLang);
+                var url = DictionaryLinksService.BuildLink(FavSite, WordDto.Title, WordDto.WordLang, WordDto.ToLang);
                 await JsRuntime.InvokeVoidAsync("window.open", url, "popup");
             }
         }
@@ -438,7 +438,7 @@ namespace sd.Client.Features.Vocab.Components;
             string tl = WordDto?.ToLang ?? DefaultLangsService.DefaultToLang;
             try
             {
-                opRes = await OtherPageService.GetOpRes(fl, tl, WordDto.Title);
+                opRes = await DictionaryLinksService.GetOpRes(fl, tl, WordDto.Title);
                 FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(fl, tl));
             }
             catch (Exception ex)

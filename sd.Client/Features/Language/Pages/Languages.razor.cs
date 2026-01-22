@@ -24,7 +24,7 @@ namespace sd.Client.Features.Language.Pages
         [Inject] protected DefaultLangsService DefaultLangsService { get; set; } = default!;
         [Inject] protected ILanguageContainerService LanguageContainer { get; set; } = default!;
         [Inject] protected NavigationManager NavigationManager { get; set; } = default!;
-        [Inject] protected DictionaryLinksService OtherPageService { get; set; } = default!;
+        [Inject] protected DictionaryLinksService DictionaryLinksService { get; set; } = default!;
         [Inject] protected IKnownLanguagesStore KnownLanguagesStore { get; set; } = default!;
 
         // All languages list (dropdown source)
@@ -134,20 +134,11 @@ namespace sd.Client.Features.Language.Pages
             await ReloadProvidersAsync();
         }
 
-        protected async Task OnUILangChanged(string? value)
-        {
-            UILang = value;
-            await SetUILangAsync();
-        }
-
         protected async Task ReloadProvidersAsync()
         {
             try
             {
-                //if (!string.IsNullOrWhiteSpace(Fl) && Fl.Length > 2) Fl = LangCodesHelper.GetLanguageCode(Fl);
-                //if (!string.IsNullOrWhiteSpace(Tl) && Tl.Length > 2) Tl = LangCodesHelper.GetLanguageCode(Tl);
-
-                opRes = await OtherPageService.GetOpRes(Fl, Tl, string.Empty) ?? new List<DictionaryProviderDto>(); // :contentReference[oaicite:2]{index=2}
+                opRes = await DictionaryLinksService.GetOpRes(Fl, Tl, string.Empty) ?? new List<DictionaryProviderDto>(); // :contentReference[oaicite:2]{index=2}
                 FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(Fl, Tl)) ?? string.Empty;
             }
             catch (Exception ex)
@@ -187,8 +178,9 @@ namespace sd.Client.Features.Language.Pages
             await ReloadProvidersAsync();
         }
 
-        protected async Task SetUILangAsync()
+        protected async Task OnUILangChanged(string? value)
         {
+            UILang = value;
             var fallbackCulture = "en-US";
 
             try

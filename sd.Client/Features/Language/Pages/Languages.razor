@@ -16,8 +16,6 @@
 
     <!-- Main content -->
     <FluentGrid Class="lang-grid">
-
-        @*  <FluentGrid Class="lang-grid"> *@
         <FluentGridItem xs="12" sm="12" md="12" lg="12">
             <FluentCard AreaRestricted="false">
 
@@ -33,7 +31,7 @@
         </FluentGridItem>
 
         <!-- Section: Display -->
-        <FluentGridItem xs="12" sm="12" md="6" lg="6">
+        <FluentGridItem xs="12" sm="12" md="12" lg="12">
             <FluentCard AreaRestricted="false">
                 <h6>Display</h6>
                 <UiLanguageSelector Items="UiLangItems"
@@ -45,7 +43,7 @@
         </FluentGridItem>
 
         <!-- Section: Pair -->
-        <FluentGridItem xs="12" sm="12" md="6" lg="6">
+        <FluentGridItem xs="12" sm="12" md="12" lg="12">
             <FluentCard AreaRestricted="false">
                 <h6>Language pair</h6>
 
@@ -117,42 +115,32 @@
 
         <!-- Danger zone -->
         <FluentGridItem xs="12" sm="12" md="12" lg="12">
-            <FluentCard Class="section-card danger-zone">
+            <FluentCard>
                 <FluentStack Orientation="Orientation.Vertical" HorizontalGap="8">
                     <h6>Reset</h6>
                     <p>These actions affect stored data and cannot be undone.</p>
 
-                    <FluentStack Orientation="Orientation.Horizontal"
-                                 HorizontalAlignment="HorizontalAlignment.Center"
-                                 VerticalAlignment="VerticalAlignment.Center">
-                        <FluentStack Orientation="Orientation.Vertical" HorizontalGap="2">
-                            <h6>Remove all stored data</h6>
-                            <p>Clears all saved settings, resources, and favorites.</p>
-                        </FluentStack>
-
+                    <FluentStack Orientation="Orientation.Horizontal" VerticalGap="2">
+                        <p>Clears all saved settings, resources, and favorites.</p>
                         <FluentButton Appearance="Appearance.Accent"
+                                      Style="margin-left: auto;"
                                       BackgroundColor="Red"
                                       OnClick="() => isRemoveAllDialogHidden = false">
                             Remove
                         </FluentButton>
                     </FluentStack>
 
-                    <FluentStack Orientation="Orientation.Horizontal"
-                                 HorizontalAlignment="HorizontalAlignment.Center"
-                                 VerticalAlignment="VerticalAlignment.Center">
-
-                        <FluentStack Orientation="Orientation.Vertical" HorizontalGap="2">
-                            <p>Active pair: @ActivePair.From.Code → @ActivePair.To.Code</p>
-                        </FluentStack>
-
+                    <FluentStack Orientation="Orientation.Horizontal" VerticalGap="2">
+                        <p>Only for active pair: @ActivePair.From.Code → @ActivePair.To.Code</p>
                         <FluentButton Appearance="Appearance.Outline"
+                                      Style="margin-left: auto;"
                                       OnClick="() => isResetDialogHidden = false">
                             Reset resources
                         </FluentButton>
-
                     </FluentStack>
 
                 </FluentStack>
+
             </FluentCard>
         </FluentGridItem>
     </FluentGrid>

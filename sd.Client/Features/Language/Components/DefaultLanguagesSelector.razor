@@ -1,33 +1,35 @@
 ﻿@using Microsoft.FluentUI.AspNetCore.Components
 @using sd.Client.Features.Language.Contracts
 
-<FluentGridItem xs="5">
-    <FluentCombobox TOption="LanguageOption"
-                    Items="@ItemsSafe"
-                    Width="70%"
-                    Label="@MotherLanguageLabel"
-                    OptionText="@(i => i.Name)"
-                    SelectedOption="@SelectedToOption"
-                    SelectedOptionChanged="OnToSelectedChanged"
-                    Autocomplete="ComboboxAutocomplete.Inline" />
-</FluentGridItem>
+<FluentGrid>
+    <FluentGridItem xs="5">
+        <FluentCombobox TOption="LanguageOption"
+                        Items="@ItemsSafe"
+                        Width="70%"
+                        Label="@MotherLanguageLabel"
+                        OptionText="@(i => i.Name)"
+                        SelectedOption="@SelectedToOption"
+                        SelectedOptionChanged="OnToSelectedChanged"
+                        Autocomplete="ComboboxAutocomplete.Inline" />
+    </FluentGridItem>
 
-<FluentGridItem xs="2">
-    <FluentLabel>Reverse</FluentLabel>
-    <FluentButton OnClick="OnReverse"
-                  IconEnd="@(new Icons.Regular.Size16.ArrowBidirectionalLeftRight())" />
-</FluentGridItem>
+    <FluentGridItem xs="2">
+        <FluentLabel Class="float-none">Rev</FluentLabel>
+        <FluentButton OnClick="OnReverse"
+                      IconEnd="@(new Icons.Regular.Size16.ArrowBidirectionalLeftRight())" />
+    </FluentGridItem>
 
-<FluentGridItem xs="5">
-    <FluentCombobox TOption="LanguageOption"
-                    Items="@ItemsSafe"
-                    Width="70%"
-                    Label="@SecondLanguageLabel"
-                    OptionText="@(i => i.Name)"
-                    SelectedOption="@SelectedFromOption"
-                    SelectedOptionChanged="OnFromSelectedChanged"
-                    Autocomplete="ComboboxAutocomplete.Inline" />
-</FluentGridItem>
+    <FluentGridItem xs="5">
+        <FluentCombobox TOption="LanguageOption"
+                        Items="@ItemsSafe"
+                        Width="70%"
+                        Label="@SecondLanguageLabel"
+                        OptionText="@(i => i.Name)"
+                        SelectedOption="@SelectedFromOption"
+                        SelectedOptionChanged="OnFromSelectedChanged"
+                        Autocomplete="ComboboxAutocomplete.Inline" />
+    </FluentGridItem>
+</FluentGrid>
 
 
 @code {

@@ -71,5 +71,8 @@ builder.Services.AddScoped<VocabStore>();
 
 builder.Services.AddScoped<IKnownLanguagesStore, KnownLanguagesStore>();
 
-
 await builder.Build().RunAsync();
+
+//var app = builder.Build();
+//app.MapRazorComponents<App>().AddInteractiveServerRenderMode;
+//await app.RunAsync();

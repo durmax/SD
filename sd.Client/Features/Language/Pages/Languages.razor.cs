@@ -27,6 +27,8 @@ namespace sd.Client.Features.Language.Pages
         [Inject] protected DictionaryLinksService DictionaryLinksService { get; set; } = default!;
         [Inject] protected IKnownLanguagesStore KnownLanguagesStore { get; set; } = default!;
 
+        [Inject] IDialogService DialogService { get; set; } = default!;
+
         // All languages list (dropdown source)
         public IEnumerable<LanguageOption>? LangCodes { get; set; }
 
@@ -51,6 +53,9 @@ namespace sd.Client.Features.Language.Pages
         protected LanguagePair ActivePair { get; set; }
 
         protected string FavSite { get; private set; } = string.Empty;
+
+        protected bool isResetDialogHidden = true;
+        protected bool isRemoveAllDialogHidden = true;
 
         protected async Task OnSelectedOptionsChanged(IEnumerable<LanguageOption> options)
         {
@@ -219,8 +224,7 @@ namespace sd.Client.Features.Language.Pages
 
         protected async Task ResetOPAsync()
         {
-            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"You try to reset {ActivePair.From.Code}-{ActivePair.To.Code}, are you sure?");
-            if (!confirmed) return;
+            isResetDialogHidden = false;
 
             await LocalStorageAccessor.RemoveAsync(LangStorageKeys.DictionaryOrder(ActivePair.From.Code, ActivePair.To.Code));
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
@@ -228,8 +232,7 @@ namespace sd.Client.Features.Language.Pages
 
         protected async Task RemoveAllDataAsync()
         {
-            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete all data, are you sure?");
-            if (!confirmed) return;
+            isRemoveAllDialogHidden = false;
 
             await LocalStorageAccessor.Clear();
             await JsRuntime.InvokeVoidAsync("alert", "Your data are deleted");

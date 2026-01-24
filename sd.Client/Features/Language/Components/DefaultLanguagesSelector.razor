@@ -6,7 +6,7 @@
         <FluentCombobox TOption="LanguageOption"
                         Items="@ItemsSafe"
                         Width="70%"
-                        Label="@MotherLanguageLabel"
+                        Label="@FirstLanguageLabel"
                         OptionText="@(i => i.Name)"
                         SelectedOption="@SelectedToOption"
                         SelectedOptionChanged="OnToSelectedChanged"
@@ -38,7 +38,7 @@
     [Parameter] public EventCallback<LanguagePair> PairChanged { get; set; }
     [Parameter] public EventCallback Reverse { get; set; }
 
-    [Parameter] public string MotherLanguageLabel { get; set; } = "Mother language";
+    [Parameter] public string FirstLanguageLabel { get; set; } = "Mother language";
     [Parameter] public string SecondLanguageLabel { get; set; } = "Second language";
 
     private IEnumerable<LanguageOption> ItemsSafe => Items ?? Array.Empty<LanguageOption>();

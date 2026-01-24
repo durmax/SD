@@ -94,8 +94,8 @@ namespace sd.Client.Features.Language.Pages
             var toCode = DefaultLangsService.DefaultToLang ?? "de";
 
             ActivePair = new LanguagePair(
-                new LanguageOption(fromCode, LangCodesHelper.GetLanguage(fromCode)),
-                new LanguageOption(toCode, LangCodesHelper.GetLanguage(toCode)));
+                new LanguageOption(fromCode, LangCodesHelper.GetLanguageNameOrEmpty(fromCode)),
+                new LanguageOption(toCode, LangCodesHelper.GetLanguageNameOrEmpty(toCode)));
 
             LangCodes ??= LangCodesHelper.Langs
                 .Select(x => new LanguageOption(x.Key, x.Value));
@@ -108,12 +108,12 @@ namespace sd.Client.Features.Language.Pages
             await KnownLanguagesStore.SaveAsync(KnownLangs);
 
 
-            UiLangItems = LangCodesHelper.UILangs
+            UiLangItems = LangCodesHelper.UiLangs
                 .Select(x => new LanguageOption(x.Key, x.Key));
 
             // UI language initial selection
             var culture = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
-            UILang = LangCodesHelper.UILangs.FirstOrDefault(x => x.Value == culture).Key;
+            UILang = LangCodesHelper.UiLangs.FirstOrDefault(x => x.Value == culture).Key;
 
             if (!_selectedItemsInitialized)
             {
@@ -171,7 +171,7 @@ namespace sd.Client.Features.Language.Pages
 
             try
             {
-                var culture = (UILang != null && LangCodesHelper.UILangs.TryGetValue(UILang, out var c))
+                var culture = (UILang != null && LangCodesHelper.UiLangs.TryGetValue(UILang, out var c))
                     ? c
                     : fallbackCulture;
 

@@ -72,8 +72,8 @@ public class DictionaryLinksService
 
         List<string> properties = new() { "FLangCode", "TLangCode", "FLangName", "TLangName", "Word" };
 
-        _linkModel.FLangName = LangCodesHelper.GetLanguage(fromLang); // Get LangName from dictionery names
-        _linkModel.TLangName = LangCodesHelper.GetLanguage(toLang); // GetLangName
+        _linkModel.FLangName = LangCodesHelper.GetLanguageNameOrEmpty(fromLang); // Get LangName from dictionery names
+        _linkModel.TLangName = LangCodesHelper.GetLanguageNameOrEmpty(toLang); // GetLangName
 
         _linkModel.Word = word;
 
@@ -101,7 +101,7 @@ public class DictionaryLinksService
             {
                 if (_linkModel.FLangCode == "ar")
                 {
-                    _linkModel.FLangName = LangCodesHelper.GetLanguage(_linkModel.TLangCode);
+                    _linkModel.FLangName = LangCodesHelper.GetLanguageNameOrEmpty(_linkModel.TLangCode);
                     _linkModel.TLangName = "arabic";
                 }
                 if (_linkModel.FLangCode == "de" || _linkModel.TLangCode == "de")

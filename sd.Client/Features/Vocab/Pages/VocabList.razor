@@ -10,7 +10,7 @@
     <FluentAccordion>
         @foreach (var word in Store.Items)
         {
-            <FluentAccordionItem Heading="@word?.Title" Class="@(!Guid.TryParse(word?.WordId, out Guid result) ? "border-primary" : "border-dark")">
+            <FluentAccordionItem Heading="@word?.Title" Expanded="@int.TryParse(@word.WordId, out int id)" Class="@(!Guid.TryParse(word?.WordId, out Guid result) ? "border-primary" : "border-dark")">
                 <Word WordDto="word"
                       OnWordSave="@OnWordSave"
                       OnWordFound="@OnWordFound"

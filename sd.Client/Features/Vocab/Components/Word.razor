@@ -20,7 +20,7 @@
                  VerticalAlignment="VerticalAlignment.Center"
                  HorizontalGap="0">
 
-        <FluentButton Id="@WordDto.WordId"
+                 <FluentButton Id="@WordDto.WordId"
                       Appearance="Appearance.Outline"
                       IconStart="@(new Icons.Regular.Size16.MoreHorizontal())"
                       OnClick="@(() => open = !open)" />
@@ -29,14 +29,12 @@
             <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
                 @foreach (var op in opRes)
                 {
-                    <FluentAnchor Href="@op.Link"
-                                  Target="_blank">
+                    <FluentMenuItem OnClick="@(() => OpenLink(op.Link))">
                         @op.Host
-                    </FluentAnchor>
+                    </FluentMenuItem>
                 }
             </FluentStack>
-        </FluentMenu>
-
+        </FluentMenu> 
 
         <FluentTextField Id="wordId"
                          Value="@WordDto.Title"

@@ -68,6 +68,11 @@ public class WordBase : ComponentBase
         return Task.CompletedTask;
     }
 
+    protected async Task OpenLink(string url)
+    {
+        open = false;                    // close menu deterministically
+        await JsRuntime.InvokeVoidAsync("open", url, "_blank"); // window.open
+    }
     protected async Task KeydownAsync(KeyboardEventArgs e)
     {
         // Mobile keyboards may send different keys for the "action" button

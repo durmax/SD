@@ -1,4 +1,5 @@
-﻿using Blazored.TextEditor;
+﻿using AKSoftware.Localization.MultiLanguages;
+using Blazored.TextEditor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
@@ -8,7 +9,6 @@ using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using sd.Client.Features.Vocab.Contracts;
 using sd.Client.Helpers;
-using sd.Client.Models;
 using sd.Client.Services;
 using sd.Shared;
 using System;
@@ -18,491 +18,469 @@ using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace sd.Client.Features.Vocab.Components;
-    public class WordBase : ComponentBase
+
+public class WordBase : ComponentBase
+{
+    [Inject] ILogger<WordBase> Log { get; set; }
+    [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
+    [Inject] IJSRuntime JsRuntime { set; get; }
+    [Inject] DictionaryLinksService DictionaryLinksService { set; get; }
+    [Inject] protected CurrentUserService CurrentUser { set; get; }
+    [Inject] protected ApiService ApiService { get; set; }
+    [Inject] protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] public DefaultLangsService DefaultLangsService { get; set; }
+    [Inject] ILanguageContainerService LanguageContainer { get; set; }
+
+    [Parameter] public string WordId { get; set; }
+    [Parameter] public WordDto WordDto { get; set; }
+    [Parameter] public EventCallback<WordDto> OnWordSave { get; set; }
+    [Parameter] public EventCallback<WordDto> OnWordFound { get; set; }
+    [Parameter] public EventCallback<WordDto> OnWordDelete { get; set; }
+
+    public bool CollapsedComm { set; get; } = true;
+    public bool CollapsedLike { set; get; } = true;
+    public int? LikesCount { get; set; }
+    protected bool CULiked { get; set; } = false;
+     protected IEnumerable<string> SameWords { get; set; }
+    protected IEnumerable<string> LanguageToolWords { get; set; }
+    protected string FavSite { get; set; }
+    protected List<CommentModel> WordComments { get; set; }
+    public BlazoredTextEditor QuillHtml { get; set; } //= new();
+    protected string Explain { get; set; }
+    protected List<DictionaryProviderDto> opRes { get; set; }
+
+    protected FluentTextField? wordTitleRef;
+    protected string cssClassDelete;// = "d-none";
+    protected string cssClassUpdate = "d-none";
+    protected bool loading;
+    protected string note;
+    protected IEnumerable<UserRelationshipsWithOneUserDto> likedUsers;
+    protected WordDto foundWordDtoToUpdate;
+    protected int Rows = 2;
+
+    protected List<string> ShareVariants { get; set; } = new();
+
+    protected bool open = false;
+    protected Task OnSpeakingChanged(bool speaking)
     {
-        [Inject] ILogger<WordBase> Log { get; set; }
-        [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
-        [Inject] IJSRuntime JsRuntime { set; get; }
-        [Inject] DictionaryLinksService DictionaryLinksService { set; get; }
-        [Inject] protected CurrentUserService CurrentUser { set; get; }
-        [Inject] protected ApiService ApiService { get; set; }
-        [Inject] protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
-        [Inject] NavigationManager NavigationManager { get; set; }
-        [Inject] public DefaultLangsService DefaultLangsService { get; set; }
-        [Inject] KnownLangsService KnownLangsService { get; set; }
+        // optional hook
+        return Task.CompletedTask;
+    }
 
-        [Parameter] public bool Collapsed { set; get; } //= true;    // hide by default
-        [Parameter] public string WordId { get; set; }
-        [Parameter] public WordDto WordDto { get; set; }
-        [Parameter] public EventCallback<WordDto> OnWordSave { get; set; }
-        [Parameter] public EventCallback<WordDto> OnWordFound { get; set; }
-        [Parameter] public EventCallback<WordDto> OnWordDelete { get; set; }
+    protected async Task KeydownAsync(KeyboardEventArgs e)
+    {
+        // Mobile keyboards may send different keys for the "action" button
+        var key = e.Key?.ToLowerInvariant();
 
-        public bool CollapsedComm { set; get; } = true;
-        public bool CollapsedLike { set; get; } = true;
-        public int? LikesCount { get; set; }
-        protected bool CULiked { get; set; } = false;
-        protected List<string> KnownLangs { get; set; }
-        protected IEnumerable<string> SameWords { get; set; }
-        protected IEnumerable<string> LanguageToolWords { get; set; }
-        protected string FavSite { get; set; }
-        protected List<CommentModel> WordComments { get; set; }
-        public BlazoredTextEditor QuillHtml { get; set; }
-        protected string Explain { get; set; }
-        protected List<DictionaryProviderDto> opRes { get; set; }
+        var isSubmit =
+            key == "enter" ||
+            key == "go" ||
+            key == "search" ||
+            key == "done";
 
-        protected FluentTextField? wordTitleRef;
-        protected string cssClassDelete;// = "d-none";
-        protected string cssClassUpdate = "d-none";
-        protected bool loading;
-        protected string note;
-        protected IEnumerable<UserRelationshipsWithOneUserDto> likedUsers;
-        protected WordDto foundWordDtoToUpdate;
-        protected int Rows = 2;
-
-        protected Task OnSpeakingChanged(bool speaking)
+        if (isSubmit && !string.IsNullOrWhiteSpace(FavSite) && WordDto is not null)
         {
-            // optional hook
-            return Task.CompletedTask;
+            var url = DictionaryLinksService.BuildLink(FavSite, WordDto.Title, WordDto.WordLang, WordDto.ToLang);
+            await JsRuntime.InvokeVoidAsync("window.open", url, "popup");
+        }
+    }
+
+    protected void Reverse()
+    {
+        (WordDto.ToLang, WordDto.WordLang) = (WordDto.WordLang, WordDto.ToLang);
+    }
+
+    protected async Task OnSelectedAsync(int selection)
+    {
+        WordDto.ShareWith = (ShareWith)selection;
+        await AddWord();
+    }
+
+    protected async Task AddWord()
+    {
+        loading = true;
+
+        if (!CurrentUser.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/authentication/login");
+            loading = false;
+            return;
         }
 
-        protected async Task KeydownAsync(KeyboardEventArgs e)
+        try
         {
-            // Mobile keyboards may send different keys for the "action" button
-            var key = e.Key?.ToLowerInvariant();
+            WordDto.Explain = await QuillHtml.GetHTML();
 
-            var isSubmit =
-                key == "enter" ||
-                key == "go" ||
-                key == "search" ||
-                key == "done";
+            var response = await ApiService.PostAsync<HttpResponseMessage>("api/Word", WordDto);
+            var responseBody = await response.Content.ReadAsStringAsync();
 
-            if (isSubmit && !string.IsNullOrWhiteSpace(FavSite) && WordDto is not null)
+            if (response.IsSuccessStatusCode)
             {
-                var url = DictionaryLinksService.BuildLink(FavSite, WordDto.Title, WordDto.WordLang, WordDto.ToLang);
-                await JsRuntime.InvokeVoidAsync("window.open", url, "popup");
+                foundWordDtoToUpdate = JsonConvert.DeserializeObject<WordDto>(responseBody);
+
+                note = $"{WordDto.Title} is Saved";
+                WordDto.UserId = foundWordDtoToUpdate?.UserId;
+                WordDto.WordId = foundWordDtoToUpdate?.WordId;
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    await OnWordSave.InvokeAsync(WordDto);
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Error {response.StatusCode}: {responseBody}");
+
+                if ((int)response.StatusCode == 302)
+                {
+                    cssClassUpdate = null;
+                }
+                note = responseBody;
             }
         }
-
-        protected void Reverse()
+        catch (Exception ex)
         {
-            (WordDto.ToLang, WordDto.WordLang) = (WordDto.WordLang, WordDto.ToLang);
+            Console.WriteLine($"Exception occurred while adding word: {ex.Message}");
+            note = "An error occurred while saving the word.";
+
+            Log.LogError(ex.Message);
+        }
+        finally
+        {
+            SameWords = null;
+            loading = false;
         }
 
-        protected async Task OnSelectedAsync(int selection)
-        {
-            WordDto.ShareWith = (ShareWith)selection;
-            await AddWord();
-        }
+        Log.LogInformation(note);
+    }
 
-        protected async Task AddWord()
+    protected async Task UpdateWord()
+    {
+        if (CurrentUser.IsAuthenticated)
         {
             loading = true;
-
-            if (!CurrentUser.IsAuthenticated)
+            if (foundWordDtoToUpdate != null)
             {
-                NavigationManager.NavigateTo("/authentication/login");
-                loading = false;
-                return;
-            }
-
-            try
-            {
+                WordDto.WordId = foundWordDtoToUpdate.WordId;
+                WordDto.UserId = foundWordDtoToUpdate.UserId;
                 WordDto.Explain = await QuillHtml.GetHTML();
+                cssClassUpdate = "d-none";
 
-                var response = await ApiService.PostAsync<HttpResponseMessage>("api/Word", WordDto);
-                var responseBody = await response.Content.ReadAsStringAsync();
-
-                if (response.IsSuccessStatusCode)
+                HttpResponseMessage respons = await ApiService.PutAsync<HttpResponseMessage>($"api/Word", WordDto);
+                if (!respons.IsSuccessStatusCode)
                 {
-                    foundWordDtoToUpdate = JsonConvert.DeserializeObject<WordDto>(responseBody);
-
-                    note = $"{WordDto.Title} is Saved";
-                    WordDto.UserId = foundWordDtoToUpdate?.UserId;
-                    WordDto.WordId = foundWordDtoToUpdate?.WordId;
-
-                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                    {
-                        await OnWordSave.InvokeAsync(WordDto);
-                    }
+                    Console.WriteLine($"Exception occurred while updating word: {respons.Content.ReadAsStringAsync()}");
+                    note = "An error occurred while updating the word.";
                 }
                 else
                 {
-                    Console.WriteLine($"Error {response.StatusCode}: {responseBody}");
-
-                    if ((int)response.StatusCode == 302)
-                    {
-                        cssClassUpdate = null;
-                    }
-                    note = responseBody;
+                    note = $"{WordDto.Title} is Updated";
+                    await OnWordSave.InvokeAsync(WordDto);
                 }
+                foundWordDtoToUpdate = null;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception occurred while adding word: {ex.Message}");
-                note = "An error occurred while saving the word.";
-
-                Log.LogError(ex.Message);
-            }
-            finally
-            {
-                SameWords = null;
-                loading = false;
-            }
-
-            Log.LogInformation(note);
+            loading = false;
         }
+        else
+        {
+            NavigationManager.NavigateTo("/authentication/login");
+        }
+    }
 
-        protected async Task UpdateWord()
+    protected async Task WordChangedAsync(string title)
+    {
+        cssClassUpdate = "d-none";
+        note = null;
+        WordDto.Title = title.Trim();
+
+        if (title.Length > 2)
+        {
+            loading = true;
+
+            Task<List<string>> wordsTask = null;
+            Task<List<string>> languageToolWordsTask = null;
+
+            if (CurrentUser.IsAuthenticated)
+            {
+                // Start SameWords task
+                wordsTask = ApiService.GetAsync<List<string>>($"api/Word/GetWordsContainText/{title}");
+                // Continue without waiting for SameWords to complete
+            }
+
+            // Start LanguageToolWords task
+            languageToolWordsTask = GetLanguageToolWords(WordDto.WordLang, title);
+
+            // Use continuations to update UI as each task completes
+            if (wordsTask != null)
+            {
+                _ = wordsTask.ContinueWith(async task =>
+                {
+                    SameWords = await task;
+                    // Trigger re-render after SameWords is set
+                    StateHasChanged();
+                });
+            }
+
+            _ = languageToolWordsTask.ContinueWith(async task =>
+            {
+                LanguageToolWords = await task;
+                // Trigger re-render after LanguageToolWords is set
+                StateHasChanged();
+            });
+
+            loading = false;
+        }
+        else
+        {
+            SameWords = null;
+            LanguageToolWords = null;
+        }
+    }
+
+    private async Task<List<string>> GetLanguageToolWords(string wordLang, string str)
+    {
+        wordLang = wordLang switch
+        {
+            "de" => "de-DE",
+            "en" => "en-US",
+            _ => string.Empty,
+        };
+        if (!string.IsNullOrEmpty(wordLang))
+        {
+            var response = await ApiService.GetAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text={str}");
+
+            // Extract the list of string values from Matches.Replacements.Value
+            return response.Matches
+                .SelectMany(match => match.Replacements)
+                .Select(replacement => replacement.Value) //.Where(value =>  value.ToLower() != str.ToLower())
+                .Take(15)
+                .ToList();
+        }
+        return null;
+    }
+    protected async Task SetWord(string id)
+    {
+        if (CurrentUser.IsAuthenticated && !string.IsNullOrEmpty(id))
+        {
+            var wDto = await ApiService.GetAsync<WordDto>($"api/Word/{id}");
+            if (wDto != null)
+            {
+                wDto.Score++;
+                await ApiService.PutAsync<HttpResponseMessage>($"api/Word", wDto);
+                await OnWordFound.InvokeAsync(wDto);
+                note = $"{wDto.Title} is found! The new score is {wDto.Score}";
+                Log.LogInformation(note);
+            }
+            else
+            {
+                note = "The Word is not found!";
+                Log.LogInformation(note);
+            }
+        }
+    }
+
+    protected void CreateComment()
+    {
+        if (!CurrentUser.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/authentication/login");
+        }
+        else
+        {
+            CommentModel commentModel = new();
+            WordComments.Add(commentModel);
+            WordDto.CommentsCount++;
+            CollapsedComm = false;
+        }
+    }
+
+    protected async Task RemoveCommentHandlerAsync(CommentModel comment)
+    {
+        loading = true;
+        if (!CurrentUser.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/authentication/login");
+        }
+        else
+        {
+            WordComments.Remove(comment);
+            var response = await ApiService.DeleteAsync($"api/Comment/DeleteComment/{WordDto.WordId}/{comment.CommentId}");
+            if (response.IsSuccessStatusCode)
+            {
+                WordDto.CommentsCount--;
+                note = $"Comment of {comment.CommentOwnerName} is deleted";
+            }
+            else note = $"Comment of {comment.CommentOwnerName} is NOT deleted";
+        }
+        loading = false;
+    }
+
+    protected async Task DeleteWord()
+    {
+        loading = true;
+        if (Guid.TryParse(WordDto?.WordId, out Guid result))// is not a new word
         {
             if (CurrentUser.IsAuthenticated)
             {
-                loading = true;
-                if (foundWordDtoToUpdate != null)
+                bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete '" + WordDto.Title + "', are you sure?");
+                if (confirmed)
                 {
-                    WordDto.WordId = foundWordDtoToUpdate.WordId;
-                    WordDto.UserId = foundWordDtoToUpdate.UserId;
-                    WordDto.Explain = await QuillHtml.GetHTML();
-                    cssClassUpdate = "d-none";
-
-                    HttpResponseMessage respons = await ApiService.PutAsync<HttpResponseMessage>($"api/Word", WordDto);
-                    if (!respons.IsSuccessStatusCode)
+                    var response = await ApiService.DeleteAsync($"api/Word/{WordDto.WordId}");
+                    if (response.IsSuccessStatusCode)
                     {
-                        Console.WriteLine($"Exception occurred while updating word: {respons.Content.ReadAsStringAsync()}");
-                        note = "An error occurred while updating the word.";
+                        await OnWordDelete.InvokeAsync(WordDto);
                     }
                     else
                     {
-                        note = $"{WordDto.Title} is Updated";
-                        await OnWordSave.InvokeAsync(WordDto);
-                    }
-                    foundWordDtoToUpdate = null;
-                }
-                loading = false;
-            }
-            else
-            {
-                NavigationManager.NavigateTo("/authentication/login");
-            }
-        }
-
-        protected async Task WordChangedAsync(string title)
-        {
-            cssClassUpdate = "d-none";
-            note = null;
-            WordDto.Title = title.Trim();
-
-            if (title.Length > 2)
-            {
-                loading = true;
-
-                Task<List<string>> wordsTask = null;
-                Task<List<string>> languageToolWordsTask = null;
-
-                if (CurrentUser.IsAuthenticated)
-                {
-                    // Start SameWords task
-                    wordsTask = ApiService.GetAsync<List<string>>($"api/Word/GetWordsContainText/{title}");
-                    // Continue without waiting for SameWords to complete
-                }
-
-                // Start LanguageToolWords task
-                languageToolWordsTask = GetLanguageToolWords(WordDto.WordLang, title);
-
-                // Use continuations to update UI as each task completes
-                if (wordsTask != null)
-                {
-                    _ = wordsTask.ContinueWith(async task =>
-                    {
-                        SameWords = await task;
-                        // Trigger re-render after SameWords is set
-                        StateHasChanged();
-                    });
-                }
-
-                _ = languageToolWordsTask.ContinueWith(async task =>
-                {
-                    LanguageToolWords = await task;
-                    // Trigger re-render after LanguageToolWords is set
-                    StateHasChanged();
-                });
-
-                loading = false;
-            }
-            else
-            {
-                SameWords = null;
-                LanguageToolWords = null;
-            }
-        }
-
-        private async Task<List<string>> GetLanguageToolWords(string wordLang, string str)
-        {
-            wordLang = wordLang switch
-            {
-                "de" => "de-DE",
-                "en" => "en-US",
-                _ => string.Empty,
-            };
-            if (!string.IsNullOrEmpty(wordLang))
-            {
-                var response = await ApiService.GetAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text={str}");
-
-                // Extract the list of string values from Matches.Replacements.Value
-                return response.Matches
-                    .SelectMany(match => match.Replacements)
-                    .Select(replacement => replacement.Value) //.Where(value =>  value.ToLower() != str.ToLower())
-                    .Take(15)
-                    .ToList();
-            }
-            return null;
-        }
-        protected async Task SetWord(string id)
-        {
-            if (CurrentUser.IsAuthenticated && !string.IsNullOrEmpty(id))
-            {
-                var wDto = await ApiService.GetAsync<WordDto>($"api/Word/{id}");
-                if (wDto != null)
-                {
-                    wDto.Score++;
-                    await ApiService.PutAsync<HttpResponseMessage>($"api/Word", wDto);
-                    await OnWordFound.InvokeAsync(wDto);
-                    note = $"{wDto.Title} is found! The new score is {wDto.Score}";
-                    Log.LogInformation(note);
-                }
-                else
-                {
-                    note = "The Word is not found!";
-                    Log.LogInformation(note);
-                }
-            }
-        }
-
-        private async Task BuildKnownLangsAsync()
-        {
-            KnownLangsService.LangsStr = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.KnownLangs);
-            KnownLangsService.AddKnownLang(WordDto.WordLang);
-            KnownLangsService.AddKnownLang(WordDto.ToLang);
-
-            KnownLangs ??= new List<string>();
-            KnownLangs = KnownLangsService.KnownLangs;
-        }
-
-        protected void CreateComment()
-        {
-            if (!CurrentUser.IsAuthenticated)
-            {
-                NavigationManager.NavigateTo("/authentication/login");
-            }
-            else
-            {
-                CommentModel commentModel = new();
-                WordComments.Add(commentModel);
-                WordDto.CommentsCount++;
-                CollapsedComm = false;
-            }
-        }
-
-        protected async Task RemoveCommentHandlerAsync(CommentModel comment)
-        {
-            loading = true;
-            if (!CurrentUser.IsAuthenticated)
-            {
-                NavigationManager.NavigateTo("/authentication/login");
-            }
-            else
-            {
-                WordComments.Remove(comment);
-                var response = await ApiService.DeleteAsync($"api/Comment/DeleteComment/{WordDto.WordId}/{comment.CommentId}");
-                if (response.IsSuccessStatusCode)
-                {
-                    WordDto.CommentsCount--;
-                    note = $"Comment of {comment.CommentOwnerName} is deleted";
-                }
-                else note = $"Comment of {comment.CommentOwnerName} is NOT deleted";
-            }
-            loading = false;
-        }
-
-        protected async Task DeleteWord()
-        {
-            loading = true;
-            if (Guid.TryParse(WordDto?.WordId, out Guid result))// is not a new word
-            {
-                if (CurrentUser.IsAuthenticated)
-                {
-                    bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "You try to delete '" + WordDto.Title + "', are you sure?");
-                    if (confirmed)
-                    {
-                        var response = await ApiService.DeleteAsync($"api/Word/{WordDto.WordId}");
-                        if (response.IsSuccessStatusCode)
-                        {
-                            await OnWordDelete.InvokeAsync(WordDto);
-                        }
-                        else
-                        {
-                            //note = $"You can NOT delete {wordModel.Title}";
-                            await JsRuntime.InvokeVoidAsync("alert", $"You do NOT have a promising to delete '{WordDto.Title}'");
-                        }
-                    }
-                }
-            }
-            else
-            {
-                await OnWordDelete.InvokeAsync(WordDto);
-            }
-            Log.LogInformation($"DeleteWord: {WordDto.Title}");
-            loading = false;
-        }
-
-        protected async Task GetAi()
-        {
-            loading = true;
-            if (CurrentUser.IsAuthenticated)
-            {
-                var response = await ApiService.GetStringAsync($"api/Word/GetAI/{WordDto.Title}");
-
-                WordDto.Explain = string.IsNullOrEmpty(WordDto.Explain) ? response : WordDto.Explain += "<br>" + response.Replace("**", "");
-                await LoadHtmlExplain();
-            }
-            await AddWord();
-            loading = false;
-        }
-        protected async Task GetLikedUsers(int? likesCount)
-        {
-            CollapsedLike = !CollapsedLike;
-            if (!CollapsedLike && likesCount != null)
-            {
-                likedUsers = await ApiService.GetAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{WordDto.WordId}");
-            }
-        }
-        protected async Task LikeAsync()
-        {
-            if (CurrentUser.IsAuthenticated)
-            {
-                CULiked = !CULiked;
-                LikesCount += CULiked ? 1 : -1;
-                await ApiService.GetAsync<int>($"api/Word/Like/{WordDto.WordId}");
-            }
-            else
-            {
-                NavigationManager.NavigateTo("authentication/login");
-            }
-        }
-
-        protected async void OnCollapsed()
-        {
-            Collapsed = !Collapsed;
-
-            if (!Collapsed)
-            {
-                if (WordDto.WordId != "0")
-                {
-                    WordDto.Score++;
-                    try
-                    {
-                        await ApiService.PutAsync<HttpResponseMessage>($"api/Word", WordDto);
-                    }
-                    catch
-                    {
-                        WordDto.Score--;
-                    }
-                }
-                await LoadHtmlExplain();
-            }
-        }
-
-        protected async Task GetWordCommentsAsync()
-        {
-            CollapsedComm = !CollapsedComm;
-            if (WordComments == null)
-            {
-                WordComments = new List<CommentModel>();
-                if (WordDto?.WordId != null)
-                {
-                    try
-                    {
-                        WordComments = string.IsNullOrEmpty(WordDto?.WordId) ? null : (List<CommentModel>)await ApiService.GetAsync<IEnumerable<CommentModel>>($"api/Comment/GetWordComments/{WordDto?.WordId}");
-                        WordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.LogError(ex.Message);
+                        //note = $"You can NOT delete {wordModel.Title}";
+                        await JsRuntime.InvokeVoidAsync("alert", $"You do NOT have a promising to delete '{WordDto.Title}'");
                     }
                 }
             }
         }
-        private async Task GetFavLinkAsync()
+        else
         {
-            string fl = WordDto?.WordLang ?? DefaultLangsService.DefaultWordLang;
-            string tl = WordDto?.ToLang ?? DefaultLangsService.DefaultToLang;
-            try
-            {
-                opRes = await DictionaryLinksService.GetOpRes(fl, tl, WordDto.Title);
-                FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(fl, tl));
-            }
-            catch (Exception ex)
-            {
-                Log.LogError(ex.Message);
-            }
+            await OnWordDelete.InvokeAsync(WordDto);
         }
+        Log.LogInformation($"DeleteWord: {WordDto.Title}");
+        loading = false;
+    }
 
-        private TaskCompletionSource<bool> _explainReadyTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        private async Task LoadHtmlExplain()
+    protected async Task GetAi()
+    {
+        loading = true;
+        if (CurrentUser.IsAuthenticated)
         {
-            if (Collapsed || string.IsNullOrEmpty(WordDto?.Explain))
-                return;
+            var response = await ApiService.GetStringAsync($"api/Word/GetAI/{WordDto.Title}");
 
-            try
-            {
-                await QuillHtml.LoadHTMLContent(WordDto?.Explain);
-                Explain = await QuillHtml.GetText();
-
-                _explainReadyTcs.TrySetResult(true);
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                Log.LogError(ex, "Failed to load Explain");
-                _explainReadyTcs.TrySetException(ex);
-            }
+            WordDto.Explain = string.IsNullOrEmpty(WordDto.Explain) ? response : WordDto.Explain += "<br>" + response.Replace("**", "");
+            await LoadHtmlExplain();
         }
-
-        protected override async Task OnInitializedAsync()
+        await AddWord();
+        loading = false;
+    }
+    protected async Task GetLikedUsers(int? likesCount)
+    {
+        CollapsedLike = !CollapsedLike;
+        if (!CollapsedLike && likesCount != null)
         {
-            if (Guid.TryParse(WordId, out Guid result))
+            likedUsers = await ApiService.GetAsync<IEnumerable<UserRelationshipsWithOneUserDto>>($"api/Word/GetLikedUsers/{WordDto.WordId}");
+        }
+    }
+    protected async Task LikeAsync()
+    {
+        if (CurrentUser.IsAuthenticated)
+        {
+            CULiked = !CULiked;
+            LikesCount += CULiked ? 1 : -1;
+            await ApiService.GetAsync<int>($"api/Word/Like/{WordDto.WordId}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("authentication/login");
+        }
+    }
+
+    protected async Task GetWordCommentsAsync()
+    {
+        CollapsedComm = !CollapsedComm;
+        if (WordComments == null)
+        {
+            WordComments = new List<CommentModel>();
+            if (WordDto?.WordId != null)
             {
                 try
                 {
-                    WordDto = await ApiService.GetAsync<WordDto>($"api/Word/{WordId}");
+                    WordComments = string.IsNullOrEmpty(WordDto?.WordId) ? null : (List<CommentModel>)await ApiService.GetAsync<IEnumerable<CommentModel>>($"api/Comment/GetWordComments/{WordDto?.WordId}");
+                    WordComments.Sort((x, y) => x.CreatedAt.CompareTo(y.CreatedAt));
                 }
                 catch (Exception ex)
                 {
                     Log.LogError(ex.Message);
                 }
             }
-
-            if (WordDto != null && Guid.TryParse(WordDto.WordId, out Guid res))
-            {
-                CULiked = WordDto.IsILiked;
-                LikesCount = WordDto.LikesCount;
-            }
-            await BuildKnownLangsAsync();
-        }
-
-        protected override async Task OnParametersSetAsync()
-        {
-            note = null;
-            await GetFavLinkAsync();
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                if (Guid.TryParse(WordDto?.WordId, out Guid result) == false) wordTitleRef!.FocusAsync();
-                await LoadHtmlExplain();
-            }
         }
     }
+    private async Task GetFavLinkAsync()
+    {
+        string fl = WordDto?.WordLang ?? DefaultLangsService.DefaultWordLang;
+        string tl = WordDto?.ToLang ?? DefaultLangsService.DefaultToLang;
+        try
+        {
+            opRes = await DictionaryLinksService.GetOpRes(fl, tl, WordDto.Title);
+            FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(fl, tl));
+        }
+        catch (Exception ex)
+        {
+            Log.LogError(ex.Message);
+        }
+    }
+
+    private TaskCompletionSource<bool> _explainReadyTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    private async Task LoadHtmlExplain()
+    {
+        if (string.IsNullOrEmpty(WordDto?.Explain))
+            return;
+
+        try
+        {
+            await QuillHtml.LoadHTMLContent(WordDto?.Explain);
+            Explain = await QuillHtml.GetText();
+
+            _explainReadyTcs.TrySetResult(true);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Log.LogError(ex, "Failed to load Explain");
+            _explainReadyTcs.TrySetException(ex);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Guid.TryParse(WordId, out Guid result))
+        {
+            try
+            {
+                WordDto = await ApiService.GetAsync<WordDto>($"api/Word/{WordId}");
+            }
+            catch (Exception ex)
+            {
+                Log.LogError(ex.Message);
+            }
+        }
+
+        if (WordDto != null && Guid.TryParse(WordDto.WordId, out Guid res))
+        {
+            CULiked = WordDto.IsILiked;
+            LikesCount = WordDto.LikesCount;
+        }
+
+        // Initialize the list here, after LanguageContainer is available
+        ShareVariants = new List<string>
+        {
+            LanguageContainer.Keys["OnlyMe"],
+            LanguageContainer.Keys["Friends"],
+            LanguageContainer.Keys["Public"]
+        };
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        note = null;
+    //    await LoadHtmlExplain();
+        await GetFavLinkAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (Guid.TryParse(WordDto?.WordId, out Guid result) == false) wordTitleRef!.FocusAsync();
+        //    await LoadHtmlExplain();
+        }
+    }
+}

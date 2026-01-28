@@ -1,10 +1,7 @@
 ﻿@page "/Word/{WordId}"
-@inject ILanguageContainerService languageContainer
-@using sd.Client.SharedUI.DictionaryLinks
 @using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
 
 @inherits WordBase
-
 
 @if (!string.IsNullOrWhiteSpace(note))
 {
@@ -13,13 +10,33 @@
 
 @if (WordDto != null)
 {
-    <div class="card mt-1 position-relative @(!Guid.TryParse(WordDto?.WordId, out Guid result) ? "border-primary" : "border-dark")">
-        @if (!string.IsNullOrEmpty(WordDto.UserName))
-        {
-            <div class="card-header p-0">
-                <a class="text-decoration-none pl-1" href="Words/@WordDto.UserId">@WordDto.UserName</a>
-            </div>
-        }
+    @if (!string.IsNullOrEmpty(WordDto.UserName))
+    {
+        <div class="card-header p-0">
+            <a class="text-decoration-none pl-1" href="Words/@WordDto.UserId">@WordDto.UserName</a>
+        </div>
+    }
+    <FluentStack Orientation="Orientation.Horizontal"
+                 VerticalAlignment="VerticalAlignment.Center"
+                 HorizontalGap="0">
+
+        <FluentButton Id="@WordDto.WordId"
+                      Appearance="Appearance.Outline"
+                      IconStart="@(new Icons.Regular.Size16.MoreHorizontal())"
+                      OnClick="@(() => open = !open)" />
+
+        <FluentMenu Anchor="@WordDto.WordId" UseMenuService="false" @bind-Open="open">
+            <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+                @foreach (var op in opRes)
+                {
+                    <FluentAnchor Href="@op.Link"
+                                  Target="_blank">
+                        @op.Host
+                    </FluentAnchor>
+                }
+            </FluentStack>
+        </FluentMenu>
+
 
         <FluentTextField Id="wordId"
                          Value="@WordDto.Title"
@@ -27,266 +44,203 @@
                          style="width: 100%;"
                          @ref="wordTitleRef"
                          @onkeydown="KeydownAsync"
-                         @oninput="@(async (ui) => await WordChangedAsync(ui.Value?.ToString() ?? ""))">
+                         @oninput="@(async (ui) => await WordChangedAsync(ui.Value?.ToString() ?? ""))" />
+    </FluentStack>
 
-            <FluentButton slot="end"
-                          Appearance="Appearance.Stealth"
-                          @onclick="OnCollapsed"
-                          IconEnd="@(new Icons.Regular.Size16.ArrowBidirectionalUpDown())">
-            </FluentButton>
-        </FluentTextField>
-
-
-        @if (!Collapsed)
+    <FluentStack Orientation="Orientation.Horizontal">
+        @if (ShareVariants.Any())
         {
-            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+            <Dropdown TItem="int" OnSelected="@OnSelectedAsync">
+                <InitialTip>
+                    @switch (WordDto.ShareWith)
+                    {
+                        case sd.Shared.ShareWith.OnlyMe:
+                            <FluentIcon Value="@(new Icons.Regular.Size16.GlobeOff())" />
+                            break;
+                        case sd.Shared.ShareWith.Friends:
+                            <FluentIcon Value="@(new Icons.Regular.Size16.ShareScreenPersonOverlay())" />
+                            break;
+                        case sd.Shared.ShareWith.Public:
+                            <FluentIcon Value="@(new Icons.Regular.Size16.Globe())" />
+                            break;
+                    }
+                </InitialTip>
 
-                @{
-                    var list = new List<string> { languageContainer.Keys["OnlyMe"], languageContainer.Keys["Friends"], languageContainer.Keys["Public"] };
-                }
-
-                <Dropdown TItem="int" OnSelected="@OnSelectedAsync">
-                    <InitialTip>
-                        @switch (WordDto.ShareWith)
-                        {
-                            case sd.Shared.ShareWith.OnlyMe:
-                                <FluentIcon Value="@(new Icons.Regular.Size16.GlobeOff())" />
-                                break;
-                            case sd.Shared.ShareWith.Friends:
-                                <FluentIcon Value="@(new Icons.Regular.Size16.ShareScreenPersonOverlay())" />
-                                break;
-                            case sd.Shared.ShareWith.Public:
-                                <FluentIcon Value="@(new Icons.Regular.Size16.Globe())" />
-                                break;
-                        }
-                    </InitialTip>
-
-                    <ChildContent>
-                        <div class="d-block p-2">
-                            <DropdownListItem Item="0">
-                                <FluentIcon Value="@(new Icons.Regular.Size16.GlobeOff())" /> @list[0]
-                            </DropdownListItem>
-                        </div>
-                        <div class="d-block p-2">
-                            <DropdownListItem Item="1">
-                                <FluentIcon Value="@(new Icons.Regular.Size16.ShareScreenPersonOverlay())" /> @list[1]
-                            </DropdownListItem>
-                        </div>
-                        <div class="d-block p-2">
-                            <DropdownListItem Item="2">
-                                <FluentIcon Value="@(new Icons.Regular.Size16.Globe())" /> @list[2]
-                            </DropdownListItem>
-                        </div>
-                    </ChildContent>
-                </Dropdown>
-
-                <button type="button" class="bg-transparent border-0" @onclick="async () => { await AddWord(); }">
-                    <FluentIcon Value="@(new Icons.Regular.Size16.CloudAdd())" />
-                </button>
-                <button type="button" class="@cssClassDelete bg-transparent border-0 pl-3 pr-3" @onclick="async () => { await DeleteWord(); }">
-                    <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" />
-                </button>
-                <button type="button" class="bg-transparent border-0 pl-3 pr-3" @onclick="async () => { await GetAi(); }">
-                    <FluentIcon Value="@(new Icons.Regular.Size16.FlashSparkle())" />
-                </button>
-
-                <SpeakButton Explain="@Explain" IsSpeakingChanged="OnSpeakingChanged" />
-
-                <input class="position-absolute text-center border-0 mt-1 w-25" style="right:20px" @bind="@WordDto.Score" />
-            </div>
-            @if (loading)
-            {
-                <button type="button" class="btn btn-light bg-transparent">
-                    <div class="spinner-border spinner-border-sm" role="status">
-                        <span class="sr-only">Loading...</span>
+                <ChildContent>
+                    <div class="d-block p-2">
+                        <DropdownListItem Item="0">
+                            <FluentIcon Value="@(new Icons.Regular.Size16.GlobeOff())" /> @ShareVariants[0]
+                        </DropdownListItem>
                     </div>
-                </button>
+                    <div class="d-block p-2">
+                        <DropdownListItem Item="1">
+                            <FluentIcon Value="@(new Icons.Regular.Size16.ShareScreenPersonOverlay())" /> @ShareVariants[1]
+                        </DropdownListItem>
+                    </div>
+                    <div class="d-block p-2">
+                        <DropdownListItem Item="2">
+                            <FluentIcon Value="@(new Icons.Regular.Size16.Globe())" /> @ShareVariants[2]
+                        </DropdownListItem>
+                    </div>
+                </ChildContent>
+            </Dropdown>
+        }
+        <FluentButton IconStart="@(new Icons.Regular.Size16.CloudAdd())" OnClick="async () => { await AddWord(); }" />
+        <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" OnClick="async () => { await DeleteWord(); }" />
+        <FluentButton IconStart="@(new Icons.Regular.Size16.FlashSparkle())" OnClick="async () => { await GetAi(); }" />
+        <SpeakButton Explain="@Explain" IsSpeakingChanged="OnSpeakingChanged" />
+
+        <FluentNumberField Size="1" @bind-Value="@WordDto.Score"></FluentNumberField>
+
+    </FluentStack>
+
+    @if (loading)
+    {
+        <button type="button" class="btn btn-light bg-transparent">
+            <div class="spinner-border spinner-border-sm" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </button>
+    }
+
+    <div style="max-width:500px">
+        @if (SameWords != null && !string.IsNullOrWhiteSpace(WordDto.Title))
+        {
+            @foreach (var w in SameWords)
+            {
+                <a href="" class="m-1" @onclick="async () => { await SetWord(w.Split(':')[1]); }">
+                    <u class="text-primary"> @w.Split(':')[0] </u>
+                </a>
             }
+        }
 
-            <div style="max-width:500px">
-                @if (SameWords != null && !string.IsNullOrWhiteSpace(WordDto.Title))
-                {
-                    @foreach (var w in SameWords)
-                    {
-                        <a href="" class="m-1" @onclick="async () => { await SetWord(w.Split(':')[1]); }">
-                            <u class="text-primary"> @w.Split(':')[0] </u>
-                        </a>
-                    }
-                }
-
-                @if (LanguageToolWords != null && !string.IsNullOrWhiteSpace(WordDto.Title))
-                {
-                    @foreach (var w in LanguageToolWords)
-                    {
-                        <a @onclick="() => WordDto.Title = w">@w</a>
-                    }
-                }
-            </div>
-
-            <div class="card-body p-0">
-
-                <div class="card mb-1 @cssClassUpdate">
-                    <div class="card-body">
-                        <div class="text-muted">@WordDto.Title is already exist</div>
-                    </div>
-                    <div class="card-footer">
-                        <button type="button" class="btn btn-outline-secondary" @onclick="UpdateWord">
-                            Update <i class="fas fa-question-circle"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary" @onclick="@(() => { foundWordDtoToUpdate = null; cssClassUpdate = "d-none"; })">
-                            Cancel <i class="fas fa-window-close"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="m-0">
-
-                    <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Write your note here!">
-                        <ToolbarContent>
-                            <select class="ql-header">
-                                <option selected=""></option>
-                                <option value="1"></option>
-                                <option value="2"></option>
-                                <option value="3"></option>
-                                <option value="4"></option>
-                                <option value="5"></option>
-                            </select>
-                            @* <span class="ql-formats"> *@
-                            <select class="ql-color"></select>
-                            <select class="ql-background"></select>
-                            @* </span> *@
-                            @* <span class="ql-formats"> *@
-                            <button class="ql-bold"></button>
-                            <button class="ql-italic"></button>
-                            <button class="ql-underline"></button>
-                            <button class="ql-strike"></button>
-                            @* </span> *@
-                            @* <span class="ql-formats"> *@
-                            <button class="ql-list" value="ordered"></button>
-                            <button class="ql-list" value="bullet"></button>
-                            @* </span> *@
-                            @* <span class="ql-formats"> *@
-                            <button class="ql-link"></button>
-                            @* </span> *@
-                        </ToolbarContent>
-                        <EditorContent></EditorContent>
-                    </BlazoredTextEditor>
-                </div>
-
-                @if (KnownLangs != null)
-                {
-                    bool IsEqual(string str1, string str2) => str1 == str2;
-
-                    <div class="pl-3">
-                        <select class="bg-transparent rounded-0 border-0" @bind="@WordDto.WordLang">
-                            @foreach (var item in KnownLangs)
-                            {
-                                <option value="@item" selected="@IsEqual(item, WordDto.WordLang)">@item</option>
-                            }
-                        </select>
-
-                        <button type="button" class="bg-transparent border-0" @onclick="Reverse">
-                            <i class="oi oi-loop"></i>
-                        </button>
-
-                        <select class="bg-transparent rounded-0 border-0" @bind="@WordDto.ToLang">
-                            @foreach (var item in KnownLangs)
-                            {
-                                <option value="@item" selected="@IsEqual(item, WordDto.ToLang)">@item</option>
-                            }
-                        </select>
-                    </div>
-                }
-
-                @if (opRes != null && !(string.IsNullOrWhiteSpace(WordDto.WordLang) || string.IsNullOrWhiteSpace(WordDto.ToLang)))
-                {
-                    <div class="card m-0 border-left-0 border-right-0 overflow-auto" style="max-height:200px">
-                    @foreach (var op in opRes)
-                    {
-                        @* <OtherPage otherPage="@op" FavSite="@FavSite" CanSetFavSite="@false" FLangCode="@WordDto.WordLang" TLangCode="@WordDto.ToLang" /> *@
-                            <OtherPage Href="@op.Link" Text="@op.Host" />
-                    }
-                    </div>
-                }
-            </div>
-
-            @if (!string.IsNullOrWhiteSpace(WordDto.WordId))
+        @if (LanguageToolWords != null && !string.IsNullOrWhiteSpace(WordDto.Title))
+        {
+            @foreach (var w in LanguageToolWords)
             {
-                <div class="card-footer p-0">
-                    <div class="row  fs-6">
-                        <div class="col-3">
-                            <button type="button" style="float:left" class="btn btn-light bg-transparent" @onclick="async () => { await LikeAsync(); }">
-                                @if (CULiked)
-                                {
-                                    <FluentIcon Value="@(new Icons.Filled.Size16.ThumbLike())" />
-                                }
-                                else
-                                {
-                                    <FluentIcon Value="@(new Icons.Regular.Size16.ThumbLike())" />
-                                }
-                            </button>
-                            @if (LikesCount != null && (CULiked ? LikesCount > 1 : LikesCount > 0))
-                            {
-                                <button type="button" class="btn btn-light bg-transparent" @onclick="async () => { await GetLikedUsers(LikesCount); }">
-                                    @LikesCount <i>likes</i>
-                                </button>
-                            }
-                        </div>
-
-                        <div class="col-3">
-                            <button type="button" style="float:right" class="btn btn-light bg-transparent" @onclick="OnCollapsed">
-                                @if (!Collapsed)
-                                {
-                                    <FluentIcon Value="@(new Icons.Regular.Size16.ArrowBidirectionalUpDown())" />
-                                }
-                            </button>
-                        </div>
-
-                        <div class="col-3">
-                            <button type="button" style="float:right" class="btn btn-light bg-transparent" @onclick="GetWordCommentsAsync">
-                                @if (WordDto.CommentsCount > 0)
-                                {
-                                    @WordDto.CommentsCount
-                                }
-
-                                <FluentIcon Value="@(new Icons.Regular.Size16.Comment())" />
-                            </button>
-                        </div>
-
-                        <div class="col-3">
-                            <a type="button" class="btn btn-link" target="_blank"
-                               href="Word/@WordDto.WordId">Share</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class=@(CollapsedLike ? "collapse" : "")>
-                    @if (likedUsers != null)
-                    {
-                        @foreach (var foudUser in likedUsers)
-                        {
-                            <Friendship FriendId="@foudUser.UserId" FriendName="@foudUser.RelationalUserName" Relationship="foudUser.Relation"></Friendship>
-                        }
-                    }
-                </div>
-
-                <div class="card m-0 border-left-0 border-right-0 @(CollapsedComm ? "collapse" : "")">
-                    @if (!CollapsedComm)
-                    {
-                        <div class="card-body p-0">
-
-                            @foreach (var comment in WordComments)
-                            {
-                                <Comment CommentModel="@comment" WordId="@WordDto.WordId" WordUserId="@WordDto.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
-                            }
-
-                            <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
-                                <span>Add Comment </span>
-                                <FluentIcon Value="@(new Icons.Regular.Size16.CommentAdd())" />
-                            </button>
-                        </div>
-                    }
-                </div>
+                <a @onclick="() => WordDto.Title = w">@w</a>
             }
         }
     </div>
+
+    <div class="card-body p-0">
+
+        <div class="card mb-1 @cssClassUpdate">
+            <div class="card-body">
+                <div class="text-muted">@WordDto.Title is already exist</div>
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-outline-secondary" @onclick="UpdateWord">
+                    Update <i class="fas fa-question-circle"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" @onclick="@(() => { foundWordDtoToUpdate = null; cssClassUpdate = "d-none"; })">
+                    Cancel <i class="fas fa-window-close"></i>
+                </button>
+            </div>
+        </div>
+        <div class="m-0">
+
+            <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Write your note here!">
+                <ToolbarContent>
+                    <select class="ql-header">
+                        <option selected=""></option>
+                        <option value="1"></option>
+                        <option value="2"></option>
+                        <option value="3"></option>
+                        <option value="4"></option>
+                        <option value="5"></option>
+                    </select>
+                    @* <span class="ql-formats"> *@
+                    <select class="ql-color"></select>
+                    <select class="ql-background"></select>
+                    @* </span> *@
+                    @* <span class="ql-formats"> *@
+                    <button class="ql-bold"></button>
+                    <button class="ql-italic"></button>
+                    <button class="ql-underline"></button>
+                    <button class="ql-strike"></button>
+                    @* </span> *@
+                    @* <span class="ql-formats"> *@
+                    <button class="ql-list" value="ordered"></button>
+                    <button class="ql-list" value="bullet"></button>
+                    @* </span> *@
+                    @* <span class="ql-formats"> *@
+                    <button class="ql-link"></button>
+                    @* </span> *@
+                </ToolbarContent>
+                <EditorContent></EditorContent>
+            </BlazoredTextEditor>
+        </div>
+
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(WordDto.WordId))
+    {
+        <div class="card-footer p-0">
+            <div class="row  fs-6">
+                <div class="col-3">
+                    <button type="button" style="float:left" class="btn btn-light bg-transparent" @onclick="async () => { await LikeAsync(); }">
+                        @if (CULiked)
+                        {
+                            <FluentIcon Value="@(new Icons.Filled.Size16.ThumbLike())" />
+                        }
+                        else
+                        {
+                            <FluentIcon Value="@(new Icons.Regular.Size16.ThumbLike())" />
+                        }
+                    </button>
+                    @if (LikesCount != null && (CULiked ? LikesCount > 1 : LikesCount > 0))
+                    {
+                        <button type="button" class="btn btn-light bg-transparent" @onclick="async () => { await GetLikedUsers(LikesCount); }">
+                            @LikesCount <i>likes</i>
+                        </button>
+                    }
+                </div>
+
+                <div class="col-3">
+                    <button type="button" style="float:right" class="btn btn-light bg-transparent" @onclick="GetWordCommentsAsync">
+                        @if (WordDto.CommentsCount > 0)
+                        {
+                            @WordDto.CommentsCount
+                        }
+
+                        <FluentIcon Value="@(new Icons.Regular.Size16.Comment())" />
+                    </button>
+                </div>
+
+                <div class="col-3">
+                    <a type="button" class="btn btn-link" target="_blank"
+                       href="Word/@WordDto.WordId">Share</a>
+                </div>
+            </div>
+        </div>
+
+        <div class=@(CollapsedLike ? "collapse" : "")>
+            @if (likedUsers != null)
+            {
+                @foreach (var foudUser in likedUsers)
+                {
+                    <Friendship FriendId="@foudUser.UserId" FriendName="@foudUser.RelationalUserName" Relationship="foudUser.Relation"></Friendship>
+                }
+            }
+        </div>
+
+        <div class="card m-0 border-left-0 border-right-0 @(CollapsedComm ? "collapse" : "")">
+            @if (!CollapsedComm)
+            {
+                <div class="card-body p-0">
+
+                    @foreach (var comment in WordComments)
+                    {
+                        <Comment CommentModel="@comment" WordId="@WordDto.WordId" WordUserId="@WordDto.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
+                    }
+
+                    <button type="button" class="btn btn-link bg-transparent" @onclick="@CreateComment">
+                        <span>Add Comment </span>
+                        <FluentIcon Value="@(new Icons.Regular.Size16.CommentAdd())" />
+                    </button>
+                </div>
+            }
+        </div>
+    }
 }

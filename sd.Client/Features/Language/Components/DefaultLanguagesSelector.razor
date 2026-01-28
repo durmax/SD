@@ -1,6 +1,7 @@
 ﻿@using Microsoft.FluentUI.AspNetCore.Components
 @using sd.Client.Features.Language.Contracts
 
+
 <FluentGrid>
     <FluentGridItem xs="5">
         <FluentCombobox TOption="LanguageOption"
@@ -10,13 +11,14 @@
                         OptionText="@(i => i.Name)"
                         SelectedOption="@SelectedToOption"
                         SelectedOptionChanged="OnToSelectedChanged"
-                        Autocomplete="ComboboxAutocomplete.Inline" />
+                        Auto-complete="ComboboxAutocomplete.Inline" />
     </FluentGridItem>
 
     <FluentGridItem xs="2">
         <FluentLabel Class="float-none">Rev</FluentLabel>
         <FluentButton OnClick="OnReverse"
                       IconEnd="@(new Icons.Regular.Size16.ArrowBidirectionalLeftRight())" />
+
     </FluentGridItem>
 
     <FluentGridItem xs="5">

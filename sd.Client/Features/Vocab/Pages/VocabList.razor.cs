@@ -11,6 +11,7 @@ namespace sd.Client.Features.Vocab.Pages;
 
 public class VocabListBase : ComponentBase
 {
+
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public LocalStorageAccessor LocalStorageAccessor { get; set; } = default!;
     [Inject] public ILanguageContainerService LanguageContainer { get; set; } = default!;

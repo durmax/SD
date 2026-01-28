@@ -2,18 +2,22 @@
 @inherits VocabListBase
 @using sd.Client.Features.Vocab.Components;
 
+
 <FluentIcon OnClick="@Store.AddNewDraftRow" Value="@(new Icons.Regular.Size24.FormNew())" />
 
 @if (Store.Items != null)
 {
-    @foreach (var word in Store.Items)
-    {
-        <Word WordDto="word"
-              Collapsed="Guid.TryParse(word?.WordId, out Guid _)"
-              OnWordSave="@OnWordSave"
-              OnWordFound="@OnWordFound"
-              OnWordDelete="@OnWordDelete" />
-    }
+    <FluentAccordion>
+        @foreach (var word in Store.Items)
+        {
+            <FluentAccordionItem Heading="@word?.Title" Class="@(!Guid.TryParse(word?.WordId, out Guid result) ? "border-primary" : "border-dark")">
+                <Word WordDto="word"
+                      OnWordSave="@OnWordSave"
+                      OnWordFound="@OnWordFound"
+                      OnWordDelete="@OnWordDelete" />
+            </FluentAccordionItem>
+        }
+    </FluentAccordion>
 }
 
 @if (Store.IsLoading)

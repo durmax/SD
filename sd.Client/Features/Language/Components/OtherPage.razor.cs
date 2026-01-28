@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using sd.Client.Features.Language.Contracts;
-using sd.Client.Helpers;
 using sd.Client.Services;
 using sd.Shared;
 using System.Threading.Tasks;
@@ -10,7 +7,7 @@ namespace sd.Client.Features.Language.Components;
 
 public class OtherPageBase : ComponentBase
 {
-    [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
+    [Inject] DefaultLangsService DefaultLangsService { get; set; }
     [Parameter] public DictionaryProviderDto otherPage { get; set; }        
     [Parameter] public string FavSite { get; set; }
     [Parameter] public bool CanSetFavSite { get; set; }
@@ -19,12 +16,12 @@ public class OtherPageBase : ComponentBase
 
     public string Info { get; private set; }
 
-    protected async Task Favorite(DictionaryProviderDto otherPage)
+    protected async Task Favorite(string pattern)
     {
         if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
         {
-            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.FavoriteSite(FLangCode,TLangCode), otherPage.Pattern);
-            FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(FLangCode, TLangCode));
+            await DefaultLangsService.SetFavorite(FLangCode,TLangCode, pattern);
+            FavSite = pattern;
         }
         else
         {

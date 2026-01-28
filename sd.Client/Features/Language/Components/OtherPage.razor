@@ -9,13 +9,13 @@
     <div class="float-right m-0">
         @if (!string.IsNullOrWhiteSpace(FavSite) && FavSite.Contains(otherPage.Host))
         {
-            <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage); })"><FluentIcon Value="@(new Icons.Regular.Size16.Crown())" /></button>
+            <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage.Pattern); })"><FluentIcon Value="@(new Icons.Regular.Size16.Crown())" /></button>
         }
         else
         {
             if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
             {
-                <div class="btn btn-light bg-transparent" style="opacity: 0.3;" @onclick="@(async () => { await Favorite(otherPage); })">
+                <div class="btn btn-light bg-transparent" style="opacity: 0.3;" @onclick="@(async () => { await Favorite(otherPage.Pattern); })">
                     <FluentIcon Value="@(new Icons.Regular.Size16.Crown())" />
                 </div>
             }

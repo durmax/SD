@@ -140,8 +140,7 @@ namespace sd.Client.Features.Language.Pages
                     ActivePair.To.Code,
                     string.Empty) ?? new List<DictionaryProviderDto>();
 
-                FavSite = await LocalStorageAccessor.GetValueAsync<string>(
-                    LangStorageKeys.FavoriteSite(ActivePair.From.Code, ActivePair.To.Code)) ?? string.Empty;
+                FavSite = await DefaultLangsService.GetFavLinkAsync(ActivePair.From.Code, ActivePair.To.Code) ?? string.Empty;
             }
             catch (Exception ex)
             {

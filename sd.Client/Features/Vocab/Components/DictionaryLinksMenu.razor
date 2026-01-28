@@ -1,0 +1,60 @@
+﻿@using Microsoft.Extensions.Logging
+@using sd.Client.Helpers
+@using sd.Client.Services
+@using sd.Shared
+
+<FluentButton Id="@WordDto.WordId"
+              Appearance="Appearance.Outline"
+              IconStart="@(new Icons.Regular.Size16.MoreHorizontal())"
+              OnClick="@(() => open = !open)" />
+
+<FluentMenu Anchor="@WordDto.WordId" UseMenuService="false" @bind-Open="open">
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+        @foreach (var op in opRes)
+        {
+            <FluentMenuItem OnClick="@(() => OpenLink(op.Link))">
+                @op.Host
+            </FluentMenuItem>
+        }
+    </FluentStack>
+</FluentMenu>
+
+@code {
+
+    [Inject] public DefaultLangsService DefaultLangsService { get; set; }
+    [Inject] DictionaryLinksService DictionaryLinksService { set; get; }
+    [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
+    [Inject] IJSRuntime JsRuntime { set; get; }
+    [Inject] ILogger<WordBase> Log { get; set; }
+
+    [Parameter] public WordDto WordDto { get; set; }
+
+    protected bool open = false;
+    protected List<DictionaryProviderDto> opRes { get; set; }
+
+    private async Task GetFavLinkAsync()
+    {
+        string fl = WordDto?.WordLang ?? DefaultLangsService.DefaultWordLang;
+        string tl = WordDto?.ToLang ?? DefaultLangsService.DefaultToLang;
+        try
+        {
+            opRes = await DictionaryLinksService.GetOpRes(fl, tl, WordDto.Title);
+        }
+        catch (Exception ex)
+        {
+            Log.LogError(ex.Message);
+        }
+    }
+
+    protected async Task OpenLink(string url)
+    {
+        open = false;                    // close menu deterministically
+        await JsRuntime.InvokeVoidAsync("open", url, "_blank"); // window.open
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        //    await LoadHtmlExplain();
+        await GetFavLinkAsync();
+    }
+}

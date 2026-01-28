@@ -22,12 +22,10 @@ namespace sd.Client.Features.Vocab.Components;
 public class WordBase : ComponentBase
 {
     [Inject] ILogger<WordBase> Log { get; set; }
-    [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
     [Inject] IJSRuntime JsRuntime { set; get; }
     [Inject] DictionaryLinksService DictionaryLinksService { set; get; }
     [Inject] protected CurrentUserService CurrentUser { set; get; }
     [Inject] protected ApiService ApiService { get; set; }
-    [Inject] protected AuthenticationStateProvider AuthenticationStateProvider { set; get; }
     [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] public DefaultLangsService DefaultLangsService { get; set; }
     [Inject] ILanguageContainerService LanguageContainer { get; set; }
@@ -44,11 +42,9 @@ public class WordBase : ComponentBase
     protected bool CULiked { get; set; } = false;
      protected IEnumerable<string> SameWords { get; set; }
     protected IEnumerable<string> LanguageToolWords { get; set; }
-    protected string FavSite { get; set; }
     protected List<CommentModel> WordComments { get; set; }
     public BlazoredTextEditor QuillHtml { get; set; } //= new();
     protected string Explain { get; set; }
-    protected List<DictionaryProviderDto> opRes { get; set; }
 
     protected FluentTextField? wordTitleRef;
     protected string cssClassDelete;// = "d-none";
@@ -61,18 +57,12 @@ public class WordBase : ComponentBase
 
     protected List<string> ShareVariants { get; set; } = new();
 
-    protected bool open = false;
     protected Task OnSpeakingChanged(bool speaking)
     {
         // optional hook
         return Task.CompletedTask;
     }
 
-    protected async Task OpenLink(string url)
-    {
-        open = false;                    // close menu deterministically
-        await JsRuntime.InvokeVoidAsync("open", url, "_blank"); // window.open
-    }
     protected async Task KeydownAsync(KeyboardEventArgs e)
     {
         // Mobile keyboards may send different keys for the "action" button
@@ -83,6 +73,8 @@ public class WordBase : ComponentBase
             key == "go" ||
             key == "search" ||
             key == "done";
+
+        var FavSite = await DefaultLangsService.GetFavLinkAsync(WordDto.WordLang, WordDto.ToLang);
 
         if (isSubmit && !string.IsNullOrWhiteSpace(FavSite) && WordDto is not null)
         {
@@ -407,20 +399,6 @@ public class WordBase : ComponentBase
             }
         }
     }
-    private async Task GetFavLinkAsync()
-    {
-        string fl = WordDto?.WordLang ?? DefaultLangsService.DefaultWordLang;
-        string tl = WordDto?.ToLang ?? DefaultLangsService.DefaultToLang;
-        try
-        {
-            opRes = await DictionaryLinksService.GetOpRes(fl, tl, WordDto.Title);
-            FavSite = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FavoriteSite(fl, tl));
-        }
-        catch (Exception ex)
-        {
-            Log.LogError(ex.Message);
-        }
-    }
 
     private TaskCompletionSource<bool> _explainReadyTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -477,7 +455,6 @@ public class WordBase : ComponentBase
     {
         note = null;
     //    await LoadHtmlExplain();
-        await GetFavLinkAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

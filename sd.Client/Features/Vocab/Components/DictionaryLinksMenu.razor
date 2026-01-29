@@ -33,7 +33,6 @@
 
 @code {
 
-    [Inject] public DefaultLangsService DefaultLangsService { get; set; }
     [Inject] DictionaryLinksService DictionaryLinksService { set; get; }
     [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
     [Inject] IJSRuntime JsRuntime { set; get; }
@@ -46,8 +45,8 @@
 
     private async Task GetFavLinkAsync()
     {
-        string fl = WordDto?.WordLang ?? DefaultLangsService.DefaultWordLang;
-        string tl = WordDto?.ToLang ?? DefaultLangsService.DefaultToLang;
+        string fl = WordDto?.WordLang;
+        string tl = WordDto?.ToLang;
         try
         {
             opRes = await DictionaryLinksService.GetOpRes(fl, tl, WordDto.Title);

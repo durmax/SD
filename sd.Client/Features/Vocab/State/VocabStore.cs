@@ -1,4 +1,5 @@
 ﻿using sd.Client.Features.Vocab.Api;
+using sd.Client.Helpers;
 using sd.Client.Services;
 using sd.Shared;
 using System.Collections.Generic;
@@ -10,12 +11,12 @@ namespace sd.Client.Features.Vocab.State;
 public sealed class VocabStore
 {
     private readonly VocabApiClient _api;
-    private readonly DefaultLangsService _defaultLangs;
+    private readonly LocalStorageAccessor LocalStorageAccessor;
 
-    public VocabStore(VocabApiClient api, DefaultLangsService defaultLangs)
+    public VocabStore(VocabApiClient api, LocalStorageAccessor localStorageAccessor)
     {
         _api = api;
-        _defaultLangs = defaultLangs;
+        LocalStorageAccessor = localStorageAccessor;
     }
 
     public List<WordDto> Items { get; } = new();
@@ -24,17 +25,17 @@ public sealed class VocabStore
     public int CurrentPage { get; private set; } = 1;
     public int NewWords { get; private set; }
 
-    public void EnsureDraftRow()
+    public async Task EnsureDraftRow()
     {
         if (Items.Count > 0) return;
 
-        Items.Insert(0, NewDraft());
+        Items.Insert(0, await NewDraftAsync());
     }
 
-    public void AddNewDraftRow()
+    public async Task AddNewDraftRow()
     {
         NewWords++;
-        Items.Insert(0, NewDraft(NewWords.ToString()));
+        Items.Insert(0, await NewDraftAsync(NewWords.ToString()));
     }
 
     public async Task LoadNextPageAsync(int pageSize = 10)
@@ -53,7 +54,7 @@ public sealed class VocabStore
         IsLoading = false;
     }
 
-    public void UpsertFromSave(WordDto word)
+    public async Task UpsertFromSave(WordDto word)
     {
         if (word == null || string.IsNullOrWhiteSpace(word.WordId))
             return;
@@ -69,7 +70,7 @@ public sealed class VocabStore
             Items.Add(word);
         }
 
-        AddNewDraftRow();
+        await AddNewDraftRow();
     }
 
     public void AddIfMissing(WordDto word)
@@ -91,12 +92,12 @@ public sealed class VocabStore
         }
     }
 
-    private WordDto NewDraft(string? id = null)
+    private async Task<WordDto> NewDraftAsync(string? id = null)
         => new()
         {
             WordId = id ?? NewWords.ToString(),
-            WordLang = _defaultLangs.DefaultWordLang,
-            ToLang = _defaultLangs.DefaultToLang,
+            WordLang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FromLang),
+            ToLang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.ToLang),
             ShareWith = ShareWith.Public
         };
 }

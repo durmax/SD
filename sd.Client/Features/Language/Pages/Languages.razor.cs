@@ -21,7 +21,6 @@ namespace sd.Client.Features.Language.Pages
         [Inject] protected ILogger<LanguagesBase> Log { get; set; } = default!;
         [Inject] protected LocalStorageAccessor LocalStorageAccessor { get; set; } = default!;
         [Inject] protected IJSRuntime JsRuntime { get; set; } = default!;
-        [Inject] protected DefaultLangsService DefaultLangsService { get; set; } = default!;
         [Inject] protected ILanguageContainerService LanguageContainer { get; set; } = default!;
         [Inject] protected NavigationManager NavigationManager { get; set; } = default!;
         [Inject] protected DictionaryLinksService DictionaryLinksService { get; set; } = default!;
@@ -96,10 +95,10 @@ namespace sd.Client.Features.Language.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            await DefaultLangsService.SetDefLangsAsync();
+            //await DefaultLangsService.SetDefLangsAsync();
 
-            var fromCode = DefaultLangsService.DefaultWordLang ?? "en";
-            var toCode = DefaultLangsService.DefaultToLang ?? "de";
+            var fromCode = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FromLang) ?? "en";
+            var toCode = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.ToLang) ?? "de";
 
             ActivePair = new LanguagePair(
                 new LanguageOption(fromCode, LangCodesHelper.GetLanguageNameOrEmpty(fromCode)),
@@ -159,7 +158,7 @@ namespace sd.Client.Features.Language.Pages
         protected async Task OnActivePairChanged(LanguagePair pair)
         {
             ActivePair = pair;
-            DefaultLangsService.DefaultWordLang = pair.From.Code;
+           //DefaultLangsService.DefaultWordLang = pair.From.Code;
 
             KnownLanguagesStore.EnsureContains(KnownLangs, pair.To.Code);
             KnownLanguagesStore.EnsureContains(KnownLangs, pair.From.Code);

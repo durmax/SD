@@ -15,7 +15,6 @@ public class VocabListBase : ComponentBase
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public LocalStorageAccessor LocalStorageAccessor { get; set; } = default!;
     [Inject] public ILanguageContainerService LanguageContainer { get; set; } = default!;
-    [Inject] public DefaultLangsService DefaultLangsService { get; set; } = default!;
     [Inject] public ILogger<VocabListBase> Log { get; set; } = default!;
     [Inject] public VocabStore Store { get; set; } = default!;
 
@@ -25,9 +24,7 @@ public class VocabListBase : ComponentBase
         if (!NavigationManager.Uri.Contains("https://www.") && !NavigationManager.Uri.Contains("localhost"))
             NavigationManager.NavigateTo("https://www.lingoclub.net/", true);
 
-        await DefaultLangsService.SetDefLangsAsync();
-
-        Store.EnsureDraftRow();
+        await Store.EnsureDraftRow();
 
         var uiLang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
         if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
@@ -49,9 +46,9 @@ public class VocabListBase : ComponentBase
         StateHasChanged();
     }
 
-    protected void OnWordSave(WordDto word)
+    protected async Task OnWordSave(WordDto word)
     {
-        Store.UpsertFromSave(word);
+        await Store.UpsertFromSave(word);
         StateHasChanged();
     }
 

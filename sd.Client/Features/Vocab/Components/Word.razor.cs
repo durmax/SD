@@ -27,7 +27,6 @@ public class WordBase : ComponentBase
     [Inject] protected CurrentUserService CurrentUser { set; get; }
     [Inject] protected ApiService ApiService { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
-    [Inject] public DefaultLangsService DefaultLangsService { get; set; }
     [Inject] ILanguageContainerService LanguageContainer { get; set; }
 
     [Parameter] public string WordId { get; set; }

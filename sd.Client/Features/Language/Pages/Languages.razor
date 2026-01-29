@@ -99,8 +99,9 @@
                                     <span aria-hidden="true">≡</span>
                                 </FluentButton>
                                 <div class="resource-content">
-                                    <OtherPage otherPage="@context"
+                                    <OtherPage op="@context"
                                                FavSite="@FavSite"
+                                               OnFavoriteChanged="@SetFavSiteAsync"
                                                CanSetFavSite="true"
                                                FLangCode="@ActivePair.From.Code"
                                                TLangCode="@ActivePair.To.Code" />

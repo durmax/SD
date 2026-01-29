@@ -1,25 +1,16 @@
 ﻿@inherits OtherPageBase
 
 <div class="d-flex" draggable="true">
-    <div class="flex-grow-1 pl-1 pt-1" onclick='window.open("@otherPage.Link","popup","width=900,height=600");return false;'>
-        <a href="@otherPage.Link">
-            <u>@otherPage.Host</u>
-        </a>
-    </div>
-    <div class="float-right m-0">
-        @if (!string.IsNullOrWhiteSpace(FavSite) && FavSite.Contains(otherPage.Host))
-        {
-            <button class="btn btn-light bg-transparent" @onclick="@(async () => { await Favorite(otherPage.Pattern); })"><FluentIcon Value="@(new Icons.Regular.Size16.Crown())" /></button>
-        }
-        else
-        {
-            if (CanSetFavSite || string.IsNullOrWhiteSpace(FavSite))
-            {
-                <div class="btn btn-light bg-transparent" style="opacity: 0.3;" @onclick="@(async () => { await Favorite(otherPage.Pattern); })">
-                    <FluentIcon Value="@(new Icons.Regular.Size16.Crown())" />
-                </div>
-            }
-        }
-    </div>
+    @if (op.IsFavorite)
+    {
+        <FluentIcon Icon="Icons.Color.Size16.Star" />
+    }
+    else
+    {
+        <FluentIcon OnClick="() => Favorite(op.Pattern)" Icon="Icons.Regular.Size16.Star" />
+    }
+    <FluentMenuItem OnClick="@(() => OpenLink(op.Link))">
+        @op.Host
+    </FluentMenuItem>
 </div>
 <hr class="m-0">

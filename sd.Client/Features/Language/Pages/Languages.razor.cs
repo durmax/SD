@@ -57,6 +57,13 @@ namespace sd.Client.Features.Language.Pages
         protected bool isResetDialogHidden = true;
         protected bool isRemoveAllDialogHidden = true;
 
+
+        protected void SetFavSiteAsync(string fav)
+        {
+            opRes.ForEach(x => x.IsFavorite = false);
+            opRes.FirstOrDefault(x => x.Pattern == fav)?.IsFavorite = true;
+        }
+
         protected async Task OnSelectedOptionsChanged(IEnumerable<LanguageOption> options)
         {
             if (_suppressSelectedItemsChanged) return;
@@ -141,6 +148,8 @@ namespace sd.Client.Features.Language.Pages
                     string.Empty) ?? new List<DictionaryProviderDto>();
 
                 FavSite = await DefaultLangsService.GetFavLinkAsync(ActivePair.From.Code, ActivePair.To.Code) ?? string.Empty;
+
+                SetFavSiteAsync(FavSite);
             }
             catch (Exception ex)
             {

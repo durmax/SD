@@ -40,17 +40,21 @@ public class WordBase : ComponentBase
     public bool CollapsedLike { set; get; } = true;
     public int? LikesCount { get; set; }
     protected bool CULiked { get; set; } = false;
-     protected IEnumerable<string> SameWords { get; set; }
+    protected IEnumerable<string> SameWords { get; set; }
     protected IEnumerable<string> LanguageToolWords { get; set; }
     protected List<CommentModel> WordComments { get; set; }
     public BlazoredTextEditor QuillHtml { get; set; } //= new();
     protected string Explain { get; set; }
+    public List<DictionaryProviderDto> OpRes { get; private set; }
 
     protected FluentTextField? wordTitleRef;
     protected string cssClassDelete;// = "d-none";
     protected string cssClassUpdate = "d-none";
     protected bool loading;
     protected string note;
+
+
+
     protected IEnumerable<UserRelationshipsWithOneUserDto> likedUsers;
     protected WordDto foundWordDtoToUpdate;
     protected int Rows = 2;
@@ -74,12 +78,11 @@ public class WordBase : ComponentBase
             key == "search" ||
             key == "done";
 
-        var FavSite = await DefaultLangsService.GetFavLinkAsync(WordDto.WordLang, WordDto.ToLang);
-
+        var FavSite = OpRes.FirstOrDefault(x => x.IsFavorite).Pattern;
         if (isSubmit && !string.IsNullOrWhiteSpace(FavSite) && WordDto is not null)
         {
             var url = DictionaryLinksService.BuildLink(FavSite, WordDto.Title, WordDto.WordLang, WordDto.ToLang);
-            await JsRuntime.InvokeVoidAsync("window.open", url, "popup");
+            await JsRuntime.InvokeVoidAsync("open", url, "_blank");
         }
     }
 
@@ -454,7 +457,8 @@ public class WordBase : ComponentBase
     protected override async Task OnParametersSetAsync()
     {
         note = null;
-    //    await LoadHtmlExplain();
+        //    await LoadHtmlExplain();
+        OpRes = await DictionaryLinksService.GetOpRes(WordDto.WordLang, WordDto.ToLang, WordDto.Title);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -462,7 +466,7 @@ public class WordBase : ComponentBase
         if (firstRender)
         {
             if (Guid.TryParse(WordDto?.WordId, out Guid result) == false) wordTitleRef!.FocusAsync();
-        //    await LoadHtmlExplain();
+            //    await LoadHtmlExplain();
         }
     }
 }

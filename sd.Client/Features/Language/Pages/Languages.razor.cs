@@ -27,8 +27,6 @@ namespace sd.Client.Features.Language.Pages
         [Inject] protected DictionaryLinksService DictionaryLinksService { get; set; } = default!;
         [Inject] protected IKnownLanguagesStore KnownLanguagesStore { get; set; } = default!;
 
-        [Inject] IDialogService DialogService { get; set; } = default!;
-
         // All languages list (dropdown source)
         public IEnumerable<LanguageOption>? LangCodes { get; set; }
 
@@ -150,9 +148,7 @@ namespace sd.Client.Features.Language.Pages
                     ActivePair.To.Code,
                     string.Empty) ?? new List<DictionaryProviderDto>();
 
-                FavSite = await DefaultLangsService.GetFavLinkAsync(ActivePair.From.Code, ActivePair.To.Code) ?? string.Empty;
-
-                SetFavSiteAsync(FavSite);
+                FavSite = opRes.FirstOrDefault(x => x.IsFavorite)?.Pattern ?? FavSite;
             }
             catch (Exception ex)
             {

@@ -9,7 +9,6 @@ namespace sd.Client.Features.Language.Components;
 public class OtherPageBase : ComponentBase
 {
     [Inject] IJSRuntime JsRuntime { set; get; }
-    [Inject] DefaultLangsService DefaultLangsService { get; set; }
     [Parameter] public DictionaryProviderDto op { get; set; }
     [Parameter] public string FavSite { get; set; }
     [Parameter] public bool CanSetFavSite { get; set; }
@@ -25,20 +24,11 @@ public class OtherPageBase : ComponentBase
             op.IsFavorite = true;
             if (OnFavoriteChanged.HasDelegate)
                 await OnFavoriteChanged.InvokeAsync(pattern);
-            await DefaultLangsService.SetFavorite(FLangCode, TLangCode, pattern);
         }
     }
 
     protected async Task OpenLink(string url)
     {
         await JsRuntime.InvokeVoidAsync("open", url, "_blank"); // window.open
-    }
-
-    protected override void OnInitialized()
-    {
-        if (FavSite == op.Pattern)
-        {
-            op.IsFavorite = true;
-        }
     }
 }

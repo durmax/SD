@@ -58,10 +58,13 @@ namespace sd.Client.Features.Language.Pages
         protected bool isRemoveAllDialogHidden = true;
 
 
-        protected void SetFavSiteAsync(string fav)
+        protected async Task SetFavSiteAsync(string fav)
         {
             opRes.ForEach(x => x.IsFavorite = false);
             opRes.FirstOrDefault(x => x.Pattern == fav)?.IsFavorite = true;
+
+            var serialized = JsonConvert.SerializeObject(opRes);
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(ActivePair.From.Code, ActivePair.To.Code), serialized);
         }
 
         protected async Task OnSelectedOptionsChanged(IEnumerable<LanguageOption> options)

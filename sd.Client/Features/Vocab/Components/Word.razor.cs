@@ -51,8 +51,7 @@ public class WordBase : ComponentBase
     protected string cssClassUpdate = "d-none";
     protected bool loading;
     protected string note;
-
-
+    protected bool open = false;
 
     protected IEnumerable<UserRelationshipsWithOneUserDto> likedUsers;
     protected WordDto foundWordDtoToUpdate;

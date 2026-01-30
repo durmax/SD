@@ -7,17 +7,16 @@
 
 @if (Store.Items != null)
 {
-    <FluentAccordion>
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="5">
         @foreach (var word in Store.Items)
         {
-            <FluentAccordionItem Heading="@word?.Title" Expanded="@int.TryParse(@word.WordId, out int id)" Class="@(!Guid.TryParse(word?.WordId, out Guid result) ? "border-primary" : "border-dark")">
-                <Word WordDto="word"
-                      OnWordSave="@OnWordSave"
-                      OnWordFound="@OnWordFound"
-                      OnWordDelete="@OnWordDelete" />
-            </FluentAccordionItem>
+            <Word WordDto="word"
+                  OnWordSave="@OnWordSave"
+                  OnWordFound="@OnWordFound"
+                  OnWordDelete="@OnWordDelete" />
         }
-    </FluentAccordion>
+    </FluentStack>
+
 }
 
 @if (Store.IsLoading)

@@ -46,7 +46,7 @@ public class WordBase : ComponentBase
     protected string Explain { get; set; }
     public List<DictionaryProviderDto> OpRes { get; private set; }
 
-    protected FluentTextField? wordTitleRef;
+    protected WordSearchField? wordSearchFieldRef;
     protected string cssClassDelete;// = "d-none";
     protected string cssClassUpdate = "d-none";
     protected bool loading;
@@ -463,7 +463,7 @@ public class WordBase : ComponentBase
     {
         if (firstRender)
         {
-            if (Guid.TryParse(WordDto?.WordId, out Guid result) == false) wordTitleRef!.FocusAsync();
+           // if (Guid.TryParse(WordDto?.WordId, out Guid result) == false) wordSearchFieldRef!.FocusAsync();
             //    await LoadHtmlExplain();
         }
     }

@@ -22,13 +22,16 @@
 
             <DictionaryLinksMenu WordDto="WordDto"></DictionaryLinksMenu>
 
-            <FluentTextField Id="wordId"
-                             Value="@WordDto.Title"
-                             InputMode="InputMode.Search"
-                             style="width: 100%;"
-                             @ref="wordTitleRef"
-                             @onkeydown="KeydownAsync"
-                             @oninput="@(async (ui) => await WordChangedAsync(ui.Value?.ToString() ?? ""))" />
+            <WordSearchField Id="wordId"
+                             @bind-Value="WordDto.Title"
+                             Placeholder=""
+                             Style="width: 100%;"
+                             @ref="wordSearchFieldRef"
+                             OnKeyDown="KeydownAsync"
+                             OnInput="WordChangedAsync"
+                             SameWords="SameWords"
+                             LanguageToolWords="LanguageToolWords"
+                             OnSelectSameWord="SetWord" />
 
             <FluentButton Appearance="Appearance.Outline"
                           IconStart="@(new Icons.Regular.Size16.ArrowExpandAll())"
@@ -82,31 +85,6 @@
                 <FluentNumberField Size="1" @bind-Value="@WordDto.Score"></FluentNumberField>
 
             </FluentStack>
-
-            #region Same words
-
-
-            <div style="max-width:500px">
-                @if (SameWords != null && !string.IsNullOrWhiteSpace(WordDto.Title))
-                {
-                    @foreach (var w in SameWords)
-                    {
-                        <a href="" class="m-1" @onclick="async () => { await SetWord(w.Split(':')[1]); }">
-                            <u class="text-primary"> @w.Split(':')[0] </u>
-                        </a>
-                    }
-                }
-
-                @if (LanguageToolWords != null && !string.IsNullOrWhiteSpace(WordDto.Title))
-                {
-                    @foreach (var w in LanguageToolWords)
-                    {
-                        <a @onclick="() => WordDto.Title = w">@w</a>
-                    }
-                }
-            </div>
-            #endregion
-
             #region UpdateWord
 
 

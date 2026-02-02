@@ -1,38 +1,30 @@
 ﻿@using Microsoft.FluentUI.AspNetCore.Components
 @using sd.Client.Features.Language.Contracts
 
-
-<FluentGrid>
-    <FluentGridItem xs="5">
+<FluentGrid Style="width:100%; align-items:center;">
+    <FluentGridItem xs="5" lg="5" Style="min-width:0;">
         <FluentCombobox TOption="LanguageOption"
                         Items="@ItemsSafe"
-                        Width="70%"
-                        Label="@FirstLanguageLabel"
                         OptionText="@(i => i.Name)"
                         SelectedOption="@SelectedToOption"
                         SelectedOptionChanged="OnToSelectedChanged"
-                        Auto-complete="ComboboxAutocomplete.Inline" />
+                        Autocomplete="ComboboxAutocomplete.Inline" 
+                        Style="width:100%; min-width:0;" />
     </FluentGridItem>
-
-    <FluentGridItem xs="2">
-        <FluentLabel Class="float-none">Rev</FluentLabel>
+    <FluentGridItem xs="2" lg="2" Style="display:flex; justify-content:center;">
         <FluentButton OnClick="OnReverse"
                       IconEnd="@(new Icons.Regular.Size16.ArrowBidirectionalLeftRight())" />
-
     </FluentGridItem>
-
-    <FluentGridItem xs="5">
+    <FluentGridItem xs="5" lg="5" Style="min-width:0;">
         <FluentCombobox TOption="LanguageOption"
                         Items="@ItemsSafe"
-                        Width="70%"
-                        Label="@SecondLanguageLabel"
                         OptionText="@(i => i.Name)"
                         SelectedOption="@SelectedFromOption"
                         SelectedOptionChanged="OnFromSelectedChanged"
-                        Autocomplete="ComboboxAutocomplete.Inline" />
+                        Autocomplete="ComboboxAutocomplete.Inline" 
+                        Style="width:100%; min-width:0;" />
     </FluentGridItem>
 </FluentGrid>
-
 
 @code {
     [Parameter] public IEnumerable<LanguageOption>? Items { get; set; }
@@ -40,8 +32,6 @@
     [Parameter] public EventCallback<LanguagePair> PairChanged { get; set; }
     [Parameter] public EventCallback Reverse { get; set; }
 
-    [Parameter] public string FirstLanguageLabel { get; set; } = "Mother language";
-    [Parameter] public string SecondLanguageLabel { get; set; } = "Second language";
 
     private IEnumerable<LanguageOption> ItemsSafe => Items ?? Array.Empty<LanguageOption>();
 

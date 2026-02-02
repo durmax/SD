@@ -4,15 +4,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
+using sd.Client.Features.Language.Contracts;
 using sd.Client.Features.Language.State;
 using sd.Client.Helpers;
-using sd.Client.Features.Language.Contracts;
 using sd.Client.Services;
 using sd.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using YamlDotNet.Core.Tokens;
 
 namespace sd.Client.Features.Language.Pages
 {
@@ -29,7 +30,8 @@ namespace sd.Client.Features.Language.Pages
         // All languages list (dropdown source)
         public IEnumerable<LanguageOption>? LangCodes { get; set; }
 
-        protected IEnumerable<LanguageOption> UiLangItems { get; set; }
+        protected IEnumerable<LanguageOption> UiLangItems { get; set; } = LangCodesHelper.UiLangs
+                .Select(x => new LanguageOption(x.Key, x.Key));
 
         // Current dictionary providers (sortable)
         protected List<DictionaryProviderDto> opRes { get; set; } = new();
@@ -38,7 +40,9 @@ namespace sd.Client.Features.Language.Pages
         protected List<string> KnownLangs { get; set; } = new();
 
         // UI language key (your UILangs dictionary key, not culture string)
-        protected string? UILang { get; set; }
+        protected string UILang { get; set; }
+        protected LanguageOption SelectedUILang =>
+        UiLangItems.FirstOrDefault(x => x.Code == UILang);
 
         private bool _selectedItemsInitialized;
 
@@ -64,7 +68,7 @@ namespace sd.Client.Features.Language.Pages
             await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(ActivePair.From.Code, ActivePair.To.Code), serialized);
         }
 
-        protected async Task OnSelectedOptionsChanged(IEnumerable<LanguageOption> options)
+        protected async Task OnKnownLangChanged(IEnumerable<LanguageOption> options)
         {
             if (_suppressSelectedItemsChanged) return;
             if (_isPersistingSelectedItems) return;
@@ -113,10 +117,6 @@ namespace sd.Client.Features.Language.Pages
             // Ensure current FL/TL are included + persist back
             KnownLanguagesStore.EnsureContains(KnownLangs, ActivePair.From.Code, ActivePair.To.Code);
             await KnownLanguagesStore.SaveAsync(KnownLangs);
-
-
-            UiLangItems = LangCodesHelper.UiLangs
-                .Select(x => new LanguageOption(x.Key, x.Key));
 
             // UI language initial selection
             var culture = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
@@ -170,9 +170,9 @@ namespace sd.Client.Features.Language.Pages
             await ReloadProvidersAsync();
         }
 
-        protected async Task OnUILangChanged(string? value)
+        protected async Task OnUILangChanged(LanguageOption option)
         {
-            UILang = value;
+            UILang = option.Code;
             var fallbackCulture = "en-US";
 
             try

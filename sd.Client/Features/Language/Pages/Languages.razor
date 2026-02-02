@@ -15,8 +15,8 @@
     </FluentStack>
 
     <!-- Main content -->
-    <FluentGrid Class="lang-grid">
-        <FluentGridItem xs="12" sm="12" md="12" lg="12">
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="6">
+
             <FluentCard AreaRestricted="false">
 
                 <h6>Languages</h6>
@@ -25,46 +25,30 @@
                                       Width="100%"
                                       OnOptionsSearch="OnSearchAsync"
                                       SelectedOptions="SelectedItems"
-                                      SelectedOptionsChanged="OnSelectedOptionsChanged" />
+                                      SelectedOptionsChanged="OnKnownLangChanged" />
 
             </FluentCard>
-        </FluentGridItem>
+
 
         <!-- Section: Display -->
-        <FluentGridItem xs="12" sm="12" md="12" lg="12">
+
             <FluentCard AreaRestricted="false">
                 <h6>Display</h6>
-                <UiLanguageSelector Items="UiLangItems"
-                                    Value="@UILang"
-                                    ValueChanged="OnUILangChanged"
-                                    Label="UI Language" />
 
+            <FluentCombobox TOption="LanguageOption"
+                            Items="UiLangItems"
+                            Label="UI Language"
+                            OptionText="@(i => i.Name)"
+                            OptionValue="@(i => i.Code)"
+                            SelectedOption="@SelectedUILang"
+                            SelectedOptionChanged="@OnUILangChanged"
+                            Autocomplete="ComboboxAutocomplete.Inline" />
             </FluentCard>
-        </FluentGridItem>
 
-        <!-- Section: Pair -->
-        <FluentGridItem xs="12" sm="12" md="12" lg="12">
-            <FluentCard AreaRestricted="false">
-                <h6>Language pair</h6>
-
-                <!-- Optional: show current pair as a chip/badge -->
-                <FluentBadge Appearance="Appearance.Neutral">
-                    @ActivePair.From.Code → @ActivePair.To.Code
-                </FluentBadge>
-
-                <DefaultLanguagesSelector Items="SelectedItems"
-                                          Pair="ActivePair"
-                                          PairChanged="OnActivePairChanged"
-                                          Reverse="Reverse"
-                                          FirstLanguageLabel="@LanguageContainer.Keys["Firstlanguage"]"
-                                          SecondLanguageLabel="@LanguageContainer.Keys["Secondlanguage"]" />
-
-            </FluentCard>
-        </FluentGridItem>
 
         <!-- Section: Resources -->
-        <FluentGridItem xs="12" sm="12" md="12" lg="12">
-            <FluentCard AreaRestricted="false">
+
+            <FluentCard AreaRestricted="true">
 
                 <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center">
                     <FluentStack Orientation="Orientation.Vertical" HorizontalGap="2">
@@ -86,36 +70,43 @@
                 }
                 else
                 {
-                    <FluentSortableList Items="opRes" OnUpdate="@SortListAsync" Sort="true" Handle="true" Class="resource-list">
-                        <ItemTemplate>
-                            <FluentStack Orientation="Orientation.Horizontal"
-                                         HorizontalGap="10"
-                                         VerticalAlignment="VerticalAlignment.Center"
-                                         Class="resource-row">
-                                <!-- Bigger grab handle -->
-                                <FluentButton Appearance="Appearance.Accent"
-                                              Class="grab-btn sortable-grab"
-                                              Title="Drag to reorder">
-                                    <span aria-hidden="true">≡</span>
-                                </FluentButton>
-                                <div class="resource-content">
-                                    <OtherPage op="@context"
-                                               FavSite="@FavSite"
-                                               OnFavoriteChanged="@SetFavSiteAsync"
-                                               CanSetFavSite="true"
-                                               FLangCode="@ActivePair.From.Code"
-                                               TLangCode="@ActivePair.To.Code" />
-                                </div>
-                            </FluentStack>
-                        </ItemTemplate>
-                    </FluentSortableList>
+                    <FluentStack Orientation="Orientation.Vertical" VerticalGap="4">
+                        <PairLanguagesSelector Items="SelectedItems"
+                                               Pair="ActivePair"
+                                               PairChanged="OnActivePairChanged"
+                                               Reverse="Reverse" />
+
+                        <FluentSortableList Items="opRes" OnUpdate="@SortListAsync" Sort="true" Handle="true" Class="resource-list">
+                            <ItemTemplate>
+                                <FluentStack Orientation="Orientation.Horizontal"
+                                             HorizontalGap="10"
+                                             VerticalAlignment="VerticalAlignment.Center"
+                                             Class="resource-row">
+                                    <!-- Bigger grab handle -->
+                                    <FluentButton Appearance="Appearance.Accent"
+                                                  Class="grab-btn sortable-grab"
+                                                  Title="Drag to reorder">
+                                        <span aria-hidden="true">≡</span>
+                                    </FluentButton>
+                                    <div class="resource-content">
+                                        <OtherPage op="@context"
+                                                   FavSite="@FavSite"
+                                                   OnFavoriteChanged="@SetFavSiteAsync"
+                                                   CanSetFavSite="true"
+                                                   FLangCode="@ActivePair.From.Code"
+                                                   TLangCode="@ActivePair.To.Code" />
+                                    </div>
+                                </FluentStack>
+                            </ItemTemplate>
+                        </FluentSortableList>
+                    </FluentStack>
                 }
 
             </FluentCard>
-        </FluentGridItem>
+
 
         <!-- Danger zone -->
-        <FluentGridItem xs="12" sm="12" md="12" lg="12">
+
             <FluentCard>
                 <FluentStack Orientation="Orientation.Vertical" HorizontalGap="8">
                     <h6>Reset</h6>
@@ -143,8 +134,8 @@
                 </FluentStack>
 
             </FluentCard>
-        </FluentGridItem>
-    </FluentGrid>
+
+    </FluentStack>
 
 </FluentCard>
 

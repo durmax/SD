@@ -1,9 +1,10 @@
 ﻿@page "/Languages"
 @inherits LanguagesBase
 @using sd.Client.Features.Language.Components
+@using sd.Client.Features.PairLanguages.Components
+@using sd.Client.Features.PairLanguages.Contracts
 @using sd.Client.Helpers
 @using sd.Client.Models
-@using sd.Client.Features.Language.Contracts
 @using sd.Client.Pages
 @using sd.Client.Services
 
@@ -17,23 +18,23 @@
     <!-- Main content -->
     <FluentStack Orientation="Orientation.Vertical" VerticalGap="6">
 
-            <FluentCard AreaRestricted="false">
+        <FluentCard AreaRestricted="false">
 
-                <h6>Languages</h6>
-                <KnownLanguagesPicker Label="@LanguageContainer.Keys["AddLang"]"
-                                      Placeholder="@LanguageContainer.Keys["AddLang"]"
-                                      Width="100%"
-                                      OnOptionsSearch="OnSearchAsync"
-                                      SelectedOptions="SelectedItems"
-                                      SelectedOptionsChanged="OnKnownLangChanged" />
+            <h6>Languages</h6>
+            <KnownLanguagesPicker Label="@LanguageContainer.Keys["AddLang"]"
+                                  Placeholder="@LanguageContainer.Keys["AddLang"]"
+                                  Width="100%"
+                                  OnOptionsSearch="OnSearchAsync"
+                                  SelectedOptions="SelectedItems"
+                                  SelectedOptionsChanged="OnKnownLangChanged" />
 
-            </FluentCard>
+        </FluentCard>
 
 
         <!-- Section: Display -->
 
-            <FluentCard AreaRestricted="false">
-                <h6>Display</h6>
+        <FluentCard AreaRestricted="false">
+            <h6>Display</h6>
 
             <FluentCombobox TOption="LanguageOption"
                             Items="UiLangItems"
@@ -43,97 +44,95 @@
                             SelectedOption="@SelectedUILang"
                             SelectedOptionChanged="@OnUILangChanged"
                             Autocomplete="ComboboxAutocomplete.Inline" />
-            </FluentCard>
+        </FluentCard>
 
 
         <!-- Section: Resources -->
 
-            <FluentCard AreaRestricted="true">
+        <FluentCard AreaRestricted="true">
 
-                <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center">
-                    <FluentStack Orientation="Orientation.Vertical" HorizontalGap="2">
-                        <h6>Resources</h6>
-                        <p>Drag the handle to reorder. Click the star to set a favorite.</p>
+            <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center">
+                <h6>Resources</h6>
+                <p>Drag the handle to reorder. Click the star to set a favorite.</p>
+                <!-- Add a compact action like "Add resource" later -->
+                <FluentButton Appearance="Appearance.Outline" IconStart="@(new Icons.Regular.Size24.Add())">Add</FluentButton>
+            </FluentStack>
+
+            @if (opRes is null || opRes.Count == 0)
+            {
+                <FluentCard Class="empty-state">
+                    <FluentStack Orientation="Orientation.Vertical" HorizontalGap="6" HorizontalAlignment="HorizontalAlignment.Center">
+                        <h6>No resources yet</h6>
+                        <p>Add languages and configure resources for this pair.</p>
                     </FluentStack>
-                    <!-- Add a compact action like "Add resource" later -->
-                    <FluentButton Appearance="Appearance.Outline" IconStart="@(new Icons.Regular.Size24.Add())">Add</FluentButton>
+                </FluentCard>
+            }
+            else
+            {
+                <FluentStack Orientation="Orientation.Vertical" VerticalGap="4">
+                    <PairLanguagesSelector Items="SelectedItems"
+                                           Pair="ActivePair"
+                                           PairChanged="OnActivePairChanged"
+                                           Reverse="Reverse" />
+
+                    <FluentSortableList Items="opRes" OnUpdate="@SortListAsync" Sort="true" Handle="true" Class="resource-list">
+                        <ItemTemplate>
+                            <FluentStack Orientation="Orientation.Horizontal"
+                                         HorizontalGap="10"
+                                         VerticalAlignment="VerticalAlignment.Center"
+                                         Class="resource-row">
+                                <!-- Bigger grab handle -->
+                                <FluentButton Appearance="Appearance.Accent"
+                                              Class="grab-btn sortable-grab"
+                                              Title="Drag to reorder">
+                                    <span aria-hidden="true">≡</span>
+                                </FluentButton>
+                                <div class="resource-content">
+                                    <OtherPage op="@context"
+                                               FavSite="@FavSite"
+                                               OnFavoriteChanged="@SetFavSiteAsync"
+                                               CanSetFavSite="true"
+                                               FLangCode="@ActivePair.From.Code"
+                                               TLangCode="@ActivePair.To.Code" />
+                                </div>
+                            </FluentStack>
+                        </ItemTemplate>
+                    </FluentSortableList>
                 </FluentStack>
+            }
 
-                @if (opRes is null || opRes.Count == 0)
-                {
-                    <FluentCard Class="empty-state">
-                        <FluentStack Orientation="Orientation.Vertical" HorizontalGap="6" HorizontalAlignment="HorizontalAlignment.Center">
-                            <h6>No resources yet</h6>
-                            <p>Add languages and configure resources for this pair.</p>
-                        </FluentStack>
-                    </FluentCard>
-                }
-                else
-                {
-                    <FluentStack Orientation="Orientation.Vertical" VerticalGap="4">
-                        <PairLanguagesSelector Items="SelectedItems"
-                                               Pair="ActivePair"
-                                               PairChanged="OnActivePairChanged"
-                                               Reverse="Reverse" />
-
-                        <FluentSortableList Items="opRes" OnUpdate="@SortListAsync" Sort="true" Handle="true" Class="resource-list">
-                            <ItemTemplate>
-                                <FluentStack Orientation="Orientation.Horizontal"
-                                             HorizontalGap="10"
-                                             VerticalAlignment="VerticalAlignment.Center"
-                                             Class="resource-row">
-                                    <!-- Bigger grab handle -->
-                                    <FluentButton Appearance="Appearance.Accent"
-                                                  Class="grab-btn sortable-grab"
-                                                  Title="Drag to reorder">
-                                        <span aria-hidden="true">≡</span>
-                                    </FluentButton>
-                                    <div class="resource-content">
-                                        <OtherPage op="@context"
-                                                   FavSite="@FavSite"
-                                                   OnFavoriteChanged="@SetFavSiteAsync"
-                                                   CanSetFavSite="true"
-                                                   FLangCode="@ActivePair.From.Code"
-                                                   TLangCode="@ActivePair.To.Code" />
-                                    </div>
-                                </FluentStack>
-                            </ItemTemplate>
-                        </FluentSortableList>
-                    </FluentStack>
-                }
-
-            </FluentCard>
+        </FluentCard>
 
 
         <!-- Danger zone -->
 
-            <FluentCard>
-                <FluentStack Orientation="Orientation.Vertical" HorizontalGap="8">
-                    <h6>Reset</h6>
-                    <p>These actions affect stored data and cannot be undone.</p>
+        <FluentCard>
+            <FluentStack Orientation="Orientation.Vertical" HorizontalGap="8">
+                <h6>Reset</h6>
+                <p>These actions affect stored data and cannot be undone.</p>
 
-                    <FluentStack Orientation="Orientation.Horizontal" VerticalGap="2">
-                        <p>Clears all saved settings, resources, and favorites.</p>
-                        <FluentButton Appearance="Appearance.Accent"
-                                      Style="margin-left: auto;"
-                                      BackgroundColor="Red"
-                                      OnClick="() => isRemoveAllDialogHidden = false">
-                            Remove
-                        </FluentButton>
-                    </FluentStack>
-
-                    <FluentStack Orientation="Orientation.Horizontal" VerticalGap="2">
-                        <p>Only for active pair: @ActivePair.From.Code → @ActivePair.To.Code</p>
-                        <FluentButton Appearance="Appearance.Outline"
-                                      Style="margin-left: auto;"
-                                      OnClick="() => isResetDialogHidden = false">
-                            Reset resources
-                        </FluentButton>
-                    </FluentStack>
-
+                <FluentStack Orientation="Orientation.Horizontal" VerticalGap="2">
+                    <p>Clears all saved settings, resources, and favorites.</p>
+                    <FluentButton Appearance="Appearance.Accent"
+                                  Style="margin-left: auto;"
+                                  BackgroundColor="Red"
+                                  OnClick="() => isRemoveAllDialogHidden = false">
+                        Remove
+                    </FluentButton>
                 </FluentStack>
 
-            </FluentCard>
+                <FluentStack Orientation="Orientation.Horizontal" VerticalGap="2">
+                    <p>Only for active pair: @ActivePair.From.Code → @ActivePair.To.Code</p>
+                    <FluentButton Appearance="Appearance.Outline"
+                                  Style="margin-left: auto;"
+                                  OnClick="() => isResetDialogHidden = false">
+                        Reset resources
+                    </FluentButton>
+                </FluentStack>
+
+            </FluentStack>
+
+        </FluentCard>
 
     </FluentStack>
 

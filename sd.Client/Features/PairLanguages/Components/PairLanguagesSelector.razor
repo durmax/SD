@@ -1,10 +1,13 @@
 ﻿@using Microsoft.FluentUI.AspNetCore.Components
-@using sd.Client.Features.Language.Contracts
+@using sd.Client.Features.Language.State
+@using sd.Client.Features.PairLanguages.Contracts
+@using sd.Client.Helpers
+@inject IKnownLanguagesStore KnownLanguagesStore
 
 <FluentGrid Style="width:100%; align-items:center;">
     <FluentGridItem xs="5" lg="5" Style="min-width:0;">
         <FluentCombobox TOption="LanguageOption"
-                        Items="@ItemsSafe"
+                        Items="@Items"
                         OptionText="@(i => i.Name)"
                         SelectedOption="@SelectedToOption"
                         SelectedOptionChanged="OnToSelectedChanged"
@@ -17,7 +20,7 @@
     </FluentGridItem>
     <FluentGridItem xs="5" lg="5" Style="min-width:0;">
         <FluentCombobox TOption="LanguageOption"
-                        Items="@ItemsSafe"
+                        Items="@Items"
                         OptionText="@(i => i.Name)"
                         SelectedOption="@SelectedFromOption"
                         SelectedOptionChanged="OnFromSelectedChanged"
@@ -27,20 +30,21 @@
 </FluentGrid>
 
 @code {
-    [Parameter] public IEnumerable<LanguageOption>? Items { get; set; }
+
+    
     [Parameter] public LanguagePair Pair { get; set; }
     [Parameter] public EventCallback<LanguagePair> PairChanged { get; set; }
     [Parameter] public EventCallback Reverse { get; set; }
 
-
-    private IEnumerable<LanguageOption> ItemsSafe => Items ?? Array.Empty<LanguageOption>();
+    [Parameter] public IEnumerable<LanguageOption>? Items { get; set; }
+    protected List<string> KnownLangs { get; set; } = new();
 
     // IMPORTANT: must return an actual item from ItemsSafe
     private LanguageOption SelectedToOption =>
-        ItemsSafe.FirstOrDefault(x => x.Code == Pair.To.Code);
+        Items.FirstOrDefault(x => x.Code == Pair.To.Code);
 
     private LanguageOption SelectedFromOption =>
-        ItemsSafe.FirstOrDefault(x => x.Code == Pair.From.Code);
+        Items.FirstOrDefault(x => x.Code == Pair.From.Code);
 
     private async Task OnToSelectedChanged(LanguageOption option)
     {
@@ -70,4 +74,5 @@
         if (Reverse.HasDelegate)
             await Reverse.InvokeAsync();
     }
+
 }

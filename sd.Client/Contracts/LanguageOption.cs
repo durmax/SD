@@ -1,4 +1,4 @@
-﻿namespace sd.Client.Features.PairLanguages.Contracts;
+﻿namespace sd.Client.Contracts;
 
 public readonly record struct LanguageOption(string Code, string Name);
 

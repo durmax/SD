@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
+using sd.Client.Contracts;
 using sd.Client.Features.Language.State;
-using sd.Client.Features.PairLanguages.Contracts;
 using sd.Client.Helpers;
 using sd.Client.Services;
 using sd.Shared;
@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using YamlDotNet.Core.Tokens;
 
 namespace sd.Client.Features.Language.Pages
 {
@@ -26,6 +25,9 @@ namespace sd.Client.Features.Language.Pages
         [Inject] protected NavigationManager NavigationManager { get; set; } = default!;
         [Inject] protected DictionaryLinksService DictionaryLinksService { get; set; } = default!;
         [Inject] protected IKnownLanguagesStore KnownLanguagesStore { get; set; } = default!;
+
+        [Inject] protected UserPreferencesService UserPreferencesService { get; set; } = default!;
+        public LanguageSettings LanguageSettings { get; set; }
 
         // All languages list (dropdown source)
         public IEnumerable<LanguageOption>? LangCodes { get; set; }
@@ -44,12 +46,7 @@ namespace sd.Client.Features.Language.Pages
         protected LanguageOption SelectedUILang =>
         UiLangItems.FirstOrDefault(x => x.Code == UILang);
 
-        private bool _selectedItemsInitialized;
-
         protected IEnumerable<LanguageOption> SelectedItems { get; set; }
-
-        private bool _suppressSelectedItemsChanged = true;
-        private bool _isPersistingSelectedItems;
 
         protected LanguagePair ActivePair { get; set; }
 
@@ -70,24 +67,12 @@ namespace sd.Client.Features.Language.Pages
 
         protected async Task OnKnownLangChanged(IEnumerable<LanguageOption> options)
         {
-            if (_suppressSelectedItemsChanged) return;
-            if (_isPersistingSelectedItems) return;
+            SelectedItems = options ?? Array.Empty<LanguageOption>();
 
-            try
-            {
-                _isPersistingSelectedItems = true;
+            KnownLangs = SelectedItems.Select(x => x.Code).Distinct().ToList();
+            KnownLanguagesStore.EnsureContains(KnownLangs, ActivePair.From.Code, ActivePair.To.Code);
 
-                SelectedItems = options ?? Array.Empty<LanguageOption>();
-
-                KnownLangs = SelectedItems.Select(x => x.Code).Distinct().ToList();
-                KnownLanguagesStore.EnsureContains(KnownLangs, ActivePair.From.Code, ActivePair.To.Code);
-
-                await KnownLanguagesStore.SaveAsync(KnownLangs);
-            }
-            finally
-            {
-                _isPersistingSelectedItems = false;
-            }
+            await KnownLanguagesStore.SaveAsync(KnownLangs);
         }
 
         protected async Task Reverse()
@@ -122,17 +107,9 @@ namespace sd.Client.Features.Language.Pages
             var culture = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
             UILang = LangCodesHelper.UiLangs.FirstOrDefault(x => x.Value == culture).Key;
 
-            if (!_selectedItemsInitialized)
-            {
-                _suppressSelectedItemsChanged = true;
-
-                SelectedItems = (LangCodes ?? Array.Empty<LanguageOption>())
-                    .Where(l => KnownLangs.Contains(l.Code))
-                    .ToList();
-
-                _suppressSelectedItemsChanged = false;
-                _selectedItemsInitialized = true;
-            }
+            SelectedItems = (LangCodes ?? Array.Empty<LanguageOption>())
+                                .Where(l => KnownLangs.Contains(l.Code))
+                                .ToList();
 
             // Load dictionary providers + favorite site
             await ReloadProvidersAsync();
@@ -158,7 +135,7 @@ namespace sd.Client.Features.Language.Pages
         protected async Task OnActivePairChanged(LanguagePair pair)
         {
             ActivePair = pair;
-           //DefaultLangsService.DefaultWordLang = pair.From.Code;
+            //DefaultLangsService.DefaultWordLang = pair.From.Code;
 
             KnownLanguagesStore.EnsureContains(KnownLangs, pair.To.Code);
             KnownLanguagesStore.EnsureContains(KnownLangs, pair.From.Code);

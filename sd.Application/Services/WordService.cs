@@ -23,7 +23,7 @@ namespace sd.Application.Services
         Task<bool> SaveComment(string wordId, CommentModel newComment);
         Task<int> LikeComment(string userId, string wordId, string commentId);
         Task<bool> DeleteComment(string currUsr, string wordId, string commentId);
-        Task<string> GetWordMeaningAI(string wordTitle, CancellationToken cancellationToken);
+        Task<string> GetWordMeaningAI(string wordTitle, CancellationToken cancellationToken, string level = "B1", string fromLang = "German", string toLang = "Arabic");
     }
 
     public class WordService : IWordService
@@ -310,15 +310,25 @@ namespace sd.Application.Services
             else return -1;
         }
 
-        public async Task<string> GetWordMeaningAI(string wordTitle, CancellationToken cancellationToken)
+        public async Task<string> GetWordMeaningAI(string wordTitle, CancellationToken cancellationToken, string level = "B1", string fromLang = "German", string toLang = "Arabic")
         {
             if (string.IsNullOrWhiteSpace(wordTitle)) return string.Empty;
-            var prompt = $"Ich lerne Deutsch als Fremdsprache auf dem Niveau B1. Erkläre mir die Bedeutung von „{wordTitle}” und schreibe Beispiele, die mir helfen es zu verstehen. Beginne die Antwort direkt mit den Beispielen, ohne einen einleitenden Satz oder eine Begrüßung.";
+
+            string prompt = @$"
+Explain the {fromLang} word '{ wordTitle}' for a learner whose native language is {toLang}, at CEFR {level}.
+Return ONLY in plain text and exactly in this format:
+Meaning: < max 10 words in simple {fromLang}>
+Examples:
+- < short example 1 using the word>
+- < short example 2 using the word>
+Synonyms: < 2 synonyms >
+Translation({toLang}): < translation only >";
+
             var res = await _geminiService.ProcessStringAsync(prompt, cancellationToken);
 
             res = ConvertFormattingToHtml(res);
 
-            return "------------------------- KI Erklärung ------------------------- </br><h3>" + res + "</h3></br> ------------------------- Ende KI Erklärung -------------------------";
+            return "------------------------- AI Explanation ------------------------- </br><h3>" + res + "</h3></br> ------------------------- End AI Explanation -------------------------";
         }
 
         /// <summary>

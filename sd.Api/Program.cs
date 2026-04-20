@@ -86,7 +86,7 @@ app.UseCors(builder =>
         "http://localhost:8085", // Docker
         "https://localhost:44301",
         "https://lingoclub.netlify.app",
-        "https://www.lingoclub.net")
+        "https://red-pond-0ccf1d603.4.azurestaticapps.net")
            .AllowAnyMethod()
            .AllowAnyHeader()
            .AllowCredentials();

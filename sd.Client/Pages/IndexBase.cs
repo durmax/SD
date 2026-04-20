@@ -84,7 +84,7 @@ namespace sd.Client.Pages
         {
             if (!NavigationManager.Uri.Contains("https://www.") && !NavigationManager.Uri.Contains("localhost"))
             {
-                NavigationManager.NavigateTo("https://www.lingoclub.net/", true);
+                NavigationManager.NavigateTo("https://red-pond-0ccf1d603.4.azurestaticapps.net/", true);
             }
             await DefaultLangsService.SetDefLangsAsync();
 

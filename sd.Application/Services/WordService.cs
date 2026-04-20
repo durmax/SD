@@ -314,15 +314,16 @@ namespace sd.Application.Services
         {
             if (string.IsNullOrWhiteSpace(wordTitle)) return string.Empty;
 
-            string prompt = @$"
-Explain the {fromLang} word '{ wordTitle}' for a learner whose native language is {toLang}, at CEFR {level}.
-Return ONLY in plain text and exactly in this format:
-Meaning: < max 10 words in simple {fromLang}>
+            string prompt = $"""
+Explain the {fromLang} word "{wordTitle}" for a {toLang} learner (CEFR {level}).
+Return ONLY:
+Meaning: (max 10 words, simple {fromLang})
 Examples:
-- < short example 1 using the word>
-- < short example 2 using the word>
-Synonyms: < 2 synonyms >
-Translation({toLang}): < translation only >";
+- ...
+- ...
+Synonyms: ...
+Translation ({toLang}): ...
+""";
 
             var res = await _geminiService.ProcessStringAsync(prompt, cancellationToken);
 

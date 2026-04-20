@@ -69,10 +69,12 @@ namespace sd.Client.Features.Language.Pages
         {
             SelectedItems = options ?? Array.Empty<LanguageOption>();
 
-            KnownLangs = SelectedItems.Select(x => x.Code).Distinct().ToList();
-            KnownLanguagesStore.EnsureContains(KnownLangs, ActivePair.From.Code, ActivePair.To.Code);
+            LanguageSettings = LanguageSettings with
+            {
+                KnownLangs = SelectedItems.Select(x => x.Code).Distinct().ToArray()
+            };
 
-            await KnownLanguagesStore.SaveAsync(KnownLangs);
+            await UserPreferencesService.SetSettingsAsync(LanguageSettings);
         }
 
         protected async Task Reverse()
@@ -96,19 +98,14 @@ namespace sd.Client.Features.Language.Pages
             LangCodes ??= LangCodesHelper.Langs
                 .Select(x => new LanguageOption(x.Key, x.Value));
 
-            // Load known langs from storage (via store)
-            KnownLangs = await KnownLanguagesStore.GetAsync();
-
-            // Ensure current FL/TL are included + persist back
-            KnownLanguagesStore.EnsureContains(KnownLangs, ActivePair.From.Code, ActivePair.To.Code);
-            await KnownLanguagesStore.SaveAsync(KnownLangs);
+            LanguageSettings = await UserPreferencesService.GetSettingsAsync(true);
 
             // UI language initial selection
             var culture = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
             UILang = LangCodesHelper.UiLangs.FirstOrDefault(x => x.Value == culture).Key;
 
             SelectedItems = (LangCodes ?? Array.Empty<LanguageOption>())
-                                .Where(l => KnownLangs.Contains(l.Code))
+                                .Where(l => LanguageSettings.KnownLangs.Contains(l.Code))
                                 .ToList();
 
             // Load dictionary providers + favorite site
@@ -137,13 +134,9 @@ namespace sd.Client.Features.Language.Pages
             ActivePair = pair;
             //DefaultLangsService.DefaultWordLang = pair.From.Code;
 
-            KnownLanguagesStore.EnsureContains(KnownLangs, pair.To.Code);
-            KnownLanguagesStore.EnsureContains(KnownLangs, pair.From.Code);
-
             await LocalStorageAccessor.SetValueAsync(LangStorageKeys.ToLang, pair.To.Code);
             await LocalStorageAccessor.SetValueAsync(LangStorageKeys.FromLang, pair.From.Code);
 
-            await KnownLanguagesStore.SaveAsync(KnownLangs);
             await ReloadProvidersAsync();
         }
 

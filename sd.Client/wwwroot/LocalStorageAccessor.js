@@ -1,5 +1,6 @@
 ﻿export function get(key) {
-    return window.localStorage.getItem(key);
+    const value = window.localStorage.getItem(key);
+    return value ? JSON.parse(value) : null;
 }
 
 export function set(key, value) {

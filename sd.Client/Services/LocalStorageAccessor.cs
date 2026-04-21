@@ -16,12 +16,10 @@ public class LocalStorageAccessor : IAsyncDisposable
 
     public async Task<T> GetValueAsync<T>(string key)
     {
-        if (string.IsNullOrWhiteSpace(key)) return default(T);
+        if (string.IsNullOrWhiteSpace(key)) return default!;
 
         await WaitForReference();
-        var result = await _accessorJsRef.Value.InvokeAsync<T>("get", key);
-
-        return result;
+        return await _module!.InvokeAsync<T>("get", key);
     }
 
     public async Task SetValueAsync<T>(string key, T value)
@@ -29,14 +27,14 @@ public class LocalStorageAccessor : IAsyncDisposable
         if (!string.IsNullOrWhiteSpace(key) && value != null)
         {
             await WaitForReference();
-            await _accessorJsRef.Value.InvokeVoidAsync("set", key, value);
+            await _module!.InvokeVoidAsync("set", key, value);
         }
     }
 
     public async Task Clear()
     {
         await WaitForReference();
-        await _accessorJsRef.Value.InvokeVoidAsync("clear");
+        await _module!.InvokeVoidAsync("clear");
     }
 
     public async Task RemoveAsync(string key)
@@ -44,23 +42,25 @@ public class LocalStorageAccessor : IAsyncDisposable
         if (!string.IsNullOrWhiteSpace(key))
         {
             await WaitForReference();
-            await _accessorJsRef.Value.InvokeVoidAsync("remove", key);
-        }
-    }
-
-    private async Task WaitForReference()
-    {
-        if (_accessorJsRef.IsValueCreated is false)
-        {
-            _accessorJsRef = new(await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/LocalStorageAccessor.js"));
+            await _module!.InvokeVoidAsync("remove", key);
         }
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (_accessorJsRef.IsValueCreated)
+        if (_module is not null)
         {
-            await _accessorJsRef.Value.DisposeAsync();
+            await _module.DisposeAsync();
         }
     }
+
+    private IJSObjectReference? _module;
+
+    private async Task WaitForReference()
+    {
+        _module ??= await _jsRuntime.InvokeAsync<IJSObjectReference>(
+            "import", "./js/LocalStorageAccessor.js");
+    }
+
+   
 }

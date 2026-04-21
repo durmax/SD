@@ -82,10 +82,10 @@ namespace sd.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            if (!NavigationManager.Uri.Contains("https://www.") && !NavigationManager.Uri.Contains("localhost"))
-            {
-                NavigationManager.NavigateTo("https://red-pond-0ccf1d603.4.azurestaticapps.net/", true);
-            }
+            //if (!NavigationManager.Uri.Contains("https://www.") && !NavigationManager.Uri.Contains("localhost"))
+            //{
+            //    NavigationManager.NavigateTo("https://red-pond-0ccf1d603.4.azurestaticapps.net/", true);
+            //}
             await DefaultLangsService.SetDefLangsAsync();
 
             if (WordDtosState.Model.Count == 0)

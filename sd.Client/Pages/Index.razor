@@ -23,13 +23,13 @@
 
 <FluentIcon OnClick="@AddNewWord" Value="@(new Icons.Regular.Size24.FormNew())" />
 
-@if (WordDtosState.Model != null)
+@* @if (WordDtosState.Model != null)
 {
     @foreach (var word in WordDtosState.Model)
     {
         <Word WordDto="word" Collapsed="Guid.TryParse(word?.WordId, out Guid result)" OnWordSave="@NewWordHandler" OnWordFound="@OldWordHandler" OnWordDelete="DeleteWordHandler"></Word>
     }
-}
+} *@
 
 @if (loading)
 {

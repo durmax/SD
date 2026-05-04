@@ -1,14 +1,11 @@
 ﻿using AKSoftware.Localization.MultiLanguages;
 using Blazored.TextEditor;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
-using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using sd.Client.Features.Vocab.Contracts;
-using sd.Client.Helpers;
 using sd.Client.Services;
 using sd.Shared;
 using System;
@@ -456,6 +453,7 @@ public class WordBase : ComponentBase
     {
         note = null;
         //    await LoadHtmlExplain();
+        if (!string.IsNullOrWhiteSpace(WordDto?.WordLang)&& !string.IsNullOrWhiteSpace(WordDto?.ToLang)&& !string.IsNullOrWhiteSpace(WordDto?.Title))
         OpRes = await DictionaryLinksService.GetOpRes(WordDto.WordLang, WordDto.ToLang, WordDto.Title);
     }
 

@@ -194,6 +194,8 @@ namespace sd.Client.Pages
             if (title.Length > 2)
             {
                 loading = true;
+                
+                opRes = await OtherPageService.GetOpRes(WordDto?.WordLang, WordDto?.ToLang, WordDto.Title);
 
                 Task<List<string>> wordsTask = null;
                 Task<List<string>> languageToolWordsTask = null;

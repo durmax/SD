@@ -21,7 +21,7 @@ public class DictionaryLinksService
     }
     public async Task<List<DictionaryProviderDto>> GetDictionaryProviders(string FLangCode, string TLangCode, string word)
     {
-        if (string.IsNullOrWhiteSpace(FLangCode) || string.IsNullOrWhiteSpace(TLangCode) || string.IsNullOrWhiteSpace(word))
+        if (string.IsNullOrWhiteSpace(FLangCode) || string.IsNullOrWhiteSpace(TLangCode))
             return null;
 
         var key = $"{FLangCode}{TLangCode}";
@@ -35,8 +35,7 @@ public class DictionaryLinksService
 
             if (FLangCode != TLangCode)
             {
-                var serialized = JsonConvert.SerializeObject(dictionaryProviders);
-                await localStorageAccessor.SetValueAsync(key, serialized);
+                await localStorageAccessor.SetValueAsync(key, dictionaryProviders);
             }
         }
 

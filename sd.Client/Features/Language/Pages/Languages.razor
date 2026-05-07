@@ -58,7 +58,7 @@
                 <FluentButton Appearance="Appearance.Outline" IconStart="@(new Icons.Regular.Size24.Add())">Add</FluentButton>
             </FluentStack>
 
-            @if (opRes is null || opRes.Count == 0)
+            @if (dictionaryProviders is null || dictionaryProviders.Count == 0)
             {
                 <FluentCard Class="empty-state">
                     <FluentStack Orientation="Orientation.Vertical" HorizontalGap="6" HorizontalAlignment="HorizontalAlignment.Center">
@@ -75,7 +75,7 @@
                                            PairChanged="OnActivePairChanged"
                                            Reverse="Reverse" />
 
-                    <FluentSortableList Items="opRes" OnUpdate="@SortListAsync" Sort="true" Handle="true" Class="resource-list">
+                    <FluentSortableList Items="dictionaryProviders" OnUpdate="@SortListAsync" Sort="true" Handle="true" Class="resource-list">
                         <ItemTemplate>
                             <FluentStack Orientation="Orientation.Horizontal"
                                          HorizontalGap="10"

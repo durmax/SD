@@ -20,10 +20,6 @@ public class VocabListBase : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        // keep your existing redirect logic
-        if (!NavigationManager.Uri.Contains("https://www.") && !NavigationManager.Uri.Contains("localhost"))
-            NavigationManager.NavigateTo("https://www.lingoclub.net/", true);
-
         await Store.EnsureDraftRow();
 
         var uiLang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);

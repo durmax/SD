@@ -36,7 +36,7 @@ namespace sd.Client.Features.Language.Pages
                 .Select(x => new LanguageOption(x.Key, x.Key));
 
         // Current dictionary providers (sortable)
-        protected List<DictionaryProviderDto> opRes { get; set; } = new();
+        protected List<DictionaryProviderDto> dictionaryProviders { get; set; } = new();
 
         // Known languages (for multi-select / tags / etc.)
         protected List<string> KnownLangs { get; set; } = new();
@@ -58,11 +58,10 @@ namespace sd.Client.Features.Language.Pages
 
         protected async Task SetFavSiteAsync(string fav)
         {
-            opRes.ForEach(x => x.IsFavorite = false);
-            opRes.FirstOrDefault(x => x.Pattern == fav)?.IsFavorite = true;
+            dictionaryProviders.ForEach(x => x.IsFavorite = false);
+            dictionaryProviders.FirstOrDefault(x => x.Pattern == fav)?.IsFavorite = true;
 
-            var serialized = JsonConvert.SerializeObject(opRes);
-            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(ActivePair.From.Code, ActivePair.To.Code), serialized);
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(ActivePair.From.Code, ActivePair.To.Code), dictionaryProviders);
         }
 
         protected async Task OnKnownLangChanged(IEnumerable<LanguageOption> options)
@@ -121,12 +120,12 @@ namespace sd.Client.Features.Language.Pages
         {
             try
             {
-                opRes = await DictionaryLinksService.GetDictionaryProviders(
+                dictionaryProviders = await DictionaryLinksService.GetDictionaryProviders(
                     ActivePair.From.Code,
                     ActivePair.To.Code,
                     string.Empty) ?? new List<DictionaryProviderDto>();
 
-                FavSite = opRes.FirstOrDefault(x => x.IsFavorite)?.Pattern ?? FavSite;
+                FavSite = dictionaryProviders.FirstOrDefault(x => x.IsFavorite)?.Pattern ?? FavSite;
             }
             catch (Exception ex)
             {
@@ -171,21 +170,20 @@ namespace sd.Client.Features.Language.Pages
         protected async Task SortListAsync(FluentSortableListEventArgs args)
         {
             if (args is null || args.OldIndex == args.NewIndex) return;
-            if (opRes is null || opRes.Count == 0) return;
-            if (args.OldIndex < 0 || args.OldIndex >= opRes.Count) return;
+            if (dictionaryProviders is null || dictionaryProviders.Count == 0) return;
+            if (args.OldIndex < 0 || args.OldIndex >= dictionaryProviders.Count) return;
             if (args.NewIndex < 0) return;
 
-            var item = opRes[args.OldIndex];
-            opRes.RemoveAt(args.OldIndex);
+            var item = dictionaryProviders[args.OldIndex];
+            dictionaryProviders.RemoveAt(args.OldIndex);
 
-            var insertIndex = Math.Min(args.NewIndex, opRes.Count);
-            opRes.Insert(insertIndex, item);
+            var insertIndex = Math.Min(args.NewIndex, dictionaryProviders.Count);
+            dictionaryProviders.Insert(insertIndex, item);
 
-            for (int i = 0; i < opRes.Count; i++)
-                opRes[i].Eval = i;
+            for (int i = 0; i < dictionaryProviders.Count; i++)
+                dictionaryProviders[i].Eval = i;
 
-            var serialized = JsonConvert.SerializeObject(opRes);
-            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(ActivePair.From.Code, ActivePair.To.Code), serialized);
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(ActivePair.From.Code, ActivePair.To.Code), dictionaryProviders);
         }
 
         protected async Task OnSearchAsync(OptionsSearchEventArgs<LanguageOption> e)

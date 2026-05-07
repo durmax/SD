@@ -33,8 +33,7 @@ public class UserPreferencesService(LocalStorageAccessor localStorage)
 
     public async Task SetSettingsAsync(LanguageSettings settings)
     {
-        var serSettings = System.Text.Json.JsonSerializer.Serialize(settings);
-        await localStorage.SetValueAsync("LangSettings", serSettings);
+        await localStorage.SetValueAsync("LangSettings", settings);
     }
 
 }

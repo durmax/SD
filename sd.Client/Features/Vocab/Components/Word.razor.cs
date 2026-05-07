@@ -73,6 +73,9 @@ public class WordBase : ComponentBase
             key == "search" ||
             key == "done";
 
+        dictionaryProviders = await DictionaryLinksService.GetDictionaryProviders(
+        WordDto.WordLang, WordDto.ToLang,string.Empty) ?? new List<DictionaryProviderDto>();
+
         var FavSite = dictionaryProviders?.FirstOrDefault(x => x.IsFavorite)?.Pattern;
         if (isSubmit && !string.IsNullOrWhiteSpace(FavSite) && WordDto is not null)
         {
@@ -223,9 +226,6 @@ public class WordBase : ComponentBase
                 // Trigger re-render after LanguageToolWords is set
                 StateHasChanged();
             });
-
-            dictionaryProviders = await DictionaryLinksService.GetDictionaryProviders(WordDto?.WordLang ?? "de", WordDto?.ToLang ?? "ar", WordDto?.Title);
-            //var FavSite = dictionaryProviders?.FirstOrDefault(x => x.IsFavorite)?.Pattern;
             loading = false;
         }
         else

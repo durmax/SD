@@ -9,22 +9,24 @@
         <FluentCombobox TOption="LanguageOption"
                         Items="@Items"
                         OptionText="@(i => i.Name)"
-                        SelectedOption="@SelectedToOption"
-                        SelectedOptionChanged="OnToSelectedChanged"
-                        Autocomplete="ComboboxAutocomplete.Inline" 
+                        SelectedOption="@SelectedFromOption"
+                        SelectedOptionChanged="OnFromSelectedChanged"
+                        Autocomplete="ComboboxAutocomplete.Inline"
                         Style="width:100%; min-width:0;" />
     </FluentGridItem>
+
     <FluentGridItem xs="2" lg="2" Style="display:flex; justify-content:center;">
         <FluentButton OnClick="OnReverse"
                       IconEnd="@(new Icons.Regular.Size16.ArrowBidirectionalLeftRight())" />
     </FluentGridItem>
+
     <FluentGridItem xs="5" lg="5" Style="min-width:0;">
         <FluentCombobox TOption="LanguageOption"
                         Items="@Items"
                         OptionText="@(i => i.Name)"
-                        SelectedOption="@SelectedFromOption"
-                        SelectedOptionChanged="OnFromSelectedChanged"
-                        Autocomplete="ComboboxAutocomplete.Inline" 
+                        SelectedOption="@SelectedToOption"
+                        SelectedOptionChanged="OnToSelectedChanged"
+                        Autocomplete="ComboboxAutocomplete.Inline"
                         Style="width:100%; min-width:0;" />
     </FluentGridItem>
 </FluentGrid>

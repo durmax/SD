@@ -10,19 +10,19 @@
 
 <FluentMenu Anchor="@WordDto.WordId" UseMenuService="true" @bind-Open="open">
     <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
-        @if (opRes != null)
+        @if (dictProviders != null)
         {
-            @foreach (var op in opRes)
+            @foreach (var dp in dictProviders)
             {
-                <FluentMenuItem OnClick="@(() => OpenLink(op.Link))">
+                <FluentMenuItem OnClick="@(() => OpenLink(dp.Link))">
                     <FluentStack Orientation="Orientation.Horizontal"
                                  HorizontalAlignment="HorizontalAlignment.SpaceBetween"
                                  VerticalAlignment="VerticalAlignment.Center"
                                  Style="width:100%">
 
-                        <span>@op.Host</span>
+                        <span>@dp.Host</span>
 
-                        @if (op.IsFavorite)
+                        @if (dp.IsFavorite)
                         {
                             <FluentIcon Icon="Icons.Color.Size16.Star" />
                         }
@@ -44,21 +44,8 @@
     [Parameter] public WordDto WordDto { get; set; }
 
     protected bool open = false;
-    protected List<DictionaryProviderDto> opRes { get; set; }
+    protected List<DictionaryProviderDto> dictProviders { get; set; } = new();
 
-    private async Task GetFavLinkAsync()
-    {
-        string fl = WordDto?.WordLang;
-        string tl = WordDto?.ToLang;
-        try
-        {
-            opRes = await DictionaryLinksService.GetOpRes(fl, tl, WordDto.Title);
-        }
-        catch (Exception ex)
-        {
-            Log.LogError(ex.Message);
-        }
-    }
 
     protected async Task OpenLink(string url)
     {
@@ -68,7 +55,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        dictProviders = await DictionaryLinksService.GetDictionaryProviders(WordDto?.WordLang, WordDto?.ToLang, WordDto?.Title);
         //    await LoadHtmlExplain();
-        await GetFavLinkAsync();
     }
 }

@@ -116,7 +116,7 @@ namespace sd.Client.Features.Language.Pages
         {
             try
             {
-                opRes = await DictionaryLinksService.GetOpRes(
+                opRes = await DictionaryLinksService.GetDictionaryProviders(
                     ActivePair.From.Code,
                     ActivePair.To.Code,
                     string.Empty) ?? new List<DictionaryProviderDto>();

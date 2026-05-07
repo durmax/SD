@@ -19,33 +19,31 @@ public class DictionaryLinksService
         _apiService = ApiService;
         localStorageAccessor = LocalStorageAccessor;
     }
-    public async Task<List<DictionaryProviderDto>> GetOpRes(string FLangCode, string TLangCode, string word)
+    public async Task<List<DictionaryProviderDto>> GetDictionaryProviders(string FLangCode, string TLangCode, string word)
     {
+        if (string.IsNullOrWhiteSpace(FLangCode) || string.IsNullOrWhiteSpace(TLangCode) || string.IsNullOrWhiteSpace(word))
+            return null;
+
         var key = $"{FLangCode}{TLangCode}";
 
-        string opStr = await localStorageAccessor.GetValueAsync<string>(key);
+        var dictionaryProviders = await localStorageAccessor.GetValueAsync<List<DictionaryProviderDto>>(key);
 
-        List<DictionaryProviderDto> raw;
-        if (!string.IsNullOrWhiteSpace(opStr) && opStr != "null")
+        if (dictionaryProviders == null || dictionaryProviders.Count == 0)
         {
-            raw = JsonConvert.DeserializeObject<List<DictionaryProviderDto>>(opStr) ?? new List<DictionaryProviderDto>();
-        }
-        else
-        {
-            raw = await _apiService.GetAsync<List<DictionaryProviderDto>>($"api/OtherPage/{FLangCode}/{TLangCode}")
+            dictionaryProviders = await _apiService.GetAsync<List<DictionaryProviderDto>>($"api/OtherPage/{FLangCode}/{TLangCode}")
                   ?? new List<DictionaryProviderDto>();
 
             if (FLangCode != TLangCode)
             {
-                var serialized = JsonConvert.SerializeObject(raw);
+                var serialized = JsonConvert.SerializeObject(dictionaryProviders);
                 await localStorageAccessor.SetValueAsync(key, serialized);
             }
         }
 
-        return MakeLinks(raw, word, FLangCode, TLangCode) ?? new List<DictionaryProviderDto>();
+        return MakeLinks(dictionaryProviders, word, FLangCode, TLangCode) ?? new List<DictionaryProviderDto>();
     }
 
-    public List<DictionaryProviderDto> MakeLinks(List<DictionaryProviderDto> OtherPageModels, 
+    public List<DictionaryProviderDto> MakeLinks(List<DictionaryProviderDto> OtherPageModels,
         string word, string fromLang, string toLang)
     {
         List<DictionaryProviderDto> res = new();
@@ -71,6 +69,9 @@ public class DictionaryLinksService
         string[] patternParts = pattern.Split(':');
 
         List<string> properties = new() { "FLangCode", "TLangCode", "FLangName", "TLangName", "Word" };
+
+        _linkModel.FLangCode = fromLang;
+        _linkModel.TLangCode = toLang;
 
         _linkModel.FLangName = LangCodesHelper.GetLanguageNameOrEmpty(fromLang); // Get LangName from dictionery names
         _linkModel.TLangName = LangCodesHelper.GetLanguageNameOrEmpty(toLang); // GetLangName

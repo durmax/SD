@@ -41,7 +41,7 @@ public class WordBase : ComponentBase
     protected List<CommentModel> WordComments { get; set; }
     public BlazoredTextEditor QuillHtml { get; set; } //= new();
     protected string Explain { get; set; }
-    public List<DictionaryProviderDto> OpRes { get; private set; }
+    public List<DictionaryProviderDto> dictionaryProviders { get; private set; }
 
     protected WordSearchField? wordSearchFieldRef;
     protected string cssClassDelete;// = "d-none";
@@ -73,7 +73,7 @@ public class WordBase : ComponentBase
             key == "search" ||
             key == "done";
 
-        var FavSite = OpRes.FirstOrDefault(x => x.IsFavorite).Pattern;
+        var FavSite = dictionaryProviders?.FirstOrDefault(x => x.IsFavorite)?.Pattern;
         if (isSubmit && !string.IsNullOrWhiteSpace(FavSite) && WordDto is not null)
         {
             var url = DictionaryLinksService.BuildLink(FavSite, WordDto.Title, WordDto.WordLang, WordDto.ToLang);
@@ -224,6 +224,8 @@ public class WordBase : ComponentBase
                 StateHasChanged();
             });
 
+            dictionaryProviders = await DictionaryLinksService.GetDictionaryProviders(WordDto?.WordLang ?? "de", WordDto?.ToLang ?? "ar", WordDto?.Title);
+            //var FavSite = dictionaryProviders?.FirstOrDefault(x => x.IsFavorite)?.Pattern;
             loading = false;
         }
         else
@@ -422,6 +424,9 @@ public class WordBase : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        WordDto.WordLang = WordDto?.WordLang ?? "de"; // ToDo
+        WordDto.ToLang = WordDto?.ToLang ?? "ar"; // ToDo
+
         if (Guid.TryParse(WordId, out Guid result))
         {
             try
@@ -447,22 +452,5 @@ public class WordBase : ComponentBase
             LanguageContainer.Keys["Friends"],
             LanguageContainer.Keys["Public"]
         };
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        note = null;
-        //    await LoadHtmlExplain();
-        if (!string.IsNullOrWhiteSpace(WordDto?.WordLang)&& !string.IsNullOrWhiteSpace(WordDto?.ToLang)&& !string.IsNullOrWhiteSpace(WordDto?.Title))
-        OpRes = await DictionaryLinksService.GetOpRes(WordDto.WordLang, WordDto.ToLang, WordDto.Title);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-           // if (Guid.TryParse(WordDto?.WordId, out Guid result) == false) wordSearchFieldRef!.FocusAsync();
-            //    await LoadHtmlExplain();
-        }
     }
 }

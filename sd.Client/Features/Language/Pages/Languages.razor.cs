@@ -102,6 +102,11 @@ namespace sd.Client.Features.Language.Pages
 
             // UI language initial selection
             var culture = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
+            if (string.IsNullOrEmpty(culture))
+            {
+                culture = System.Globalization.CultureInfo.CurrentUICulture.Name;
+                await LocalStorageAccessor.SetValueAsync(LangStorageKeys.UiLang, culture);
+            }
             UILang = LangCodesHelper.UiLangs.FirstOrDefault(x => x.Value == culture).Key;
 
             SelectedItems = (LangCodes ?? Array.Empty<LanguageOption>())

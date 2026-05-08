@@ -76,11 +76,12 @@
                                          HorizontalGap="10"
                                          Class="resource-row">
                                 <!-- Bigger grab handle -->
-                                <FluentButton Appearance="Appearance.Outline"
-                                              Class="sortable-grab"
+                                <div class="sortable-grab">
+                                <FluentButton Appearance="Appearance.Accent"
                                               IconStart="@(new Icons.Regular.Size16.ReOrder())"
                                               Title="Drag to reorder">
                                 </FluentButton>
+                                </div>
 
                                 <div class="resource-content">
                                     <OtherPage op="@context"
@@ -91,12 +92,13 @@
                                                TLangCode="@ActivePair.To.Code" />
                                 </div>
 
-                                <FluentButton Appearance="Appearance.Outline"
+                                <FluentButton Appearance="Appearance.Neutral"
                                               Title="Remove Site"
                                               OnClick="async () => await RemoveItemAsync(context)"
                                               IconStart="@(new Icons.Regular.Size16.Delete())"
                                               Style="margin-left:auto;">
                                 </FluentButton>
+                                
                             </FluentStack>
                         </ItemTemplate>
                     </FluentSortableList>

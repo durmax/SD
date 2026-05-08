@@ -39,7 +39,7 @@ public class WordBase : ComponentBase
     protected IEnumerable<string> SameWords { get; set; }
     protected IEnumerable<string> LanguageToolWords { get; set; }
     protected List<CommentModel> WordComments { get; set; }
-    public BlazoredTextEditor QuillHtml { get; set; } //= new();
+    public BlazoredTextEditor QuillHtml { get; set; }
     protected string Explain { get; set; }
     public List<DictionaryProviderDto> dictionaryProviders { get; private set; }
 
@@ -399,34 +399,25 @@ public class WordBase : ComponentBase
             }
         }
     }
-
-    private TaskCompletionSource<bool> _explainReadyTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
-
     private async Task LoadHtmlExplain()
     {
         if (string.IsNullOrEmpty(WordDto?.Explain))
             return;
 
+        await Task.Delay(100); // give Quill JS time to initialize
         try
         {
             await QuillHtml.LoadHTMLContent(WordDto?.Explain);
             Explain = await QuillHtml.GetText();
-
-            _explainReadyTcs.TrySetResult(true);
-            StateHasChanged();
         }
         catch (Exception ex)
         {
-            Log.LogError(ex, "Failed to load Explain");
-            _explainReadyTcs.TrySetException(ex);
+            Log.LogError(ex, "Failed to load Explain: " + ex.Message);
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        WordDto.WordLang = WordDto?.WordLang ?? "de"; // ToDo
-        WordDto.ToLang = WordDto?.ToLang ?? "ar"; // ToDo
-
         if (Guid.TryParse(WordId, out Guid result))
         {
             try
@@ -438,6 +429,8 @@ public class WordBase : ComponentBase
                 Log.LogError(ex.Message);
             }
         }
+        WordDto.WordLang = WordDto?.WordLang ?? "de"; // ToDo
+        WordDto.ToLang = WordDto?.ToLang ?? "ar"; // ToDo
 
         if (WordDto != null && Guid.TryParse(WordDto.WordId, out Guid res))
         {
@@ -452,5 +445,15 @@ public class WordBase : ComponentBase
             LanguageContainer.Keys["Friends"],
             LanguageContainer.Keys["Public"]
         };
+    }
+
+    private bool _shouldLoadExplain = true;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_shouldLoadExplain && QuillHtml != null)
+        {
+            _shouldLoadExplain = false;
+            await LoadHtmlExplain();
+        }
     }
 }

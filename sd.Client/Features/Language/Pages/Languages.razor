@@ -50,13 +50,8 @@
         <!-- Section: Resources -->
 
         <FluentCard AreaRestricted="true">
-
-            <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center">
-                <h6>Resources</h6>
-                <p>Drag the handle to reorder. Click the star to set a favorite.</p>
-                <!-- Add a compact action like "Add resource" later -->
-                <FluentButton Appearance="Appearance.Outline" IconStart="@(new Icons.Regular.Size24.Add())">Add</FluentButton>
-            </FluentStack>
+            <h6>Resources</h6>
+            <p>Drag the handle to reorder.</p> <p>Click the star to set a favorite.</p>
 
             @if (dictionaryProviders is null || dictionaryProviders.Count == 0)
             {
@@ -79,14 +74,14 @@
                         <ItemTemplate>
                             <FluentStack Orientation="Orientation.Horizontal"
                                          HorizontalGap="10"
-                                         VerticalAlignment="VerticalAlignment.Center"
                                          Class="resource-row">
                                 <!-- Bigger grab handle -->
-                                <FluentButton Appearance="Appearance.Accent"
-                                              Class="grab-btn sortable-grab"
+                                <FluentButton Appearance="Appearance.Outline"
+                                              Class="sortable-grab"
+                                              IconStart="@(new Icons.Regular.Size16.ReOrder())"
                                               Title="Drag to reorder">
-                                    <span aria-hidden="true">≡</span>
                                 </FluentButton>
+
                                 <div class="resource-content">
                                     <OtherPage op="@context"
                                                FavSite="@FavSite"
@@ -95,9 +90,20 @@
                                                FLangCode="@ActivePair.From.Code"
                                                TLangCode="@ActivePair.To.Code" />
                                 </div>
+
+                                <FluentButton Appearance="Appearance.Outline"
+                                              Title="Remove Site"
+                                              OnClick="async () => await RemoveItemAsync(context)"
+                                              IconStart="@(new Icons.Regular.Size16.Delete())"
+                                              Style="margin-left:auto;">
+                                </FluentButton>
                             </FluentStack>
                         </ItemTemplate>
                     </FluentSortableList>
+                </FluentStack>
+
+                <FluentStack Class="mt-1" Orientation="Orientation.Horizontal">
+                    <FluentButton Appearance="Appearance.Outline" IconStart="@(new Icons.Regular.Size24.Add())">Add</FluentButton>
                 </FluentStack>
             }
 

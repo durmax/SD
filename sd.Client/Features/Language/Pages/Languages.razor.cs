@@ -218,5 +218,12 @@ namespace sd.Client.Features.Language.Pages
 
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
+
+        protected async Task RemoveItemAsync(DictionaryProviderDto item)
+        {
+            dictionaryProviders.Remove(item);
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.DictionaryOrder(ActivePair.From.Code, ActivePair.To.Code), dictionaryProviders);
+            StateHasChanged();
+        }
     }
 }

@@ -1,11 +1,6 @@
 ﻿@inject IJSRuntime JsRuntime
 
-<button type="button"
-        class="bg-transparent border-0 pl-3 pr-3"
-        @onclick="SpeakStop"
-        disabled="@ExplainReady">
-    @SpeakIcon
-</button>
+<FluentButton IconStart="@SpeakIcon" OnClick="SpeakStop" Disabled="ExplainReady"> @SpeakText </FluentButton>
 
 @code {
     [Parameter] public string Explain { get; set; } = string.Empty;
@@ -13,7 +8,8 @@
 
     [Parameter] public EventCallback<bool> IsSpeakingChanged { get; set; }
 
-    private string SpeakIcon { get; set; } = "🔊";
+    private string SpeakText { get; set; } = "Read";
+    private Icon SpeakIcon = new Icons.Regular.Size16.Speaker2();
     private bool IsSpeaking { get; set; }
 
     private async Task SpeakStop()
@@ -22,7 +18,8 @@
         {
             await Stop();
             IsSpeaking = false;
-            SpeakIcon = "🔊";
+            SpeakText = "Read";
+            SpeakIcon = new Icons.Regular.Size16.Speaker2();
         }
         else
         {
@@ -31,7 +28,8 @@
 
             await Speak();
             IsSpeaking = true;
-            SpeakIcon = "⏹ Stop";
+            SpeakText = "Stop";
+            SpeakIcon = new Icons.Regular.Size16.Stop();
         }
 
         if (IsSpeakingChanged.HasDelegate)

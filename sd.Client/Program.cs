@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using sd.Client;
+using sd.Client.Features.Language.State;
+using sd.Client.Features.Vocab.Api;
+using sd.Client.Features.Vocab.State;
 using sd.Client.LoggerProvider;
 using sd.Client.Models;
 using sd.Client.Services;
@@ -54,15 +57,23 @@ builder.Services.AddScoped<CurrentUserService>();
 builder.Services.AddScoped<ApiService>();
 
 builder.Services.AddScoped<KnownLangsService>();
-builder.Services.AddScoped<DefaultLangsService>();
+builder.Services.AddScoped<UserPreferencesService>();
 
-builder.Services.AddScoped<UriService>();
+
 builder.Services.AddScoped<LinkModel>();
-builder.Services.AddScoped<LinkParam>();
-builder.Services.AddScoped<OtherPageService>();
+builder.Services.AddScoped<DictionaryLinksService>();
 
 builder.Services.AddSingleton<WordDtosState>();
 
 builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
 
+builder.Services.AddScoped<VocabApiClient>();
+builder.Services.AddScoped<VocabStore>();
+
+builder.Services.AddScoped<IKnownLanguagesStore, KnownLanguagesStore>();
+
 await builder.Build().RunAsync();
+
+//var app = builder.Build();
+//app.MapRazorComponents<App>().AddInteractiveServerRenderMode;
+//await app.RunAsync();

@@ -1,0 +1,56 @@
+﻿<FluentDialog @bind-Hidden="Hidden" Modal="true">
+    <FluentDialogHeader>@Title</FluentDialogHeader>
+
+    <FluentDialogBody>
+        @Body
+    </FluentDialogBody>
+
+    <FluentDialogFooter>
+        <FluentButton Appearance="Appearance.Outline" OnClick="Close">
+            @CancelText
+        </FluentButton>
+
+        <FluentButton Appearance="Appearance.Accent"
+                      Disabled="@IsBusy"
+                      OnClick="ConfirmAsync"
+                      BackgroundColor="@ConfirmBackgroundColor">
+            @ConfirmText
+        </FluentButton>
+    </FluentDialogFooter>
+</FluentDialog>
+
+@code {
+    [Parameter] public bool Hidden { get; set; }
+    [Parameter] public EventCallback<bool> HiddenChanged { get; set; }
+
+    [Parameter] public string Title { get; set; } = "Confirm";
+    [Parameter] public RenderFragment? Body { get; set; }
+
+    [Parameter] public string CancelText { get; set; } = "Cancel";
+    [Parameter] public string ConfirmText { get; set; } = "OK";
+
+    // Optional: allow “danger” styling
+    [Parameter] public string? ConfirmBackgroundColor { get; set; }
+
+    [Parameter] public EventCallback OnConfirm { get; set; }
+
+    private bool IsBusy;
+
+    private async Task Close()
+        => await HiddenChanged.InvokeAsync(true);
+
+    private async Task ConfirmAsync()
+    {
+        if (IsBusy) return;
+        IsBusy = true;
+        try
+        {
+            await OnConfirm.InvokeAsync();
+            await HiddenChanged.InvokeAsync(true);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+}

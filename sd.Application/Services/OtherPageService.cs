@@ -16,7 +16,7 @@ public interface IOtherPageService
     Task<bool> Update(OtherPageModel entity);
     Task<bool> Delete(string id);
 
-    Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang);
+    Task<List<DictionaryProviderDto>> GetOPResModels(string fromLang, string toLang);
     Task<OtherPageModel> GetModelByAI(string exampleURL, CancellationToken cancellationToken);
 }
 
@@ -31,9 +31,9 @@ public class OtherPageService : IOtherPageService
         _geminiService = geminiService;
     }
 
-    public async Task<List<OtherPageResModel>> GetOPResModels(string fromLang, string toLang)
+    public async Task<List<DictionaryProviderDto>> GetOPResModels(string fromLang, string toLang)
     {
-        List<OtherPageResModel> res = new List<OtherPageResModel>();
+        List<DictionaryProviderDto> res = new List<DictionaryProviderDto>();
 
 
         var otherPages = await _otherPageRepository.GetByCondition(o =>
@@ -49,7 +49,7 @@ public class OtherPageService : IOtherPageService
             {
                 if (!string.IsNullOrEmpty(otherPage.Pattern))
                 {
-                    OtherPageResModel otherPageResModel = new OtherPageResModel()
+                    DictionaryProviderDto otherPageResModel = new DictionaryProviderDto()
                     {
                         Pattern = otherPage.Pattern,
                         Host = otherPage.Host,

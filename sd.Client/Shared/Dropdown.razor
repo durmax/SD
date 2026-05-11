@@ -1,12 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Components.Web
 @typeparam TItem
 <div class="dropdown">
-    <button class="btn btn-light  bg-transparent dropdown-toggle border-0" data-toggle="dropdown" type="button" @onclick="e => this.show=!this.show "
-            aria-haspopup="true" aria-expanded="false">
-         @Tip
-    </button>
+    <FluentButton OnClick="e => this.show = !this.show">@Tip </FluentButton>
+
     <CascadingValue name="Dropdown" Value="@this">
-        <div class="dropdown-menu @(show? "show":"")">
+        <div class="dropdown-menu @(show ? "show" : "")">
             @ChildContent
         </div>
     </CascadingValue>
@@ -24,7 +22,7 @@
 
     public async Task HandleSelect(TItem item, RenderFragment<TItem> contentFragment)
     {
-       //this.Tip = contentFragment.Invoke(item);
+        //this.Tip = contentFragment.Invoke(item);
         this.show = false;
         StateHasChanged();
         await this.OnSelected.InvokeAsync(item);

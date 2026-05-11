@@ -1,0 +1,30 @@
+﻿@using Microsoft.FluentUI.AspNetCore.Components
+@using sd.Client.Contracts
+@using sd.Client.Models
+
+<FluentGridItem xs="12">
+    <FluentAutocomplete TOption="LanguageOption"
+                        Label="@Label"
+                        AutoComplete="off"
+                        Width="@Width"
+                        Placeholder="@Placeholder"
+                        OnOptionsSearch="@OnOptionsSearch"
+                        OptionText="@(item => item.Name)"
+                        SelectedOptions="@SelectedOptionsSafe"
+                        SelectedOptionsChanged="@SelectedOptionsChanged" />
+</FluentGridItem>
+
+@code {
+    [Parameter] public string Label { get; set; } = "Add language";
+    [Parameter] public string Placeholder { get; set; } = "Add language";
+    [Parameter] public string Width { get; set; } = "100%";
+
+    // Data binding
+    [Parameter] public IEnumerable<LanguageOption>? SelectedOptions { get; set; }
+    [Parameter] public EventCallback<IEnumerable<LanguageOption>> SelectedOptionsChanged { get; set; }
+
+    // Search callback from page
+    [Parameter] public EventCallback<OptionsSearchEventArgs<LanguageOption>> OnOptionsSearch { get; set; }
+
+    private IEnumerable<LanguageOption> SelectedOptionsSafe => SelectedOptions ?? Array.Empty<LanguageOption>();
+}

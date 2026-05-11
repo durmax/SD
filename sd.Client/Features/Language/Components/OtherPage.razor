@@ -1,0 +1,16 @@
+﻿@inherits OtherPageBase
+
+<div class="d-flex" draggable="true">
+    @if (op.IsFavorite)
+    {
+        <FluentIcon Icon="Icons.Color.Size16.Star" />
+    }
+    else
+    {
+        <FluentIcon OnClick="() => Favorite(op.Pattern)" Icon="Icons.Regular.Size16.Star" />
+    }
+    <FluentMenuItem OnClick="@(() => OpenLink(op.Link))">
+        @op.Host
+    </FluentMenuItem>
+</div>
+<hr class="m-0">

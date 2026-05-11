@@ -1,0 +1,188 @@
+﻿@page "/Word/{WordId}"
+@using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
+@using sd.Client.Pages
+
+@inherits WordBase
+
+@if (!string.IsNullOrWhiteSpace(note))
+{
+    @note
+}
+
+@if (WordDto != null)
+{
+    <FluentCard Class="@(!Guid.TryParse(WordDto?.WordId, out Guid result) ? "border-primary p-0" : "border-dark p-0")">
+        @if (!string.IsNullOrEmpty(WordDto.UserName))
+        {
+            <a class="text-decoration-none pl-1" href="Words/@WordDto.UserId">@WordDto.UserName</a>
+        }
+        <FluentStack Orientation="Orientation.Horizontal"
+                     VerticalAlignment="VerticalAlignment.Center"
+                     HorizontalGap="0">
+
+            <DictionaryLinksMenu WordDto="WordDto"></DictionaryLinksMenu>
+
+            <WordSearchField Id="wordId"
+                             @bind-Value="WordDto.Title"
+                             Placeholder=""
+                             Style="width: 100%;"
+                             @ref="wordSearchFieldRef"
+                             OnKeyDown="KeydownAsync"
+                             OnInput="WordChangedAsync"
+                             SameWords="SameWords"
+                             LanguageToolWords="LanguageToolWords"
+                             OnSelectSameWord="SetWord" />
+
+            <FluentButton Appearance="Appearance.Outline"
+                          IconStart="@(new Icons.Regular.Size16.ArrowExpandAll())"
+                          OnClick="@(() => open = !open)" />
+        </FluentStack>
+        @if (open)
+        {
+            <FluentStack Orientation="Orientation.Horizontal">
+                @if (ShareVariants.Any())
+                {
+                    <Dropdown TItem="int" OnSelected="@OnSelectedAsync">
+                        <InitialTip>
+                            @switch (WordDto.ShareWith)
+                            {
+                                case sd.Shared.ShareWith.OnlyMe:
+                                    <FluentIcon Value="@(new Icons.Regular.Size16.GlobeOff())" />
+                                    break;
+                                case sd.Shared.ShareWith.Friends:
+                                    <FluentIcon Value="@(new Icons.Regular.Size16.ShareScreenPersonOverlay())" />
+                                    break;
+                                case sd.Shared.ShareWith.Public:
+                                    <FluentIcon Value="@(new Icons.Regular.Size16.Globe())" />
+                                    break;
+                            }
+                        </InitialTip>
+
+                        <ChildContent>
+                            <div class="d-block p-2">
+                                <DropdownListItem Item="0">
+                                    <FluentIcon Value="@(new Icons.Regular.Size16.GlobeOff())" /> @ShareVariants[0]
+                                </DropdownListItem>
+                            </div>
+                            <div class="d-block p-2">
+                                <DropdownListItem Item="1">
+                                    <FluentIcon Value="@(new Icons.Regular.Size16.ShareScreenPersonOverlay())" /> @ShareVariants[1]
+                                </DropdownListItem>
+                            </div>
+                            <div class="d-block p-2">
+                                <DropdownListItem Item="2">
+                                    <FluentIcon Value="@(new Icons.Regular.Size16.Globe())" /> @ShareVariants[2]
+                                </DropdownListItem>
+                            </div>
+                        </ChildContent>
+                    </Dropdown>
+                }
+                <FluentButton IconStart="@(new Icons.Regular.Size16.CloudAdd())" OnClick="async () => { await AddWord(); }" />
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" OnClick="async () => { await DeleteWord(); }" />
+                <FluentButton IconStart="@(new Icons.Regular.Size16.FlashSparkle())" OnClick="async () => { await GetAi(); }" />
+                <SpeakButton Explain="@Explain" IsSpeakingChanged="OnSpeakingChanged" />
+
+                <FluentNumberField Size="1" @bind-Value="@WordDto.Score"></FluentNumberField>
+
+            </FluentStack>
+            #region UpdateWord
+
+
+            <div class="@cssClassUpdate">
+                <b>@WordDto.Title is already exist</b>
+                <FluentButton OnClick="UpdateWord" IconEnd="@(new Icons.Regular.Size16.Question())">Update</FluentButton>
+                <FluentButton OnClick="@(() => { foundWordDtoToUpdate = null; cssClassUpdate = "d-none"; })" IconEnd="@(new Icons.Regular.Size16.Question())">Cancel</FluentButton>
+            </div>
+            #endregion
+
+            <div class="m-0">
+                <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Write your note here!">
+                    <ToolbarContent>
+                        <select class="ql-header">
+                            <option selected=""></option>
+                            <option value="1"></option>
+                            <option value="2"></option>
+                            <option value="3"></option>
+                            <option value="4"></option>
+                            <option value="5"></option>
+                        </select>
+                        @* <span class="ql-formats"> *@
+                        <select class="ql-color"></select>
+                        <select class="ql-background"></select>
+                        @* </span> *@
+                        @* <span class="ql-formats"> *@
+                        <button class="ql-bold"></button>
+                        <button class="ql-italic"></button>
+                        <button class="ql-underline"></button>
+                        <button class="ql-strike"></button>
+                        @* </span> *@
+                        @* <span class="ql-formats"> *@
+                        <button class="ql-list" value="ordered"></button>
+                        <button class="ql-list" value="bullet"></button>
+                        @* </span> *@
+                        @* <span class="ql-formats"> *@
+                        <button class="ql-link"></button>
+                        @* </span> *@
+                    </ToolbarContent>
+                    <EditorContent></EditorContent>
+                </BlazoredTextEditor>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(WordDto.WordId))
+            {
+
+                <FluentCounterBadge Count="LikesCount" Appearance="Appearance.Accent">
+                    <FluentButton OnClick="async () => { await LikeAsync(); }">
+                        @if (CULiked)
+                        {
+                            <FluentIcon Value="@(new Icons.Filled.Size16.ThumbLike())" Color="@Color.Neutral" />
+                        }
+                        else
+                        {
+                            <FluentIcon Value="@(new Icons.Regular.Size16.ThumbLike())" Color="@Color.Neutral" />
+                        }
+                    </FluentButton>
+                </FluentCounterBadge>
+
+
+                @if (LikesCount != null && (CULiked ? LikesCount > 1 : LikesCount > 0))
+                {
+                    <FluentButton OnClick="async () => { await GetLikedUsers(LikesCount); }">
+                        @LikesCount <i>likes</i>
+                    </FluentButton>
+                }
+
+
+                <FluentCounterBadge Count="WordDto.CommentsCount" Appearance="Appearance.Accent">
+                    <FluentButton OnClick="GetWordCommentsAsync">
+                        <FluentIcon Value="@(new Icons.Regular.Size16.Comment())" Color="@Color.Neutral" />
+                    </FluentButton>
+                </FluentCounterBadge>
+
+                var href = "Word/" + @WordDto.WordId;
+                <FluentAnchor Href=@href Target="_blank">Share</FluentAnchor>
+
+                <div class=@(CollapsedLike ? "collapse" : "")>
+                    @if (likedUsers != null)
+                    {
+                        @foreach (var foudUser in likedUsers)
+                        {
+                            <Friendship FriendId="@foudUser.UserId" FriendName="@foudUser.RelationalUserName" Relationship="foudUser.Relation"></Friendship>
+                        }
+                    }
+                </div>
+
+                <div class="@(CollapsedComm ? "collapse" : "")">
+                    @if (!CollapsedComm)
+                    {
+                        @foreach (var comment in WordComments)
+                        {
+                            <Comment CommentModel="@comment" WordId="@WordDto.WordId" WordUserId="@WordDto.UserId" OnCommentDelete="RemoveCommentHandlerAsync"></Comment>
+                        }
+                        <FluentButton OnClick="CreateComment" IconStart="@(new Icons.Regular.Size16.CommentAdd())">Add Comment</FluentButton>
+                    }
+                </div>
+            }
+        }
+    </FluentCard>
+}

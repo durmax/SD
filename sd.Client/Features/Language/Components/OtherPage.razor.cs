@@ -1,0 +1,34 @@
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using sd.Client.Services;
+using sd.Shared;
+using System.Threading.Tasks;
+
+namespace sd.Client.Features.Language.Components;
+
+public class OtherPageBase : ComponentBase
+{
+    [Inject] IJSRuntime JsRuntime { set; get; }
+    [Parameter] public DictionaryProviderDto op { get; set; }
+    [Parameter] public string FavSite { get; set; }
+    [Parameter] public bool CanSetFavSite { get; set; }
+    [Parameter] public string FLangCode { get; set; }
+    [Parameter] public string TLangCode { get; set; }
+    [Parameter] public EventCallback<string> OnFavoriteChanged { get; set; }
+
+    protected async Task Favorite(string pattern)
+    {
+        if (CanSetFavSite)
+        {
+            FavSite = pattern;
+            op.IsFavorite = true;
+            if (OnFavoriteChanged.HasDelegate)
+                await OnFavoriteChanged.InvokeAsync(pattern);
+        }
+    }
+
+    protected async Task OpenLink(string url)
+    {
+        await JsRuntime.InvokeVoidAsync("open", url, "_blank"); // window.open
+    }
+}

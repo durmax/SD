@@ -6,7 +6,6 @@ namespace sd.Client.Services;
 
 public class LocalStorageAccessor : IAsyncDisposable
 {
-    private Lazy<IJSObjectReference> _accessorJsRef = new();
     private readonly IJSRuntime _jsRuntime;
 
     public LocalStorageAccessor(IJSRuntime jsRuntime)
@@ -58,6 +57,7 @@ public class LocalStorageAccessor : IAsyncDisposable
 
     private async Task WaitForReference()
     {
+        if (_module is null)
         _module ??= await _jsRuntime.InvokeAsync<IJSObjectReference>(
             "import", "./js/LocalStorageAccessor.js");
     }

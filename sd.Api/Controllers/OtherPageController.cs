@@ -27,7 +27,7 @@ namespace sd.Api.Controllers
         // GET: api/OtherPage/ar/de
         [AllowAnonymous]
         [HttpGet("{fromLangCode}/{toLangCode}")]
-        public async Task<ActionResult<List<OtherPageResModel>>> GetLinks(string fromLangCode, string toLangCode)
+        public async Task<ActionResult<List<DictionaryProviderDto>>> GetLinks(string fromLangCode, string toLangCode)
         {
             return Ok(await _otherPageService.GetOPResModels(fromLangCode, toLangCode));
         }

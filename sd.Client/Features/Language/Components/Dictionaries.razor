@@ -1,0 +1,54 @@
+@using Microsoft.FluentUI.AspNetCore.Components
+@using sd.Client.Features.PairLanguages.Components
+@using sd.Shared
+@inherits ComponentBase
+
+@if (DictionaryProviders is null || DictionaryProviders.Count == 0)
+{
+    <FluentCard Class="empty-state">
+        <FluentStack Orientation="Orientation.Vertical" HorizontalGap="6" HorizontalAlignment="HorizontalAlignment.Center">
+            <h6>No resources yet</h6>
+            <p>Add languages and configure resources for this pair.</p>
+        </FluentStack>
+    </FluentCard>
+}
+else
+{
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="4">
+        <PairLanguagesSelector Items="SelectedItems"
+                               Pair="ActivePair"
+                               PairChanged="PairChanged"
+                               Reverse="Reverse" />
+
+        <FluentSortableList Items="DictionaryProviders" OnUpdate="SortListAsync" Sort="true" Handle="true" Class="resource-list">
+            <ItemTemplate Context="context">
+                <FluentStack Orientation="Orientation.Horizontal"
+                             HorizontalGap="10"
+                             Class="resource-row">
+                    <div class="sortable-grab">
+                        <FluentButton Appearance="Appearance.Accent"
+                                      IconStart="@(new Icons.Regular.Size16.ReOrder())"
+                                      Title="Drag to reorder">
+                        </FluentButton>
+                    </div>
+
+                    <div class="resource-content">
+                        <FluentMenuItem>
+                            <OtherPage op="context"
+                                       FavSite="FavSite"
+                                       OnFavoriteChanged="SetFavSiteAsync"
+                                       OnLanguageDeleted="RemoveItemAsync"
+                                       CanSetFavSite="true"
+                                       FLangCode="ActivePair.From.Code"
+                                       TLangCode="ActivePair.To.Code" />
+                        </FluentMenuItem>
+                    </div>
+                </FluentStack>
+            </ItemTemplate>
+        </FluentSortableList>
+    </FluentStack>
+
+    <FluentStack Class="mt-1" Orientation="Orientation.Horizontal">
+        <FluentButton Appearance="Appearance.Outline" IconStart="@(new Icons.Regular.Size24.Add())">Add</FluentButton>
+    </FluentStack>
+}

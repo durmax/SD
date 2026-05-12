@@ -49,7 +49,7 @@ builder.Services.AddMsalAuthentication(options =>
     options.ProviderOptions.DefaultAccessTokenScopes.Add(builder.Configuration["AzureAd:Scope"]);
     options.ProviderOptions.LoginMode = "redirect";
     options.ProviderOptions.Cache.CacheLocation = "localStorage"; // remove this option to use Session storage.
-}) ;
+});
 
 builder.Services.AddFluentUIComponents();
 
@@ -66,6 +66,7 @@ builder.Services.AddScoped<DictionaryLinksService>();
 builder.Services.AddSingleton<WordDtosState>();
 
 builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
+builder.Services.AddSingleton<LanguageContainerService>();
 
 builder.Services.AddScoped<VocabApiClient>();
 builder.Services.AddScoped<VocabStore>();

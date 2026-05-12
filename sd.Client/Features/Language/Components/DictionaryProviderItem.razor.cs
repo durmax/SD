@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace sd.Client.Features.Language.Components;
 
-public class OtherPageBase : ComponentBase
+public class DictionaryProviderItemBase : ComponentBase
 {
     [Inject] IJSRuntime JsRuntime { set; get; }
-    [Parameter] public DictionaryProviderDto op { get; set; }
+    [Parameter] public DictionaryProviderDto dictionaryProvider { get; set; }
     [Parameter] public string FavSite { get; set; }
     [Parameter] public bool CanSetFavSite { get; set; }
     [Parameter] public string FLangCode { get; set; }
@@ -24,7 +24,7 @@ public class OtherPageBase : ComponentBase
         if (CanSetFavSite)
         {
             FavSite = pattern;
-            op.IsFavorite = true;
+            dictionaryProvider.IsFavorite = true;
             if (OnFavoriteChanged.HasDelegate)
                 await OnFavoriteChanged.InvokeAsync(pattern);
         }

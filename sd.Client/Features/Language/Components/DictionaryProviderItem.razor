@@ -1,29 +1,29 @@
-﻿@inherits OtherPageBase
+﻿@inherits DictionaryProviderItemBase
 
 <FluentStack> 
-    @op.Host
+    @dictionaryProvider.Host
 
 
-    @if (op.IsFavorite)
+    @if (dictionaryProvider.IsFavorite)
     {
         <FluentIcon Icon="Icons.Color.Size16.Star" />
 
     }
 
-    <FluentButton Style="margin-left:auto;" Id="@op.Pattern"
+    <FluentButton Style="margin-left:auto;" Id="@dictionaryProvider.Pattern"
                   Appearance="Appearance.Outline"
                   IconStart="@(new Icons.Regular.Size16.MoreHorizontal())"
                   OnClick="@(() => open = !open)" />
 
-    <FluentMenu Anchor="@op.Pattern" UseMenuService="true" @bind-Open="open">
+    <FluentMenu Anchor="@dictionaryProvider.Pattern" UseMenuService="true" @bind-Open="open">
 
-        <FluentMenuItem OnClick="@(() => OpenLink(op.Link))">
+        <FluentMenuItem OnClick="@(() => OpenLink(dictionaryProvider.Link))">
             <span>Open Link</span>
             <FluentIcon Icon="Icons.Regular.Size16.Link" />
 
         </FluentMenuItem>
-        <FluentMenuItem OnClick="() => Favorite(op.Pattern)">
-            @if (op.IsFavorite)
+        <FluentMenuItem OnClick="() => Favorite(dictionaryProvider.Pattern)">
+            @if (dictionaryProvider.IsFavorite)
             {
                 <span>Unfavorite</span>
                 <FluentIcon Icon="Icons.Color.Size16.Star" />
@@ -32,10 +32,10 @@
             {
 
                 <span>Set Favorite</span>
-                <FluentIcon OnClick="() => Favorite(op.Pattern)" Icon="Icons.Regular.Size16.Star" />
+                <FluentIcon OnClick="() => Favorite(dictionaryProvider.Pattern)" Icon="Icons.Regular.Size16.Star" />
             }
         </FluentMenuItem>
-        <FluentMenuItem OnClick="async () => await DeleteLanguage(op)">
+        <FluentMenuItem OnClick="async () => await DeleteLanguage(dictionaryProvider)">
             <span>Remove Site</span>
             <FluentIcon Icon="Icons.Regular.Size16.Delete" />
         </FluentMenuItem>

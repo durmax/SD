@@ -1,16 +1,44 @@
 ﻿@inherits OtherPageBase
 
-<div class="d-flex" draggable="true">
+<FluentStack> 
+    @op.Host
+
+
     @if (op.IsFavorite)
     {
         <FluentIcon Icon="Icons.Color.Size16.Star" />
+
     }
-    else
-    {
-        <FluentIcon OnClick="() => Favorite(op.Pattern)" Icon="Icons.Regular.Size16.Star" />
-    }
-    <FluentMenuItem OnClick="@(() => OpenLink(op.Link))">
-        @op.Host
-    </FluentMenuItem>
-</div>
+
+    <FluentButton Style="margin-left:auto;" Id="@op.Pattern"
+                  Appearance="Appearance.Outline"
+                  IconStart="@(new Icons.Regular.Size16.MoreHorizontal())"
+                  OnClick="@(() => open = !open)" />
+
+    <FluentMenu Anchor="@op.Pattern" UseMenuService="true" @bind-Open="open">
+
+        <FluentMenuItem OnClick="@(() => OpenLink(op.Link))">
+            <span>Open Link</span>
+            <FluentIcon Icon="Icons.Regular.Size16.Link" />
+
+        </FluentMenuItem>
+        <FluentMenuItem OnClick="() => Favorite(op.Pattern)">
+            @if (op.IsFavorite)
+            {
+                <span>Unfavorite</span>
+                <FluentIcon Icon="Icons.Color.Size16.Star" />
+            }
+            else
+            {
+
+                <span>Set Favorite</span>
+                <FluentIcon OnClick="() => Favorite(op.Pattern)" Icon="Icons.Regular.Size16.Star" />
+            }
+        </FluentMenuItem>
+        <FluentMenuItem OnClick="async () => await DeleteLanguage(op)">
+            <span>Remove Site</span>
+            <FluentIcon Icon="Icons.Regular.Size16.Delete" />
+        </FluentMenuItem>
+    </FluentMenu>
+</FluentStack>
 <hr class="m-0">

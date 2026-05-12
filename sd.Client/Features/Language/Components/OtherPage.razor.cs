@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using sd.Client.Services;
 using sd.Shared;
 using System.Threading.Tasks;
 
@@ -16,6 +15,10 @@ public class OtherPageBase : ComponentBase
     [Parameter] public string TLangCode { get; set; }
     [Parameter] public EventCallback<string> OnFavoriteChanged { get; set; }
 
+    [Parameter] public EventCallback<DictionaryProviderDto> OnLanguageDeleted { get; set; }
+
+    protected bool open = false;
+
     protected async Task Favorite(string pattern)
     {
         if (CanSetFavSite)
@@ -25,6 +28,12 @@ public class OtherPageBase : ComponentBase
             if (OnFavoriteChanged.HasDelegate)
                 await OnFavoriteChanged.InvokeAsync(pattern);
         }
+    }
+
+    protected async Task DeleteLanguage(DictionaryProviderDto op)
+    {
+        if (OnLanguageDeleted.HasDelegate)
+            await OnLanguageDeleted.InvokeAsync(op);
     }
 
     protected async Task OpenLink(string url)

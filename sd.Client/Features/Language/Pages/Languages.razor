@@ -77,28 +77,23 @@
                                          Class="resource-row">
                                 <!-- Bigger grab handle -->
                                 <div class="sortable-grab">
-                                <FluentButton Appearance="Appearance.Accent"
-                                              IconStart="@(new Icons.Regular.Size16.ReOrder())"
-                                              Title="Drag to reorder">
-                                </FluentButton>
+                                    <FluentButton Appearance="Appearance.Accent"
+                                                  IconStart="@(new Icons.Regular.Size16.ReOrder())"
+                                                  Title="Drag to reorder">
+                                    </FluentButton>
                                 </div>
 
                                 <div class="resource-content">
-                                    <OtherPage op="@context"
-                                               FavSite="@FavSite"
-                                               OnFavoriteChanged="@SetFavSiteAsync"
-                                               CanSetFavSite="true"
-                                               FLangCode="@ActivePair.From.Code"
-                                               TLangCode="@ActivePair.To.Code" />
+                                    <FluentMenuItem>
+                                        <OtherPage op="@context"
+                                                   FavSite="@FavSite"
+                                                   OnFavoriteChanged="SetFavSiteAsync"
+                                                   OnLanguageDeleted="RemoveItemAsync"
+                                                   CanSetFavSite="true"
+                                                   FLangCode="@ActivePair.From.Code"
+                                                   TLangCode="@ActivePair.To.Code" />
+                                    </FluentMenuItem>
                                 </div>
-
-                                <FluentButton Appearance="Appearance.Neutral"
-                                              Title="Remove Site"
-                                              OnClick="async () => await RemoveItemAsync(context)"
-                                              IconStart="@(new Icons.Regular.Size16.Delete())"
-                                              Style="margin-left:auto;">
-                                </FluentButton>
-                                
                             </FluentStack>
                         </ItemTemplate>
                     </FluentSortableList>

@@ -9,28 +9,30 @@
               OnClick="@(() => open = !open)" />
 
 <FluentMenu Anchor="@WordDto.WordId" UseMenuService="true" @bind-Open="open">
-    <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
-        @if (dictProviders != null)
-        {
-            @foreach (var dp in dictProviders)
+    <div style="max-height:300px; overflow-y:auto; min-width:220px;">
+        <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+            @if (dictProviders != null)
             {
-                <FluentMenuItem OnClick="@(() => OpenLink(dp.Link))">
-                    <FluentStack Orientation="Orientation.Horizontal"
-                                 HorizontalAlignment="HorizontalAlignment.SpaceBetween"
-                                 VerticalAlignment="VerticalAlignment.Center"
-                                 Style="width:100%">
+                @foreach (var dp in dictProviders)
+                {
+                    <FluentMenuItem OnClick="@(() => OpenLink(dp.Link))">
+                        <FluentStack Orientation="Orientation.Horizontal"
+                                     HorizontalAlignment="HorizontalAlignment.SpaceBetween"
+                                     VerticalAlignment="VerticalAlignment.Center"
+                                     Style="width:100%">
 
-                        <span>@dp.Host</span>
+                            <span>@dp.Host</span>
 
-                        @if (dp.IsFavorite)
-                        {
-                            <FluentIcon Icon="Icons.Color.Size16.Star" />
-                        }
-                    </FluentStack>
-                </FluentMenuItem>
+                            @if (dp.IsFavorite)
+                            {
+                                <FluentIcon Icon="Icons.Color.Size16.Star" />
+                            }
+                        </FluentStack>
+                    </FluentMenuItem>
+                }
             }
-        }
-    </FluentStack>
+        </FluentStack>
+    </div>
 </FluentMenu>
 
 

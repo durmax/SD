@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Newtonsoft.Json;
 using sd.Client.Contracts;
 using sd.Client.Features.Language.State;
 using sd.Client.Helpers;

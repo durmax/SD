@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
+using sd.Client.Contracts;
 using sd.Client.Features.Vocab.Contracts;
 using sd.Client.Services;
 using sd.Shared;
@@ -87,6 +88,12 @@ public class WordBase : ComponentBase
     protected void Reverse()
     {
         (WordDto.ToLang, WordDto.WordLang) = (WordDto.WordLang, WordDto.ToLang);
+    }
+
+    protected void PairChanged(LanguagePair newPair)
+    {
+        WordDto.WordLang = newPair.From.Code;
+        WordDto.ToLang = newPair.To.Code;
     }
 
     protected async Task OnSelectedAsync(int selection)

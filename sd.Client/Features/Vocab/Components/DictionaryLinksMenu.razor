@@ -1,4 +1,6 @@
 ﻿@using Microsoft.Extensions.Logging
+@using System.Threading.Tasks
+@using sd.Client.Contracts
 @using sd.Client.Features.Shared
 @using sd.Client.Helpers
 @using sd.Client.Services
@@ -12,6 +14,17 @@
 <FluentMenu Anchor="@WordDto.WordId" UseMenuService="true" @bind-Open="open">
     <div style="max-height:300px; overflow-y:auto; min-width:220px;">
         <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+            @* Pair selector at the top of the menu *@
+            @if (LanguageOptions != null && Pair != null)
+            {
+                <div class="pl-2 pr-2 pb-2">
+                    <PairLanguagesSelector Items="LanguageOptions"
+                                           Pair="Pair"
+                                           PairChanged="OnPairChangedAsync"
+                                           Reverse="OnReverseAsync" />
+                </div>
+            }
+
             @if (dictProviders != null)
             {
                 @foreach (var dp in dictProviders)
@@ -32,8 +45,17 @@
     [Inject] LocalStorageAccessor LocalStorageAccessor { get; set; }
     [Inject] IJSRuntime JsRuntime { set; get; }
     [Inject] ILogger<WordBase> Log { get; set; }
+    [Inject] UserPreferencesService UserPreferencesService { get; set; }
 
     [Parameter] public WordDto WordDto { get; set; }
+
+    // New parameters to support pair selector
+    public IEnumerable<LanguageOption> LanguageOptions { get; set; } = new List<LanguageOption>();
+    public LanguagePair Pair { get; set; }
+    [Parameter] public EventCallback<LanguagePair> PairChanged { get; set; }
+    [Parameter] public EventCallback Reverse { get; set; }
+
+    public LanguageSettings LanguageSettings { get; set; }
 
     protected bool open = false;
     protected List<DictionaryProviderDto> dictProviders { get; set; } = new();
@@ -44,9 +66,67 @@
         await JsRuntime.InvokeVoidAsync("open", url, "_blank"); // window.open
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        LanguageSettings = await UserPreferencesService.GetSettingsAsync(false);
+
+        LanguageOptions = LanguageSettings.KnownLangs.Select(code => new LanguageOption { Code = code, Name = LangCodesHelper.GetLanguageNameOrEmpty(code) }).ToList();
+
+        Pair = new LanguagePair
+        {
+            From = new LanguageOption
+            {
+                Code = WordDto.WordLang,
+                Name = LangCodesHelper.GetLanguageNameOrEmpty(WordDto.WordLang)
+            },
+            To = new LanguageOption
+            {
+                Code = WordDto.ToLang,
+                Name = LangCodesHelper.GetLanguageNameOrEmpty(WordDto.ToLang)
+            }
+        };
+    }
+
     protected override async Task OnParametersSetAsync()
     {
-        dictProviders = await DictionaryLinksService.GetDictionaryProviders(WordDto?.WordLang, WordDto?.ToLang, WordDto?.Title);
-        //    await LoadHtmlExplain();
+        var from = Pair.From.Code ?? WordDto?.WordLang;
+        var to = Pair.To.Code ?? WordDto?.ToLang;
+
+        dictProviders = await DictionaryLinksService.GetDictionaryProviders(from, to, WordDto?.Title);
+    }
+
+    private async Task OnPairChangedAsync(LanguagePair newPair)
+    {
+        Pair = newPair;
+        if (PairChanged.HasDelegate)
+            await PairChanged.InvokeAsync(newPair);
+
+        // reload providers for the new pair
+        dictProviders = await DictionaryLinksService.GetDictionaryProviders(Pair.From.Code, Pair.To.Code, WordDto?.Title);
+        StateHasChanged();
+    }
+
+    private async Task OnReverseAsync()
+    {
+        if (Reverse.HasDelegate)
+            await Reverse.InvokeAsync();
+        else if (Pair != null)
+            Pair = new LanguagePair(Pair.To, Pair.From);
+
+        // reload providers after reverse
+        var from = Pair.From.Code ?? WordDto?.WordLang;
+        var to = Pair.To.Code ?? WordDto?.ToLang;
+        dictProviders = await DictionaryLinksService.GetDictionaryProviders(from, to, WordDto?.Title);
+        StateHasChanged();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Log the initial state for debugging
+            Log.LogInformation("DictionaryLinksMenu initialized with WordId: {WordId}, Initial Pair: {From} -> {To}",
+                WordDto?.WordId, Pair.From.Code, Pair.To.Code);
+        }
     }
 }

@@ -17,6 +17,7 @@ public class VocabListBase : ComponentBase
     [Inject] public ILanguageContainerService LanguageContainer { get; set; } = default!;
     [Inject] public ILogger<VocabListBase> Log { get; set; } = default!;
     [Inject] public VocabStore Store { get; set; } = default!;
+    [Inject] protected UserPreferencesService UserPreferencesService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {

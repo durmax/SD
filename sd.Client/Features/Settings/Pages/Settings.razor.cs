@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using sd.Client.Contracts;
-using sd.Client.Features.Language.State;
+using sd.Client.Features.Settings.State;
 using sd.Client.Helpers;
 using sd.Client.Services;
 using sd.Shared;
@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace sd.Client.Features.Language.Pages
+namespace sd.Client.Features.Settings.Pages
 {
     public class SettingsBase : ComponentBase
     {

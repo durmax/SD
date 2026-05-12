@@ -3,7 +3,7 @@ using Microsoft.JSInterop;
 using sd.Shared;
 using System.Threading.Tasks;
 
-namespace sd.Client.Features.Language.Components;
+namespace sd.Client.Features.Settings.Components;
 
 public class DictionaryProviderItemBase : ComponentBase
 {

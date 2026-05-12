@@ -4,9 +4,9 @@ using sd.Client.Contracts;
 using sd.Shared;
 using System.Collections.Generic;
 
-namespace sd.Client.Features.Language.Components
+namespace sd.Client.Features.Settings.Components
 {
-    public partial class Dictionaries
+    public class DictionariesBase : ComponentBase
     {
         [Parameter] public List<DictionaryProviderDto> DictionaryProviders { get; set; } = new();
         [Parameter] public IEnumerable<LanguageOption> SelectedItems { get; set; } = new List<LanguageOption>();

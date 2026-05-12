@@ -6,6 +6,12 @@
 		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Remove="Features\Language\**" />
+	  <Content Remove="Features\Language\**" />
+	  <EmbeddedResource Remove="Features\Language\**" />
+	  <None Remove="Features\Language\**" />
+	</ItemGroup>
+	<ItemGroup>
 		<EmbeddedResource Include="Resources\ar-SY.yml" />
 		<EmbeddedResource Include="Resources\de-DE.yml" />
 		<EmbeddedResource Include="Resources\en-US.yml" />
@@ -33,7 +39,6 @@
 	  <ProjectReference Include="..\sd.Shared\sd.Shared.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Features\Language\Contracts\" />
 	  <Folder Include="Features\Vocab\Mapping\" />
 	  <Folder Include="SharedUI\" />
 	</ItemGroup>

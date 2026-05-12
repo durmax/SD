@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace sd.Client.Features.Language.State;
+namespace sd.Client.Features.Settings.State;
 public sealed class KnownLanguagesStore : IKnownLanguagesStore
 {
     private readonly LocalStorageAccessor _localStorage;

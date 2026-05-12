@@ -1,5 +1,6 @@
 @using Microsoft.FluentUI.AspNetCore.Components
 @using sd.Client.Features.PairLanguages.Components
+@using sd.Client.Features.Shared
 @using sd.Shared
 @inherits DictionariesBase
 
@@ -24,7 +25,8 @@ else
             <ItemTemplate Context="context">
                 <FluentStack Orientation="Orientation.Horizontal"
                              HorizontalGap="10"
-                             Class="resource-row">
+                             Class="resource-row"
+                             Style="display:flex; align-items:center;">
                     <div class="sortable-grab">
                         <FluentButton Appearance="Appearance.Accent"
                                       IconStart="@(new Icons.Regular.Size16.ReOrder())"
@@ -32,16 +34,20 @@ else
                         </FluentButton>
                     </div>
 
-                    <div class="resource-content">
-                        <FluentMenuItem>
-                            <DictionaryProviderItem dictionaryProvider="context"
-                                       FavSite="FavSite"
-                                       OnFavoriteChanged="SetFavSiteAsync"
-                                       OnLanguageDeleted="RemoveItemAsync"
-                                       CanSetFavSite="true"
-                                       FLangCode="ActivePair.From.Code"
-                                       TLangCode="ActivePair.To.Code" />
-                        </FluentMenuItem>
+                    <!-- Host column: take remaining space -->
+                    <div class="resource-content" style="flex:1; display:flex; align-items:center;">
+                        <DictionaryProviderEntry Provider="context" />
+                    </div>
+
+                    <!-- Action/menu column: fixed width, aligned right -->
+                    <div class="resource-action">
+                        <DictionaryProviderItem dictionaryProvider="context"
+                                               FavSite="FavSite"
+                                               OnFavoriteChanged="SetFavSiteAsync"
+                                               OnLanguageDeleted="RemoveItemAsync"
+                                               CanSetFavSite="true"
+                                               FLangCode="ActivePair.From.Code"
+                                               TLangCode="ActivePair.To.Code" />
                     </div>
                 </FluentStack>
             </ItemTemplate>

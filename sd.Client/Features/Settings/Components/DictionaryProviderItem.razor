@@ -1,38 +1,35 @@
 ﻿@using sd.Client.Features.Shared
 @inherits DictionaryProviderItemBase
 
-<FluentStack>
-    <DictionaryProviderEntry Provider="dictionaryProvider" />
+<!-- Action button + menu only; host entry is rendered by the parent so columns behave correctly -->
+<FluentButton Id="@dictionaryProvider.Pattern"
+              Appearance="Appearance.Outline"
+              IconStart="@(new Icons.Regular.Size16.MoreHorizontal())"
+              OnClick="@(() => open = !open)" />
 
-    <FluentButton Style="margin-left:auto;" Id="@dictionaryProvider.Pattern"
-                  Appearance="Appearance.Outline"
-                  IconStart="@(new Icons.Regular.Size16.MoreHorizontal())"
-                  OnClick="@(() => open = !open)" />
+<FluentMenu Anchor="@dictionaryProvider.Pattern" UseMenuService="true" @bind-Open="open">
 
-    <FluentMenu Anchor="@dictionaryProvider.Pattern" UseMenuService="true" @bind-Open="open">
+    <FluentMenuItem OnClick="@(() => OpenLink(dictionaryProvider.Link))">
+        <span>Open Link</span>
+        <FluentIcon Icon="Icons.Regular.Size16.Link" />
+    </FluentMenuItem>
 
-        <FluentMenuItem OnClick="@(() => OpenLink(dictionaryProvider.Link))">
-            <span>Open Link</span>
-            <FluentIcon Icon="Icons.Regular.Size16.Link" />
-        </FluentMenuItem>
+    <FluentMenuItem OnClick="() => Favorite(dictionaryProvider.Pattern)">
+        @if (dictionaryProvider.IsFavorite)
+        {
+            <span>Unfavorite</span>
+            <FluentIcon Icon="Icons.Color.Size16.Star" />
+        }
+        else
+        {
+            <span>Set Favorite</span>
+            <FluentIcon OnClick="() => Favorite(dictionaryProvider.Pattern)" Icon="Icons.Regular.Size16.Star" />
+        }
+    </FluentMenuItem>
 
-        <FluentMenuItem OnClick="() => Favorite(dictionaryProvider.Pattern)">
-            @if (dictionaryProvider.IsFavorite)
-            {
-                <span>Unfavorite</span>
-                <FluentIcon Icon="Icons.Color.Size16.Star" />
-            }
-            else
-            {
-                <span>Set Favorite</span>
-                <FluentIcon OnClick="() => Favorite(dictionaryProvider.Pattern)" Icon="Icons.Regular.Size16.Star" />
-            }
-        </FluentMenuItem>
-
-        <FluentMenuItem OnClick="async () => await DeleteLanguage(dictionaryProvider)">
-            <span>Remove Site</span>
-            <FluentIcon Icon="Icons.Regular.Size16.Delete" />
-        </FluentMenuItem>
-    </FluentMenu>
-</FluentStack>
+    <FluentMenuItem OnClick="async () => await DeleteLanguage(dictionaryProvider)">
+        <span>Remove Site</span>
+        <FluentIcon Icon="Icons.Regular.Size16.Delete" />
+    </FluentMenuItem>
+</FluentMenu>
 <hr class="m-0">

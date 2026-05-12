@@ -1,0 +1,14 @@
+@using sd.Shared
+<FluentStack Orientation="Orientation.Horizontal"
+             HorizontalGap="8"
+             VerticalAlignment="VerticalAlignment.Center">
+    <span>@Provider.Host</span>
+    @if (Provider.IsFavorite)
+    {
+        <FluentIcon Icon="Icons.Color.Size16.Star" />
+    }
+</FluentStack>
+
+@code {
+    [Parameter] public DictionaryProviderDto Provider { get; set; } = default!;
+}

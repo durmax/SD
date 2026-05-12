@@ -1,14 +1,8 @@
-﻿@inherits DictionaryProviderItemBase
+﻿@using sd.Client.Features.Shared
+@inherits DictionaryProviderItemBase
 
-<FluentStack> 
-    @dictionaryProvider.Host
-
-
-    @if (dictionaryProvider.IsFavorite)
-    {
-        <FluentIcon Icon="Icons.Color.Size16.Star" />
-
-    }
+<FluentStack>
+    <DictionaryProviderEntry Provider="dictionaryProvider" />
 
     <FluentButton Style="margin-left:auto;" Id="@dictionaryProvider.Pattern"
                   Appearance="Appearance.Outline"
@@ -20,8 +14,8 @@
         <FluentMenuItem OnClick="@(() => OpenLink(dictionaryProvider.Link))">
             <span>Open Link</span>
             <FluentIcon Icon="Icons.Regular.Size16.Link" />
-
         </FluentMenuItem>
+
         <FluentMenuItem OnClick="() => Favorite(dictionaryProvider.Pattern)">
             @if (dictionaryProvider.IsFavorite)
             {
@@ -30,11 +24,11 @@
             }
             else
             {
-
                 <span>Set Favorite</span>
                 <FluentIcon OnClick="() => Favorite(dictionaryProvider.Pattern)" Icon="Icons.Regular.Size16.Star" />
             }
         </FluentMenuItem>
+
         <FluentMenuItem OnClick="async () => await DeleteLanguage(dictionaryProvider)">
             <span>Remove Site</span>
             <FluentIcon Icon="Icons.Regular.Size16.Delete" />

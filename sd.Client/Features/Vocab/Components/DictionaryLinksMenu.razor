@@ -1,4 +1,5 @@
 ﻿@using Microsoft.Extensions.Logging
+@using sd.Client.Features.Shared
 @using sd.Client.Helpers
 @using sd.Client.Services
 @using sd.Shared
@@ -16,18 +17,7 @@
                 @foreach (var dp in dictProviders)
                 {
                     <FluentMenuItem OnClick="@(() => OpenLink(dp.Link))">
-                        <FluentStack Orientation="Orientation.Horizontal"
-                                     HorizontalAlignment="HorizontalAlignment.SpaceBetween"
-                                     VerticalAlignment="VerticalAlignment.Center"
-                                     Style="width:100%">
-
-                            <span>@dp.Host</span>
-
-                            @if (dp.IsFavorite)
-                            {
-                                <FluentIcon Icon="Icons.Color.Size16.Star" />
-                            }
-                        </FluentStack>
+                        <DictionaryProviderEntry Provider="dp" />
                     </FluentMenuItem>
                 }
             }

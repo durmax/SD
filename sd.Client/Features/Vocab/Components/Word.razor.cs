@@ -74,7 +74,7 @@ public class WordBase : ComponentBase
             key == "done";
 
         dictionaryProviders = await DictionaryLinksService.GetDictionaryProviders(
-        WordDto.WordLang, WordDto.ToLang,string.Empty) ?? new List<DictionaryProviderDto>();
+        WordDto.WordLang, WordDto.ToLang, string.Empty) ?? new List<DictionaryProviderDto>();
 
         var FavSite = dictionaryProviders?.FirstOrDefault(x => x.IsFavorite)?.Pattern;
         if (isSubmit && !string.IsNullOrWhiteSpace(FavSite) && WordDto is not null)
@@ -399,12 +399,22 @@ public class WordBase : ComponentBase
             }
         }
     }
+
+    protected async Task OpenAsync()
+    {
+        open = !open;
+        if (open)
+        {
+            await LoadHtmlExplain();
+        }
+    }
     private async Task LoadHtmlExplain()
     {
         if (string.IsNullOrEmpty(WordDto?.Explain))
             return;
 
         await Task.Delay(100); // give Quill JS time to initialize
+
         try
         {
             await QuillHtml.LoadHTMLContent(WordDto?.Explain);
@@ -445,15 +455,5 @@ public class WordBase : ComponentBase
             LanguageContainer.Keys["Friends"],
             LanguageContainer.Keys["Public"]
         };
-    }
-
-    private bool _shouldLoadExplain = true;
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (_shouldLoadExplain && QuillHtml != null)
-        {
-            _shouldLoadExplain = false;
-            await LoadHtmlExplain();
-        }
     }
 }

@@ -35,7 +35,7 @@
 
             <FluentButton Appearance="Appearance.Outline"
                           IconStart="@(new Icons.Regular.Size16.ArrowExpandAll())"
-                          OnClick="@(() => open = !open)" />
+                          OnClick="@(async() => {await OpenAsync();})" />
         </FluentStack>
         @if (open)
         {

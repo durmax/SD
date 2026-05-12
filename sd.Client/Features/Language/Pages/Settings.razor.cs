@@ -15,9 +15,9 @@ using System.Threading.Tasks;
 
 namespace sd.Client.Features.Language.Pages
 {
-    public class LanguagesBase : ComponentBase
+    public class SettingsBase : ComponentBase
     {
-        [Inject] protected ILogger<LanguagesBase> Log { get; set; } = default!;
+        [Inject] protected ILogger<SettingsBase> Log { get; set; } = default!;
         [Inject] protected LocalStorageAccessor LocalStorageAccessor { get; set; } = default!;
         [Inject] protected IJSRuntime JsRuntime { get; set; } = default!;
         [Inject] protected ILanguageContainerService LanguageContainer { get; set; } = default!;

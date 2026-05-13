@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace sd.Client.Features.Vocab.Components;
 
-public class WordBase : ComponentBase
+public class WordBase : ComponentBase, IDisposable
 {
     [Inject] ILogger<WordBase> Log { get; set; }
     [Inject] IJSRuntime JsRuntime { set; get; }
@@ -56,6 +56,8 @@ public class WordBase : ComponentBase
     protected int Rows = 2;
 
     protected List<string> ShareVariants { get; set; } = new();
+    private System.Threading.CancellationTokenSource _wordChangedCts;
+    private const int WordChangedDebounceMs = 350;
 
     protected Task OnSpeakingChanged(bool speaking)
     {
@@ -202,14 +204,30 @@ public class WordBase : ComponentBase
 
         if (title.Length > 2)
         {
+            // debounce + cancellation
+            _wordChangedCts?.Cancel();
+            _wordChangedCts?.Dispose();
+            _wordChangedCts = new System.Threading.CancellationTokenSource();
+            var ct = _wordChangedCts.Token;
+
+            try
+            {
+                await Task.Delay(WordChangedDebounceMs, ct);
+            }
+            catch (OperationCanceledException)
+            {
+                // cancelled by new input
+                return;
+            }
+
             loading = true;
 
             Task<List<string>> wordsTask = null;
-            Task<List<string>> languageToolWordsTask = GetLanguageToolWords(WordDto.WordLang, title);
+            Task<List<string>> languageToolWordsTask = GetLanguageToolWords(WordDto.WordLang, title, ct);
 
             if (CurrentUser.IsAuthenticated)
             {
-                wordsTask = ApiService.GetAsync<List<string>>($"api/Word/GetWordsContainText/{title}");
+                wordsTask = ApiService.GetAsync<List<string>>($"api/Word/GetWordsContainText/{title}", ct);
             }
 
             if (wordsTask != null)
@@ -217,6 +235,10 @@ public class WordBase : ComponentBase
                 try
                 {
                     SameWords = await wordsTask;
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
                 }
                 catch (Exception ex)
                 {
@@ -229,6 +251,10 @@ public class WordBase : ComponentBase
             try
             {
                 LanguageToolWords = await languageToolWordsTask;
+            }
+            catch (OperationCanceledException)
+            {
+                return;
             }
             catch (Exception ex)
             {
@@ -246,7 +272,7 @@ public class WordBase : ComponentBase
         }
     }
 
-    private async Task<List<string>> GetLanguageToolWords(string wordLang, string str)
+    private async Task<List<string>> GetLanguageToolWords(string wordLang, string str, System.Threading.CancellationToken cancellationToken = default)
     {
         wordLang = wordLang switch
         {
@@ -256,16 +282,29 @@ public class WordBase : ComponentBase
         };
         if (!string.IsNullOrEmpty(wordLang))
         {
-            var response = await ApiService.GetAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text={str}");
+            var response = await ApiService.GetAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text={str}", cancellationToken);
 
             // Extract the list of string values from Matches.Replacements.Value
-            return response.Matches
+            return response?.Matches
                 .SelectMany(match => match.Replacements)
                 .Select(replacement => replacement.Value) //.Where(value =>  value.ToLower() != str.ToLower())
                 .Take(15)
                 .ToList();
         }
         return null;
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            _wordChangedCts?.Cancel();
+            _wordChangedCts?.Dispose();
+        }
+        catch
+        {
+            // ignore
+        }
     }
     protected async Task SetWord(string id)
     {

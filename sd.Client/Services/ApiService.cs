@@ -47,6 +47,25 @@ namespace sd.Client.Services
             }
         }
 
+        // Overload supporting cancellation token
+        public async Task<T> GetAsync<T>(string url, System.Threading.CancellationToken cancellationToken)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync(url, cancellationToken);
+                return await HandleResponse<T>(response);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _log.LogError($"GET request failed: {url}, Error: {ex}");
+                throw;
+            }
+        }
+
         public async Task<T> PostAsync<T>(string url, object data)
         {
             try

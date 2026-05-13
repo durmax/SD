@@ -197,6 +197,7 @@ public class WordBase : ComponentBase
     {
         cssClassUpdate = "d-none";
         note = null;
+        WordDto ??= new WordDto();
         WordDto.Title = title.Trim();
 
         if (title.Length > 2)
@@ -204,35 +205,38 @@ public class WordBase : ComponentBase
             loading = true;
 
             Task<List<string>> wordsTask = null;
-            Task<List<string>> languageToolWordsTask = null;
+            Task<List<string>> languageToolWordsTask = GetLanguageToolWords(WordDto.WordLang, title);
 
             if (CurrentUser.IsAuthenticated)
             {
-                // Start SameWords task
                 wordsTask = ApiService.GetAsync<List<string>>($"api/Word/GetWordsContainText/{title}");
-                // Continue without waiting for SameWords to complete
             }
 
-            // Start LanguageToolWords task
-            languageToolWordsTask = GetLanguageToolWords(WordDto.WordLang, title);
-
-            // Use continuations to update UI as each task completes
             if (wordsTask != null)
             {
-                _ = wordsTask.ContinueWith(async task =>
+                try
                 {
-                    SameWords = await task;
-                    // Trigger re-render after SameWords is set
-                    StateHasChanged();
-                });
+                    SameWords = await wordsTask;
+                }
+                catch (Exception ex)
+                {
+                    Log.LogError(ex, "Failed to load SameWords");
+                    SameWords = null;
+                }
+                StateHasChanged();
             }
 
-            _ = languageToolWordsTask.ContinueWith(async task =>
+            try
             {
-                LanguageToolWords = await task;
-                // Trigger re-render after LanguageToolWords is set
-                StateHasChanged();
-            });
+                LanguageToolWords = await languageToolWordsTask;
+            }
+            catch (Exception ex)
+            {
+                Log.LogError(ex, "Failed to load LanguageToolWords");
+                LanguageToolWords = null;
+            }
+            StateHasChanged();
+
             loading = false;
         }
         else
@@ -446,6 +450,7 @@ public class WordBase : ComponentBase
                 Log.LogError(ex.Message);
             }
         }
+        WordDto ??= new WordDto();
         WordDto.WordLang = WordDto?.WordLang ?? "de"; // ToDo
         WordDto.ToLang = WordDto?.ToLang ?? "ar"; // ToDo
 

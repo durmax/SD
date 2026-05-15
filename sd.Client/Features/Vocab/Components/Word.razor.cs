@@ -25,8 +25,6 @@ public class WordBase : ComponentBase, IDisposable
     [Inject] protected ApiService ApiService { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] ILanguageContainerService LanguageContainer { get; set; }
-
-    [Parameter] public string WordId { get; set; }
     [Parameter] public WordDto WordDto { get; set; }
     [Parameter] public EventCallback<WordDto> OnWordSave { get; set; }
     [Parameter] public EventCallback<WordDto> OnWordFound { get; set; }
@@ -377,25 +375,26 @@ public class WordBase : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        if (Guid.TryParse(WordId, out Guid result))
-        {
-            try
-            {
-                WordDto = await ApiService.GetAsync<WordDto>($"api/Word/{WordId}");
-            }
-            catch (Exception ex)
-            {
-                Log.LogError(ex.Message);
-            }
-        }
-        WordDto ??= new WordDto();
-        WordDto.WordLang = WordDto?.WordLang ?? "de"; // ToDo
-        WordDto.ToLang = WordDto?.ToLang ?? "ar"; // ToDo
+        //if (Guid.TryParse(WordId, out Guid result))
+        //{
+        //    try
+        //    {
+        //        WordDto = await ApiService.GetAsync<WordDto>($"api/Word/{WordId}");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.LogError(ex.Message);
+        //    }
+        //}
 
-        if (WordDto != null && Guid.TryParse(WordDto.WordId, out Guid res))
+        if (Guid.TryParse(WordDto.WordId, out Guid res))
         {
             CULiked = WordDto.IsILiked;
             LikesCount = WordDto.LikesCount;
+        }
+        else
+        {
+            open = true;
         }
 
         // Initialize the list here, after LanguageContainer is available

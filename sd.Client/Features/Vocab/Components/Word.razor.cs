@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using sd.Client.Contracts;
-using sd.Client.Features.Vocab.Contracts;
 using sd.Client.Services;
 using sd.Shared;
 using System;
@@ -37,8 +36,6 @@ public class WordBase : ComponentBase, IDisposable
     public bool CollapsedLike { set; get; } = true;
     public int? LikesCount { get; set; }
     protected bool CULiked { get; set; } = false;
-    protected IEnumerable<string> SameWords { get; set; }
-    protected IEnumerable<string> LanguageToolWords { get; set; }
     protected List<CommentModel> WordComments { get; set; }
     public BlazoredTextEditor QuillHtml { get; set; }
     protected string Explain { get; set; }
@@ -56,8 +53,6 @@ public class WordBase : ComponentBase, IDisposable
     protected int Rows = 2;
 
     protected List<string> ShareVariants { get; set; } = new();
-    private System.Threading.CancellationTokenSource _wordChangedCts;
-    private const int WordChangedDebounceMs = 350;
 
     protected Task OnSpeakingChanged(bool speaking)
     {
@@ -155,7 +150,6 @@ public class WordBase : ComponentBase, IDisposable
         }
         finally
         {
-            SameWords = null;
             loading = false;
         }
 
@@ -195,117 +189,22 @@ public class WordBase : ComponentBase, IDisposable
         }
     }
 
-    protected async Task WordChangedAsync(string title)
+    // Simplified: suggestion fetching is handled by WordSearchField component.
+    // Keep a lightweight handler for title changes that only updates model state.
+    protected Task WordChangedAsync(string title)
     {
         cssClassUpdate = "d-none";
         note = null;
         WordDto ??= new WordDto();
-        WordDto.Title = title.Trim();
-
-        if (title.Length > 2)
-        {
-            // debounce + cancellation
-            _wordChangedCts?.Cancel();
-            _wordChangedCts?.Dispose();
-            _wordChangedCts = new System.Threading.CancellationTokenSource();
-            var ct = _wordChangedCts.Token;
-
-            try
-            {
-                await Task.Delay(WordChangedDebounceMs, ct);
-            }
-            catch (OperationCanceledException)
-            {
-                // cancelled by new input
-                return;
-            }
-
-            loading = true;
-
-            Task<List<string>> wordsTask = null;
-            Task<List<string>> languageToolWordsTask = GetLanguageToolWords(WordDto.WordLang, title, ct);
-
-            if (CurrentUser.IsAuthenticated)
-            {
-                wordsTask = ApiService.GetAsync<List<string>>($"api/Word/GetWordsContainText/{title}", ct);
-            }
-
-            if (wordsTask != null)
-            {
-                try
-                {
-                    SameWords = await wordsTask;
-                }
-                catch (OperationCanceledException)
-                {
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Log.LogError(ex, "Failed to load SameWords");
-                    SameWords = null;
-                }
-                StateHasChanged();
-            }
-
-            try
-            {
-                LanguageToolWords = await languageToolWordsTask;
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-            catch (Exception ex)
-            {
-                Log.LogError(ex, "Failed to load LanguageToolWords");
-                LanguageToolWords = null;
-            }
-            StateHasChanged();
-
-            loading = false;
-        }
-        else
-        {
-            SameWords = null;
-            LanguageToolWords = null;
-        }
-    }
-
-    private async Task<List<string>> GetLanguageToolWords(string wordLang, string str, System.Threading.CancellationToken cancellationToken = default)
-    {
-        wordLang = wordLang switch
-        {
-            "de" => "de-DE",
-            "en" => "en-US",
-            _ => string.Empty,
-        };
-        if (!string.IsNullOrEmpty(wordLang))
-        {
-            var response = await ApiService.GetAsync<LanguageToolResponse>($"https://api.languagetool.org/v2/check?language={wordLang}&text={str}", cancellationToken);
-
-            // Extract the list of string values from Matches.Replacements.Value
-            return response?.Matches
-                .SelectMany(match => match.Replacements)
-                .Select(replacement => replacement.Value) //.Where(value =>  value.ToLower() != str.ToLower())
-                .Take(15)
-                .ToList();
-        }
-        return null;
+        WordDto.Title = title?.Trim() ?? string.Empty;
+        return Task.CompletedTask;
     }
 
     public void Dispose()
     {
-        try
-        {
-            _wordChangedCts?.Cancel();
-            _wordChangedCts?.Dispose();
-        }
-        catch
-        {
-            // ignore
-        }
+        // No local cancellation resources to clean up anymore.
     }
+
     protected async Task SetWord(string id)
     {
         if (CurrentUser.IsAuthenticated && !string.IsNullOrEmpty(id))

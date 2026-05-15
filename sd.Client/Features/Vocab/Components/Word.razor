@@ -22,15 +22,14 @@
 
             <DictionaryLinksMenu WordDto="WordDto" PairChanged="PairChanged"></DictionaryLinksMenu>
 
-            <WordSearchField Id="wordId"
+            <WordSearchField Id="WordId"
                              @bind-Value="WordDto.Title"
                              Placeholder=""
+                             WordLang="@WordDto.WordLang"
                              Style="width: 100%;"
                              @ref="wordSearchFieldRef"
                              OnKeyDown="KeydownAsync"
                              OnInput="WordChangedAsync"
-                             SameWords="SameWords"
-                             LanguageToolWords="LanguageToolWords"
                              OnSelectSameWord="SetWord" />
 
             <FluentButton Appearance="Appearance.Outline"

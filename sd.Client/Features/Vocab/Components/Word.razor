@@ -22,7 +22,7 @@
 
             <DictionaryLinksMenu WordDto="WordDto" PairChanged="PairChanged"></DictionaryLinksMenu>
 
-            <WordSearchField Id="WordId"
+            <WordSearchField Id="@WordDto.Title"
                              @bind-Value="WordDto.Title"
                              Placeholder=""
                              WordLang="@WordDto.WordLang"

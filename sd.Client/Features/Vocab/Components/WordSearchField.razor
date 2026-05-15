@@ -8,22 +8,24 @@
 @inject sd.Client.Services.CurrentUserService CurrentUser
 
 <FluentSearch Id="@Id"
-               Value="@Value"
-               ValueChanged="HandleValueChanged"
-               Immediate="true"
-               ImmediateDelay="@ImmediateDelay"
-               Appearance="@Appearance"
-               Placeholder="@Placeholder"
-               autocomplete="off"
-               style="@Style"
-               @ref="_search"
-               @onkeydown="OnKeyDown"
-               @onfocusin="HandleSearchFocus"
-               @attributes="AdditionalAttributes" />
+              Value="@Value"
+              ValueChanged="HandleValueChanged"
+              Immediate="true"
+              ImmediateDelay="@ImmediateDelay"
+              Appearance="@Appearance"
+              Placeholder="@Placeholder"
+              autocomplete="off"
+              style="@Style"
+              @ref="_search"
+              @onkeydown="OnKeyDown"
+              @onfocusin="HandleSearchFocus"
+              @attributes="AdditionalAttributes" />
 
 @if (!HideSuggestions)
 {
-    <FluentMenu Anchor="@Id" UseMenuService="true" @bind-Open="_suggestionsOpen">
+    <FluentMenu Anchor="@Id"
+                UseMenuService="true"
+                @bind-Open="_suggestionsOpen">
         <div style="max-width:500px; max-height:280px; overflow:auto;">
             @if (_suggestions != null && _suggestions.Any())
             {

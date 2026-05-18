@@ -1,7 +1,6 @@
 ﻿@using Microsoft.FluentUI.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.Extensions.Logging
-@using sd.Client.Features.Vocab.Contracts
 
 @inject ILogger<WordSearchField>? Logger
 @inject sd.Client.Services.ApiService ApiService
@@ -57,7 +56,6 @@
     private bool _suggestionsOpen = false;
     private System.Threading.CancellationTokenSource? _wordChangedCts;
     private List<string>? _fetchedSameWords;
-    private List<string>? _fetchedLanguageToolWords;
     private bool loading = false;
 
     // existing parameters (kept for backward compatibility)
@@ -86,23 +84,17 @@
     /// <summary>List in the format "DisplayText:WordId" (your SameWords).</summary>
     [Parameter] public IEnumerable<string>? SameWords { get; set; }
 
-    [Parameter] public IEnumerable<string>? LanguageToolWords { get; set; }
-
     /// <summary>
     /// Called when a SameWords item is clicked. Receives the part after ':' (WordId).
     /// </summary>
     [Parameter] public EventCallback<string> OnSelectSameWord { get; set; }
 
-    /// <summary>Hide the suggestion lists (SameWords/LanguageToolWords).</summary>
+    /// <summary>Hide the suggestion lists (SameWords).</summary>
     [Parameter] public bool HideSuggestions { get; set; } = false;
 
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
 
-    // New parameters to let this component fetch suggestions itself.
-    // If null, component will use the incoming parameters `SameWords` and `LanguageToolWords` instead.
-    // Language tool delegate: (wordLang, title, ct)
-    [Parameter] public Func<string?, string, System.Threading.CancellationToken, Task<List<string>>>? GetLanguageToolWordsAsync { get; set; }
     [Parameter] public Func<string, System.Threading.CancellationToken, Task<List<string>>>? GetSameWordsAsync { get; set; }
     [Parameter] public bool IsUserAuthenticated { get; set; } = false;
     [Parameter] public string? WordLang { get; set; }
@@ -121,7 +113,7 @@
             await OnInput.InvokeAsync(value ?? string.Empty);
 
         // If fetch functions are provided, trigger component-local suggestion fetching.
-        if (GetLanguageToolWordsAsync != null || GetSameWordsAsync != null || ApiService != null)
+        if (GetSameWordsAsync != null || ApiService != null)
         {
             // use the current Value (title)
             var title = Value ?? string.Empty;
@@ -129,7 +121,7 @@
         }
         else
         {
-            // If consumer provided SameWords/LanguageToolWords as parameters, ensure UI updates
+            // If consumer provided SameWords as parameters, ensure UI updates
             RebuildSuggestionsFromParameters();
         }
 
@@ -142,7 +134,6 @@
     {
         // prefer fetched lists if present, otherwise use passed-in parameters
         var sameWordsSource = _fetchedSameWords ?? SameWords;
-        var languageToolSource = _fetchedLanguageToolWords ?? LanguageToolWords;
 
         _parsedSameWords = (sameWordsSource ?? Enumerable.Empty<string>())
             .Where(s => !string.IsNullOrWhiteSpace(s))
@@ -155,21 +146,7 @@
         {
             _suggestions.AddRange(_parsedSameWords.Select(p => (p.Text, p.WordId, true)));
         }
-
-        if (languageToolSource != null)
-        {
-            var lt = languageToolSource.Where(s => !string.IsNullOrWhiteSpace(s))
-                        .OrderBy(s => s, StringComparer.OrdinalIgnoreCase)
-                        .Select(s => (Text: s, WordId: (string?)null, IsSameWord: false));
-            _suggestions.AddRange(lt);
-        }
-
         _suggestionsOpen = _showSuggestions;
-
-        Logger?.LogInformation("RebuildSuggestionsFromParameters: parsedSame={Count}, languageTool={LtCount}, totalSuggestions={Total}",
-            _parsedSameWords?.Count ?? 0,
-            _fetchedLanguageToolWords?.Count ?? 0,
-            _suggestions?.Count ?? 0);
     }
 
     private async Task FetchSuggestionsDebouncedAsync(string title)
@@ -182,7 +159,6 @@
             _wordChangedCts = null;
 
             _fetchedSameWords = null;
-            _fetchedLanguageToolWords = null;
             RebuildSuggestionsFromParameters();
             await InvokeAsync(StateHasChanged);
             return;
@@ -208,29 +184,9 @@
         await InvokeAsync(StateHasChanged);
 
         Task<List<string>>? sameWordsTask = null;
-        Task<List<string>>? languageToolTask = null;
 
         try
         {
-            // LanguageTool: prefer delegate, otherwise call LanguageTool directly
-            if (GetLanguageToolWordsAsync != null)
-            {
-                try
-                {
-                    languageToolTask = GetLanguageToolWordsAsync(WordLang, title, ct);
-                }
-                catch (Exception ex)
-                {
-                    Logger?.LogError(ex, "GetLanguageToolWordsAsync invocation failed");
-                    languageToolTask = Task.FromResult(new List<string>());
-                }
-            }
-            else
-            {
-                // local fallback to call LanguageTool API
-                languageToolTask = GetLanguageToolWordsLocal(WordLang, title, ct);
-            }
-
             // SameWords: prefer delegate, otherwise call API if user is authenticated
             if (GetSameWordsAsync != null)
             {
@@ -274,33 +230,6 @@
                 }
             }
 
-            if (languageToolTask != null)
-            {
-                try
-                {
-                    _fetchedLanguageToolWords = await languageToolTask;
-                }
-                catch (OperationCanceledException)
-                {
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Logger?.LogError(ex, "Failed to load LanguageToolWords (component)");
-                    _fetchedLanguageToolWords = null;
-                }
-            }
-
-            // log fetched results for diagnostics
-            Logger?.LogInformation("FetchSuggestionsDebouncedAsync: fetchedSameWords={SameCount}, fetchedLanguageToolWords={LtCount}",
-                _fetchedSameWords?.Count ?? 0,
-                _fetchedLanguageToolWords?.Count ?? 0);
-            if (_fetchedLanguageToolWords != null && _fetchedLanguageToolWords.Any())
-            {
-                var sample = string.Join(", ", _fetchedLanguageToolWords.Take(5));
-                Logger?.LogInformation("LanguageTool sample: {Sample}", sample);
-            }
-
             RebuildSuggestionsFromParameters();
 
             // ensure menu reflects new suggestions
@@ -325,50 +254,6 @@
             loading = false;
             await InvokeAsync(StateHasChanged);
         }
-    }
-
-    private async Task<List<string>> GetLanguageToolWordsLocal(string wordLang, string str, System.Threading.CancellationToken cancellationToken = default)
-    {
-        wordLang = wordLang switch
-        {
-            "de" => "de-DE",
-            "en" => "en-US",
-            _ => string.Empty,
-        };
-        if (!string.IsNullOrEmpty(wordLang))
-        {
-            try
-            {
-                var url = $"https://api.languagetool.org/v2/check?language={wordLang}&text={System.Net.WebUtility.UrlEncode(str)}";
-                var response = await ApiService.GetAsync<LanguageToolResponse>(url, cancellationToken);
-
-                var matches = response?.Matches ?? Enumerable.Empty<Match>();
-                Logger?.LogInformation("LanguageTool HTTP OK: url={Url}, matches={MatchesCount}", url, matches.Count());
-
-                foreach (var (mIndex, match) in matches.Select((m, i) => (i, m)))
-                {
-                    var replCount = match.Replacements?.Count() ?? 0;
-                    var sample = replCount > 0 ? string.Join(", ", match.Replacements.Take(3).Select(r => r.Value)) : "<no replacements>";
-                    Logger?.LogInformation("LanguageTool match #{Index}: replacements={Count}, sample={Sample}", mIndex, replCount, sample);
-                }
-
-                var replacements = matches
-                    .SelectMany(match => match.Replacements ?? Enumerable.Empty<Replacement>())
-                    .Select(replacement => replacement.Value)
-                    .Where(v => !string.IsNullOrWhiteSpace(v))
-                    .Take(15)
-                    .ToList();
-
-                Logger?.LogInformation("Extracted replacements count={Count}, sample={Sample}", replacements.Count, string.Join(", ", replacements.Take(5)));
-                return replacements;
-            }
-            catch (Exception ex)
-            {
-                Logger?.LogError(ex, "LanguageTool local fetch failed");
-                return new List<string>();
-            }
-        }
-        return new List<string>();
     }
 
     private async Task SelectSameWordAsync(string wordId)
@@ -407,7 +292,7 @@
         base.OnParametersSet();
 
         // If consumer provided server-side lists and this component is not fetching, build suggestions from those.
-        if (GetLanguageToolWordsAsync == null && GetSameWordsAsync == null)
+        if (GetSameWordsAsync == null)
         {
             RebuildSuggestionsFromParameters();
         }

@@ -12,7 +12,7 @@ public class UserPreferencesService(LocalStorageAccessor localStorage)
             LanguageSettings = await localStorage.GetValueAsync<LanguageSettings>("LangSettings")
                     ?? LanguageSettings.Default;
 
-        return LanguageSettings;
+        return LanguageSettings ?? LanguageSettings.Default ;
     }
 
     public async Task SetSettingsAsync(LanguageSettings settings)

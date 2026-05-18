@@ -375,19 +375,7 @@ public class WordBase : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        //if (Guid.TryParse(WordId, out Guid result))
-        //{
-        //    try
-        //    {
-        //        WordDto = await ApiService.GetAsync<WordDto>($"api/Word/{WordId}");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.LogError(ex.Message);
-        //    }
-        //}
-
-        if (Guid.TryParse(WordDto.WordId, out Guid res))
+        if (WordDto != null && Guid.TryParse(WordDto.WordId, out Guid res))
         {
             CULiked = WordDto.IsILiked;
             LikesCount = WordDto.LikesCount;

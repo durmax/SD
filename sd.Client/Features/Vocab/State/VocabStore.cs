@@ -12,11 +12,13 @@ public sealed class VocabStore
 {
     private readonly VocabApiClient _api;
     private readonly LocalStorageAccessor LocalStorageAccessor;
+    private readonly UserPreferencesService UserPreferencesService;
 
-    public VocabStore(VocabApiClient api, LocalStorageAccessor localStorageAccessor)
+    public VocabStore(VocabApiClient api, LocalStorageAccessor localStorageAccessor, UserPreferencesService userPreferencesService)
     {
         _api = api;
         LocalStorageAccessor = localStorageAccessor;
+        UserPreferencesService = userPreferencesService;
     }
 
     public List<WordDto> Items { get; } = new();
@@ -93,11 +95,14 @@ public sealed class VocabStore
     }
 
     private async Task<WordDto> NewDraftAsync(string? id = null)
-        => new()
-        {
-            WordId = id ?? NewWords.ToString(),
-            WordLang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FromLang),
-            ToLang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.ToLang),
-            ShareWith = ShareWith.Public
-        };
+    {
+        var languageSettings = await UserPreferencesService.GetSettingsAsync(false);
+        return new()
+           {
+               WordId = id ?? NewWords.ToString(),
+               WordLang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FromLang)?? languageSettings.FromLang,
+               ToLang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.ToLang)?? languageSettings.ToLang,
+               ShareWith = ShareWith.Public
+           };
+    }
 }

@@ -107,6 +107,12 @@ namespace sd.Client.Features.Settings.Pages
             }
             UILang = LangCodesHelper.UiLangs.FirstOrDefault(x => x.Value == culture).Key;
 
+            if (string.IsNullOrEmpty(UILang))
+            {
+                UILang = "english";
+                await LocalStorageAccessor.SetValueAsync(LangStorageKeys.UiLang, LangCodesHelper.UiLangs["english"]);
+            }
+
             SelectedItems = (LangCodes ?? Array.Empty<LanguageOption>())
                                 .Where(l => LanguageSettings.KnownLangs.Contains(l.Code))
                                 .ToList();

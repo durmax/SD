@@ -23,7 +23,6 @@ public class VocabListBase : ComponentBase
     {
         await Store.EnsureDraftRow();
 
-        //var uiLang = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
         var uiLang = UserPreferencesService.GetSettingsAsync(false).Result.UiLang;
 
         if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")

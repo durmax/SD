@@ -13,6 +13,7 @@ using sd.Client.LoggerProvider;
 using sd.Client.Models;
 using sd.Client.Services;
 using System;
+using System.Globalization;
 using System.Reflection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -72,8 +73,11 @@ builder.Services.AddScoped<VocabStore>();
 
 builder.Services.AddScoped<IKnownLanguagesStore, KnownLanguagesStore>();
 
-await builder.Build().RunAsync();
+var host = builder.Build();
 
-//var app = builder.Build();
-//app.MapRazorComponents<App>().AddInteractiveServerRenderMode;
-//await app.RunAsync();
+var languageContainer =
+    host.Services.GetRequiredService<ILanguageContainerService>();
+
+languageContainer.SetLanguage(CultureInfo.GetCultureInfo("en-US"));
+
+await host.RunAsync();

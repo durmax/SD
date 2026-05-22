@@ -1,8 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-@using sd.Client.Services
 
-@inject LanguageContainerService languageContainer
+
+@inject ILanguageContainerService languageContainer
 @inject NavigationManager Navigation
 @inject SignOutSessionStateManager SignOutManager
 
@@ -17,15 +17,15 @@
             ?? "User";
         }
 
-        @languageContainer.GetValue("Hello"), @userName
+        @languageContainer.Keys["Hello"], @userName
 
         <button class="nav-link btn btn-link" @onclick="BeginLogout">
-            @languageContainer.GetValue("LogOut")
+            @languageContainer.Keys["LogOut"]
         </button>
     </Authorized>
 
     <NotAuthorized>
-        <a href="authentication/login">@languageContainer.GetValue("LogIn")</a>
+        <a href="authentication/login">@languageContainer.Keys["LogIn"]</a>
     </NotAuthorized>
 </AuthorizeView>
 

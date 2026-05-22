@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Frozen;
+using System.Globalization;
 
 namespace sd.Client.Helpers;
 
@@ -190,6 +191,22 @@ public static class LangCodesHelper
     public static IReadOnlyDictionary<string, string> UiLangs { get; } =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
+            ["ar"] = "arabic",
+            ["en"] = "english",
+            ["de"] = "german",
+            ["fr"] = "french",
+            ["ru"] = "russian",
+            ["tr"] = "turkish",
+            ["it"] = "italian",
+            ["es"] = "spanish",
+            ["pt"] = "brazilian",
+            ["fa"] = "Farsi"
+
+        }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+
+    public static IReadOnlyDictionary<string, string> CultureCodes { get; } =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
             ["arabic"] = "ar-SY",
             ["english"] = "en-US",
             ["german"] = "de-DE",
@@ -209,6 +226,20 @@ public static class LangCodesHelper
     public static bool TryGetLanguageName(string code, out string? name) =>
         Langs.TryGetValue(code, out name);
 
-    public static bool TryGetUiCulture(string uiLangKey, out string? culture) =>
-        UiLangs.TryGetValue(uiLangKey, out culture);
+    public static bool GetUiCulture(string uiLangCode, out CultureInfo? culture)
+    {
+        culture = null;
+
+        var languageName = GetLanguageNameOrEmpty(uiLangCode);
+
+        if (string.IsNullOrWhiteSpace(languageName))
+            return false;
+
+        if (!CultureCodes.TryGetValue(languageName, out var cultureCode))
+            return false;
+
+        culture = CultureInfo.GetCultureInfo(cultureCode);
+
+        return true;
+    }
 }

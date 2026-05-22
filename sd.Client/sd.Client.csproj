@@ -12,16 +12,36 @@
 	  <None Remove="Features\Language\**" />
 	</ItemGroup>
 	<ItemGroup>
-		<EmbeddedResource Include="Resources\ar-SY.yml" />
-		<EmbeddedResource Include="Resources\de-DE.yml" />
-		<EmbeddedResource Include="Resources\en-US.yml" />
-		<EmbeddedResource Include="Resources\es-ES.yml" />
-		<EmbeddedResource Include="Resources\fa-IR.yml" />
-		<EmbeddedResource Include="Resources\fr-FR.yml" />
-		<EmbeddedResource Include="Resources\it-IT.yml" />
-		<EmbeddedResource Include="Resources\pt-PT.yml" />
-		<EmbeddedResource Include="Resources\ru-RU.yml" />
-		<EmbeddedResource Include="Resources\tr-TR.yml" />
+		<EmbeddedResource Include="Resources\ar-SY.yml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\de-DE.yml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\en-US.yml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\es-ES.yml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\fa-IR.yml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\fr-FR.yml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\it-IT.yml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\pt-PT.yml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\ru-RU.yml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\tr-TR.yml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="AKSoftware.Localization.MultiLanguages" Version="6.0.1" />

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using sd.Client.Contracts;
-using sd.Client.Features.Settings.State;
 using sd.Client.Helpers;
 using sd.Client.Services;
 using sd.Shared;
@@ -23,27 +22,22 @@ namespace sd.Client.Features.Settings.Pages
         [Inject] protected ILanguageContainerService LanguageContainer { get; set; } = default!;
         [Inject] protected NavigationManager NavigationManager { get; set; } = default!;
         [Inject] protected DictionaryLinksService DictionaryLinksService { get; set; } = default!;
-        [Inject] protected IKnownLanguagesStore KnownLanguagesStore { get; set; } = default!;
-
         [Inject] protected UserPreferencesService UserPreferencesService { get; set; } = default!;
-        public LanguageSettings LanguageSettings { get; set; }
+        public LanguageSettings? LanguageSettings { get; set; } = LanguageSettings.Default;
 
         // All languages list (dropdown source)
         public IEnumerable<LanguageOption>? LangCodes { get; set; }
 
         protected IEnumerable<LanguageOption> UiLangItems { get; set; } = LangCodesHelper.UiLangs
-                .Select(x => new LanguageOption(x.Key, x.Key));
+            .Select(x => new LanguageOption(x.Key, x.Value))
+            .ToList();
 
         // Current dictionary providers (sortable)
         protected List<DictionaryProviderDto> dictionaryProviders { get; set; } = new();
 
-        // Known languages (for multi-select / tags / etc.)
-        protected List<string> KnownLangs { get; set; } = new();
-
         // UI language key (your UILangs dictionary key, not culture string)
-        protected string UILang { get; set; }
-        protected LanguageOption SelectedUILang =>
-        UiLangItems.FirstOrDefault(x => x.Code == UILang);
+        // protected string UILang { get; set; }
+        protected LanguageOption SelectedUILang { get; set; }
 
         protected IEnumerable<LanguageOption> SelectedItems { get; set; }
 
@@ -53,7 +47,6 @@ namespace sd.Client.Features.Settings.Pages
 
         protected bool isResetDialogHidden = true;
         protected bool isRemoveAllDialogHidden = true;
-
 
         protected async Task SetFavSiteAsync(string fav)
         {
@@ -72,7 +65,7 @@ namespace sd.Client.Features.Settings.Pages
                 KnownLangs = SelectedItems.Select(x => x.Code).Distinct().ToArray()
             };
 
-            await UserPreferencesService.SetSettingsAsync(LanguageSettings);
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.LanguageSettings, LanguageSettings);
         }
 
         protected async Task Reverse()
@@ -84,38 +77,28 @@ namespace sd.Client.Features.Settings.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            //await DefaultLangsService.SetDefLangsAsync();
+            LanguageSettings = await UserPreferencesService.GetSettingsAsync(false)
+                   ?? LanguageSettings.Default;
 
-            var fromCode = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.FromLang) ?? "en";
-            var toCode = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.ToLang) ?? "de";
+            LangCodes = LangCodesHelper.Langs
+                .Select(x => new LanguageOption(x.Key, x.Value))
+                .ToList();
 
             ActivePair = new LanguagePair(
-                new LanguageOption(fromCode, LangCodesHelper.GetLanguageNameOrEmpty(fromCode)),
-                new LanguageOption(toCode, LangCodesHelper.GetLanguageNameOrEmpty(toCode)));
+                new LanguageOption(LanguageSettings.FromLang, LangCodesHelper.GetLanguageNameOrEmpty(LanguageSettings.FromLang)),
+                new LanguageOption(LanguageSettings.ToLang, LangCodesHelper.GetLanguageNameOrEmpty(LanguageSettings.ToLang)));
 
-            LangCodes ??= LangCodesHelper.Langs
-                .Select(x => new LanguageOption(x.Key, x.Value));
-
-            LanguageSettings = await UserPreferencesService.GetSettingsAsync(true);
+            SelectedUILang = UiLangItems.FirstOrDefault(x => x.Code == LanguageSettings.UiLangCode);
+            
+            SelectedItems = LangCodes
+    .Where(l => LanguageSettings.KnownLangs.Contains(l.Code))
+    .ToList();
 
             // UI language initial selection
-            var culture = await LocalStorageAccessor.GetValueAsync<string>(LangStorageKeys.UiLang);
-            if (string.IsNullOrEmpty(culture))
+            if (LangCodesHelper.GetUiCulture(LanguageSettings.UiLangCode, out var culture))
             {
-                culture = System.Globalization.CultureInfo.CurrentUICulture.Name;
-                await LocalStorageAccessor.SetValueAsync(LangStorageKeys.UiLang, culture);
+                LanguageContainer.SetLanguage(culture!);
             }
-            UILang = LangCodesHelper.UiLangs.FirstOrDefault(x => x.Value == culture).Key;
-
-            if (string.IsNullOrEmpty(UILang))
-            {
-                UILang = "english";
-                await LocalStorageAccessor.SetValueAsync(LangStorageKeys.UiLang, LangCodesHelper.UiLangs["english"]);
-            }
-
-            SelectedItems = (LangCodes ?? Array.Empty<LanguageOption>())
-                                .Where(l => LanguageSettings.KnownLangs.Contains(l.Code))
-                                .ToList();
 
             // Load dictionary providers + favorite site
             await ReloadProvidersAsync();
@@ -143,32 +126,50 @@ namespace sd.Client.Features.Settings.Pages
             ActivePair = pair;
             //DefaultLangsService.DefaultWordLang = pair.From.Code;
 
-            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.ToLang, pair.To.Code);
-            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.FromLang, pair.From.Code);
+            LanguageSettings = LanguageSettings with
+            {
+                ToLang = pair.To.Code,
+                FromLang = pair.From.Code
+            };
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.LanguageSettings, LanguageSettings);
 
             await ReloadProvidersAsync();
         }
 
         protected async Task OnUILangChanged(LanguageOption option)
         {
-            UILang = option.Code;
-            var fallbackCulture = "en-US";
+            if (option.Code == SelectedUILang.Code)
+                return;
+
+            SelectedUILang = option;
+
+            LanguageSettings = LanguageSettings! with
+            {
+                UiLangCode = option.Code
+            };
+
+            await UserPreferencesService.SetSettingsAsync(LanguageSettings);
+
+            var fallbackUiLangCode = "en";
+
+            await LocalStorageAccessor.SetValueAsync(LangStorageKeys.LanguageSettings, LanguageSettings);
 
             try
             {
-                var culture = (UILang != null && LangCodesHelper.UiLangs.TryGetValue(UILang, out var c))
-                    ? c
-                    : fallbackCulture;
-
-                LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(culture));
-                await LocalStorageAccessor.SetValueAsync(LangStorageKeys.UiLang, culture);
+                if (LangCodesHelper.GetUiCulture(option.Code, out var culture))
+                {
+                    LanguageContainer.SetLanguage(culture);
+                }
             }
             catch (Exception ex)
             {
-                LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(fallbackCulture));
-                await LocalStorageAccessor.SetValueAsync(LangStorageKeys.UiLang, fallbackCulture);
+                if (LangCodesHelper.GetUiCulture(fallbackUiLangCode, out var culture))
+                {
+                    LanguageContainer.SetLanguage(culture);
+                }
 
-                Log.LogError(ex, $"SetUILangAsync: '{UILang}' not found, set to {fallbackCulture}");
+                Log.LogError(ex, "SetUILangAsync failed for '{UiLangCode}', fallback to {FallbackUiLangCode}",
+                    option.Code, fallbackUiLangCode);
             }
         }
 

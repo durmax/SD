@@ -65,8 +65,7 @@ builder.Services.AddScoped<DictionaryLinksService>();
 
 builder.Services.AddSingleton<WordDtosState>();
 
-builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
-builder.Services.AddSingleton<LanguageContainerService>();
+builder.Services.AddLanguageContainer(typeof(Program).Assembly);
 
 builder.Services.AddScoped<VocabApiClient>();
 builder.Services.AddScoped<VocabStore>();

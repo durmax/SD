@@ -26,7 +26,7 @@ namespace sd.Client.Features.Vocab.Components
         [Parameter] public EventCallback<LanguagePair> PairChanged { get; set; }
         [Parameter] public EventCallback Reverse { get; set; }
 
-        public LanguageSettings LanguageSettings { get; set; }
+        public LanguageSettings? LanguageSettings { get; set; }
 
         protected bool open = false;
         protected List<DictionaryProviderDto> dictProviders { get; set; } = new();

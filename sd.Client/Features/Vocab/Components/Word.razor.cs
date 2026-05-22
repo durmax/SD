@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using sd.Client.Contracts;
+using sd.Client.Helpers;
 using sd.Client.Services;
 using sd.Shared;
 using System;
@@ -388,9 +389,9 @@ public class WordBase : ComponentBase, IDisposable
         // Initialize the list here, after LanguageContainer is available
         ShareVariants = new List<string>
         {
-            LanguageContainer.Keys["OnlyMe"],
-            LanguageContainer.Keys["Friends"],
-            LanguageContainer.Keys["Public"]
+            LanguageContainer["OnlyMe"],
+            LanguageContainer["Friends"],
+            LanguageContainer["Public"]
         };
     }
 }

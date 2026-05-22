@@ -23,17 +23,20 @@ public class VocabListBase : ComponentBase
     {
         await Store.EnsureDraftRow();
 
-        var uiLang = UserPreferencesService.GetSettingsAsync(false).Result.UiLang;
+        var uiLangCode = UserPreferencesService.GetSettingsAsync(false).Result.UiLangCode;
 
-        if (!string.IsNullOrWhiteSpace(uiLang) && uiLang != "null")
+        if (!string.IsNullOrWhiteSpace(uiLangCode) && uiLangCode != "null")
         {
             try
             {
-                LanguageContainer.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo(uiLang));
+                if (LangCodesHelper.GetUiCulture(uiLangCode, out var culture))
+                {
+                    LanguageContainer.SetLanguage(culture!);
+                }
             }
             catch
             {
-                Log.LogError($"SetLanguage for uiLang: {uiLang}");
+                Log.LogError($"SetLanguage for uiLang: {uiLangCode}");
             }
         }
     }

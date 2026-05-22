@@ -36,7 +36,7 @@
             @if (IsChanged)
             {
                 <button type="button" class="btn btn-link bg-transparent" @onclick="@SaveComment">
-                    <FluentIcon Value="@(new Icons.Regular.Size16.Save())" /> <lable class="pl-1">@languageContainer.Keys["Save"]</lable>
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Save())" /> <lable class="pl-1">@languageContainer?.Keys?["Save"]</lable>
                 </button>
             }
         </div>

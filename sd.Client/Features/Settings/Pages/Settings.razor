@@ -6,6 +6,7 @@
 @using sd.Client.Helpers
 @using sd.Client.Models
 @using sd.Client.Pages
+@inject ILanguageContainerService languageContainer
 
 
 <FluentCard Class="lang-card">
@@ -21,8 +22,8 @@
         <FluentCard AreaRestricted="false">
 
             <h6>Languages</h6>
-            <KnownLanguagesPicker Label="@LanguageContainer.Keys["AddLang"]"
-                                  Placeholder="@LanguageContainer.Keys["AddLang"]"
+            <KnownLanguagesPicker Label="@languageContainer?.Keys?["AddLang"]"
+                                  Placeholder="@languageContainer?.Keys?["AddLang"]"
                                   Width="100%"
                                   OnOptionsSearch="OnSearchAsync"
                                   SelectedOptions="SelectedItems"

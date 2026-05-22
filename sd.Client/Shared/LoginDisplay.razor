@@ -17,15 +17,15 @@
             ?? "User";
         }
 
-        @languageContainer.Keys["Hello"], @userName
+        @languageContainer?.Keys?["Hello"], @userName
 
         <button class="nav-link btn btn-link" @onclick="BeginLogout">
-            @languageContainer.Keys["LogOut"]
+            @languageContainer?.Keys?["LogOut"]
         </button>
     </Authorized>
 
     <NotAuthorized>
-        <a href="authentication/login">@languageContainer.Keys["LogIn"]</a>
+        <a href="authentication/login">@languageContainer?.Keys?["LogIn"]</a>
     </NotAuthorized>
 </AuthorizeView>
 

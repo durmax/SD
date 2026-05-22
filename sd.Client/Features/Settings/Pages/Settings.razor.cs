@@ -19,7 +19,7 @@ namespace sd.Client.Features.Settings.Pages
         [Inject] protected ILogger<SettingsBase> Log { get; set; } = default!;
         [Inject] protected LocalStorageAccessor LocalStorageAccessor { get; set; } = default!;
         [Inject] protected IJSRuntime JsRuntime { get; set; } = default!;
-        [Inject] protected ILanguageContainerService LanguageContainer { get; set; } = default!;
+        [Inject] protected ILanguageContainerService LanguageContainer { get; set; }
         [Inject] protected NavigationManager NavigationManager { get; set; } = default!;
         [Inject] protected DictionaryLinksService DictionaryLinksService { get; set; } = default!;
         [Inject] protected UserPreferencesService UserPreferencesService { get; set; } = default!;

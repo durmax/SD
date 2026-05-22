@@ -24,12 +24,3 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
-
-@code {
-    private LanguageSettings? _settings;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _settings = await PreferencesService.GetSettingsAsync(true);
-    }
-}

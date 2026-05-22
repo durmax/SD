@@ -7,7 +7,7 @@
 </div>
 
 <div class="input-group pt-1">
-    <input type="search" class="form-control" placeholder=@languageContainer?.Keys?["FindUser"]
+    <input type="search" class="form-control" placeholder=@languageContainer?["FindUser"]
            @onchange="@(async(e)=> {await SearchUser((string)e.Value);})" />
 
     <div class="input-group-append">
@@ -62,7 +62,7 @@
         else
         {
             <div class="card pt-1">
-                <div class="card-header"> <a href="Friends"> @languageContainer?.Keys?["YouHave"] <span class="badge badge-primary">@FriendsCount</span> @languageContainer?.Keys?["Friends"]</a></div>
+                <div class="card-header"> <a href="Friends"> @languageContainer?["YouHave"] <span class="badge badge-primary">@FriendsCount</span> @languageContainer?["Friends"]</a></div>
 
                 @if (FriendsDictionary != null)
                 {

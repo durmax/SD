@@ -53,6 +53,8 @@ builder.Services.AddMsalAuthentication(options =>
 
 builder.Services.AddFluentUIComponents();
 
+builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
+
 builder.Services.AddScoped<CurrentUserService>();
 builder.Services.AddScoped<ApiService>();
 
@@ -64,8 +66,6 @@ builder.Services.AddScoped<LinkModel>();
 builder.Services.AddScoped<DictionaryLinksService>();
 
 builder.Services.AddSingleton<WordDtosState>();
-
-builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
 
 builder.Services.AddScoped<VocabApiClient>();
 builder.Services.AddScoped<VocabStore>();

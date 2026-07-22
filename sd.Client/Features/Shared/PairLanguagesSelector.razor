@@ -1,0 +1,80 @@
+﻿@using Microsoft.FluentUI.AspNetCore.Components
+@using sd.Client.Contracts
+@using sd.Client.Features.Settings.State
+@using sd.Client.Helpers
+@inject IKnownLanguagesStore KnownLanguagesStore
+
+<FluentGrid Style="width:100%; align-items:center;">
+    <FluentGridItem xs="5" lg="5" Style="min-width:0;">
+        <FluentCombobox TOption="LanguageOption"
+                        Items="@Items"
+                        OptionText="@(i => i.Name)"
+                        SelectedOption="@SelectedFromOption"
+                        SelectedOptionChanged="OnFromSelectedChanged"
+                        Autocomplete="ComboboxAutocomplete.Inline"
+                        Style="width:100%; min-width:0;" />
+    </FluentGridItem>
+
+    <FluentGridItem xs="2" lg="2" Style="display:flex; justify-content:center;">
+        <FluentButton OnClick="OnReverse"
+                      IconEnd="@(new Icons.Regular.Size16.ArrowBidirectionalLeftRight())" />
+    </FluentGridItem>
+
+    <FluentGridItem xs="5" lg="5" Style="min-width:0;">
+        <FluentCombobox TOption="LanguageOption"
+                        Items="@Items"
+                        OptionText="@(i => i.Name)"
+                        SelectedOption="@SelectedToOption"
+                        SelectedOptionChanged="OnToSelectedChanged"
+                        Autocomplete="ComboboxAutocomplete.Inline"
+                        Style="width:100%; min-width:0;" />
+    </FluentGridItem>
+</FluentGrid>
+
+@code {
+
+    
+    [Parameter] public LanguagePair Pair { get; set; }
+    [Parameter] public EventCallback<LanguagePair> PairChanged { get; set; }
+    [Parameter] public EventCallback Reverse { get; set; }
+
+    [Parameter] public IEnumerable<LanguageOption>? Items { get; set; }
+    protected List<string> KnownLangs { get; set; } = new();
+
+    // IMPORTANT: must return an actual item from ItemsSafe
+    private LanguageOption SelectedToOption =>
+        Items.FirstOrDefault(x => x.Code == Pair.To.Code);
+
+    private LanguageOption SelectedFromOption =>
+        Items.FirstOrDefault(x => x.Code == Pair.From.Code);
+
+    private async Task OnToSelectedChanged(LanguageOption option)
+    {
+        // Defensive guard (struct default)
+        if (string.IsNullOrWhiteSpace(option.Code))
+            return;
+
+        Pair = Pair with { To = option };
+
+        if (PairChanged.HasDelegate)
+            await PairChanged.InvokeAsync(Pair);
+    }
+
+    private async Task OnFromSelectedChanged(LanguageOption option)
+    {
+        if (string.IsNullOrWhiteSpace(option.Code))
+            return;
+
+        Pair = Pair with { From = option };
+
+        if (PairChanged.HasDelegate)
+            await PairChanged.InvokeAsync(Pair);
+    }
+
+    private async Task OnReverse()
+    {
+        if (Reverse.HasDelegate)
+            await Reverse.InvokeAsync();
+    }
+
+}

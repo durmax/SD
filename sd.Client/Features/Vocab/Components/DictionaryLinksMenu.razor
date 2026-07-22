@@ -1,0 +1,41 @@
+﻿@using Microsoft.Extensions.Logging
+@using System.Threading.Tasks
+@using sd.Client.Contracts
+@using sd.Client.Features.Shared
+@using sd.Client.Helpers
+@using sd.Client.Services
+@using sd.Shared
+
+@inherits DictionaryLinksMenuBase
+
+<FluentButton Id="@WordDto.WordId"
+              Appearance="Appearance.Outline"
+              IconStart="@(new Icons.Regular.Size16.MoreHorizontal())"
+              OnClick="@(() => open = !open)" />
+
+<FluentMenu Anchor="@WordDto.WordId" UseMenuService="true" @bind-Open="open">
+    <div style="max-height:300px; overflow-y:auto; min-width:220px;">
+        <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+            @* Pair selector at the top of the menu *@
+            @if (LanguageOptions != null && Pair != null)
+            {
+                <div class="pl-2 pr-2 pb-2">
+                    <PairLanguagesSelector Items="LanguageOptions"
+                                           Pair="Pair"
+                                           PairChanged="OnPairChangedAsync"
+                                           Reverse="OnReverseAsync" />
+                </div>
+            }
+
+            @if (dictProviders != null)
+            {
+                @foreach (var dp in dictProviders)
+                {
+                    <FluentMenuItem OnClick="@(() => OpenLink(dp.Link))">
+                        <DictionaryProviderEntry Provider="dp" />
+                    </FluentMenuItem>
+                }
+            }
+        </FluentStack>
+    </div>
+</FluentMenu>

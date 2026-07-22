@@ -1,0 +1,307 @@
+﻿@using Microsoft.FluentUI.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Logging
+
+@inject ILogger<WordSearchField>? Logger
+@inject sd.Client.Services.ApiService ApiService
+@inject sd.Client.Services.CurrentUserService CurrentUser
+
+<FluentSearch Id="@Id"
+              Value="@Value"
+              ValueChanged="HandleValueChanged"
+              Immediate="true"
+              ImmediateDelay="@ImmediateDelay"
+              Appearance="@Appearance"
+              Placeholder="@Placeholder"
+              autocomplete="off"
+              style="@Style"
+              @ref="_search"
+              @onkeydown="OnKeyDown"
+              @onfocusin="HandleSearchFocus"
+              @attributes="AdditionalAttributes" />
+
+@if (!HideSuggestions)
+{
+    <FluentMenu Anchor="@Id"
+                UseMenuService="true"
+                @bind-Open="_suggestionsOpen">
+        <div style="max-width:500px; max-height:280px; overflow:auto;">
+            @if (_suggestions != null && _suggestions.Any())
+            {
+                @foreach (var s in _suggestions)
+                {
+                    if (s.IsSameWord)
+                    {
+                        <FluentMenuItem @key="@($"{s.IsSameWord}_{s.Text}_{s.WordId}")" OnClick="async () => { _suggestionsOpen = false; await SelectSameWordAsync(s.WordId!); }">
+                            <u class="text-primary">@s.Text</u>
+                        </FluentMenuItem>
+                    }
+                    else
+                    {
+                        <FluentMenuItem @key="@($"{s.IsSameWord}_{s.Text}_{s.WordId}")" OnClick="async () => { _suggestionsOpen = false; await SetValueFromSuggestionAsync(s.Text); }">
+                            @s.Text
+                        </FluentMenuItem>
+                    }
+                }
+            }
+        </div>
+    </FluentMenu>
+}
+
+@code {
+#nullable enable
+    private FluentSearch? _search;
+    private List<(string Text, string WordId)> _parsedSameWords = new();
+    private List<(string Text, string? WordId, bool IsSameWord)> _suggestions = new();
+    private bool _suggestionsOpen = false;
+    private System.Threading.CancellationTokenSource? _wordChangedCts;
+    private List<string>? _fetchedSameWords;
+    private bool loading = false;
+
+    // existing parameters (kept for backward compatibility)
+    [Parameter] public string Id { get; set; } = "wordId";
+    [Parameter] public string Style { get; set; } = "width: 100%;";
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public FluentInputAppearance Appearance { get; set; } = FluentInputAppearance.Outline;
+
+    /// <summary>
+    /// Delay (ms) before raising ValueChanged when Immediate=true.
+    /// Use 0 for "old" behavior (every keystroke, no debounce).
+    /// </summary>
+    [Parameter] public int ImmediateDelay { get; set; } = 0;
+
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+
+    /// <summary>
+    /// Raised on every input change (Immediate=true). This is your old WordChangedAsync.
+    /// </summary>
+    [Parameter] public EventCallback<string> OnInput { get; set; }
+
+    /// <summary>Raised on key down (Enter/Search/Go...). This is your old KeydownAsync.</summary>
+    [Parameter] public EventCallback<KeyboardEventArgs> OnKeyDown { get; set; }
+
+    /// <summary>List in the format "DisplayText:WordId" (your SameWords).</summary>
+    [Parameter] public IEnumerable<string>? SameWords { get; set; }
+
+    /// <summary>
+    /// Called when a SameWords item is clicked. Receives the part after ':' (WordId).
+    /// </summary>
+    [Parameter] public EventCallback<string> OnSelectSameWord { get; set; }
+
+    /// <summary>Hide the suggestion lists (SameWords).</summary>
+    [Parameter] public bool HideSuggestions { get; set; } = false;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    [Parameter] public Func<string, System.Threading.CancellationToken, Task<List<string>>>? GetSameWordsAsync { get; set; }
+    [Parameter] public bool IsUserAuthenticated { get; set; } = false;
+    [Parameter] public string? WordLang { get; set; }
+    [Parameter] public int WordChangedDebounceMs { get; set; } = 300;
+
+    private bool _showSuggestions => !HideSuggestions && !string.IsNullOrWhiteSpace(Value) && (_suggestions.Any());
+
+    private async Task HandleValueChanged(string? value)
+    {
+        Value = value;
+
+        if (ValueChanged.HasDelegate)
+            await ValueChanged.InvokeAsync(value);
+
+        if (OnInput.HasDelegate)
+            await OnInput.InvokeAsync(value ?? string.Empty);
+
+        // If fetch functions are provided, trigger component-local suggestion fetching.
+        if (GetSameWordsAsync != null || ApiService != null)
+        {
+            // use the current Value (title)
+            var title = Value ?? string.Empty;
+            _ = FetchSuggestionsDebouncedAsync(title); // fire-and-forget (debounced inside)
+        }
+        else
+        {
+            // If consumer provided SameWords as parameters, ensure UI updates
+            RebuildSuggestionsFromParameters();
+        }
+
+        // Ensure menu open state follows latest suggestions immediately during editing
+        _suggestionsOpen = _showSuggestions;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void RebuildSuggestionsFromParameters()
+    {
+        // prefer fetched lists if present, otherwise use passed-in parameters
+        var sameWordsSource = _fetchedSameWords ?? SameWords;
+
+        _parsedSameWords = (sameWordsSource ?? Enumerable.Empty<string>())
+            .Where(s => !string.IsNullOrWhiteSpace(s))
+            .Select(ParseSameWord)
+            .OrderBy(p => p.Text, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        _suggestions.Clear();
+        if (_parsedSameWords.Any())
+        {
+            _suggestions.AddRange(_parsedSameWords.Select(p => (p.Text, p.WordId, true)));
+        }
+        _suggestionsOpen = _showSuggestions;
+    }
+
+    private async Task FetchSuggestionsDebouncedAsync(string title)
+    {
+        // if input too short, clear
+        if (string.IsNullOrWhiteSpace(title) || title.Length <= 2)
+        {
+            _wordChangedCts?.Cancel();
+            _wordChangedCts?.Dispose();
+            _wordChangedCts = null;
+
+            _fetchedSameWords = null;
+            RebuildSuggestionsFromParameters();
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        // debounce + cancellation
+        _wordChangedCts?.Cancel();
+        _wordChangedCts?.Dispose();
+        _wordChangedCts = new System.Threading.CancellationTokenSource();
+        var ct = _wordChangedCts.Token;
+
+        try
+        {
+            await Task.Delay(WordChangedDebounceMs, ct);
+        }
+        catch (OperationCanceledException)
+        {
+            // cancelled by new input
+            return;
+        }
+
+        loading = true;
+        await InvokeAsync(StateHasChanged);
+
+        Task<List<string>>? sameWordsTask = null;
+
+        try
+        {
+            // SameWords: prefer delegate, otherwise call API if user is authenticated
+            if (GetSameWordsAsync != null)
+            {
+                try
+                {
+                    sameWordsTask = GetSameWordsAsync(title, ct);
+                }
+                catch (Exception ex)
+                {
+                    Logger?.LogError(ex, "GetSameWordsAsync invocation failed");
+                    sameWordsTask = Task.FromResult(new List<string>());
+                }
+            }
+            else if (CurrentUser?.IsAuthenticated == true)
+            {
+                try
+                {
+                    sameWordsTask = ApiService.GetAsync<List<string>>($"api/Word/GetWordsContainText/{title}", ct);
+                }
+                catch (Exception ex)
+                {
+                    Logger?.LogError(ex, "ApiService GetWordsContainText invocation failed");
+                    sameWordsTask = Task.FromResult(new List<string>());
+                }
+            }
+
+            if (sameWordsTask != null)
+            {
+                try
+                {
+                    _fetchedSameWords = await sameWordsTask;
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Logger?.LogError(ex, "Failed to load SameWords (component)");
+                    _fetchedSameWords = null;
+                }
+            }
+
+            RebuildSuggestionsFromParameters();
+
+            // ensure menu reflects new suggestions
+            // If the menu is currently open, briefly close and reopen it so the FluentMenu overlay refreshes.
+            if (_suggestionsOpen)
+            {
+                _suggestionsOpen = false;
+                await InvokeAsync(StateHasChanged);
+                // allow the renderer / menu service to process the close before reopening
+                await Task.Yield();
+                _suggestionsOpen = _showSuggestions;
+                await InvokeAsync(StateHasChanged);
+            }
+            else
+            {
+                _suggestionsOpen = _showSuggestions;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        finally
+        {
+            loading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task SelectSameWordAsync(string wordId)
+    {
+        if (OnSelectSameWord.HasDelegate && !string.IsNullOrWhiteSpace(wordId))
+            await OnSelectSameWord.InvokeAsync(wordId);
+    }
+
+    private async Task SetValueFromSuggestionAsync(string value)
+    {
+        // Clicking a suggestion should behave like typing it:
+        // update Value + raise callbacks
+        await HandleValueChanged(value);
+    }
+
+    private static (string Text, string WordId) ParseSameWord(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return (string.Empty, string.Empty);
+
+        var parts = input.Split(':', 2, StringSplitOptions.TrimEntries);
+        var text = parts.Length > 0 ? parts[0] : input;
+        var id = parts.Length > 1 ? parts[1] : parts[0];
+
+        return (text, id);
+    }
+
+    private async Task HandleSearchFocus(FocusEventArgs _)
+    {
+        _suggestionsOpen = _showSuggestions;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        // If consumer provided server-side lists and this component is not fetching, build suggestions from those.
+        if (GetSameWordsAsync == null)
+        {
+            RebuildSuggestionsFromParameters();
+        }
+        // otherwise, keep fetched lists and let FetchSuggestionsDebouncedAsync manage _suggestions.
+    }
+
+    public void Dispose()
+    {
+        _wordChangedCts?.Cancel();
+        _wordChangedCts?.Dispose();
+    }
+}

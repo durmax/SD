@@ -1,0 +1,44 @@
+﻿@inject ILanguageContainerService languageContainer
+@inherits CommentBase
+
+@if (CommentModel != null)
+{
+    <div class="ml-2 mr-2">
+        <div class="card mb-2">
+            <div class="text-muted pl-1">
+                <i class="bg-light">@note</i>
+            </div>
+            <div class="card-title pb-0">
+                @if (loading)
+                {
+                    <button type="button" class="btn btn-light">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </button>
+                }
+                @if (CommentModel.CommentId != null)
+                {
+                    <a type="button" class="btn btn-link"
+                       href="Words/@CommentModel.UserId/@CommentModel.CommentOwnerName">@CommentModel.CommentOwnerName</a>
+                    <lable> form @DateTime.Now.Subtract(CommentModel.CreatedAt).Days day </lable>
+                }
+                <button type="button" style="float:right" class="btn btn-link bg-transparent" @onclick="@(async () => await RemoveComment())">
+                    <FluentIcon Value="@(new Icons.Regular.Size24.CommentDismiss())" />
+                </button>
+            </div>
+            <div class="card-body p-2">
+                <textarea @oninput="@(()=> {IsChanged=true;})" class="form-control text-wrap"
+                          rows="@Rows"
+                          @bind-value="@MyText"
+                          @bind-value:event="onchange">@MyText </textarea>
+            </div>
+            @if (IsChanged)
+            {
+                <button type="button" class="btn btn-link bg-transparent" @onclick="@SaveComment">
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Save())" /> <lable class="pl-1">@languageContainer?["Save"]</lable>
+                </button>
+            }
+        </div>
+    </div>
+}

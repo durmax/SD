@@ -1,0 +1,83 @@
+﻿@page  "/Friends"
+@inject ILanguageContainerService languageContainer
+@inherits FriendsBase
+
+<div class="text-muted pl-1 @InfoDisplayClass">
+    <i class="bg-light">@Info</i>
+</div>
+
+<div class="input-group pt-1">
+    <input type="search" class="form-control" placeholder=@languageContainer?["FindUser"]
+           @onchange="@(async(e)=> {await SearchUser((string)e.Value);})" />
+
+    <div class="input-group-append">
+        <button class="btn btn-outline-secondary bg-white text-dark">
+            <i class="oi oi-magnifying-glass"></i>
+        </button>
+    </div>
+</div>
+
+<div class="@SearchDisplayClass">
+    @if (FoundUsers == null)
+    {
+        <div class="d-flex justify-content-center p-1">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body">
+                <div class="container">
+                    @foreach (var user in FoundUsers)
+                    {
+                        <Friendship FriendId="@user.UserId" FriendName="@user.RelationalUserName" Relationship=user.Relation></Friendship>
+                    }
+                    @if (SendFriendReqWait)
+                    {
+                        <div class="d-flex justify-content-center p-1">
+                            <div class="spinner-border" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<AuthorizeView>
+    <Authorized>
+        @if (FriendsCount == null)
+        {
+            <div class="d-flex justify-content-center p-1">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card pt-1">
+                <div class="card-header"> <a href="Friends"> @languageContainer?["YouHave"] <span class="badge badge-primary">@FriendsCount</span> @languageContainer?["Friends"]</a></div>
+
+                @if (FriendsDictionary != null)
+                {
+                    <div class="card-body">
+                        <div class="container">
+                            @foreach (var foudUser in FriendsDictionary)
+                            {
+                                <Friendship FriendId="@foudUser.Key" FriendName="@foudUser.Value" Relationship=sd.Shared.Relation.Friend></Friendship>
+                            }
+
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </Authorized>
+</AuthorizeView>
+

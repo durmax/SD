@@ -1,0 +1,38 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+
+@inject ILanguageContainerService languageContainer
+@inject NavigationManager Navigation
+@inject SignOutSessionStateManager SignOutManager
+
+<AuthorizeView>
+    <Authorized Context="authContext">
+        @{
+            var userName =
+            authContext.User?.Identity?.Name
+            ?? authContext.User?.FindFirst("name")?.Value
+            ?? authContext.User?.FindFirst("preferred_username")?.Value
+            ?? authContext.User?.FindFirst("email")?.Value
+            ?? "User";
+        }
+
+        @languageContainer?["Hello"], @userName
+
+        <button class="nav-link btn btn-link" @onclick="BeginLogout">
+            @languageContainer?["LogOut"]
+        </button>
+    </Authorized>
+
+    <NotAuthorized>
+        <a href="authentication/login">@languageContainer?["LogIn"]</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private async Task BeginLogout(MouseEventArgs args)
+    {
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
+    }
+}

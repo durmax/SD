@@ -1,0 +1,45 @@
+﻿@page  "/User"
+
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILanguageContainerService languageContainer
+
+@inherits UserRegisterBase
+
+<div class="alert alert-primary @InfoDisplayClass" role="alert">
+    @Info
+</div>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="card p-0">
+            @*<EditForm Model="@userModel" OnValidSubmit="UserData">
+                <DataAnnotationsValidator />
+                <ValidationSummary />*@
+
+            <div class="card-header">
+                <p>@languageContainer?["MyProfile"]</p>
+            </div>
+            <div class="card-body">
+
+                <div class="col-sm-10">
+                    <input class="form-control" placeholder="Nick Name"
+                           @bind="userModel.Name" />
+                </div>
+
+                <div class="col-sm-10">
+                    <p class="form-control"> @userModel.Email </p>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-outline-primary" @onclick="SaveUserData"><i class="fa fa-save"></i> @languageContainer?["Save"]</button>
+                </div>
+            </div>
+
+            @* <div class="card-header"> <a href="Friends"> @languageContainer?["YouHave"] <span class="badge badge-primary">@FriendsCount</span> @languageContainer?["Friends"]</a></div>*@
+
+        </div>
+    </Authorized>
+</AuthorizeView>

@@ -1,0 +1,123 @@
+﻿@page "/Settings"
+@inherits SettingsBase
+@using sd.Client.Contracts
+@using sd.Client.Features.Shared
+@using sd.Client.Features.Settings.Components
+@using sd.Client.Helpers
+@using sd.Client.Models
+@using sd.Client.Pages
+@inject ILanguageContainerService languageContainer
+
+
+<FluentCard Class="lang-card">
+    <!-- Header -->
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="4" Class="lang-header">
+        <h5>Languages</h5>
+        <p>Choose your UI language, select your learning languages, and manage translation resources.</p>
+    </FluentStack>
+
+    <!-- Main content -->
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="6">
+
+        <FluentCard AreaRestricted="false">
+
+            <h6>Languages</h6>
+            <KnownLanguagesPicker Label="@languageContainer?["AddLang"]"
+                                  Placeholder="@languageContainer?["AddLang"]"
+                                  Width="100%"
+                                  OnOptionsSearch="OnSearchAsync"
+                                  SelectedOptions="SelectedItems"
+                                  SelectedOptionsChanged="OnKnownLangChanged" />
+
+        </FluentCard>
+
+
+        <!-- Section: Display -->
+
+        <FluentCard AreaRestricted="false">
+            <h6>Display</h6>
+
+            <FluentCombobox TOption="LanguageOption"
+                            Items="UiLangItems"
+                            Label="UI Language"
+                            OptionText="@(i => i.Name)"
+                            OptionValue="@(i => i.Code)"
+                            SelectedOption="@SelectedUILang"
+                            SelectedOptionChanged="@OnUILangChanged"
+                            Autocomplete="ComboboxAutocomplete.Inline" />
+        </FluentCard>
+
+
+        <!-- Section: Dictionaries -->
+        <FluentCard AreaRestricted="true">
+            <h6>Dictionaries</h6>
+            <p>Drag the handle to reorder.</p> <p>Click the star to set a favorite.</p>
+
+            <Dictionaries DictionaryProviders="dictionaryProviders"
+                                 SelectedItems="SelectedItems"
+                                 ActivePair="ActivePair"
+                                 FavSite="FavSite"
+                                 SetFavSiteAsync="SetFavSiteAsync"
+                                 PairChanged="OnActivePairChanged"
+                                 Reverse="Reverse"
+                                 SortListAsync="SortListAsync"
+                                 RemoveItemAsync="RemoveItemAsync" />
+
+        </FluentCard>
+
+
+        <!-- Danger zone -->
+
+        <FluentCard>
+            <FluentStack Orientation="Orientation.Vertical" HorizontalGap="8">
+                <h6>Reset</h6>
+                <p>These actions affect stored data and cannot be undone.</p>
+
+                <FluentStack Orientation="Orientation.Horizontal" VerticalGap="2">
+                    <p>Clears all saved settings, resources, and favorites.</p>
+                    <FluentButton Appearance="Appearance.Accent"
+                                  Style="margin-left: auto;"
+                                  BackgroundColor="Red"
+                                  OnClick="() => isRemoveAllDialogHidden = false">
+                        Remove
+                    </FluentButton>
+                </FluentStack>
+
+                <FluentStack Orientation="Orientation.Horizontal" VerticalGap="2">
+                    <p>Only for active pair: @ActivePair.From.Code → @ActivePair.To.Code</p>
+                    <FluentButton Appearance="Appearance.Outline"
+                                  Style="margin-left: auto;"
+                                  OnClick="() => isResetDialogHidden = false">
+                        Reset resources
+                    </FluentButton>
+                </FluentStack>
+
+            </FluentStack>
+
+        </FluentCard>
+
+    </FluentStack>
+
+</FluentCard>
+
+
+<!-- Confirm dialogs -->
+<ConfirmDialog @bind-Hidden="isResetDialogHidden"
+               Title="Reset resources for this pair?"
+               ConfirmText="Reset"
+               OnConfirm="ResetOPAsync">
+    <Body>
+        This will reset the resource order and settings for
+        <b>@ActivePair.From.Code → @ActivePair.To.Code</b>.
+    </Body>
+</ConfirmDialog>
+
+<ConfirmDialog @bind-Hidden="isRemoveAllDialogHidden"
+               Title="Remove all stored data?"
+               ConfirmText="Remove"
+               ConfirmBackgroundColor="Red"
+               OnConfirm="RemoveAllDataAsync">
+    <Body>
+        This action cannot be undone.
+    </Body>
+</ConfirmDialog>

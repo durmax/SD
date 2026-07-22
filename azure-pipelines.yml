@@ -1,0 +1,52 @@
+# Simplest: build & deploy .NET 8 Web API to Azure Web App (single stage)
+trigger:
+- work
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  azureSubscription: 'sdServiceConnection'
+  webAppName: 'sdApi20200529140234'
+  buildConfiguration: 'Release'
+
+steps:
+# Ensures the agent has the exact .NET SDK version project needs.
+- task: UseDotNet@2
+  displayName: 'Use .NET SDK 8.x'
+  inputs:
+    packageType: 'sdk'
+    version: '8.0.x'
+
+# Restores NuGet packages for solution.
+- task: DotNetCoreCLI@2
+  displayName: 'Restore'
+  inputs:
+    command: 'restore'
+    projects: 'sd.Api/sd.Api.csproj'    #projects: '**/*.sln'
+
+# Compiles code into binaries.
+- task: DotNetCoreCLI@2
+  displayName: 'Build sd.Api'
+  inputs:
+    command: 'build'
+    projects: 'sd.Api/sd.Api.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-restore' # --no-restore avoids repeating restore work.
+
+# Produces a ready-to-run folder for deployment (app dlls, static files, web.config if Windows, etc.).
+- task: DotNetCoreCLI@2
+  displayName: 'Publish sd.Api'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'sd.Api/sd.Api.csproj'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: true # create sd.Api.zip
+
+# Pushes the published zip to your Azure Web App using Zip Deploy
+- task: AzureWebApp@1
+  displayName: 'Deploy to Azure Web App'
+  inputs:
+    azureSubscription: '$(azureSubscription)'
+    appName: '$(webAppName)'
+    package: '$(Build.ArtifactStagingDirectory)/sd.Api.zip'

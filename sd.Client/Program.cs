@@ -1,0 +1,83 @@
+using AKSoftware.Localization.MultiLanguages;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.FluentUI.AspNetCore.Components;
+using sd.Client;
+using sd.Client.Features.Settings.State;
+using sd.Client.Features.Vocab.Api;
+using sd.Client.Features.Vocab.State;
+using sd.Client.LoggerProvider;
+using sd.Client.Models;
+using sd.Client.Services;
+using System;
+using System.Globalization;
+using System.Reflection;
+
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("app");
+
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+
+builder.Services.AddSingleton(new InMemoryLogStore(capacity: 1000));
+builder.Logging.AddProvider(new InMemoryLoggerProvider(
+    builder.Services.BuildServiceProvider().GetRequiredService<InMemoryLogStore>()));
+
+builder.Services.AddScoped<LocalStorageAccessor>();
+
+// Add configured HttpClient with AuthorizationMessageHandler
+builder.Services.AddHttpClient("forAuthenticatedUser", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiUrl"]); // "ApiUrl:Prod" or "ApiUrl:Dev"
+}).AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizationMessageHandler>()
+                                     .ConfigureHandler(
+                                                        authorizedUrls: new[] { builder.Configuration["ApiUrl"] },
+                                                        scopes: new[] { builder.Configuration["AzureAd:Scope"] }
+                                                        ));
+
+// Add configured HttpClient without AuthorizationMessageHandler
+builder.Services.AddHttpClient("forNotAuthenticatedUser", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiUrl"]); // "ApiUrl:Prod" or "ApiUrl:Dev"
+});
+
+
+builder.Services.AddMsalAuthentication(options =>
+{
+    builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
+    options.ProviderOptions.DefaultAccessTokenScopes.Add(builder.Configuration["AzureAd:Scope"]);
+    options.ProviderOptions.LoginMode = "redirect";
+    options.ProviderOptions.Cache.CacheLocation = "localStorage"; // remove this option to use Session storage.
+});
+
+builder.Services.AddFluentUIComponents();
+
+builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
+
+builder.Services.AddScoped<CurrentUserService>();
+builder.Services.AddScoped<ApiService>();
+
+builder.Services.AddScoped<KnownLangsService>();
+builder.Services.AddScoped<UserPreferencesService>();
+
+
+builder.Services.AddScoped<LinkModel>();
+builder.Services.AddScoped<DictionaryLinksService>();
+
+builder.Services.AddSingleton<WordDtosState>();
+
+builder.Services.AddScoped<VocabApiClient>();
+builder.Services.AddScoped<VocabStore>();
+
+builder.Services.AddScoped<IKnownLanguagesStore, KnownLanguagesStore>();
+
+var host = builder.Build();
+
+var languageContainer =
+    host.Services.GetRequiredService<ILanguageContainerService>();
+
+languageContainer.SetLanguage(CultureInfo.GetCultureInfo("en-US"));
+
+await host.RunAsync();

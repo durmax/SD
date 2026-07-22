@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  api:
+    container_name: ${API_CONTAINER_NAME}
+    build:
+      context: .
+      dockerfile: sd.Api/Dockerfile
+      target: final
+      args:
+        BUILD_CONFIGURATION: ${BUILD_CONFIGURATION}
+    environment:
+      ASPNETCORE_URLS: ${ASPNETCORE_URLS}
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ENABLE_SWAGGER: ${ENABLE_SWAGGER}
+    ports:
+      - "8080:8080"
+    networks:
+      - sdnet
+
+  client:
+    container_name: ${CLIENT_CONTAINER_NAME}
+    build:
+      context: .
+      dockerfile: sd.Client/Dockerfile
+      args:
+       BUILD_CONFIGURATION: ${BUILD_CONFIGURATION}
+       BLAZOR_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+    ports:
+      - "8085:80"
+    depends_on:
+      - api
+    networks:
+      - sdnet
+
+networks:
+  sdnet:

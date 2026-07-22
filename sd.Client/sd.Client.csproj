@@ -1,0 +1,66 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Version>2.2.3</Version>
+		<RazorLangVersion>3.0</RazorLangVersion>
+		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="Features\Language\**" />
+	  <Content Remove="Features\Language\**" />
+	  <EmbeddedResource Remove="Features\Language\**" />
+	  <None Remove="Features\Language\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\ar-SY.yml">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\de-DE.yml">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\en-US.yml">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\es-ES.yml">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\fa-IR.yml">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\fr-FR.yml">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\it-IT.yml">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\pt-PT.yml">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\ru-RU.yml">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\tr-TR.yml">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AKSoftware.Localization.MultiLanguages" Version="6.0.1" />
+		<PackageReference Include="Blazored.Typeahead" Version="4.7.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.2" />
+		<PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="10.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.2" />
+		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.13.2" />
+		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.13.2" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="Blazored.TextEditor" Version="1.1.3" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\sd.Shared\sd.Shared.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Features\Vocab\Contracts\" />
+	  <Folder Include="Features\Vocab\Mapping\" />
+	  <Folder Include="SharedUI\" />
+	</ItemGroup>
+</Project>

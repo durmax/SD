@@ -1,0 +1,32 @@
+﻿using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace sd.Shared
+{
+    public class RelationshipModel
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.String)]
+        public string RelationshipId { get; set; }
+        public string UserId1 { get; set; }
+
+        [Required]
+        public Relation Relation { get; set; }
+
+        public bool Follow { get; set; }
+        public bool Block { get; set; }
+
+        [Required]
+        public string UserId2 { get; set; }
+    }
+
+    public enum Relation
+    {
+        None,
+        FriendRequestTo,
+        FriendRequestFrom,
+        Friend
+    }
+
+}

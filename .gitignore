@@ -1,0 +1,44 @@
+# Visual Studio / .NET
+.vs/
+bin/
+obj/
+[Bb]uild/
+TestResults/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+project.fragments.lock.json
+
+# Logs, temp
+*.log
+*.tmp
+*.temp
+*.cache
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Node, tools
+node_modules/
+bower_components/
+
+# Visual Studio Code
+.vscode/
+
+# User secrets / local settings
+secrets.json
+appsettings.Development.json
+local.settings.json

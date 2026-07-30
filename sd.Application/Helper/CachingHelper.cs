@@ -11,9 +11,9 @@ namespace sd.Application.Helper
             _cache = cache;
         }
 
-        public T SetValue<T>(string key, T input)
+        public T? SetValue<T>(string key, T input)
         {
-            if (!_cache.TryGetValue(key, out T result))
+            if (!_cache.TryGetValue(key, out T? result))
             {
                 result = input;
 
@@ -27,9 +27,9 @@ namespace sd.Application.Helper
             return result;
         }
 
-        public T GetValue<T>(string key)
+        public T? GetValue<T>(string key)
         {
-            return _cache.TryGetValue(key, out T value) ? value : default(T);
+            return _cache.TryGetValue(key, out T? value) ? value : default;
         }
     }
 }

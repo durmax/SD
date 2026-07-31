@@ -23,14 +23,21 @@ builder.Services.Configure<MongodbSettings>(builder.Configuration.GetSection(nam
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
 
-builder.Services.Configure<JwtBearerOptions>(
-    JwtBearerDefaults.AuthenticationScheme, options =>
-    {
-        options.TokenValidationParameters.NameClaimType = "name";
-    });
+const string TestAuthScheme = "Test";
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+if (!builder.Environment.IsEnvironment("IntegrationTests"))
+{
+    builder.Services.Configure<JwtBearerOptions>(
+        JwtBearerDefaults.AuthenticationScheme, options =>
+        {
+            options.TokenValidationParameters.NameClaimType = "name";
+        });
+
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+}
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddDataProtection();
 
@@ -92,9 +99,9 @@ app.UseCors(builder =>
            .AllowCredentials();
 });
 
+// Temporary disable exception middleware to reveal the real startup error.
+// app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
@@ -108,3 +115,8 @@ app.UseSwaggerUI();
 app.MapHealthChecks("/healthz");
 
 await app.RunAsync();
+
+namespace sd.Api
+{
+    public partial class Program { }
+}

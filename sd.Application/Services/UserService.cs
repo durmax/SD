@@ -46,18 +46,17 @@ namespace sd.Application.Services
         {
             var result = await _userRepository.GetByCondition(u => u.Email == email);
 
-            if (result?.First() != null)
+            if (result != null && result.Any())
                 return result.First();
-            else
-            {
-                UserModel userModel = new UserModel();
-                userModel.UserId = Guid.NewGuid().ToString();
-                userModel.CreatedAt = DateTime.Now;
 
-                await _userRepository.Create(userModel);
-                var res = await GetByCondition(u => u.Email == userModel.Email);
-                return res.First();
-            }
+            UserModel userModel = new UserModel();
+            userModel.UserId = Guid.NewGuid().ToString();
+            userModel.Email = email;
+            userModel.CreatedAt = DateTime.Now;
+
+            await _userRepository.Create(userModel);
+            var res = await GetByCondition(u => u.Email == email);
+            return res.FirstOrDefault();
         }
 
         public async Task<bool> Update(UserModel newVer)

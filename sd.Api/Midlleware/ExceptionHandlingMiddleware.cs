@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using System;
+using System.Text.Json;
 
 namespace sd.Api.Midlleware
 {
@@ -29,7 +30,8 @@ namespace sd.Api.Midlleware
                 context.Response.ContentType = "application/json";
 
                 var response = new { message = "An API internal server error occurred.", details = ex.Message };
-                await context.Response.WriteAsJsonAsync(response);
+                var payload = JsonSerializer.Serialize(response);
+                await context.Response.WriteAsync(payload);
             }
         }
     }
